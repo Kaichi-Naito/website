@@ -47,11 +47,13 @@
             justify-content: center;
             gap: 15px;
             margin-top: 20px;
+            flex-wrap: wrap; /* アイコンを折り返す */
         }
         .social-icons a {
             text-align: center;
             color: white; /* テキストの色を白に設定 */
             text-decoration: none;
+            flex-basis: 33%; /* 各アイコンの幅を均等に分ける */
         }
         .social-icons a:visited {
             color: white; /* 訪問済みリンクの色も白に */
@@ -67,19 +69,16 @@
         /* スマホ用のスタイル */
         @media (max-width: 600px) {
             .nav {
-                flex-direction: column; /* 縦並びに変更 */
-                gap: 10px;
+                flex-wrap: wrap; /* 折り返しを許可 */
+                justify-content: center; /* 中央に揃える */
             }
             .nav a {
+                flex-basis: 33%; /* 各リンクの幅を均等に分ける */
                 font-size: 16px; /* フォントサイズを少し小さく */
             }
             .profile-img {
                 width: 120px; /* サイズを小さく */
                 height: 120px; /* サイズを小さく */
-            }
-            .social-icons {
-                flex-direction: column; /* 縦並びに変更 */
-                gap: 10px;
             }
             .social-icons img {
                 max-width: 50px; /* 最大幅を50pxに設定 */
@@ -105,7 +104,7 @@
     </div>
     <div class="content">
         <div class="social-icons">
-            <a href="#"><img src="images/X_logo-white.png" alt="Twitter"><div>Twitter</div></a>
+            <a href="#"><img src="images/X_logo-white.png" alt="Twitter"><div>X(Twitter)</div></a>
             <a href="#"><img src="images/instagram_white_logo.png" alt="Instagram"><div>Instagram</div></a>
             <a href="#"><img src="images/Youtube_white_logo.png" alt="YouTube"><div>YouTube</div></a>
             <a href="#"><img src="images/bilibili-icon.png" alt="BiliBili"><div>BiliBili</div></a>
