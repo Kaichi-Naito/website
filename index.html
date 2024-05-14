@@ -69,7 +69,7 @@
 		@media (max-width: 600px) {
 		    .nav {
 		        flex-wrap: wrap; /* 折り返しを許可 */
-		        justify-content: center; /* 中央に揃える */
+		        justify-content: center; /* 中央揃え */
 		    }
 		    .nav a {
 		        flex-basis: 33%; /* 各リンクの幅を均等に分ける */
@@ -80,8 +80,11 @@
 		        height: 120px; /* サイズを小さく */
 		    }
 		    .social-icons {
-		        flex-direction: column; /* 縦並びに変更 */
-		        align-items: center; /* 中央揃え */
+		        flex-wrap: wrap; /* 折り返しを許可 */
+		        gap: 10px; /* アイコン間のスペースを調整 */
+		    }
+		    .social-icons a {
+		        flex-basis: 45%; /* 2列にするための幅設定 */
 		    }
 		    .social-icons img {
 		        max-width: 50px; /* 最大幅を50pxに設定 */
