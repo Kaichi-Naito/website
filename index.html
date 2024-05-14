@@ -88,8 +88,10 @@
         /* スマホ用のスタイル */
         @media (max-width: 600px) {
             .nav {
-                flex-wrap: wrap; /* 折り返しを許可 */
-                justify-content: center; /* 中央揃え */
+                display: grid; /* グリッドレイアウトに変更 */
+                grid-template-columns: repeat(3, 1fr); /* 3列に設定 */
+                gap: 10px; /* アイコン間のスペースを調整 */
+                justify-items: center; /* 中央揃え */
             }
             .nav a {
                 flex-basis: 33%; /* 各リンクの幅を均等に分ける */
