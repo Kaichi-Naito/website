@@ -14,11 +14,11 @@
 		    color: white;
 		    text-align: center;
 		    position: relative; /* 擬似要素のために必要 */
-		    overflow: hidden; /* 擬似要素のために必要 */
+		    height: 100%; /* 背景全体をカバー */
 		}
 			 body::before {
 		         content: "";
-		         position: absolute;
+		         position: fixed; /* 固定位置に変更 */
 		         top: 0;
 		         left: 0;
 		         width: 100%;
@@ -26,6 +26,10 @@
 		         background-color: rgba(0, 0, 0, 0.3); /* 透明度70%の黒 */
 		         z-index: -1; /* 背景の下に配置 */
         }
+	    .header, .content {
+		    position: relative;
+		    z-index: 1; /* コンテンツを擬似要素の上に配置 */
+	    }
 		.header {
 		    padding: 20px;
 		}
