@@ -100,11 +100,13 @@
                 height: 120px; /* サイズを小さく */
             }
             .social-icons {
-                flex-wrap: wrap; /* 折り返しを許可 */
+                display: grid; /* グリッドレイアウトに変更 */
+                grid-template-columns: repeat(3, 1fr); /* 3列に設定 */
                 gap: 10px; /* アイコン間のスペースを調整 */
+                justify-items: center; /* 中央揃え */
             }
             .social-icons a {
-                flex-basis: 50%; /* 2列にするための幅設定 */
+                width: 100%; /* アイコンの幅を100%に設定 */
             }
             .social-icons img {
                 max-width: 50px; /* 最大幅を50pxに設定 */
