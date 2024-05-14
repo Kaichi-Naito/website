@@ -6,112 +6,114 @@
     <title>Kaichi Guitar Music</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <style>
-		/* PC用のスタイル（デフォルト） */
-		body {
-		    background: url('https://kaichi-naito.github.io/website/images/8bit_town.gif') no-repeat center center fixed; /* 背景にGIFを設定 */
-		    background-size: cover; /* 背景をカバーする */
-		    font-family: 'Noto Sans JP', sans-serif;
-		    color: white;
-		    text-align: center;
-		    position: relative; /* 擬似要素のために必要 */
-		    height: 100%; /* 背景全体をカバー */
-		}
-			 body::before {
-		         content: "";
-		         position: fixed; /* 固定位置に変更 */
-		         top: 0;
-		         left: 0;
-		         width: 100%;
-		         height: 100%;
-		         background-color: rgba(0, 0, 0, 0.3); /* 透明度70%の黒 */
-		         z-index: -1; /* 背景の下に配置 */
+        /* PC用のスタイル（デフォルト） */
+        body {
+            background: url('https://kaichi-naito.github.io/website/images/8bit_town.gif') no-repeat center center fixed; /* 背景にGIFを設定 */
+            background-size: cover; /* 背景をカバーする */
+            font-family: 'Noto Sans JP', sans-serif;
+            color: white;
+            text-align: center;
+            position: relative; /* 擬似要素のために必要 */
+            height: 100%; /* 背景全体をカバー */
         }
-	    .header, .content {
-		    position: relative;
-		    z-index: 1; /* コンテンツを擬似要素の上に配置 */
-	    }
-		.header {
-		    padding: 20px;
-		}
-		.nav {
-		    display: flex;
-		    justify-content: center;
-		    gap: 20px;
-		    margin-bottom: 20px;
-		}
-		.nav a, .nav a:visited {
-		    color: white;
-		    text-decoration: none;
-		    font-size: 18px;
-		}
-		.nav a:hover {
-		    text-decoration: underline;
-		}
-		.content {
-		    max-width: 600px;
-		    margin: auto;
-		}
-		.profile-img {
-		    width: 150px;
-		    height: 150px;
-		    border-radius: 50%;
-		    border: 2px solid white;
-		    margin-top: 20px;
-		    margin-bottom: 20px;
-		}
-		.social-icons {
-		    display: flex;
-		    justify-content: center;
-		    gap: 15px;
-		    margin-top: 20px;
-		}
-		.social-icons a {
-		    text-align: center;
-		    color: white; /* テキストの色を白に設定 */
-		    text-decoration: none;
-		    flex-basis: auto; /* 自動幅 */
-		}
-		.social-icons a:visited {
-		    color: white; /* 訪問済みリンクの色も白に */
-		}
-		.social-icons img {
-		    max-width: 60px; /* 最大幅を60pxに設定 */
-		    max-height: 60px; /* 最大高さを60pxに設定 */
-		    width: auto; /* 元のアスペクト比を保持 */
-		    height: auto; /* 元のアスペクト比を保持 */
-		    margin-bottom: 5px; /* テキストとの間隔を設定 */
-		}
 
-		/* スマホ用のスタイル */
-		@media (max-width: 600px) {
-		    .nav {
-		        flex-wrap: wrap; /* 折り返しを許可 */
-		        justify-content: center; /* 中央揃え */
-		    }
-		    .nav a {
-		        flex-basis: 33%; /* 各リンクの幅を均等に分ける */
-		        font-size: 16px; /* フォントサイズを少し小さく */
-		    }
-		    .profile-img {
-		        width: 120px; /* サイズを小さく */
-		        height: 120px; /* サイズを小さく */
-		    }
-		    .social-icons {
-		        flex-wrap: wrap; /* 折り返しを許可 */
-		        gap: 10px; /* アイコン間のスペースを調整 */
-		    }
-		    .social-icons a {
-		        flex-basis: 45%; /* 2列にするための幅設定 */
-		    }
-		    .social-icons img {
-		        max-width: 50px; /* 最大幅を50pxに設定 */
-		        max-height: 50px; /* 最大高さを50pxに設定 */
-		    }
-		    .content {
-		        padding: 0 10px; /* 余白を追加 */
-		    }
-		}
+        body::before {
+            content: "";
+            position: fixed; /* 固定位置に変更 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3); /* 透明度70%の黒 */
+            z-index: -1; /* 背景の上に配置 */
+        }
 
+        .header, .content {
+            position: relative;
+            z-index: 1; /* コンテンツを擬似要素の上に配置 */
+        }
+
+        .header {
+            padding: 20px;
+        }
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .nav a, .nav a:visited {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .nav a:hover {
+            text-decoration: underline;
+        }
+        .content {
+            max-width: 600px;
+            margin: auto;
+        }
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 2px solid white;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .social-icons a {
+            text-align: center;
+            color: white; /* テキストの色を白に設定 */
+            text-decoration: none;
+            flex-basis: auto; /* 自動幅 */
+        }
+        .social-icons a:visited {
+            color: white; /* 訪問済みリンクの色も白に */
+        }
+        .social-icons img {
+            max-width: 60px; /* 最大幅を60pxに設定 */
+            max-height: 60px; /* 最大高さを60pxに設定 */
+            width: auto; /* 元のアスペクト比を保持 */
+            height: auto; /* 元のアスペクト比を保持 */
+            margin-bottom: 5px; /* テキストとの間隔を設定 */
+        }
+
+        /* スマホ用のスタイル */
+        @media (max-width: 600px) {
+            .nav {
+                flex-wrap: wrap; /* 折り返しを許可 */
+                justify-content: center; /* 中央揃え */
+            }
+            .nav a {
+                flex-basis: 33%; /* 各リンクの幅を均等に分ける */
+                font-size: 16px; /* フォントサイズを少し小さく */
+            }
+            .profile-img {
+                width: 120px; /* サイズを小さく */
+                height: 120px; /* サイズを小さく */
+            }
+            .social-icons {
+                flex-wrap: wrap; /* 折り返しを許可 */
+                gap: 10px; /* アイコン間のスペースを調整 */
+            }
+            .social-icons a {
+                flex-basis: 50%; /* 2列にするための幅設定 */
+            }
+            .social-icons img {
+                max-width: 50px; /* 最大幅を50pxに設定 */
+                max-height: 50px; /* 最大高さを50pxに設定 */
+            }
+            .content {
+                padding: 0 10px; /* 余白を追加 */
+            }
+        }
     </style>
 </head>
 <body>
