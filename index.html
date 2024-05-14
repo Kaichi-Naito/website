@@ -8,12 +8,24 @@
     <style>
 		/* PC用のスタイル（デフォルト） */
 		body {
-		    background: url('https://kaichi-naito.github.io/website/images/8bit_town_v2.gif') no-repeat center center fixed; /* 背景にGIFを設定 */
+		    background: url('https://kaichi-naito.github.io/website/images/8bit_town.gif') no-repeat center center fixed; /* 背景にGIFを設定 */
 		    background-size: cover; /* 背景をカバーする */
 		    font-family: 'Noto Sans JP', sans-serif;
 		    color: white;
 		    text-align: center;
+		    position: relative; /* 擬似要素のために必要 */
+		    overflow: hidden; /* 擬似要素のために必要 */
 		}
+			 body::before {
+		         content: "";
+		         position: absolute;
+		         top: 0;
+		         left: 0;
+		         width: 100%;
+		         height: 100%;
+		         background-color: rgba(0, 0, 0, 0.7); /* 透明度70%の黒 */
+		         z-index: -1; /* 背景の下に配置 */
+        }
 		.header {
 		    padding: 20px;
 		}
