@@ -89,6 +89,17 @@
             margin-top: 20px;
             background-color: black; /* 黒い背景 */
             display: inline-block;
+            position: relative;
+        }
+
+        .credit-box::after {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 2px dashed white; /* 点線の白い枠 */
         }
 
         @media (max-width: 600px) {
