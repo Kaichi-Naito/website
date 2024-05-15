@@ -41,8 +41,8 @@
         }
 
         .header h1 {
-            font-size: 1.5em; /* テキストサイズを1.5倍に設定 */
-            margin-bottom: 30px; /* 余白を1.5倍に設定 */
+            font-size: 1.5em;
+            margin-bottom: 30px;
         }
 
         .nav {
@@ -85,7 +85,7 @@
         }
 
         .profile-text p.artist-info {
-            font-size: 0.8em; /* テキストサイズを0.8倍に設定 */
+            font-size: 0.8em;
         }
 
         .social-icons {
@@ -93,6 +93,7 @@
             justify-content: center;
             gap: 15px;
             margin-top: 20px;
+            margin-bottom: 60px; /* SNSアイコンと「Original songs🎸」の間の余白 */
         }
 
         .social-icons a {
@@ -111,29 +112,28 @@
             max-height: 60px;
             width: auto;
             height: auto;
-            margin-bottom: 5px; /* PC版での距離 */
+            margin-bottom: 5px;
         }
 
         .section-title {
             text-align: left;
-            font-size: 1.2em; /* テキストサイズを少々大きく設定 */
+            font-size: 1.2em;
             margin: 20px 0;
-            padding-left: 10px; /* テキストを少し右に寄せる */
-            text-decoration: none; /* アンダーバーを消す */
-            display: block; /* 左寄せするためにブロック要素にする */
+            padding-left: 10px;
+            text-decoration: none;
         }
 
         a, a:visited {
-            color: white; /* リンク色を白に統一 */
+            color: white;
         }
 
         a.section-title:hover {
-            text-decoration: underline;
+            text-decoration: none;
         }
 
         @media (max-width: 600px) {
             body {
-                font-size: 80%; /* スマホ版でのテキストサイズを80%に設定 */
+                font-size: 80%;
             }
 
             .nav {
@@ -162,22 +162,22 @@
 
             .social-icons a {
                 width: 100%;
-                margin-bottom: 20px; /* スマホ版の余白を2倍に設定 */
+                margin-bottom: 20px;
             }
 
             .social-icons img {
                 max-width: 50px;
                 max-height: 50px;
-                margin-bottom: 2px; /* スマホ版での距離 */
+                margin-bottom: 2px;
             }
 
             .content {
                 padding: 0 10px;
-                flex-direction: row; /* スマホ版でも横並びに設定 */
+                flex-direction: row;
             }
 
             .profile-img {
-                width: 120px; /* スマホ版でのプロフィール画像のサイズ調整 */
+                width: 120px;
             }
 
             .profile-text {
@@ -196,11 +196,11 @@
 
         .profile-text h2 {
             display: inline-block;
-            margin-right: 0; /* 余白を削除 */
+            margin-right: 0;
         }
 
         .profile-text .handle {
-            font-size: 0.8em; /* テキストサイズを0.8倍に設定 */
+            font-size: 0.8em;
             display: inline-block;
         }
 
@@ -225,8 +225,8 @@
         <div class="profile-text">
             <h2>Kaichi</h2>
             <p>Guitar, write music.</p>
-            <p class="artist-info">avex muchoo<br>Hotone Audio オフィシャルアーティスト</p>
-            <p><a href="#">ご依頼はこちら<br>Job request here</a></p>
+            <p class="artist-info"><a href="https://avex.jp/muchoo/creator/detail.php?id=1002656" target="_blank">avex muchoo</a><br><a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank">Hotone Audio オフィシャルアーティスト</a></p>
+            <p><a href="https://kaichinaito.wixsite.com/home/%E3%81%94%E4%BE%9D%E9%A0%BC" target="_blank">ご依頼はこちら<br>Job request here</a></p>
         </div>
     </div>
     <div class="social-icons">
