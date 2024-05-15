@@ -29,6 +29,7 @@
             width: auto;
             height: auto;
             z-index: -2;
+            object-fit: cover; /* ビデオが画面を覆うように設定 */
         }
 
         body::before {
@@ -131,7 +132,7 @@
     </style>
 </head>
 <body>
-    <video autoplay muted loop class="background-video">
+    <video autoplay muted loop playsinline class="background-video">
         <source src="images/8bit_town.mp4" type="video/mp4">
     </video>
     <div class="header">
