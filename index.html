@@ -75,7 +75,7 @@
             border-radius: 50%;
         }
 
-        .profile-img::after {
+        .profile-img-container::after {
             content: '';
             position: absolute;
             top: -8px;
@@ -83,7 +83,6 @@
             width: 166px;
             height: 166px;
             border-radius: 50%;
-            border: 2px solid transparent;
             background: radial-gradient(circle, blue 2px, transparent 2px);
             background-size: 10px 10px;
             z-index: -1;
@@ -115,6 +114,10 @@
             margin-bottom: 5px;
         }
 
+        a, a:visited {
+            color: white; /* リンク色を白に統一 */
+        }
+
         @media (max-width: 600px) {
             .nav {
                 display: grid;
@@ -133,7 +136,7 @@
                 height: 120px;
             }
 
-            .profile-img::after {
+            .profile-img-container::after {
                 top: -6px;
                 left: -6px;
                 width: 132px;
