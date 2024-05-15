@@ -36,7 +36,7 @@
         }
 
         .header h1 {
-            font-size: 1.5em;
+            font-size: 2em;
             margin-bottom: 30px;
         }
 
@@ -58,35 +58,35 @@
         }
 
         .content {
-            max-width: 600px;
+            max-width: 800px;
             margin: auto;
-            text-align: left;
-            background: rgba(0, 0, 0, 0.5);
             padding: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
             border-radius: 10px;
         }
 
         .content h2 {
-            font-size: 1.2em;
+            font-size: 1.5em;
             margin-bottom: 20px;
         }
 
-        .bgm-list {
-            list-style: none;
-            padding: 0;
+        .content p {
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
 
-        .bgm-list li {
-            margin-bottom: 10px;
-        }
-
-        .bgm-list li a {
+        .content a, .content a:visited {
             color: white;
-            text-decoration: none;
         }
 
-        .bgm-list li a:hover {
+        .content a:hover {
             text-decoration: underline;
+        }
+
+        .credit-box {
+            border: 2px dashed white;
+            padding: 10px;
+            margin-top: 20px;
         }
 
         @media (max-width: 600px) {
@@ -106,11 +106,15 @@
             }
 
             .header h1 {
-                font-size: 1.2em;
+                font-size: 1.5em;
+            }
+
+            .content {
+                padding: 10px;
             }
 
             .content h2 {
-                font-size: 1em;
+                font-size: 1.2em;
             }
         }
     </style>
@@ -128,13 +132,21 @@
         </div>
     </div>
     <div class="content">
-        <h2>ＦＲＥＥ ＢＧＭ</h2>
-        <p>You may use my music as free music. When you use it, please write the credit contents in the summary column, etc. as shown in the example below. (I don't obtain content IDs, so videos using background music can be monetized on YouTube.)</p>
-        <p>私の曲をフリーBGMとして動画や配信で使用することを許可します。使用する際は概要欄等に以下記載例のようにクレジット内容を記載してください。(コンテンツIDを取得しておりませんので、BGM使用動画はYouTubeで収益化可能です。)</p>
-        <p>–––––––––––––𝐜𝐫𝐞𝐝𝐢𝐭–––––––––––––<br>
-        BGM：Kaichi Naito<br>
-        <a href="https://www.youtube.com/@Kaichi_zZ" target="_blank">https://www.youtube.com/@Kaichi_zZ</a><br>
-        ––––––––––––––––––––––––––––––</p>
+        <h2>FREE BGM</h2>
+        <p>
+            You may use my music as free music. When you use it, please write the credit contents in the summary column, etc.
+            as shown in the example below. (I don't obtain content IDs, so videos using background music can be monetized on YouTube.)
+        </p>
+        <p>
+            私の曲をフリーBGMとして動画や配信で使用することを許可します。使用する際は概要欄等に以下記載例のようにクレジット内容を記載してください。
+            (コンテンツIDを取得しておりませんので、BGM使用動画はYouTubeで収益化可能です。)
+        </p>
+        <div class="credit-box">
+            －－－－－－－－－－credit－－－－－－－－－－<br>
+            BGM：Kaichi Naito<br>
+            <a href="https://www.youtube.com/@Kaichi_zZ" target="_blank">https://www.youtube.com/@Kaichi_zZ</a><br>
+            －－－－－－－－－－－－－－－－－－－－－－－－－
+        </div>
     </div>
 </body>
 </html>
