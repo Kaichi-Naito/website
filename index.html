@@ -37,10 +37,11 @@
         }
 
         .header {
-            padding: 0px; /* 余白を半分に設定 */
+            padding: 0px;
         }
 
         .header h1 {
+            font-size: 1.5em; /* テキストサイズを1.5倍に設定 */
             margin-bottom: 30px; /* 余白を1.5倍に設定 */
         }
 
@@ -81,6 +82,10 @@
 
         .profile-text {
             text-align: left;
+        }
+
+        .profile-text p.artist-info {
+            font-size: 0.8em; /* テキストサイズを0.8倍に設定 */
         }
 
         .social-icons {
@@ -166,6 +171,16 @@
                 text-align: left;
             }
         }
+
+        .playlist-container {
+            margin-top: 20px;
+        }
+
+        .playlist-container iframe {
+            width: 100%;
+            height: 315px;
+        }
+
     </style>
 </head>
 <body>
@@ -187,7 +202,7 @@
         <div class="profile-text">
             <h2>Kaichi</h2>
             <p>Guitar, write music.</p>
-            <p>avex muchoo<br>Hotone Audio オフィシャルアーティスト</p>
+            <p class="artist-info">avex muchoo<br>Hotone Audio オフィシャルアーティスト</p>
             <p><a href="#">ご依頼はこちら<br>Job request here</a></p>
         </div>
     </div>
@@ -198,6 +213,9 @@
         <a href="https://space.bilibili.com/1471756997/channel/series" target="_blank"><img src="images/bilibili_dot_icon.png" alt="BiliBili"><div>BiliBili</div></a>
         <a href="https://open.spotify.com/artist/0zok75wIWAb9qQ0hofCT1h?si=QrD4CGKXSyGttC7-3nM-XA" target="_blank"><img src="images/spotify-icon.png" alt="Spotify"><div>Spotify</div></a>
         <a href="https://music.apple.com/jp/artist/kaichi-naito/1542151566" target="_blank"><img src="images/applemusic_dot_logo.png" alt="Apple Music"><div>Apple Music</div></a>
+    </div>
+    <div class="playlist-container">
+        <iframe src="https://www.youtube.com/embed/videoseries?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" frameborder="0" allowfullscreen></iframe>
     </div>
 </body>
 </html>
