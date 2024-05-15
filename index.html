@@ -11,13 +11,24 @@
         }
 
         body {
-            background: url('https://kaichi-naito.github.io/website/images/8bit_town.gif') no-repeat center center fixed;
-            background-size: cover;
             font-family: 'PixelMplus', sans-serif;
             color: white;
             text-align: center;
             position: relative;
             height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .background-video {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -1;
         }
 
         body::before {
@@ -41,8 +52,8 @@
         }
 
         .header h1 {
-            font-size: 1.5em;
-            margin-bottom: 30px;
+            font-size: 1.5em; /* テキストサイズを1.5倍に設定 */
+            margin-bottom: 30px; /* 余白を1.5倍に設定 */
         }
 
         .nav {
@@ -85,7 +96,7 @@
         }
 
         .profile-text p.artist-info {
-            font-size: 0.8em;
+            font-size: 0.8em; /* テキストサイズを0.8倍に設定 */
         }
 
         .social-icons {
@@ -93,7 +104,7 @@
             justify-content: center;
             gap: 15px;
             margin-top: 20px;
-            margin-bottom: 60px; /* SNSアイコンと「Original songs🎸」の間の余白 */
+            margin-bottom: 60px; /* PC版とスマホ版で余白を統一 */
         }
 
         .social-icons a {
@@ -112,28 +123,28 @@
             max-height: 60px;
             width: auto;
             height: auto;
-            margin-bottom: 5px;
+            margin-bottom: 5px; /* PC版での距離 */
         }
 
         .section-title {
             text-align: left;
-            font-size: 1.2em;
+            font-size: 1.2em; /* テキストサイズを少々大きく設定 */
             margin: 20px 0;
-            padding-left: 10px;
-            text-decoration: none;
+            padding-left: 10px; /* テキストを少し右に寄せる */
+            text-decoration: none; /* アンダーバーを消す */
         }
 
         a, a:visited {
-            color: white;
+            color: white; /* リンク色を白に統一 */
         }
 
         a.section-title:hover {
-            text-decoration: none;
+            text-decoration: none; /* ホバー時もアンダーバーを消す */
         }
 
         @media (max-width: 600px) {
             body {
-                font-size: 80%;
+                font-size: 80%; /* スマホ版でのテキストサイズを80%に設定 */
             }
 
             .nav {
@@ -162,22 +173,22 @@
 
             .social-icons a {
                 width: 100%;
-                margin-bottom: 20px;
+                margin-bottom: 20px; /* スマホ版の余白を2倍に設定 */
             }
 
             .social-icons img {
                 max-width: 50px;
                 max-height: 50px;
-                margin-bottom: 2px;
+                margin-bottom: 2px; /* スマホ版での距離 */
             }
 
             .content {
                 padding: 0 10px;
-                flex-direction: row;
+                flex-direction: row; /* スマホ版でも横並びに設定 */
             }
 
             .profile-img {
-                width: 120px;
+                width: 120px; /* スマホ版でのプロフィール画像のサイズ調整 */
             }
 
             .profile-text {
@@ -196,17 +207,20 @@
 
         .profile-text h2 {
             display: inline-block;
-            margin-right: 0;
+            margin-right: 0; /* 余白を削除 */
         }
 
         .profile-text .handle {
-            font-size: 0.8em;
+            font-size: 0.8em; /* テキストサイズを0.8倍に設定 */
             display: inline-block;
         }
 
     </style>
 </head>
 <body>
+    <video autoplay muted loop class="background-video">
+        <source src="images/8bit_town.mp4" type="video/mp4">
+    </video>
     <div class="header">
         <h1>Kaichi Guitar Music</h1>
         <div class="nav">
