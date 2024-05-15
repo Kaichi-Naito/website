@@ -119,10 +119,16 @@
             font-size: 1.2em; /* テキストサイズを少々大きく設定 */
             margin: 20px 0;
             padding-left: 10px; /* テキストを少し右に寄せる */
+            text-decoration: none; /* アンダーバーを消す */
+            display: block; /* 左寄せするためにブロック要素にする */
         }
 
         a, a:visited {
             color: white; /* リンク色を白に統一 */
+        }
+
+        a.section-title:hover {
+            text-decoration: underline;
         }
 
         @media (max-width: 600px) {
