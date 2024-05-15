@@ -75,17 +75,15 @@
             border-radius: 50%;
         }
 
-        .profile-img-container::after {
-            content: '';
+        .dot-border {
             position: absolute;
-            top: -8px;
-            left: -8px;
-            width: 166px;
-            height: 166px;
-            border-radius: 50%;
-            background: radial-gradient(circle, blue 2px, transparent 2px);
-            background-size: 10px 10px;
-            z-index: -1;
+            top: -15px;
+            left: -15px;
+            width: 180px;
+            height: 180px;
+            background: url('images/dot_circle.png') no-repeat center center;
+            background-size: contain;
+            pointer-events: none;
         }
 
         .social-icons {
@@ -136,12 +134,12 @@
                 height: 120px;
             }
 
-            .profile-img-container::after {
-                top: -6px;
-                left: -6px;
-                width: 132px;
-                height: 132px;
-                background-size: 8px 8px;
+            .dot-border {
+                top: -10px;
+                left: -10px;
+                width: 140px;
+                height: 140px;
+                background-size: contain;
             }
 
             .social-icons {
@@ -189,6 +187,7 @@
         </div>
         <div class="profile-img-container">
             <img src="images/profile-image.png" alt="Kaichi" class="profile-img">
+            <div class="dot-border"></div>
         </div>
         <h2>Kaichi</h2>
         <p>Guitar, write music.</p>
