@@ -18,24 +18,21 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
-        }
-
-        .background-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            z-index: -2;
+            overflow: hidden;
         }
 
         .background-video {
-            min-width: 50%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+
+        .background-video.right {
+            left: 50%;
         }
 
         body::before {
@@ -45,7 +42,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: rgba(0, 0, 0, 0.3);
             z-index: -1;
         }
 
@@ -111,7 +108,6 @@
             justify-content: center;
             gap: 15px;
             margin-top: 20px;
-            margin-bottom: 60px;
         }
 
         .social-icons a {
@@ -138,20 +134,16 @@
             font-size: 1.2em;
             margin: 20px 0;
             padding-left: 10px;
-            text-decoration: none;
         }
 
         a, a:visited {
             color: white;
         }
 
-        a.section-title:hover {
-            text-decoration: none;
-        }
-
         @media (max-width: 600px) {
             body {
                 font-size: 80%;
+                overflow: auto;
             }
 
             .nav {
@@ -209,8 +201,7 @@
 
         .playlist-container iframe {
             width: 100%;
-            height: calc(100vw * 9 / 16);
-            max-height: 315px;
+            height: 315px;
         }
 
         .profile-text h2 {
@@ -222,18 +213,15 @@
             font-size: 0.8em;
             display: inline-block;
         }
-
     </style>
 </head>
 <body>
-    <div class="background-container">
-        <video autoplay muted loop playsinline class="background-video">
-            <source src="images/8bit_town.mp4" type="video/mp4">
-        </video>
-        <video autoplay muted loop playsinline class="background-video">
-            <source src="images/8bit_town.mp4" type="video/mp4">
-        </video>
-    </div>
+    <video autoplay muted loop playsinline class="background-video">
+        <source src="images/8bit_town.mp4" type="video/mp4">
+    </video>
+    <video autoplay muted loop playsinline class="background-video right">
+        <source src="images/8bit_town.mp4" type="video/mp4">
+    </video>
     <div class="header">
         <h1>Kaichi Guitar Music</h1>
         <div class="nav">
@@ -250,7 +238,7 @@
             <img src="images/dot_profile.png" alt="Kaichi" class="profile-img">
         </div>
         <div class="profile-text">
-            <h2>Kaichi</h2>
+            <h2>Kaichi</h2><span class="handle">@Kaichi_zZ</span>
             <p>Guitar, write music.</p>
             <p class="artist-info"><a href="https://avex.jp/muchoo/creator/detail.php?id=1002656" target="_blank">avex muchoo</a><br><a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank">Hotone Audio オフィシャルアーティスト</a></p>
             <p><a href="https://kaichinaito.wixsite.com/home/%E3%81%94%E4%BE%9D%E9%A0%BC" target="_blank">ご依頼はこちら<br>Job request here</a></p>
