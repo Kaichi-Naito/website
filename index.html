@@ -60,18 +60,23 @@
         .content {
             max-width: 600px;
             margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
         }
 
         .profile-img-container {
-            position: relative;
-            display: inline-block;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            flex-shrink: 0;
         }
 
         .profile-img {
             width: 150px;
             height: auto;
+        }
+
+        .profile-text {
+            text-align: left;
         }
 
         .social-icons {
@@ -117,6 +122,11 @@
                 font-size: 16px;
             }
 
+            .content {
+                flex-direction: column;
+                padding: 0 10px;
+            }
+
             .profile-img {
                 width: 120px;
                 height: auto;
@@ -138,10 +148,6 @@
                 max-height: 50px;
                 margin-bottom: 2px; /* スマホ版での距離 */
             }
-
-            .content {
-                padding: 0 10px;
-            }
         }
     </style>
 </head>
@@ -158,21 +164,23 @@
         </div>
     </div>
     <div class="content">
-        <div class="social-icons">
-            <a href="https://x.com/Kaichi_zZ" target="_blank"><img src="images/X_dot_logo.png" alt="Twitter"><div>X(Twitter)</div></a>
-            <a href="https://www.instagram.com/kaichi_zz/" target="_blank"><img src="images/instagram_dot_logo.png" alt="Instagram"><div>Instagram</div></a>
-            <a href="https://www.youtube.com/KaichizZ" target="_blank"><img src="images/Youtube_dot_logo.png" alt="YouTube"><div>YouTube</div></a>
-            <a href="https://space.bilibili.com/1471756997/channel/series" target="_blank"><img src="images/bilibili_dot_icon.png" alt="BiliBili"><div>BiliBili</div></a>
-            <a href="https://open.spotify.com/artist/0zok75wIWAb9qQ0hofCT1h?si=QrD4CGKXSyGttC7-3nM-XA" target="_blank"><img src="images/spotify-icon.png" alt="Spotify"><div>Spotify</div></a>
-            <a href="https://music.apple.com/jp/artist/kaichi-naito/1542151566" target="_blank"><img src="images/applemusic_dot_logo.png" alt="Apple Music"><div>Apple Music</div></a>
-        </div>
         <div class="profile-img-container">
             <img src="images/dot_profile.png" alt="Kaichi" class="profile-img">
         </div>
-        <h2>Kaichi</h2>
-        <p>Guitar, write music.</p>
-        <p>avex muchoo<br>Hotone Audio オフィシャルアーティスト</p>
-        <p><a href="#">ご依頼はこちら<br>Job request here</a></p>
+        <div class="profile-text">
+            <h2>Kaichi</h2>
+            <p>Guitar, write music.</p>
+            <p>avex muchoo<br>Hotone Audio オフィシャルアーティスト</p>
+            <p><a href="#">ご依頼はこちら<br>Job request here</a></p>
+        </div>
+    </div>
+    <div class="social-icons">
+        <a href="https://x.com/Kaichi_zZ" target="_blank"><img src="images/X_dot_logo.png" alt="Twitter"><div>X(Twitter)</div></a>
+        <a href="https://www.instagram.com/kaichi_zz/" target="_blank"><img src="images/instagram_dot_logo.png" alt="Instagram"><div>Instagram</div></a>
+        <a href="https://www.youtube.com/KaichizZ" target="_blank"><img src="images/Youtube_dot_logo.png" alt="YouTube"><div>YouTube</div></a>
+        <a href="https://space.bilibili.com/1471756997/channel/series" target="_blank"><img src="images/bilibili_dot_icon.png" alt="BiliBili"><div>BiliBili</div></a>
+        <a href="https://open.spotify.com/artist/0zok75wIWAb9qQ0hofCT1h?si=QrD4CGKXSyGttC7-3nM-XA" target="_blank"><img src="images/spotify-icon.png" alt="Spotify"><div>Spotify</div></a>
+        <a href="https://music.apple.com/jp/artist/kaichi-naito/1542151566" target="_blank"><img src="images/applemusic_dot_logo.png" alt="Apple Music"><div>Apple Music</div></a>
     </div>
 </body>
 </html>
