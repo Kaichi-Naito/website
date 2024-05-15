@@ -66,9 +66,38 @@
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            border: 2px solid white;
+            border: 2px solid transparent; /* 透明な境界線を設定 */
+            position: relative;
             margin-top: 20px;
             margin-bottom: 20px;
+        }
+
+        .profile-img::before {
+            content: '';
+            position: absolute;
+            top: -2px; /* ドットの位置を調整 */
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 0 4px blue, /* ドットの色と大きさを設定 */
+                4px 0 0 4px blue,
+                -4px 0 0 4px blue,
+                0 4px 0 4px blue,
+                0 -4px 0 4px blue,
+                4px 4px 0 4px blue,
+                -4px -4px 0 4px blue,
+                -4px 4px 0 4px blue,
+                4px -4px 0 4px blue,
+                8px 0 0 4px blue,
+                -8px 0 0 4px blue,
+                0 8px 0 4px blue,
+                0 -8px 0 4px blue,
+                8px 8px 0 4px blue,
+                -8px -8px 0 4px blue,
+                -8px 8px 0 4px blue,
+                8px -8px 0 4px blue; /* ドットの間隔を設定 */
         }
 
         .social-icons {
