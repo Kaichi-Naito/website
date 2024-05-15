@@ -62,42 +62,30 @@
             margin: auto;
         }
 
+        .profile-img-container {
+            position: relative;
+            display: inline-block;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
         .profile-img {
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            border: 2px solid transparent; /* 透明な境界線を設定 */
-            position: relative;
-            margin-top: 20px;
-            margin-bottom: 20px;
         }
 
         .profile-img::before {
             content: '';
             position: absolute;
-            top: -2px; /* ドットの位置を調整 */
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
+            top: -4px;
+            left: -4px;
+            width: 158px;
+            height: 158px;
             border-radius: 50%;
-            box-shadow: 
-                0 0 0 4px blue, /* ドットの色と大きさを設定 */
-                4px 0 0 4px blue,
-                -4px 0 0 4px blue,
-                0 4px 0 4px blue,
-                0 -4px 0 4px blue,
-                4px 4px 0 4px blue,
-                -4px -4px 0 4px blue,
-                -4px 4px 0 4px blue,
-                4px -4px 0 4px blue,
-                8px 0 0 4px blue,
-                -8px 0 0 4px blue,
-                0 8px 0 4px blue,
-                0 -8px 0 4px blue,
-                8px 8px 0 4px blue,
-                -8px -8px 0 4px blue,
-                -8px 8px 0 4px blue,
-                8px -8px 0 4px blue; /* ドットの間隔を設定 */
+            background: radial-gradient(circle, blue 4px, transparent 4px);
+            background-size: 8px 8px;
+            z-index: -1;
         }
 
         .social-icons {
@@ -144,6 +132,14 @@
                 height: 120px;
             }
 
+            .profile-img::before {
+                top: -3px;
+                left: -3px;
+                width: 126px;
+                height: 126px;
+                background-size: 6px 6px;
+            }
+
             .social-icons {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
@@ -187,7 +183,9 @@
             <a href="https://open.spotify.com/artist/0zok75wIWAb9qQ0hofCT1h?si=QrD4CGKXSyGttC7-3nM-XA" target="_blank"><img src="images/spotify-icon.png" alt="Spotify"><div>Spotify</div></a>
             <a href="https://music.apple.com/jp/artist/kaichi-naito/1542151566" target="_blank"><img src="images/applemusic_dot_logo.png" alt="Apple Music"><div>Apple Music</div></a>
         </div>
-        <img src="images/profile-image.png" alt="Kaichi" class="profile-img">
+        <div class="profile-img-container">
+            <img src="images/profile-image.png" alt="Kaichi" class="profile-img">
+        </div>
         <h2>Kaichi</h2>
         <p>Guitar, write music.</p>
         <p>avex muchoo<br>Hotone Audio オフィシャルアーティスト</p>
