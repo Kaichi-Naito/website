@@ -122,11 +122,6 @@
                 font-size: 16px;
             }
 
-            .content {
-                flex-direction: column;
-                padding: 0 10px;
-            }
-
             .profile-img {
                 width: 120px;
                 height: auto;
@@ -147,6 +142,19 @@
                 max-width: 50px;
                 max-height: 50px;
                 margin-bottom: 2px; /* スマホ版での距離 */
+            }
+
+            .content {
+                padding: 0 10px;
+                flex-direction: row; /* スマホ版でも横並びに設定 */
+            }
+
+            .profile-img {
+                width: 120px; /* スマホ版でのプロフィール画像のサイズ調整 */
+            }
+
+            .profile-text {
+                text-align: left;
             }
         }
     </style>
