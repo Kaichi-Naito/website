@@ -11,13 +11,24 @@
         }
 
         body {
-            background: url('https://kaichi-naito.github.io/website/images/8bit_town.gif') no-repeat center center fixed;
-            background-size: cover;
             font-family: 'PixelMplus', sans-serif;
             color: white;
             text-align: center;
             position: relative;
             height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .background-video {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -2;
         }
 
         body::before {
@@ -27,7 +38,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.3);
+            background-color: rgba(0, 0, 0, 0.2); /* 明るさを下げるための黒のオーバーレイ */
             z-index: -1;
         }
 
@@ -41,8 +52,8 @@
         }
 
         .header h1 {
-            font-size: 1.5em; /* テキストサイズを1.5倍に設定 */
-            margin-bottom: 30px; /* 余白を1.5倍に設定 */
+            font-size: 1.5em;
+            margin-bottom: 30px;
         }
 
         .nav {
@@ -85,7 +96,7 @@
         }
 
         .profile-text p.artist-info {
-            font-size: 0.8em; /* テキストサイズを0.8倍に設定 */
+            font-size: 0.8em;
         }
 
         .social-icons {
@@ -93,6 +104,7 @@
             justify-content: center;
             gap: 15px;
             margin-top: 20px;
+            margin-bottom: 60px;
         }
 
         .social-icons a {
@@ -111,23 +123,28 @@
             max-height: 60px;
             width: auto;
             height: auto;
-            margin-bottom: 5px; /* PC版での距離 */
+            margin-bottom: 5px;
         }
 
         .section-title {
             text-align: left;
-            font-size: 1.2em; /* テキストサイズを少々大きく設定 */
+            font-size: 1.2em;
             margin: 20px 0;
-            padding-left: 10px; /* テキストを少し右に寄せる */
+            padding-left: 10px;
+            text-decoration: none;
         }
 
         a, a:visited {
-            color: white; /* リンク色を白に統一 */
+            color: white;
+        }
+
+        a.section-title:hover {
+            text-decoration: none;
         }
 
         @media (max-width: 600px) {
             body {
-                font-size: 80%; /* スマホ版でのテキストサイズを80%に設定 */
+                font-size: 80%;
             }
 
             .nav {
@@ -156,22 +173,22 @@
 
             .social-icons a {
                 width: 100%;
-                margin-bottom: 20px; /* スマホ版の余白を2倍に設定 */
+                margin-bottom: 20px;
             }
 
             .social-icons img {
                 max-width: 50px;
                 max-height: 50px;
-                margin-bottom: 2px; /* スマホ版での距離 */
+                margin-bottom: 2px;
             }
 
             .content {
                 padding: 0 10px;
-                flex-direction: row; /* スマホ版でも横並びに設定 */
+                flex-direction: row;
             }
 
             .profile-img {
-                width: 120px; /* スマホ版でのプロフィール画像のサイズ調整 */
+                width: 120px;
             }
 
             .profile-text {
@@ -190,31 +207,20 @@
 
         .profile-text h2 {
             display: inline-block;
-            margin-right: 0; /* 余白を削除 */
+            margin-right: 0;
         }
 
         .profile-text .handle {
-            font-size: 0.8em; /* テキストサイズを0.8倍に設定 */
+            font-size: 0.8em;
             display: inline-block;
-        }
-
-        /* 追加コード */
-        @media (min-width: 600px) {
-            .background-video-right {
-                left: 50%;
-            }
         }
 
     </style>
 </head>
 <body>
-    <video autoplay muted loop class="background-video" playsinline>
+    <video autoplay muted loop playsinline class="background-video">
         <source src="images/8bit_town.mp4" type="video/mp4">
     </video>
-    <video autoplay muted loop class="background-video background-video-right" playsinline>
-        <source src="images/8bit_town.mp4" type="video/mp4">
-    </video>
-
     <div class="header">
         <h1>Kaichi Guitar Music</h1>
         <div class="nav">
@@ -231,9 +237,9 @@
             <img src="images/dot_profile.png" alt="Kaichi" class="profile-img">
         </div>
         <div class="profile-text">
-            <h2>Kaichi</h2><span class="handle">@Kaichi_zZ</span>
+            <h2>Kaichi</h2>
             <p>Guitar, write music.</p>
-            <p class="artist-info">avex muchoo<br><a href="https://avex.jp/muchoo/creator/detail.php?id=1002656" target="_blank">Hotone Audio オフィシャルアーティスト</a></p>
+            <p class="artist-info"><a href="https://avex.jp/muchoo/creator/detail.php?id=1002656" target="_blank">avex muchoo</a><br><a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank">Hotone Audio オフィシャルアーティスト</a></p>
             <p><a href="https://kaichinaito.wixsite.com/home/%E3%81%94%E4%BE%9D%E9%A0%BC" target="_blank">ご依頼はこちら<br>Job request here</a></p>
         </div>
     </div>
@@ -245,7 +251,7 @@
         <a href="https://open.spotify.com/artist/0zok75wIWAb9qQ0hofCT1h?si=QrD4CGKXSyGttC7-3nM-XA" target="_blank"><img src="images/spotify-icon.png" alt="Spotify"><div>Spotify</div></a>
         <a href="https://music.apple.com/jp/artist/kaichi-naito/1542151566" target="_blank"><img src="images/applemusic_dot_logo.png" alt="Apple Music"><div>Apple Music</div></a>
     </div>
-    <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" target="_blank" class="section-title">Original songs🎸</a>
+    <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" target="_blank" class="section-title">　Original songs🎸</a>
     <div class="playlist-container">
         <iframe src="https://www.youtube.com/embed/videoseries?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" frameborder="0" allowfullscreen></iframe>
     </div>
