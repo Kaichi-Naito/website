@@ -82,10 +82,17 @@
         }
 
         .credit-box {
-            border: 2px dashed white; /* 枠を追加 */
-            padding: 10px;
+            border: 2px solid white; /* 白い縁取り */
+            padding: 8px;
             margin-top: 20px;
             text-align: center; /* 中央寄せに設定 */
+            background-color: black; /* 黒い背景 */
+            display: inline-block;
+        }
+
+        .credit-box-inner {
+            border: 2px dashed white; /* 内側の白い枠を追加 */
+            padding: 10px;
         }
 
         @media (max-width: 600px) {
@@ -145,10 +152,12 @@
             (コンテンツIDを取得しておりませんので、BGM使用動画はYouTubeで収益化可能です。)
         </p>
         <div class="credit-box">
-            －－－－－－－－－－－credit－－－－－－－－－－－<br>
-            BGM：Kaichi Naito<br>
-            <a href="https://www.youtube.com/@Kaichi_zZ" target="_blank">https://www.youtube.com/@Kaichi_zZ</a><br>
-            －－－－－－－－－－－－－－－－－－－－－－－－－
+            <div class="credit-box-inner">
+                －－－－－－－－－－－credit－－－－－－－－－－－<br>
+                BGM：Kaichi Naito<br>
+                <a href="https://www.youtube.com/@Kaichi_zZ" target="_blank">https://www.youtube.com/@Kaichi_zZ</a><br>
+                －－－－－－－－－－－－－－－－－－－－－－－－－
+            </div>
         </div>
     </div>
 </body>
