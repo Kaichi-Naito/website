@@ -18,7 +18,6 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            font-size: 16px; /* 基準フォントサイズを16pxに設定 */
         }
 
         .background-video {
@@ -44,18 +43,13 @@
             z-index: -1;
         }
 
-        .header, .content {
-            position: relative;
-            z-index: 1;
-        }
-
         .header {
-            padding: 20px 0 0 0; /* 天井との余白を追加 */
+            padding: 0px;
         }
 
         .header h1 {
-            font-size: 2em; /* テキストサイズを少し大きく設定 */
-            margin-bottom: 40px; /* 必要に応じて余白も調整 */
+            font-size: 2em;
+            margin-bottom: 30px;
         }
 
         .nav {
@@ -68,7 +62,7 @@
         .nav a, .nav a:visited {
             color: white;
             text-decoration: none;
-            font-size: 1.125rem; /* 18px */
+            font-size: 18px;
         }
 
         .nav a:hover {
@@ -98,31 +92,31 @@
         }
 
         .profile-text h2 {
-            font-size: 1.5rem; /* 24px */
+            font-size: 24px;
             display: inline-block;
             margin-right: 0;
         }
 
         .profile-text p {
-            font-size: 1.25rem; /* 20px */
+            font-size: 20px;
         }
 
         .profile-text p.artist-info {
-            font-size: 1.125rem; /* 18px */
+            font-size: 18px;
         }
 
         .profile-text p.artist-info a {
             display: block;
-            margin-bottom: 10px; /* 適度な余白を追加 */
+            margin-bottom: 10px;
         }
 
         .profile-text .official-artist {
-            font-size: 0.9375rem; /* 15px */
+            font-size: 15px;
             display: block;
         }
 
         .profile-text .request {
-            font-size: 1.125rem; /* 18px */
+            font-size: 18px;
         }
 
         .social-icons {
@@ -175,7 +169,7 @@
 
             .nav {
                 display: grid;
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
                 gap: 10px;
                 justify-items: center;
             }
@@ -189,23 +183,23 @@
             }
 
             .profile-text h2 {
-                font-size: 1.2rem; /* 24pxの80% = 19.2px */
+                font-size: 1.2rem; /* 24pxの80% */
             }
 
             .profile-text p {
-                font-size: 1rem; /* 20pxの80% = 16px */
+                font-size: 1rem; /* 20pxの80% */
             }
 
             .profile-text p.artist-info {
-                font-size: 0.9rem; /* 18pxの80% = 14.4px */
+                font-size: 0.9rem; /* 18pxの80% */
             }
 
             .profile-text .official-artist {
-                font-size: 0.75rem; /* 15pxの80% = 12px */
+                font-size: 0.75rem; /* 15pxの80% */
             }
 
             .profile-text .request {
-                font-size: 0.9rem; /* 18pxの80% = 14.4px */
+                font-size: 0.9rem; /* 18pxの80% */
             }
 
             .profile-img {
@@ -236,20 +230,6 @@
                 flex-direction: row;
             }
         }
-
-        /* 既存のスタイルに追加 */
-        .playlist-container {
-            margin-top: 20px;
-            padding: 0 20px; /* 左右に余白を追加 */
-        }
-        
-        .playlist-container iframe {
-            width: 100%;
-            height: calc(100vw * 9 / 16); /* 16:9 のアスペクト比を保つ */
-            max-height: 563px; /* 最大高さを設定 */
-            max-width: 1000px; /* 最大幅を設定 */
-        }
-
     </style>
 </head>
 <body>
@@ -274,7 +254,7 @@
         <div class="profile-text">
             <h2>Kaichi</h2>
             <p>Guitar, write music.</p>
-            <p class="artist-info"><a href="https://avex.jp/muchoo/creator/detail.php?id=1002656" target="_blank">avex muchoo</a><br><a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank"><span style="font-size: 1.125rem;">Hotone Audio</span><br><span class="official-artist">オフィシャルアーティスト</span></a></p>
+            <p class="artist-info"><a href="https://avex.jp/muchoo/creator/detail.php?id=1002656" target="_blank">avex muchoo</a><br><a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank"><span style="font-size: 18px;">Hotone Audio</span><br><span class="official-artist">オフィシャルアーティスト</span></a></p>
             <p class="request"><a href="https://kaichinaito.wixsite.com/home/%E3%81%94%E4%BE%9D%E9%A0%BC" target="_blank">ご依頼はこちら<br>Job request here</a></p>
         </div>
     </div>
