@@ -30,6 +30,7 @@
             width: auto;
             height: auto;
             z-index: -2;
+            object-fit: cover; /* ビデオが画面を覆うように設定 */
         }
 
         body::before {
@@ -169,24 +170,22 @@
 
         @media (max-width: 600px) {
             body {
-                font-size: 80%; /* 基準フォントサイズの80%に設定 */
+                font-size: 80%;
             }
 
             .nav {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                justify-items: center;
             }
 
             .nav a {
-                flex-basis: 45%;
-                margin: 5px;
-                text-align: center;
-                font-size: 0.9rem; /* 18pxの80% = 14.4px */
+                font-size: 16px;
             }
 
             .header h1 {
-                font-size: 1.6em; /* 2emの80% = 1.6em */
+                font-size: 1.5em;
             }
 
             .profile-text h2 {
