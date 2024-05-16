@@ -29,7 +29,7 @@
             width: auto;
             height: auto;
             z-index: -2;
-            object-fit: cover; /* ビデオが画面を覆うように設定 */
+            object-fit: cover;
         }
 
         body::before {
@@ -169,7 +169,7 @@
 
             .nav {
                 display: grid;
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
                 justify-items: center;
             }
@@ -229,6 +229,18 @@
                 padding: 0 10px;
                 flex-direction: row;
             }
+        }
+
+        .playlist-container {
+            margin-top: 20px;
+            padding: 0 20px; /* 左右に余白を追加 */
+        }
+
+        .playlist-container iframe {
+            width: 100%;
+            height: calc(100vw * 9 / 16); /* 16:9 のアスペクト比を保つ */
+            max-height: 563px; /* 最大高さを設定 */
+            max-width: 1000px; /* 最大幅を設定 */
         }
     </style>
 </head>
