@@ -18,6 +18,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
+            font-size: 16px; /* 基準フォントサイズを16pxに設定 */
         }
 
         .background-video {
@@ -168,19 +169,35 @@
 
         @media (max-width: 600px) {
             body {
-                font-size: 80%;
-            }
-
-            .nav {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-                justify-items: center;
+                font-size: 80%; /* 基準フォントサイズの80%に設定 */
             }
 
             .nav a {
-                flex-basis: 33%;
-                font-size: 0.9rem; /* 16px */
+                font-size: 0.9rem; /* 18pxの80% = 14.4px */
+            }
+
+            .header h1 {
+                font-size: 1.6em; /* 2emの80% = 1.6em */
+            }
+
+            .profile-text h2 {
+                font-size: 1.2rem; /* 24pxの80% = 19.2px */
+            }
+
+            .profile-text p {
+                font-size: 1rem; /* 20pxの80% = 16px */
+            }
+
+            .profile-text p.artist-info {
+                font-size: 0.9rem; /* 18pxの80% = 14.4px */
+            }
+
+            .profile-text .official-artist {
+                font-size: 0.75rem; /* 15pxの80% = 12px */
+            }
+
+            .profile-text .request {
+                font-size: 0.9rem; /* 18pxの80% = 14.4px */
             }
 
             .profile-img {
@@ -209,14 +226,6 @@
             .content {
                 padding: 0 10px;
                 flex-direction: row;
-            }
-
-            .profile-img {
-                width: 120px;
-            }
-
-            .profile-text {
-                text-align: left;
             }
         }
 
