@@ -39,7 +39,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.2); /* 明るさを下げるための黒のオーバーレイ */
+            background-color: rgba(0, 0, 0, 0.2);
             z-index: -1;
         }
 
@@ -95,33 +95,34 @@
             font-size: 24px;
             display: inline-block;
             margin-right: 0;
-            margin-bottom: 7.5px; /* 1/4 の余白に設定 (現行余白が30pxの1/4) */
+            margin-bottom: 7.5px;
         }
 
         .profile-text p {
             font-size: 20px;
-            margin-top: 0; /* 余白の重複を防ぐため */
+            margin-top: 0;
         }
 
         .profile-text p.artist-info {
-            font-size: 16px; /* 少々小さく設定 */
-            margin-bottom: 3px; /* 小さな余白を設定 */
+            font-size: 16px;
+            margin-bottom: 3px;
         }
 
         .profile-text p.artist-info a {
+            font-size: 14px; /* フォントサイズを14pxに設定 */
             display: block;
-            margin-bottom: 3px; /* 小さな余白を設定 */
+            margin-bottom: 3px;
         }
 
         .profile-text .official-artist {
-            font-size: 13px; /* 少々小さく設定 */
+            font-size: 13px;
             display: block;
-            margin-bottom: 10px; /* 小さな余白を設定 */
+            margin-bottom: 10px;
         }
 
         .profile-text .request {
-            font-size: 16px; /* 少々小さく設定 */
-            margin-bottom: 3px; /* 小さな余白を設定 */
+            font-size: 16px;
+            margin-bottom: 3px;
         }
 
         .social-icons {
@@ -188,32 +189,33 @@
             }
 
             .profile-text h2 {
-                font-size: 1.2rem; /* 24pxの80% */
-                margin-bottom: 7.5px; /* 1/4 の余白に設定 (現行余白が30pxの1/4) */
+                font-size: 1.2rem;
+                margin-bottom: 7.5px;
             }
 
             .profile-text p {
-                font-size: 1rem; /* 20pxの80% */
-                margin-top: 0; /* 余白の重複を防ぐため */
+                font-size: 1rem;
+                margin-top: 0;
             }
 
             .profile-text p.artist-info {
-                font-size: 0.8rem; /* 少々小さく設定 (16px相当) */
-                margin-bottom: 3px; /* 小さな余白を設定 */
+                font-size: 0.8rem;
+                margin-bottom: 3px;
             }
 
             .profile-text p.artist-info a {
-                margin-bottom: 3px; /* 小さな余白を設定 */
+                font-size: 0.7rem; /* フォントサイズを0.7remに設定 */
+                margin-bottom: 3px;
             }
 
             .profile-text .official-artist {
-                font-size: 0.65rem; /* 少々小さく設定 (13px相当) */
-                margin-bottom: 10px; /* 小さな余白を設定 */
+                font-size: 0.65rem;
+                margin-bottom: 10px;
             }
 
             .profile-text .request {
-                font-size: 0.8rem; /* 少々小さく設定 (16px相当) */
-                margin-bottom: 3px; /* 小さな余白を設定 */
+                font-size: 0.8rem;
+                margin-bottom: 3px;
             }
 
             .profile-img {
@@ -247,14 +249,14 @@
 
         .playlist-container {
             margin-top: 20px;
-            padding: 0 20px; /* 左右に余白を追加 */
+            padding: 0 20px;
         }
 
         .playlist-container iframe {
             width: 100%;
-            height: calc(100vw * 9 / 16); /* 16:9 のアスペクト比を保つ */
-            max-height: 563px; /* 最大高さを設定 */
-            max-width: 1000px; /* 最大幅を設定 */
+            height: calc(100vw * 9 / 16);
+            max-height: 563px;
+            max-width: 1000px;
         }
     </style>
 </head>
@@ -286,15 +288,13 @@
     </div>
     <div class="social-icons">
         <a href="https://x.com/Kaichi_zZ" target="_blank"><img src="images/X_dot_logo.png" alt="Twitter"><div>X(Twitter)</div></a>
-        <a href="https://www.instagram.com/kaichi_zz/" target="_blank"><img src="images/instagram_dot_logo.png" alt="Instagram"><div>Instagram</div></a>
-        <a href="https://www.youtube.com/KaichizZ" target="_blank"><img src="images/Youtube_dot_logo.png" alt="YouTube"><div>YouTube</div></a>
-        <a href="https://space.bilibili.com/1471756997/channel/series" target="_blank"><img src="images/bilibili_dot_icon.png" alt="BiliBili"><div>BiliBili</div></a>
-        <a href="https://open.spotify.com/artist/0zok75wIWAb9qQ0hofCT1h?si=QrD4CGKXSyGttC7-3nM-XA" target="_blank"><img src="images/spotify-icon.png" alt="Spotify"><div>Spotify</div></a>
-        <a href="https://music.apple.com/jp/artist/kaichi-naito/1542151566" target="_blank"><img src="images/applemusic_dot_logo.png" alt="Apple Music"><div>Apple Music</div></a>
-    </div>
-    <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" target="_blank" class="section-title">　Original songs🎸</a>
-    <div class="playlist-container">
-        <iframe src="https://www.youtube.com/embed/videoseries?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" frameborder="0" allowfullscreen></iframe>
-    </div>
-</body>
-</html>
+        <a href="https://www.instagram.com/kaichi_zz/" target="_blank"><img src="images/instagram_dot_logo.png" alt="Instagram"><div>Instagram以下の変更を現行のHTMLに加えることで、「Hotone Audio」のフォントサイズを「avex muchoo」と一致させます。
+
+現行のCSS部分を以下のように変更します。
+
+```css
+.profile-text p.artist-info a {
+    font-size: 14px; /* フォントサイズを14pxに設定 */
+    display: block;
+    margin-bottom: 3px;
+}
