@@ -8,7 +8,7 @@
         body {
             font-family: 'PixelMplus', sans-serif;
             color: white;
-            text-align: left; /* 左揃え */
+            text-align: center;
             background-color: #607D8B; /* ブルーグレー */
             font-size: 14px; /* 文字サイズを小さく */
             margin: 10px; /* 上下左右に少しの余白 */
@@ -84,6 +84,20 @@
             document.getElementById('offGuitarTracksCount1Year').textContent = offGuitarTracksCount1Year;
         }
 
+        function clearLastWeekVisits() {
+            const now = new Date().getTime();
+            const limit1Week = now - 604800000; // 1週間前のタイムスタンプ
+
+            let visits = JSON.parse(localStorage.getItem('visits')) || [];
+
+            // 1週間以内の訪問のみ削除
+            visits = visits.filter(timestamp => timestamp <= limit1Week);
+
+            // ローカルストレージに保存
+            localStorage.setItem('visits', JSON.stringify(visits));
+            location.reload(); // ページをリロードしてカウンターを更新
+        }
+
         window.onload = displayCounter;
     </script>
 </head>
@@ -137,6 +151,7 @@
             </tr>
         </tbody>
     </table>
+    <button onclick="clearLastWeekVisits()">直近1週間分のアクセスを削除</button>
     <a href="OffGuitarTracks.html">Off Guitar Tracksページに戻る</a>
     <a href="Job_request.html">Job Requestページに戻る</a>
 </body>
