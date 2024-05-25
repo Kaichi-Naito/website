@@ -97,7 +97,7 @@
             let visits = JSON.parse(localStorage.getItem('visits')) || [];
 
             // 1週間以内の訪問のみ削除
-            visits = visits.filter(timestamp => timestamp <= limit1Week);
+            visits = visits.filter(visit => visit.timestamp <= limit1Week);
 
             // ローカルストレージに保存
             localStorage.setItem('visits', JSON.stringify(visits));
@@ -111,7 +111,7 @@
             let visits = JSON.parse(localStorage.getItem('visits')) || [];
 
             // 24時間以内の訪問のみ削除
-            visits = visits.filter(timestamp => timestamp <= limit1Day);
+            visits = visits.filter(visit => visit.timestamp <= limit1Day);
 
             // ローカルストレージに保存
             localStorage.setItem('visits', JSON.stringify(visits));
@@ -120,7 +120,10 @@
 
         function displayTimestamps() {
             const visits = JSON.parse(localStorage.getItem('visits')) || [];
-            const recentVisits = visits.slice(-100).map(timestamp => new Date(timestamp).toLocaleString());
+            const recentVisits = visits.slice(-100).map(visit => {
+                const date = new Date(visit.timestamp).toLocaleString();
+                return `${date} - ${visit.page} - ${visit.userId}`;
+            });
             const timestampContainer = document.getElementById('timestamps');
             timestampContainer.innerHTML = recentVisits.join('<br>');
         }
