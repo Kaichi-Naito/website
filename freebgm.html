@@ -110,76 +110,16 @@
             }
         }
     </style>
-    <script>
-    function updateCounter() {
-        const now = new Date().getTime();
-        const page = 'Free BGM';
-        const userId = getUserId();
-        let visits = JSON.parse(localStorage.getItem('visits')) || [];
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HS4S0YCE2Y"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-        // タイムスタンプ、ページ情報、ユーザーIDを追加
-        visits.push({ timestamp: now, page: page, userId: userId });
-
-        // 30日（2592000000ミリ秒）、120日（10368000000ミリ秒）、1年（31536000000ミリ秒）前のタイムスタンプを計算
-        const limit30Days = now - 2592000000;
-        const limit120Days = now - 10368000000;
-        const limit1Year = now - 31536000000;
-
-        // 1年以内の訪問のみフィルター
-        visits = visits.filter(visit => visit.timestamp > limit1Year);
-
-        // 30日、120日、および1年以内の訪問数をカウント
-        const freeBGMCount30Days = visits.filter(visit => visit.timestamp > limit30Days).length;
-        const freeBGMCount120Days = visits.filter(visit => visit.timestamp > limit120Days).length;
-        const freeBGMCount1Year = visits.length;
-
-        // ローカルストレージに保存
-        localStorage.setItem('visits', JSON.stringify(visits));
-        localStorage.setItem('freeBGMCount30Days', freeBGMCount30Days);
-        localStorage.setItem('freeBGMCount120Days', freeBGMCount120Days);
-        localStorage.setItem('freeBGMCount1Year', freeBGMCount1Year);
-    }
-
-    function generateUniqueId() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            const r = Math.random() * 16 | 0;
-            const v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-    }
-
-    function setCookie(name, value, days) {
-        let expires = "";
-        if (days) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            expires = "; expires=" + date.toUTCString();
-        }
-        document.cookie = name + "=" + (value || "") + expires + "; path=/";
-    }
-
-    function getCookie(name) {
-        const nameEQ = name + "=";
-        const ca = document.cookie.split(';');
-        for (let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-        }
-        return null;
-    }
-
-    function getUserId() {
-        let userId = getCookie("userId");
-        if (!userId) {
-            userId = generateUniqueId();
-            setCookie("userId", userId, 365); // クッキーの有効期限を1年に設定
-        }
-        return userId;
-    }
-
-    window.onload = updateCounter;
+  gtag('config', 'G-HS4S0YCE2Y');
 </script>
+    
 </head>
 <body>
     <video autoplay muted loop playsinline class="background-video">
