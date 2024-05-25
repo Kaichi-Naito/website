@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kaichi Guitar Music - Discography</title>
-    <link rel="icon" href="images/favicon.png" type="image/png"> <!-- ファビコンを追加 -->
+    <link rel="icon" href="images/favicon.png" type="image/png">
     <style>
         @font-face {
             font-family: 'PixelMplus';
@@ -18,30 +18,11 @@
             height: 100%;
             margin: 0;
             padding: 0;
-        }
-        .background-video {
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: -2;
-            object-fit: cover;
-        }
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.2); /* 明るさを下げるための黒のオーバーレイ */
-            z-index: -1;
+            background-image: url('images/background.png'); /* 背景画像を設定 */
+            background-size: cover;
         }
         .header {
-            padding: 0px;
+            padding: 20px;
         }
         .header h1 {
             font-size: 2em;
@@ -62,7 +43,7 @@
             text-decoration: underline;
         }
         .content {
-            max-width: 800px;
+            max-width: 1000px;
             margin: auto;
             padding: 20px;
             text-align: left;
@@ -70,67 +51,23 @@
         .content h2 {
             text-align: center;
         }
-        .content ul {
-            list-style: none;
-            padding: 0;
-        }
-        .content li {
-            margin-bottom: 10px;
-        }
-        a, a:visited {
-            color: white;
-        }
-        .section {
-            padding: 20px;
-            border: 2px solid white;
-            background-color: rgba(0, 0, 0, 0.7);
-            margin-bottom: 20px;
-        }
-        .section h2 {
-            margin-top: 0;
-        }
-        .section p {
-            margin-bottom: 10px;
-        }
-        @media (max-width: 600px) {
-            body {
-                font-size: 80%;
-            }
-            .nav {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-                justify-items: center;
-            }
-            .nav a {
-                font-size: 16px;
-            }
-        }
         .discography-section {
-            text-align: center;
-            margin: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
             padding: 20px;
             background-color: rgba(0, 0, 0, 0.7);
             border-radius: 15px;
             border: 2px solid white;
-        }
-        .discography-section h2 {
-            font-size: 2em;
-            margin-bottom: 20px;
-            color: white;
-        }
-        .album {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         .album img {
             max-width: 300px;
             border-radius: 15px;
-            margin-bottom: 20px;
+            margin-right: 20px;
         }
         .album-info {
-            text-align: center;
+            text-align: left;
             color: white;
         }
         .album-info h3 {
@@ -157,35 +94,9 @@
         .links img:hover {
             transform: scale(1.1);
         }
-        .custom-player {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            margin-top: 20px;
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.7);
-            border-radius: 12px;
-            border: 2px solid white;
-            max-width: 600px;
-            margin: 20px auto;
-        }
-        .custom-player img {
-            border-radius: 12px;
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 20px;
-        }
-        .custom-player audio {
-            width: 100%;
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
-    <video autoplay muted loop playsinline class="background-video">
-        <source src="images/8bit_town.mp4" type="video/mp4">
-    </video>
     <div class="header">
         <h1>Kaichi Guitar Music</h1>
         <div class="nav">
@@ -201,24 +112,21 @@
         <h2>Discography</h2>
         <div class="discography-section">
             <div class="album">
-                <img src="https://i.scdn.co/image/ab67616d0000b2733c7d8a3a0b6d0d8e0d4e81f4" alt="Peaceful Cafe">
-                <div class="album-info">
-                    <h3>Single</h3>
-                    <h1>Peaceful Cafe</h1>
-                    <p>Release: 2024.5.9</p>
-                    <div class="links">
-                        <a href="https://open.spotify.com" target="_blank"><img src="images/spotify-icon.png" alt="Spotify"></a>
-                        <a href="https://music.apple.com" target="_blank"><img src="images/applemusic-dot-logo.png" alt="Apple Music"></a>
-                    </div>
+                <img src="images/peaceful_cafe.png" alt="Peaceful Cafe">
+            </div>
+            <div class="album-info">
+                <h3>Single</h3>
+                <h1>Peaceful Cafe</h1>
+                <p>Release: 2024.5.9</p>
+                <div class="links">
+                    <a href="https://open.spotify.com" target="_blank">
+                        <img src="images/spotify-icon.png" alt="Spotify">
+                    </a>
+                    <a href="https://music.apple.com" target="_blank">
+                        <img src="images/applemusic-dot-logo.png" alt="Apple Music">
+                    </a>
                 </div>
             </div>
-        </div>
-        <div class="custom-player">
-            <img src="https://i.scdn.co/image/ab67616d0000b2733c7d8a3a0b6d0d8e0d4e81f4" alt="Album Cover">
-            <audio controls>
-                <source src="https://p.scdn.co/mp3-preview/ae34b6f35f6bff944ddc8f7478c85e0674b94a8d?cid=774b29d4f13844c495f206cafdad9c86" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
         </div>
     </div>
 </body>
