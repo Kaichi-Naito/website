@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaichi Guitar Music - Discography</title>
+    <link rel="icon" href="images/favicon.png" type="image/png"> <!-- ファビコンを追加 -->
+    <style>
+        @font-face {
+            font-family: 'PixelMplus';
+            src: url('https://kaichi-naito.github.io/website/fonts/PixelMplus10-Regular.ttf') format('truetype');
+        }
+        body {
+            font-family: 'PixelMplus', sans-serif;
+            color: white;
+            text-align: center;
+            position: relative;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .background-video {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -2;
+            object-fit: cover;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2); /* 明るさを下げるための黒のオーバーレイ */
+            z-index: -1;
+        }
+        .header {
+            padding: 0px;
+        }
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .nav a, .nav a:visited {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .nav a:hover {
+            text-decoration: underline;
+        }
+        .content {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            text-align: left;
+        }
+        .content h2 {
+            text-align: center;
+        }
+        .content ul {
+            list-style: none;
+            padding: 0;
+        }
+        .content li {
+            margin-bottom: 10px;
+        }
+        a, a:visited {
+            color: white;
+        }
+        .section {
+            padding: 20px;
+            border: 2px solid white;
+            background-color: rgba(0, 0, 0, 0.7);
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            margin-top: 0;
+        }
+        .section p {
+            margin-bottom: 10px;
+        }
+        @media (max-width: 600px) {
+            body {
+                font-size: 80%;
+            }
+            .nav {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                justify-items: center;
+            }
+            .nav a {
+                font-size: 16px;
+            }
+        }
+        .discography-section {
+            text-align: center;
+            margin: 20px;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            border: 2px solid white;
+        }
+
+        .discography-section h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .album {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .album img {
+            max-width: 300px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .album-info {
+            text-align: center;
+            color: white;
+        }
+
+        .album-info h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .album-info h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .album-info p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .links a {
+            margin: 0 10px;
+            display: inline-block;
+        }
+
+        .links img {
+            width: 50px;
+            height: 50px;
+            transition: transform 0.3s;
+        }
+
+        .links img:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop playsinline class="background-video">
+        <source src="images/8bit_town.mp4" type="video/mp4">
+    </video>
+    <div class="header">
+        <h1>Kaichi Guitar Music</h1>
+        <div class="nav">
+            <a href="https://kaichi-naito.github.io/website/index.html">Home</a>
+            <a href="https://kaichi-naito.github.io/website/Job_request.html">ご依頼</a>
+            <a href="https://kaichi-naito.github.io/website/Works.html">Works</a>
+            <a href="https://kaichinaito.wixsite.com/home/discography">Discography</a>
+            <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank">Contact</a>
+            <a href="https://kaichi-naito.github.io/website/freebgm.html">FREEBGM</a>
+        </div>
+    </div>
+    <div class="content">
+        <h2>Discography</h2>
+        <div class="discography-section">
+            <div class="album">
+                <img src="images/peaceful_cafe.png" alt="Peaceful Cafe">
+                <div class="album-info">
+                    <h3>Single</h3>
+                    <h1>Peaceful Cafe</h1>
+                    <p>Release: 2024.5.9</p>
+                    <div class="links">
+                        <a href="https://open.spotify.com" target="_blank"><img src="images/spotify-icon.png" alt="Spotify"></a>
+                        <a href="https://music.apple.com" target="_blank"><img src="images/applemusic-dot-logo.png" alt="Apple Music"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
