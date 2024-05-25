@@ -132,6 +132,36 @@
             }
         }
     </style>
+       <script>
+        function updateCounter() {
+            const now = new Date().getTime();
+            let visits = JSON.parse(localStorage.getItem('jobRequestVisits')) || [];
+
+            // タイムスタンプを追加
+            visits.push(now);
+
+            // 30日（2592000000ミリ秒）、120日（10368000000ミリ秒）、1年（31536000000ミリ秒）前のタイムスタンプを計算
+            const limit30Days = now - 2592000000;
+            const limit120Days = now - 10368000000;
+            const limit1Year = now - 31536000000;
+
+            // 1年以内の訪問のみフィルター
+            visits = visits.filter(timestamp => timestamp > limit1Year);
+
+            // 30日、120日、および1年以内の訪問数をカウント
+            const count30Days = visits.filter(timestamp => timestamp > limit30Days).length;
+            const count120Days = visits.filter(timestamp => timestamp > limit120Days).length;
+            const count1Year = visits.length;
+
+            // ローカルストレージに保存
+            localStorage.setItem('jobRequestVisits', JSON.stringify(visits));
+            localStorage.setItem('jobRequestCount30Days', count30Days);
+            localStorage.setItem('jobRequestCount120Days', count120Days);
+            localStorage.setItem('jobRequestCount1Year', count1Year);
+        }
+
+        window.onload = updateCounter;
+    </script>
 </head>
 <body>
     <video autoplay muted loop playsinline class="background-video">
