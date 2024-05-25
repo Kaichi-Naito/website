@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アクセスカウンター</title>
+    <style>
+        body {
+            font-family: 'PixelMplus', sans-serif;
+            color: white;
+            text-align: center;
+            background-color: #000;
+        }
+        a, a:visited {
+            color: white;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        // ローカルストレージからアクセスカウントを取得する関数
+        function displayCounter() {
+            if (localStorage.getItem('visitCount')) {
+                document.getElementById('visitCount').textContent = localStorage.getItem('visitCount');
+            } else {
+                document.getElementById('visitCount').textContent = 0;
+            }
+        }
+        window.onload = displayCounter;
+    </script>
+</head>
+<body>
+    <h1>アクセスカウンター</h1>
+    <p>このカウンターは <strong>Off Guitar Tracks</strong> ページのものです。</p>
+    <p>このページのアクセス数: <span id="visitCount"></span></p>
+    <a href="OffGuitarTracks.html">Off Guitar Tracksページに戻る</a>
+</body>
+</html>
