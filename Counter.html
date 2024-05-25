@@ -21,6 +21,22 @@
         a:hover {
             text-decoration: underline;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid white;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #455A64; /* 濃いブルーグレー */
+        }
+        td {
+            background-color: #607D8B; /* ブルーグレー */
+        }
     </style>
     <script>
         function displayCounter() {
@@ -43,24 +59,29 @@
             const discographyCount120Days = localStorage.getItem('discographyCount120Days') || 0;
             const discographyCount1Year = localStorage.getItem('discographyCount1Year') || 0;
 
-            document.getElementById('count30Days').textContent = count30Days;
-            document.getElementById('count120Days').textContent = count120Days;
-            document.getElementById('count1Year').textContent = count1Year;
-            document.getElementById('jobRequestCount30Days').textContent = jobRequestCount30Days;
-            document.getElementById('jobRequestCount120Days').textContent = jobRequestCount120Days;
-            document.getElementById('jobRequestCount1Year').textContent = jobRequestCount1Year;
-            document.getElementById('worksCount30Days').textContent = worksCount30Days;
-            document.getElementById('worksCount120Days').textContent = worksCount120Days;
-            document.getElementById('worksCount1Year').textContent = worksCount1Year;
             document.getElementById('indexCount30Days').textContent = indexCount30Days;
             document.getElementById('indexCount120Days').textContent = indexCount120Days;
             document.getElementById('indexCount1Year').textContent = indexCount1Year;
-            document.getElementById('freeBGMCount30Days').textContent = freeBGMCount30Days;
-            document.getElementById('freeBGMCount120Days').textContent = freeBGMCount120Days;
-            document.getElementById('freeBGMCount1Year').textContent = freeBGMCount1Year;
+
             document.getElementById('discographyCount30Days').textContent = discographyCount30Days;
             document.getElementById('discographyCount120Days').textContent = discographyCount120Days;
             document.getElementById('discographyCount1Year').textContent = discographyCount1Year;
+
+            document.getElementById('worksCount30Days').textContent = worksCount30Days;
+            document.getElementById('worksCount120Days').textContent = worksCount120Days;
+            document.getElementById('worksCount1Year').textContent = worksCount1Year;
+
+            document.getElementById('jobRequestCount30Days').textContent = jobRequestCount30Days;
+            document.getElementById('jobRequestCount120Days').textContent = jobRequestCount120Days;
+            document.getElementById('jobRequestCount1Year').textContent = jobRequestCount1Year;
+
+            document.getElementById('freeBGMCount30Days').textContent = freeBGMCount30Days;
+            document.getElementById('freeBGMCount120Days').textContent = freeBGMCount120Days;
+            document.getElementById('freeBGMCount1Year').textContent = freeBGMCount1Year;
+
+            document.getElementById('count30Days').textContent = count30Days;
+            document.getElementById('count120Days').textContent = count120Days;
+            document.getElementById('count1Year').textContent = count1Year;
         }
 
         window.onload = displayCounter;
@@ -68,36 +89,54 @@
 </head>
 <body>
     <h1>アクセスカウンター</h1>
-    <h2>Homeページ</h2>
-    <p>過去30日間のアクセス数: <span id="indexCount30Days"></span></p>
-    <p>過去120日間のアクセス数: <span id="indexCount120Days"></span></p>
-    <p>過去1年間のアクセス数: <span id="indexCount1Year"></span></p>
-
-    <h2>Discographyページ</h2>
-    <p>過去30日間のアクセス数: <span id="discographyCount30Days"></span></p>
-    <p>過去120日間のアクセス数: <span id="discographyCount120Days"></span></p>
-    <p>過去1年間のアクセス数: <span id="discographyCount1Year"></span></p>
-
-    <h2>Worksページ</h2>
-    <p>過去30日間のアクセス数: <span id="worksCount30Days"></span></p>
-    <p>過去120日間のアクセス数: <span id="worksCount120Days"></span></p>
-    <p>過去1年間のアクセス数: <span id="worksCount1Year"></span></p>
-
-    <h2>Job Requestページ</h2>
-    <p>過去30日間のアクセス数: <span id="jobRequestCount30Days"></span></p>
-    <p>過去120日間のアクセス数: <span id="jobRequestCount120Days"></span></p>
-    <p>過去1年間のアクセス数: <span id="jobRequestCount1Year"></span></p>
-
-    <h2>FREEBGMページ</h2>
-    <p>過去30日間のアクセス数: <span id="freeBGMCount30Days"></span></p>
-    <p>過去120日間のアクセス数: <span id="freeBGMCount120Days"></span></p>
-    <p>過去1年間のアクセス数: <span id="freeBGMCount1Year"></span></p>
-
-    <h2>Off Guitar Tracksページ</h2>
-    <p>過去30日間のアクセス数: <span id="count30Days"></span></p>
-    <p>過去120日間のアクセス数: <span id="count120Days"></span></p>
-    <p>過去1年間のアクセス数: <span id="count1Year"></span></p>
-
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th>過去30日間</th>
+                <th>過去90日間</th>
+                <th>過去1年間</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Home</td>
+                <td id="indexCount30Days"></td>
+                <td id="indexCount120Days"></td>
+                <td id="indexCount1Year"></td>
+            </tr>
+            <tr>
+                <td>Discography</td>
+                <td id="discographyCount30Days"></td>
+                <td id="discographyCount120Days"></td>
+                <td id="discographyCount1Year"></td>
+            </tr>
+            <tr>
+                <td>Works</td>
+                <td id="worksCount30Days"></td>
+                <td id="worksCount120Days"></td>
+                <td id="worksCount1Year"></td>
+            </tr>
+            <tr>
+                <td>Job Request</td>
+                <td id="jobRequestCount30Days"></td>
+                <td id="jobRequestCount120Days"></td>
+                <td id="jobRequestCount1Year"></td>
+            </tr>
+            <tr>
+                <td>FREEBGM</td>
+                <td id="freeBGMCount30Days"></td>
+                <td id="freeBGMCount120Days"></td>
+                <td id="freeBGMCount1Year"></td>
+            </tr>
+            <tr>
+                <td>Off Guitar Tracks</td>
+                <td id="count30Days"></td>
+                <td id="count120Days"></td>
+                <td id="count1Year"></td>
+            </tr>
+        </tbody>
+    </table>
     <a href="OffGuitarTracks.html">Off Guitar Tracksページに戻る</a>
     <a href="Job_request.html">Job Requestページに戻る</a>
 </body>
