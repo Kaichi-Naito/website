@@ -233,6 +233,36 @@
         }
 
     </style>
+    <script>
+    function updateIndexCounter() {
+        const now = new Date().getTime();
+        let indexVisits = JSON.parse(localStorage.getItem('indexVisits')) || [];
+
+        // タイムスタンプを追加
+        indexVisits.push(now);
+
+        // 30日（2592000000ミリ秒）、120日（10368000000ミリ秒）、1年（31536000000ミリ秒）前のタイムスタンプを計算
+        const limit30Days = now - 2592000000;
+        const limit120Days = now - 10368000000;
+        const limit1Year = now - 31536000000;
+
+        // 1年以内の訪問のみフィルター
+        indexVisits = indexVisits.filter(timestamp => timestamp > limit1Year);
+
+        // 30日、120日、および1年以内の訪問数をカウント
+        const count30Days = indexVisits.filter(timestamp => timestamp > limit30Days).length;
+        const count120Days = indexVisits.filter(timestamp => timestamp > limit120Days).length;
+        const count1Year = indexVisits.length;
+
+        // ローカルストレージに保存
+        localStorage.setItem('indexVisits', JSON.stringify(indexVisits));
+        localStorage.setItem('indexCount30Days', count30Days);
+        localStorage.setItem('indexCount120Days', count120Days);
+        localStorage.setItem('indexCount1Year', count1Year);
+    }
+
+    window.onload = updateIndexCounter;
+    </script>
 </head>
 <body>
     <video autoplay muted loop playsinline class="background-video">
