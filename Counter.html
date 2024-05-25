@@ -8,7 +8,7 @@
         body {
             font-family: 'PixelMplus', sans-serif;
             color: white;
-            text-align: center;
+            text-align: left; /* 左揃え */
             background-color: #607D8B; /* ブルーグレー */
             font-size: 14px; /* 文字サイズを小さく */
             margin: 10px; /* 上下左右に少しの余白 */
@@ -120,7 +120,8 @@
 
         function displayTimestamps() {
             const visits = JSON.parse(localStorage.getItem('visits')) || [];
-            const recentVisits = visits.slice(-100).map(visit => {
+            // 新しいアクセスが上に来るようにする
+            const recentVisits = visits.slice(-100).reverse().map(visit => {
                 const date = new Date(visit.timestamp).toLocaleString();
                 return `${date} - ${visit.page} - ${visit.userId}`;
             });
