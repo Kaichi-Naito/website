@@ -22,7 +22,7 @@
             text-decoration: underline;
         }
         table {
-            width: 100%;
+            width: 400px; /* 表の横幅を400pxに設定 */
             border-collapse: collapse;
             margin-top: 20px;
         }
@@ -58,6 +58,9 @@
             const discographyCount30Days = localStorage.getItem('discographyCount30Days') || 0;
             const discographyCount120Days = localStorage.getItem('discographyCount120Days') || 0;
             const discographyCount1Year = localStorage.getItem('discographyCount1Year') || 0;
+            const offGuitarTracksCount30Days = localStorage.getItem('offGuitarTracksCount30Days') || 0;
+            const offGuitarTracksCount120Days = localStorage.getItem('offGuitarTracksCount120Days') || 0;
+            const offGuitarTracksCount1Year = localStorage.getItem('offGuitarTracksCount1Year') || 0;
 
             document.getElementById('indexCount30Days').textContent = indexCount30Days;
             document.getElementById('indexCount120Days').textContent = indexCount120Days;
@@ -79,9 +82,9 @@
             document.getElementById('freeBGMCount120Days').textContent = freeBGMCount120Days;
             document.getElementById('freeBGMCount1Year').textContent = freeBGMCount1Year;
 
-            document.getElementById('count30Days').textContent = count30Days;
-            document.getElementById('count120Days').textContent = count120Days;
-            document.getElementById('count1Year').textContent = count1Year;
+            document.getElementById('offGuitarTracksCount30Days').textContent = offGuitarTracksCount30Days;
+            document.getElementById('offGuitarTracksCount120Days').textContent = offGuitarTracksCount120Days;
+            document.getElementById('offGuitarTracksCount1Year').textContent = offGuitarTracksCount1Year;
         }
 
         window.onload = displayCounter;
@@ -131,9 +134,9 @@
             </tr>
             <tr>
                 <td>Off Guitar Tracks</td>
-                <td id="count30Days"></td>
-                <td id="count120Days"></td>
-                <td id="count1Year"></td>
+                <td id="offGuitarTracksCount30Days"></td>
+                <td id="offGuitarTracksCount120Days"></td>
+                <td id="offGuitarTracksCount1Year"></td>
             </tr>
         </tbody>
     </table>
