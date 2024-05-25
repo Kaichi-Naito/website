@@ -126,6 +126,37 @@
             }
         }
     </style>
+    <script>
+    function updateFreeBGMCounter() {
+        const now = new Date().getTime();
+        let freeBGMVisits = JSON.parse(localStorage.getItem('freeBGMVisits')) || [];
+
+        // タイムスタンプを追加
+        freeBGMVisits.push(now);
+
+        // 30日（2592000000ミリ秒）、120日（10368000000ミリ秒）、1年（31536000000ミリ秒）前のタイムスタンプを計算
+        const limit30Days = now - 2592000000;
+        const limit120Days = now - 10368000000;
+        const limit1Year = now - 31536000000;
+
+        // 1年以内の訪問のみフィルター
+        freeBGMVisits = freeBGMVisits.filter(timestamp => timestamp > limit1Year);
+
+        // 30日、120日、および1年以内の訪問数をカウント
+        const count30Days = freeBGMVisits.filter(timestamp => timestamp > limit30Days).length;
+        const count120Days = freeBGMVisits.filter(timestamp => timestamp > limit120Days).length;
+        const count1Year = freeBGMVisits.length;
+
+        // ローカルストレージに保存
+        localStorage.setItem('freeBGMVisits', JSON.stringify(freeBGMVisits));
+        localStorage.setItem('freeBGMCount30Days', count30Days);
+        localStorage.setItem('freeBGMCount120Days', count120Days);
+        localStorage.setItem('freeBGMCount1Year', count1Year);
+    }
+
+    window.onload = updateFreeBGMCounter;
+</script>
+
 </head>
 <body>
     <video autoplay muted loop playsinline class="background-video">
