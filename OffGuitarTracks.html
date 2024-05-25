@@ -125,36 +125,37 @@
             }
         }
     </style>
-    <script>
-        function updateCounter() {
-            const now = new Date().getTime();
-            let visits = JSON.parse(localStorage.getItem('visits')) || [];
+<script>
+    function updateCounter() {
+        const now = new Date().getTime();
+        let visits = JSON.parse(localStorage.getItem('visits')) || [];
 
-            // タイムスタンプを追加
-            visits.push(now);
+        // タイムスタンプを追加
+        visits.push(now);
 
-            // 30日（2592000000ミリ秒）、120日（10368000000ミリ秒）、1年（31536000000ミリ秒）前のタイムスタンプを計算
-            const limit30Days = now - 2592000000;
-            const limit120Days = now - 10368000000;
-            const limit1Year = now - 31536000000;
+        // 30日（2592000000ミリ秒）、120日（10368000000ミリ秒）、1年（31536000000ミリ秒）前のタイムスタンプを計算
+        const limit30Days = now - 2592000000;
+        const limit120Days = now - 10368000000;
+        const limit1Year = now - 31536000000;
 
-            // 1年以内の訪問のみフィルター
-            visits = visits.filter(timestamp => timestamp > limit1Year);
+        // 1年以内の訪問のみフィルター
+        visits = visits.filter(timestamp => timestamp > limit1Year);
 
-            // 30日、120日、および1年以内の訪問数をカウント
-            const offGuitarTrackscount30Days = visits.filter(timestamp => timestamp > limit30Days).length;
-            const offGuitarTrackscount120Days = visits.filter(timestamp => timestamp > limit120Days).length;
-            const offGuitarTrackscount1Year = visits.length;
+        // 30日、120日、および1年以内の訪問数をカウント
+        const offGuitarTracksCount30Days = visits.filter(timestamp => timestamp > limit30Days).length;
+        const offGuitarTracksCount120Days = visits.filter(timestamp => timestamp > limit120Days).length;
+        const offGuitarTracksCount1Year = visits.length;
 
-            // ローカルストレージに保存
-            localStorage.setItem('visits', JSON.stringify(visits));
-            localStorage.setItem('offGuitarTrackscount30Days', count30Days);
-            localStorage.setItem('offGuitarTrackscount120Days', count120Days);
-            localStorage.setItem('offGuitarTrackscount1Year', count1Year);
-        }
+        // ローカルストレージに保存
+        localStorage.setItem('visits', JSON.stringify(visits));
+        localStorage.setItem('offGuitarTracksCount30Days', offGuitarTracksCount30Days);
+        localStorage.setItem('offGuitarTracksCount120Days', offGuitarTracksCount120Days);
+        localStorage.setItem('offGuitarTracksCount1Year', offGuitarTracksCount1Year);
+    }
 
-        window.onload = updateCounter;
-    </script>
+    window.onload = updateCounter;
+</script>
+
 </head>
 <body>
     <video autoplay muted loop playsinline class="background-video">
