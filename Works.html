@@ -132,36 +132,16 @@
             }
         }
     </style>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HS4S0YCE2Y"></script>
     <script>
-    function updateWorksCounter() {
-        const now = new Date().getTime();
-        let worksVisits = JSON.parse(localStorage.getItem('worksVisits')) || [];
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-        // タイムスタンプを追加
-        worksVisits.push(now);
-
-        // 30日（2592000000ミリ秒）、120日（10368000000ミリ秒）、1年（31536000000ミリ秒）前のタイムスタンプを計算
-        const limit30Days = now - 2592000000;
-        const limit120Days = now - 10368000000;
-        const limit1Year = now - 31536000000;
-
-        // 1年以内の訪問のみフィルター
-        worksVisits = worksVisits.filter(timestamp => timestamp > limit1Year);
-
-        // 30日、120日、および1年以内の訪問数をカウント
-        const count30Days = worksVisits.filter(timestamp => timestamp > limit30Days).length;
-        const count120Days = worksVisits.filter(timestamp => timestamp > limit120Days).length;
-        const count1Year = worksVisits.length;
-
-        // ローカルストレージに保存
-        localStorage.setItem('worksVisits', JSON.stringify(worksVisits));
-        localStorage.setItem('worksCount30Days', count30Days);
-        localStorage.setItem('worksCount120Days', count120Days);
-        localStorage.setItem('worksCount1Year', count1Year);
-    }
-
-    window.onload = updateWorksCounter;
-</script>
+        gtag('config', 'G-HS4S0YCE2Y');
+    </script>
 </head>
 <body>
     <video autoplay muted loop playsinline class="background-video">
