@@ -152,22 +152,22 @@
             }
 
             .discography-section {
-                flex-direction: column;
+                flex-direction: row; /* スマホ表示でも横並びにする */
                 align-items: center;
-                margin: 40px 0; /* 上下の余白を40pxに設定 */
-                padding: 20px 0; /* 上下の内側余白を20pxに設定 */
-                text-align: center; /* 曲情報を中央揃え */
+                justify-content: flex-start;
+                text-align: left; /* 曲情報を左揃え */
+                margin: 20px 0; /* 上下の余白を20pxに設定 */
+                padding: 10px 0; /* 上下の内側余白を10pxに設定 */
             }
 
             .album img {
-                width: 30%; /* スマホ表示時の幅 */
-                height: auto; /* アスペクト比を維持 */
-                margin-right: 0;
-                margin-bottom: 20px;
+                width: 150px; /* スマホ表示時の幅を150pxに設定 */
+                height: 150px; /* スマホ表示時の高さを150pxに設定 */
+                margin-right: 20px; /* 余白を20pxに設定 */
             }
 
-    　　　　.album-info {
-       　　　　　 text-align: left; /* 曲情報を左揃え */
+            .album-info {
+                text-align: left; /* 曲情報を左揃え */
             }
         }
     </style>
