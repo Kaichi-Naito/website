@@ -8,8 +8,11 @@
         body {
             font-family: 'PixelMplus', sans-serif;
             color: white;
-            text-align: center;
-            background-color: #000;
+            text-align: left; /* 左揃え */
+            background-color: #607D8B; /* ブルーグレー */
+            font-size: 14px; /* 文字サイズを小さく */
+            margin: 10px; /* 上下左右に少しの余白 */
+            padding: 10px; /* 上下左右に少しのパディング */
         }
         a, a:visited {
             color: white;
@@ -20,47 +23,47 @@
         }
     </style>
     <script>
-function displayCounter() {
-    const count30Days = localStorage.getItem('count30Days') || 0;
-    const count120Days = localStorage.getItem('count120Days') || 0;
-    const count1Year = localStorage.getItem('count1Year') || 0;
-    const jobRequestCount30Days = localStorage.getItem('jobRequestCount30Days') || 0;
-    const jobRequestCount120Days = localStorage.getItem('jobRequestCount120Days') || 0;
-    const jobRequestCount1Year = localStorage.getItem('jobRequestCount1Year') || 0;
-    const worksCount30Days = localStorage.getItem('worksCount30Days') || 0;
-    const worksCount120Days = localStorage.getItem('worksCount120Days') || 0;
-    const worksCount1Year = localStorage.getItem('worksCount1Year') || 0;
-    const indexCount30Days = localStorage.getItem('indexCount30Days') || 0;
-    const indexCount120Days = localStorage.getItem('indexCount120Days') || 0;
-    const indexCount1Year = localStorage.getItem('indexCount1Year') || 0;
-    const freeBGMCount30Days = localStorage.getItem('freeBGMCount30Days') || 0;
-    const freeBGMCount120Days = localStorage.getItem('freeBGMCount120Days') || 0;
-    const freeBGMCount1Year = localStorage.getItem('freeBGMCount1Year') || 0;
-    const discographyCount30Days = localStorage.getItem('discographyCount30Days') || 0;
-    const discographyCount120Days = localStorage.getItem('discographyCount120Days') || 0;
-    const discographyCount1Year = localStorage.getItem('discographyCount1Year') || 0;
+        function displayCounter() {
+            const count30Days = localStorage.getItem('count30Days') || 0;
+            const count120Days = localStorage.getItem('count120Days') || 0;
+            const count1Year = localStorage.getItem('count1Year') || 0;
+            const jobRequestCount30Days = localStorage.getItem('jobRequestCount30Days') || 0;
+            const jobRequestCount120Days = localStorage.getItem('jobRequestCount120Days') || 0;
+            const jobRequestCount1Year = localStorage.getItem('jobRequestCount1Year') || 0;
+            const worksCount30Days = localStorage.getItem('worksCount30Days') || 0;
+            const worksCount120Days = localStorage.getItem('worksCount120Days') || 0;
+            const worksCount1Year = localStorage.getItem('worksCount1Year') || 0;
+            const indexCount30Days = localStorage.getItem('indexCount30Days') || 0;
+            const indexCount120Days = localStorage.getItem('indexCount120Days') || 0;
+            const indexCount1Year = localStorage.getItem('indexCount1Year') || 0;
+            const freeBGMCount30Days = localStorage.getItem('freeBGMCount30Days') || 0;
+            const freeBGMCount120Days = localStorage.getItem('freeBGMCount120Days') || 0;
+            const freeBGMCount1Year = localStorage.getItem('freeBGMCount1Year') || 0;
+            const discographyCount30Days = localStorage.getItem('discographyCount30Days') || 0;
+            const discographyCount120Days = localStorage.getItem('discographyCount120Days') || 0;
+            const discographyCount1Year = localStorage.getItem('discographyCount1Year') || 0;
 
-    document.getElementById('count30Days').textContent = count30Days;
-    document.getElementById('count120Days').textContent = count120Days;
-    document.getElementById('count1Year').textContent = count1Year;
-    document.getElementById('jobRequestCount30Days').textContent = jobRequestCount30Days;
-    document.getElementById('jobRequestCount120Days').textContent = jobRequestCount120Days;
-    document.getElementById('jobRequestCount1Year').textContent = jobRequestCount1Year;
-    document.getElementById('worksCount30Days').textContent = worksCount30Days;
-    document.getElementById('worksCount120Days').textContent = worksCount120Days;
-    document.getElementById('worksCount1Year').textContent = worksCount1Year;
-    document.getElementById('indexCount30Days').textContent = indexCount30Days;
-    document.getElementById('indexCount120Days').textContent = indexCount120Days;
-    document.getElementById('indexCount1Year').textContent = indexCount1Year;
-    document.getElementById('freeBGMCount30Days').textContent = freeBGMCount30Days;
-    document.getElementById('freeBGMCount120Days').textContent = freeBGMCount120Days;
-    document.getElementById('freeBGMCount1Year').textContent = freeBGMCount1Year;
-    document.getElementById('discographyCount30Days').textContent = discographyCount30Days;
-    document.getElementById('discographyCount120Days').textContent = discographyCount120Days;
-    document.getElementById('discographyCount1Year').textContent = discographyCount1Year;
-}
+            document.getElementById('count30Days').textContent = count30Days;
+            document.getElementById('count120Days').textContent = count120Days;
+            document.getElementById('count1Year').textContent = count1Year;
+            document.getElementById('jobRequestCount30Days').textContent = jobRequestCount30Days;
+            document.getElementById('jobRequestCount120Days').textContent = jobRequestCount120Days;
+            document.getElementById('jobRequestCount1Year').textContent = jobRequestCount1Year;
+            document.getElementById('worksCount30Days').textContent = worksCount30Days;
+            document.getElementById('worksCount120Days').textContent = worksCount120Days;
+            document.getElementById('worksCount1Year').textContent = worksCount1Year;
+            document.getElementById('indexCount30Days').textContent = indexCount30Days;
+            document.getElementById('indexCount120Days').textContent = indexCount120Days;
+            document.getElementById('indexCount1Year').textContent = indexCount1Year;
+            document.getElementById('freeBGMCount30Days').textContent = freeBGMCount30Days;
+            document.getElementById('freeBGMCount120Days').textContent = freeBGMCount120Days;
+            document.getElementById('freeBGMCount1Year').textContent = freeBGMCount1Year;
+            document.getElementById('discographyCount30Days').textContent = discographyCount30Days;
+            document.getElementById('discographyCount120Days').textContent = discographyCount120Days;
+            document.getElementById('discographyCount1Year').textContent = discographyCount1Year;
+        }
 
-window.onload = displayCounter;
+        window.onload = displayCounter;
     </script>
 </head>
 <body>
@@ -74,7 +77,6 @@ window.onload = displayCounter;
     <p>過去30日間のアクセス数: <span id="discographyCount30Days"></span></p>
     <p>過去120日間のアクセス数: <span id="discographyCount120Days"></span></p>
     <p>過去1年間のアクセス数: <span id="discographyCount1Year"></span></p>
-
 
     <h2>Worksページ</h2>
     <p>過去30日間のアクセス数: <span id="worksCount30Days"></span></p>
@@ -91,7 +93,6 @@ window.onload = displayCounter;
     <p>過去120日間のアクセス数: <span id="freeBGMCount120Days"></span></p>
     <p>過去1年間のアクセス数: <span id="freeBGMCount1Year"></span></p>
 
-    
     <h2>Off Guitar Tracksページ</h2>
     <p>過去30日間のアクセス数: <span id="count30Days"></span></p>
     <p>過去120日間のアクセス数: <span id="count120Days"></span></p>
@@ -101,4 +102,3 @@ window.onload = displayCounter;
     <a href="Job_request.html">Job Requestページに戻る</a>
 </body>
 </html>
-
