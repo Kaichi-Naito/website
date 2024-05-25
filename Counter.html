@@ -20,21 +20,22 @@
         }
     </style>
     <script>
-        // ローカルストレージからアクセスカウントを取得する関数
         function displayCounter() {
-            if (localStorage.getItem('visitCount')) {
-                document.getElementById('visitCount').textContent = localStorage.getItem('visitCount');
-            } else {
-                document.getElementById('visitCount').textContent = 0;
-            }
+            const count30Days = localStorage.getItem('count30Days') || 0;
+            const count120Days = localStorage.getItem('count120Days') || 0;
+
+            document.getElementById('count30Days').textContent = count30Days;
+            document.getElementById('count120Days').textContent = count120Days;
         }
+
         window.onload = displayCounter;
     </script>
 </head>
 <body>
     <h1>アクセスカウンター</h1>
     <p>このカウンターは <strong>Off Guitar Tracks</strong> ページのものです。</p>
-    <p>このページのアクセス数: <span id="visitCount"></span></p>
+    <p>過去30日間のアクセス数: <span id="count30Days"></span></p>
+    <p>過去120日間のアクセス数: <span id="count120Days"></span></p>
     <a href="OffGuitarTracks.html">Off Guitar Tracksページに戻る</a>
 </body>
 </html>
