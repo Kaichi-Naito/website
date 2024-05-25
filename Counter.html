@@ -30,6 +30,9 @@ function displayCounter() {
     const worksCount30Days = localStorage.getItem('worksCount30Days') || 0;
     const worksCount120Days = localStorage.getItem('worksCount120Days') || 0;
     const worksCount1Year = localStorage.getItem('worksCount1Year') || 0;
+    const indexCount30Days = localStorage.getItem('indexCount30Days') || 0;
+    const indexCount120Days = localStorage.getItem('indexCount120Days') || 0;
+    const indexCount1Year = localStorage.getItem('indexCount1Year') || 0;
 
     document.getElementById('count30Days').textContent = count30Days;
     document.getElementById('count120Days').textContent = count120Days;
@@ -40,14 +43,21 @@ function displayCounter() {
     document.getElementById('worksCount30Days').textContent = worksCount30Days;
     document.getElementById('worksCount120Days').textContent = worksCount120Days;
     document.getElementById('worksCount1Year').textContent = worksCount1Year;
+    document.getElementById('indexCount30Days').textContent = indexCount30Days;
+    document.getElementById('indexCount120Days').textContent = indexCount120Days;
+    document.getElementById('indexCount1Year').textContent = indexCount1Year;
 }
 
 window.onload = displayCounter;
 
-    </script>
 </head>
 <body>
     <h1>アクセスカウンター</h1>
+    <h2>Homeページ</h2>
+    <p>過去30日間のアクセス数: <span id="indexCount30Days"></span></p>
+    <p>過去120日間のアクセス数: <span id="indexCount120Days"></span></p>
+    <p>過去1年間のアクセス数: <span id="indexCount1Year"></span></p>
+
     <h2>Worksページ</h2>
     <p>過去30日間のアクセス数: <span id="worksCount30Days"></span></p>
     <p>過去120日間のアクセス数: <span id="worksCount120Days"></span></p>
