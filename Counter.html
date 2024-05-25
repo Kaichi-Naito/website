@@ -37,6 +37,10 @@
         td {
             background-color: #607D8B; /* ブルーグレー */
         }
+        .timestamps {
+            text-align: left;
+            margin-top: 20px;
+        }
     </style>
     <script>
         function displayCounter() {
@@ -82,6 +86,8 @@
             document.getElementById('offGuitarTracksCount30Days').textContent = offGuitarTracksCount30Days;
             document.getElementById('offGuitarTracksCount120Days').textContent = offGuitarTracksCount120Days;
             document.getElementById('offGuitarTracksCount1Year').textContent = offGuitarTracksCount1Year;
+
+            displayTimestamps();
         }
 
         function clearLastWeekVisits() {
@@ -96,6 +102,27 @@
             // ローカルストレージに保存
             localStorage.setItem('visits', JSON.stringify(visits));
             location.reload(); // ページをリロードしてカウンターを更新
+        }
+
+        function clearLastDayVisits() {
+            const now = new Date().getTime();
+            const limit1Day = now - 86400000; // 24時間前のタイムスタンプ
+
+            let visits = JSON.parse(localStorage.getItem('visits')) || [];
+
+            // 24時間以内の訪問のみ削除
+            visits = visits.filter(timestamp => timestamp <= limit1Day);
+
+            // ローカルストレージに保存
+            localStorage.setItem('visits', JSON.stringify(visits));
+            location.reload(); // ページをリロードしてカウンターを更新
+        }
+
+        function displayTimestamps() {
+            const visits = JSON.parse(localStorage.getItem('visits')) || [];
+            const recentVisits = visits.slice(-100).map(timestamp => new Date(timestamp).toLocaleString());
+            const timestampContainer = document.getElementById('timestamps');
+            timestampContainer.innerHTML = recentVisits.join('<br>');
         }
 
         window.onload = displayCounter;
@@ -152,6 +179,8 @@
         </tbody>
     </table>
     <button onclick="clearLastWeekVisits()">直近1週間分のアクセスを削除</button>
+    <button onclick="clearLastDayVisits()">直近24時間分のアクセスを削除</button>
+    <div id="timestamps" class="timestamps"></div>
     <a href="OffGuitarTracks.html">Off Guitar Tracksページに戻る</a>
     <a href="Job_request.html">Job Requestページに戻る</a>
 </body>
