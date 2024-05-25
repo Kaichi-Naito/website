@@ -36,6 +36,9 @@ function displayCounter() {
     const freeBGMCount30Days = localStorage.getItem('freeBGMCount30Days') || 0;
     const freeBGMCount120Days = localStorage.getItem('freeBGMCount120Days') || 0;
     const freeBGMCount1Year = localStorage.getItem('freeBGMCount1Year') || 0;
+    const discographyCount30Days = localStorage.getItem('discographyCount30Days') || 0;
+    const discographyCount120Days = localStorage.getItem('discographyCount120Days') || 0;
+    const discographyCount1Year = localStorage.getItem('discographyCount1Year') || 0;
 
     document.getElementById('count30Days').textContent = count30Days;
     document.getElementById('count120Days').textContent = count120Days;
@@ -52,9 +55,13 @@ function displayCounter() {
     document.getElementById('freeBGMCount30Days').textContent = freeBGMCount30Days;
     document.getElementById('freeBGMCount120Days').textContent = freeBGMCount120Days;
     document.getElementById('freeBGMCount1Year').textContent = freeBGMCount1Year;
+    document.getElementById('discographyCount30Days').textContent = discographyCount30Days;
+    document.getElementById('discographyCount120Days').textContent = discographyCount120Days;
+    document.getElementById('discographyCount1Year').textContent = discographyCount1Year;
 }
 
 window.onload = displayCounter;
+
 
 
 </head>
@@ -64,6 +71,12 @@ window.onload = displayCounter;
     <p>過去30日間のアクセス数: <span id="indexCount30Days"></span></p>
     <p>過去120日間のアクセス数: <span id="indexCount120Days"></span></p>
     <p>過去1年間のアクセス数: <span id="indexCount1Year"></span></p>
+
+    <h2>Discographyページ</h2>
+    <p>過去30日間のアクセス数: <span id="discographyCount30Days"></span></p>
+    <p>過去120日間のアクセス数: <span id="discographyCount120Days"></span></p>
+    <p>過去1年間のアクセス数: <span id="discographyCount1Year"></span></p>
+
 
     <h2>Worksページ</h2>
     <p>過去30日間のアクセス数: <span id="worksCount30Days"></span></p>
