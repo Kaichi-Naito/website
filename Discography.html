@@ -83,7 +83,7 @@
         .discography-section {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             margin: 20px auto;
             padding: 20px;
         }
@@ -96,6 +96,7 @@
         .album-info {
             text-align: left;
             color: white;
+            flex-grow: 1;
         }
 
         .album-info h3 {
@@ -142,6 +143,16 @@
 
             .nav a {
                 font-size: 16px;
+            }
+
+            .discography-section {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .album img {
+                margin-right: 0;
+                margin-bottom: 20px;
             }
         }
     </style>
