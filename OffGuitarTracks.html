@@ -148,9 +148,9 @@
 
             // ローカルストレージに保存
             localStorage.setItem('visits', JSON.stringify(visits));
-            localStorage.setItem('offGuitarTrackscount30Days', offGuitarTrackscount30Days);
-            localStorage.setItem('offGuitarTrackscount120Days', offGuitarTrackscount120Days);
-            localStorage.setItem('offGuitarTrackscount1Year', offGuitarTrackscount1Year);
+            localStorage.setItem('offGuitarTrackscount30Days', count30Days);
+            localStorage.setItem('offGuitarTrackscount120Days', count120Days);
+            localStorage.setItem('offGuitarTrackscount1Year', count1Year);
         }
 
         window.onload = updateCounter;
