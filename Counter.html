@@ -23,9 +23,11 @@
         function displayCounter() {
             const count30Days = localStorage.getItem('count30Days') || 0;
             const count120Days = localStorage.getItem('count120Days') || 0;
+            const count1Year = localStorage.getItem('count1Year') || 0;
 
             document.getElementById('count30Days').textContent = count30Days;
             document.getElementById('count120Days').textContent = count120Days;
+            document.getElementById('count1Year').textContent = count1Year;
         }
 
         window.onload = displayCounter;
@@ -36,6 +38,7 @@
     <p>このカウンターは <strong>Off Guitar Tracks</strong> ページのものです。</p>
     <p>過去30日間のアクセス数: <span id="count30Days"></span></p>
     <p>過去120日間のアクセス数: <span id="count120Days"></span></p>
+    <p>過去1年間のアクセス数: <span id="count1Year"></span></p>
     <a href="OffGuitarTracks.html">Off Guitar Tracksページに戻る</a>
 </body>
 </html>
