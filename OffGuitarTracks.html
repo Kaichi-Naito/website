@@ -133,21 +133,24 @@
             // タイムスタンプを追加
             visits.push(now);
 
-            // 30日（2592000000ミリ秒）と120日（10368000000ミリ秒）前のタイムスタンプを計算
+            // 30日（2592000000ミリ秒）、120日（10368000000ミリ秒）、1年（31536000000ミリ秒）前のタイムスタンプを計算
             const limit30Days = now - 2592000000;
             const limit120Days = now - 10368000000;
+            const limit1Year = now - 31536000000;
 
-            // 30日以内の訪問のみフィルター
-            visits = visits.filter(timestamp => timestamp > limit120Days);
+            // 1年以内の訪問のみフィルター
+            visits = visits.filter(timestamp => timestamp > limit1Year);
 
-            // 30日と120日以内の訪問数をカウント
+            // 30日、120日、および1年以内の訪問数をカウント
             const count30Days = visits.filter(timestamp => timestamp > limit30Days).length;
-            const count120Days = visits.length;
+            const count120Days = visits.filter(timestamp => timestamp > limit120Days).length;
+            const count1Year = visits.length;
 
             // ローカルストレージに保存
             localStorage.setItem('visits', JSON.stringify(visits));
             localStorage.setItem('count30Days', count30Days);
             localStorage.setItem('count120Days', count120Days);
+            localStorage.setItem('count1Year', count1Year);
         }
 
         window.onload = updateCounter;
