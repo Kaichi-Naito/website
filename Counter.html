@@ -20,36 +20,49 @@
         }
     </style>
     <script>
-        function displayCounter() {
-            const count30Days = localStorage.getItem('count30Days') || 0;
-            const count120Days = localStorage.getItem('count120Days') || 0;
-            const count1Year = localStorage.getItem('count1Year') || 0;
-            const jobRequestCount30Days = localStorage.getItem('jobRequestCount30Days') || 0;
-            const jobRequestCount120Days = localStorage.getItem('jobRequestCount120Days') || 0;
-            const jobRequestCount1Year = localStorage.getItem('jobRequestCount1Year') || 0;
+function displayCounter() {
+    const count30Days = localStorage.getItem('count30Days') || 0;
+    const count120Days = localStorage.getItem('count120Days') || 0;
+    const count1Year = localStorage.getItem('count1Year') || 0;
+    const jobRequestCount30Days = localStorage.getItem('jobRequestCount30Days') || 0;
+    const jobRequestCount120Days = localStorage.getItem('jobRequestCount120Days') || 0;
+    const jobRequestCount1Year = localStorage.getItem('jobRequestCount1Year') || 0;
+    const worksCount30Days = localStorage.getItem('worksCount30Days') || 0;
+    const worksCount120Days = localStorage.getItem('worksCount120Days') || 0;
+    const worksCount1Year = localStorage.getItem('worksCount1Year') || 0;
 
-            document.getElementById('count30Days').textContent = count30Days;
-            document.getElementById('count120Days').textContent = count120Days;
-            document.getElementById('count1Year').textContent = count1Year;
-            document.getElementById('jobRequestCount30Days').textContent = jobRequestCount30Days;
-            document.getElementById('jobRequestCount120Days').textContent = jobRequestCount120Days;
-            document.getElementById('jobRequestCount1Year').textContent = jobRequestCount1Year;
-        }
+    document.getElementById('count30Days').textContent = count30Days;
+    document.getElementById('count120Days').textContent = count120Days;
+    document.getElementById('count1Year').textContent = count1Year;
+    document.getElementById('jobRequestCount30Days').textContent = jobRequestCount30Days;
+    document.getElementById('jobRequestCount120Days').textContent = jobRequestCount120Days;
+    document.getElementById('jobRequestCount1Year').textContent = jobRequestCount1Year;
+    document.getElementById('worksCount30Days').textContent = worksCount30Days;
+    document.getElementById('worksCount120Days').textContent = worksCount120Days;
+    document.getElementById('worksCount1Year').textContent = worksCount1Year;
+}
 
-        window.onload = displayCounter;
+window.onload = displayCounter;
+
     </script>
 </head>
 <body>
     <h1>アクセスカウンター</h1>
-    <p>このカウンターは <strong>Off Guitar Tracks</strong> および <strong>Job Request</strong> ページのものです。</p>
-    <h2>Off Guitar Tracksページ</h2>
-    <p>過去30日間のアクセス数: <span id="count30Days"></span></p>
-    <p>過去120日間のアクセス数: <span id="count120Days"></span></p>
-    <p>過去1年間のアクセス数: <span id="count1Year"></span></p>
+    <h2>Worksページ</h2>
+    <p>過去30日間のアクセス数: <span id="worksCount30Days"></span></p>
+    <p>過去120日間のアクセス数: <span id="worksCount120Days"></span></p>
+    <p>過去1年間のアクセス数: <span id="worksCount1Year"></span></p>
+
     <h2>Job Requestページ</h2>
     <p>過去30日間のアクセス数: <span id="jobRequestCount30Days"></span></p>
     <p>過去120日間のアクセス数: <span id="jobRequestCount120Days"></span></p>
     <p>過去1年間のアクセス数: <span id="jobRequestCount1Year"></span></p>
+    
+    <h2>Off Guitar Tracksページ</h2>
+    <p>過去30日間のアクセス数: <span id="count30Days"></span></p>
+    <p>過去120日間のアクセス数: <span id="count120Days"></span></p>
+    <p>過去1年間のアクセス数: <span id="count1Year"></span></p>
+
     <a href="OffGuitarTracks.html">Off Guitar Tracksページに戻る</a>
     <a href="Job_request.html">Job Requestページに戻る</a>
 </body>
