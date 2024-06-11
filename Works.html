@@ -19,10 +19,13 @@
             height: 100%;
             margin: 0;
             padding: 0;
+           background: url('images/8bit_star.png') no-repeat center center fixed;
+            background-size: cover;
         }
 
         .background-video {
-            position: fixed;
+            display: none; /* 背景を画像に変更するため、ビデオを非表示にします */
+            /*position: fixed;
             right: 0;
             bottom: 0;
             min-width: 100%;
@@ -30,7 +33,7 @@
             width: auto;
             height: auto;
             z-index: -2;
-            object-fit: cover;
+            object-fit: cover;*/
         }
 
         body::before {
