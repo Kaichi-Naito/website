@@ -299,14 +299,15 @@
     <script>
         (function(){
             const MIN = 1;
-            const MAX = 15;
+            const MAX = 20;
             const a = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
             const b = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
             const correct = a + b;
+            const encodedEmail = 'a2FpY2hpLm5haXRvQGdtYWlsLmNvbQ=='; // Base64 encode
             let wrongCount = 0;
 
             document.getElementById('question').textContent =
-                ` ${a} ＋ ${b} ＝ ？`;
+                `次の計算を解いてください： ${a} ＋ ${b} ＝ ？`;
 
             const submitBtn = document.getElementById('submit');
             const answerInput = document.getElementById('answer');
@@ -315,8 +316,10 @@
             submitBtn.addEventListener('click', function(){
                 const userAns = parseInt(answerInput.value, 10);
                 if (userAns === correct) {
-                    // 正解したらメールアドレスをで表示
-                    resultEl.innerHTML = '<span style="color: yellow;">kaichi.naito@gmail.com</span>';
+                    // Base64デコードして表示
+                    const email = atob(encodedEmail);
+                    resultEl.innerHTML =
+                        'メールアドレス： <span style="color: yellow;">' + email + '</span>';
                 } else {
                     wrongCount++;
                     if (wrongCount >= 3) {
