@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kaichi Guitar Music</title>
-    <link rel="icon" href="images/favicon.png" type="image/png">
     <style>
         @font-face {
             font-family: 'PixelMplus';
@@ -21,9 +20,10 @@
             background: url('images/8bit_star.png') no-repeat center center fixed;
             background-size: cover;
         }
-/* 
+
         .background-video {
-            position: fixed;
+            display: none; /* 背景を画像に変更するため、ビデオを非表示にします */
+            /*position: fixed;
             right: 0;
             bottom: 0;
             min-width: 100%;
@@ -31,9 +31,8 @@
             width: auto;
             height: auto;
             z-index: -2;
-            object-fit: cover;
+            object-fit: cover;*/
         }
-*/
         body::before {
             content: "";
             position: fixed;
@@ -41,77 +40,87 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: rgba(0, 0, 0, 0.2); /* 明るさを下げるための黒のオーバーレイ */
             z-index: -1;
         }
-
+        .header {
+            padding: 0px;
+        }
         .header h1 {
             font-size: 2em;
             margin-bottom: 30px;
         }
-
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
         .nav a, .nav a:visited {
             color: white;
             text-decoration: none;
             font-size: 18px;
         }
-
         .nav a:hover {
             text-decoration: underline;
         }
-
         .content {
             max-width: 800px;
             margin: auto;
             padding: 20px;
-            text-align: left;
         }
-
-        .section {
-            padding: 20px;
-            border: 2px solid white;
-            background-color: rgba(0, 0, 0, 0.7);
+        .content h2 {
+            font-size: 1.5em;
             margin-bottom: 20px;
         }
-
-        /* テキストサイズ調整 */
-        .small-text {
-            font-size: 0.8em;
-            line-height: 1.4;
+        .content p {
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
-
-        /* DMリンク同サイズ・下部配置 */
-        .dm-link {
-            font-size: 1.5em;
-            margin-top: 30px;
-        }
-
-        a, a:visited {
+        .content a, .content a:visited {
             color: white;
         }
-
+        .content a:hover {
+            text-decoration: underline;
+        }
+        .credit-box {
+            border: 2px solid white;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: black; /* 背景色を黒に設定 */
+            color: white; /* テキスト色を白に設定 */
+        }
         .footer {
-            text-align: center;
-            font-size: 0.8em;
-            color: white;
-            margin: 20px 0;
-            padding: 10px 0;
+            text-align: center; /* 中央揃え */
+            font-size: 0.8em; /* 標準サイズより少し小さめ */
+            color: white; /* 白色に変更 */
+            margin: 20px 0; /* 上下に20pxのマージン */
+            padding: 10px 0; /* 上下に10pxのパディング */
         }
-
         @media (max-width: 600px) {
             body {
                 font-size: 80%;
             }
-
+            .nav {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+                justify-items: center;
+            }
             .nav a {
                 font-size: 16px;
             }
-
-            .dm-link {
+            .header h1 {
+                font-size: 1.5em;
+            }
+            .content {
+                padding: 10px;
+            }
+            .content h2 {
                 font-size: 1.2em;
             }
         }
-    </style>
+    </style>   
 </head>
 <body>
      <!--<video autoplay muted loop playsinline class="background-video">
