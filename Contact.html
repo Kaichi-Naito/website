@@ -280,8 +280,8 @@
             <h2>ご連絡先</h2>
             <h2>Contact</h2>
             <p class="small-text">
-                以下の簡単なテストに答えるとメールアドレスが表示されます。<br>
-                Answer the simple test below to display the email address.
+                以下のテストに答えるとメールアドレスが表示されます。<br>
+                Answer the Test below to display the email address.
             </p>
             <p id="question" class="small-text">読み込み中…</p>
             <input type="number" id="answer" placeholder="ここに答えを入力">
@@ -299,7 +299,7 @@
     <script>
         (function(){
             const MIN = 1;
-            const MAX = 20;
+            const MAX = 15;
             const a = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
             const b = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
             const correct = a + b;
@@ -315,7 +315,7 @@
             submitBtn.addEventListener('click', function(){
                 const userAns = parseInt(answerInput.value, 10);
                 if (userAns === correct) {
-                    resultEl.textContent = 'メールアドレス： kaichi.naito@gmail.com';
+                    resultEl.textContent = ' kaichi.naito@gmail.com';
                 } else {
                     wrongCount++;
                     if (wrongCount >= 3) {
