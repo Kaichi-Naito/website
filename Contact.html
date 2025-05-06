@@ -66,6 +66,13 @@
         /* テキストサイズ調整 */
         .small-text {
             font-size: 0.8em;
+            line-height: 1.4;
+        }
+
+        /* DMリンク同サイズ・下部配置 */
+        .dm-link {
+            font-size: 1.5em;
+            margin-top: 30px;
         }
 
         a, a:visited {
@@ -85,15 +92,12 @@
                 font-size: 80%;
             }
 
-            .nav {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-                justify-items: center;
-            }
-
             .nav a {
                 font-size: 16px;
+            }
+
+            .dm-link {
+                font-size: 1.2em;
             }
         }
     </style>
@@ -116,12 +120,17 @@
         <div class="section">
             <h2>ご連絡先</h2>
             <h2>Contact</h2>
-            <p class="small-text">以下の簡単なテストに答えるとメールアドレスが表示されます。</p>
+            <p class="small-text">
+                以下の簡単なテストに答えるとメールアドレスが表示されます。<br>
+                Answer the simple test below to display the email address.
+            </p>
             <p id="question" class="small-text">読み込み中…</p>
             <input type="number" id="answer" placeholder="ここに答えを入力">
             <button id="submit">送信</button>
             <p id="result"></p>
-            <p class="small-text"><a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank">X(Twitter)のDMはこちら</a></p>
+            <p class="dm-link">
+                <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank">X(Twitter)のDMはこちら</a>
+            </p>
         </div>
     </div>
     <div class="footer">
