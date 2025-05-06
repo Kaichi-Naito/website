@@ -319,7 +319,7 @@
                     // Base64デコードして表示
                     const email = atob(encodedEmail);
                     resultEl.innerHTML =
-                        'メールアドレス： <span style="color: yellow;">' + email + '</span>';
+                        '<span style="color: yellow;">' + email + '</span>';
                 } else {
                     wrongCount++;
                     if (wrongCount >= 3) {
