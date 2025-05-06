@@ -315,7 +315,8 @@
             submitBtn.addEventListener('click', function(){
                 const userAns = parseInt(answerInput.value, 10);
                 if (userAns === correct) {
-                    resultEl.textContent = ' kaichi.naito@gmail.com';
+                    // 正解したらメールアドレスをで表示
+                    resultEl.innerHTML = '<span style="color: yellow;">kaichi.naito@gmail.com</span>';
                 } else {
                     wrongCount++;
                     if (wrongCount >= 3) {
