@@ -23,20 +23,6 @@
             background-size: cover;
         }
 
-        /*
-        .background-video {
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: -2;
-            object-fit: cover;
-        }
-        */
-
         body::before {
             content: "";
             position: fixed;
@@ -81,23 +67,6 @@
             text-align: left;
         }
 
-        .content h2 {
-            text-align: center;
-        }
-
-        .content ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .content li {
-            margin-bottom: 10px;
-        }
-
-        a, a:visited {
-            color: white;
-        }
-
         .section {
             padding: 20px;
             border: 2px solid white;
@@ -111,6 +80,11 @@
 
         .section p {
             margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        a, a:visited {
+            color: white;
         }
 
         .footer {
@@ -138,7 +112,6 @@
             }
         }
     </style>
-
 </head>
 <body>
     <video autoplay muted loop playsinline class="background-video">
@@ -157,7 +130,7 @@
     <div class="content">
         <div class="section">
             <h2>ご連絡先</h2>
-            <h2>Contact</n2>
+            <h2>Contact</h2>
             <p>以下の簡単なテストに答えるとメールアドレスが表示されます。</p>
             <p id="question">読み込み中…</p>
             <input type="number" id="answer" placeholder="ここに答えを入力">
@@ -168,7 +141,6 @@
     <div class="footer">
         このサイトは本人によって頑張って作成されました
     </div>
-
     <script>
         (function(){
             const MIN = 1;
@@ -176,18 +148,28 @@
             const a = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
             const b = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
             const correct = a + b;
+            let wrongCount = 0;
 
             document.getElementById('question').textContent =
                 `次の計算を解いてください： ${a} ＋ ${b} ＝ ？`;
 
-            document.getElementById('submit').addEventListener('click', function(){
-                const userAns = parseInt(document.getElementById('answer').value, 10);
-                const resultEl = document.getElementById('result');
+            const submitBtn = document.getElementById('submit');
+            const answerInput = document.getElementById('answer');
+            const resultEl = document.getElementById('result');
 
+            submitBtn.addEventListener('click', function(){
+                const userAns = parseInt(answerInput.value, 10);
                 if (userAns === correct) {
                     resultEl.textContent = 'メールアドレス： kaichi.naito@gmail.com';
                 } else {
-                    resultEl.textContent = '不正解です。もう一度お試しください。';
+                    wrongCount++;
+                    if (wrongCount >= 3) {
+                        resultEl.textContent = '回答回数の上限に達しました。';
+                        submitBtn.disabled = true;
+                        answerInput.disabled = true;
+                    } else {
+                        resultEl.textContent = `不正解です。残り${3 - wrongCount}回です。`;
+                    }
                 }
             });
         })();
