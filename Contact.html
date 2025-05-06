@@ -176,6 +176,9 @@
             margin: 20px 0; /* 上下に20pxのマージン */
             padding: 10px 0; /* 上下に10pxのパディング */
         }
+         .dm-link {
+            font-size: 1.2em;
+        }
         /* スマホ版 */
         @media (max-width: 600px) {
             body {
@@ -303,7 +306,7 @@
             let wrongCount = 0;
 
             document.getElementById('question').textContent =
-                `次の計算を解いてください： ${a} ＋ ${b} ＝ ？`;
+                ` ${a} ＋ ${b} ＝ ？`;
 
             const submitBtn = document.getElementById('submit');
             const answerInput = document.getElementById('answer');
