@@ -5,21 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- SEO 用メタタグ -->
-    <meta name="description" content="Kaichi Naito（内藤海地）によるギター演奏・オリジナル楽曲を紹介する公式サイト。YouTube・Spotifyで最新楽曲をお楽しみください。">
+    <meta name="description" content="Kaichi（内藤海地）によるギター演奏・オリジナル楽曲を紹介する公式サイト。YouTube・Spotifyで最新楽曲をお楽しみください。">
     <!-- Open Graph タグ（SNSシェア対策） -->
     <meta property="og:title" content="Kaichi Guitar Music">
-    <meta property="og:description" content="Kaichi Naito（内藤海地）のオリジナル楽曲・ギター演奏動画を公開中。">
+    <meta property="og:description" content="Kaichi（内藤海地）のオリジナル楽曲・ギター演奏動画を公開中。">
     <meta property="og:image" content="https://kaichi-naito.github.io/website/images/Kaichi_profile-image.jpg">
     <meta property="og:url" content="https://kaichi-naito.github.io/website/index.html">
     <meta property="og:type" content="website">
     <!-- Twitter カード -->
     <meta name="twitter:card" content="summary_large_image">
 
-    <!-- キャッシュ制御 (Meta http-equiv で設定) -->
+    <!-- キャッシュ制御 -->
     <meta http-equiv="Cache-Control" content="max-age=31536000">
 
     <title>Kaichi Guitar Music</title>
-    <link rel="icon" href="images/favicon.png" type="image/png"> <!-- ファビコン -->
+    <link rel="icon" href="images/favicon.png" type="image/png">
 
     <style>
         @font-face {
@@ -44,7 +44,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.2); /* 明るさを下げるための黒のオーバーレイ */
+            background-color: rgba(0, 0, 0, 0.2);
             z-index: -1;
         }
 
@@ -94,7 +94,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 40px;
+            gap: 30px; /* 元の間隔に戻しました */
             margin-bottom: 60px;
         }
         .profile-img-container {
@@ -110,24 +110,24 @@
         .profile-text h2 {
             font-size: 24px;
             display: inline-block;
-            margin: 0 0 7.5px 0; /* 下に小さな余白 */
+            margin-bottom: 7.5px;
         }
         .profile-text p {
             font-size: 20px;
-            margin: 0 0 10px 0;
+            margin-top: 0;
         }
         .profile-text p.artist-info {
             font-size: 16px;
-            margin: 0 0 3px 0;
+            margin-bottom: 3px;
         }
         .profile-text p.artist-info-2 {
             font-size: 14px;
-            margin: 0 0 3px 0;
+            margin-bottom: 3px;
         }
         .profile-text .official-artist {
             font-size: 13px;
             display: block;
-            margin: 0 0 10px 0;
+            margin-bottom: 10px;
         }
 
         /* ソーシャルアイコン */
@@ -210,29 +210,29 @@
             }
             nav.nav {
                 display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                justify-content: center;
+                grid-template-columns: repeat(5, 1fr);
                 gap: 10px;
+                justify-items: center;
             }
             nav.nav a {
                 font-size: 16px;
-                padding: 6px 2px; /* タップ領域を確保 */
+                padding: 6px 2px;
             }
             header h1 {
                 font-size: 1.5em;
             }
             .profile-text h2 {
-                font-size: 1.2rem; /* 24px の 80% */
+                font-size: 1.2rem;
                 margin-bottom: 7.5px;
             }
             .profile-text p {
-                font-size: 1rem; /* 20px の 80% */
+                font-size: 1rem;
                 margin-bottom: 8px;
             }
             .profile-text p.artist-info,
             .profile-text p.artist-info-2,
             .profile-text .official-artist {
-                font-size: 0.8rem; /* 16px 相当 */
+                font-size: 0.8rem;
                 margin-bottom: 3px;
             }
             .profile-img {
@@ -248,7 +248,7 @@
             .social-icons a {
                 width: 100%;
                 margin-bottom: 20px;
-                padding: 6px 2px; /* タップ領域を確保 */
+                padding: 6px 2px;
             }
             .social-icons img {
                 max-width: 50px;
@@ -285,18 +285,19 @@
     </header>
 
     <main role="main">
-        <!-- プロフィールセクション -->
+        <!-- プロフィールセクション（元の表示に戻しました） -->
         <div class="content">
             <div class="profile-img-container">
-                <img src="images/Kaichi_profile-image.jpg" alt="Kaichi プロフィール画像" class="profile-img" width="150" height="150">
+                <img src="images/Kaichi_profile-image.jpg" alt="Kaichi" class="profile-img" width="150" height="auto">
             </div>
             <div class="profile-text">
-            <h2>Kaichi</h2>
-            <p>Guitar, write music.</p>
-            <p class="artist-info"><a href="https://avex.jp/muchoo/creator/detail.php?id=1002656" target="_blank">avex muchoo所属</a></p><br>
-            <p class="artist-info"><a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank">Hotone Audio</a></p>
-            <p class="artist-info-2"><a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank">オフィシャルアーティスト</a></p><br>
-            <!-- <p class="request"><a href="https://kaichi-naito.github.io/website/Job_request.html" target="_blank">ご依頼はこちら<br>Job request here</a></p> -->
+                <h2>Kaichi</h2>
+                <p>Guitar, write music.</p>
+                <p class="artist-info"><a href="https://avex.jp/muchoo/creator/detail.php?id=1002656" target="_blank">avex muchoo所属</a></p><br>
+                <p class="artist-info"><a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank">Hotone Audio</a></p>
+                <p class="artist-info-2"><a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank">オフィシャルアーティスト</a></p><br>
+                <!-- <p class="request"><a href="https://kaichi-naito.github.io/website/Job_request.html" target="_blank">ご依頼はこちら<br>Job request here</a></p> -->
+            </div>
         </div>
 
         <!-- ソーシャルアイコンセクション -->
