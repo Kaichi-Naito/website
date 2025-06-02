@@ -3,8 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO 用メタタグ -->
+    <meta name="description" content="Kaichi（内藤海地）によるギター演奏・オリジナル楽曲を紹介する公式サイト。YouTube・Spotifyで最新楽曲をお楽しみください。">
+    <!-- Open Graph タグ（SNSシェア対策） -->
+    <meta property="og:title" content="Kaichi Guitar Music">
+    <meta property="og:description" content="Kaichi（内藤海地）のオリジナル楽曲・ギター演奏動画を公開中。">
+    <meta property="og:image" content="https://kaichi-naito.github.io/website/images/Kaichi_profile-image.jpg">
+    <meta property="og:url" content="https://kaichi-naito.github.io/website/index.html">
+    <meta property="og:type" content="website">
+    <!-- Twitter カード -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- キャッシュ制御 (Meta http-equiv で設定) -->
+    <meta http-equiv="Cache-Control" content="max-age=31536000">
+
     <title>Kaichi Guitar Music</title>
     <link rel="icon" href="images/favicon.png" type="image/png"> <!-- ファビコン -->
+
     <style>
         @font-face {
             font-family: 'PixelMplus';
@@ -21,19 +37,6 @@
             background: url('images/8bit_star.png') no-repeat center center fixed;
             background-size: cover;
         }
-/* 
-        .background-video {
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: -2;
-            object-fit: cover;
-        }
-*/
         body::before {
             content: "";
             position: fixed;
@@ -44,39 +47,56 @@
             background-color: rgba(0, 0, 0, 0.2); /* 明るさを下げるための黒のオーバーレイ */
             z-index: -1;
         }
-        .header {
-            padding: 0px;
+
+        /* ヘッダー */
+        header {
+            padding: 0;
         }
-        .header h1 {
+        header h1 {
             font-size: 2em;
             margin-bottom: 30px;
         }
-        .nav {
+        nav.nav {
             display: flex;
             justify-content: center;
             gap: 20px;
             margin-bottom: 20px;
             flex-wrap: nowrap;
         }
-        .nav a, .nav a:visited {
+        nav.nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 20px;
+        }
+        nav.nav li {
+            margin: 0;
+        }
+        nav.nav a,
+        nav.nav a:visited {
             color: white;
             text-decoration: none;
             font-size: 18px;
-            white-space: nowrap; 
+            white-space: nowrap;
+            display: inline-block;
+            padding: 8px 4px; /* タップ領域を確保 */
         }
-        .nav a:hover {
+        nav.nav a:hover {
             text-decoration: underline;
         }
-        .content {
+
+        main {
             max-width: 600px;
             margin: auto;
+        }
+        .content {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 40px;
-            gap: 30px;
+            margin-bottom: 60px;
         }
-
         .profile-img-container {
             flex-shrink: 0;
         }
@@ -90,42 +110,39 @@
         .profile-text h2 {
             font-size: 24px;
             display: inline-block;
-            margin-right: 0;
-            margin-bottom: 7.5px; /* 1/4 の余白に設定 (現行余白が30pxの1/4) */
+            margin: 0 0 7.5px 0; /* 下に小さな余白 */
         }
         .profile-text p {
             font-size: 20px;
-            margin-top: 0; /* 余白の重複を防ぐため */
+            margin: 0 0 10px 0;
         }
         .profile-text p.artist-info {
-            font-size: 16px; /* 少々小さく設定 */
-            margin-bottom: 3px; /* 小さな余白を設定 */
+            font-size: 16px;
+            margin: 0 0 3px 0;
         }
         .profile-text p.artist-info-2 {
-            font-size: 14px; /* 少々小さく設定 */
-            margin-bottom: 3px; /* 小さな余白を設定 */
+            font-size: 14px;
+            margin: 0 0 3px 0;
         }
         .profile-text .official-artist {
-            font-size: 13px; /* 少々小さく設定 */
+            font-size: 13px;
             display: block;
-            margin-bottom: 10px; /* 小さな余白を設定 */
+            margin: 0 0 10px 0;
         }
-        .profile-text .request {
-            font-size: 16px; /* 少々小さく設定 */
-            margin-bottom: 3px; /* 小さな余白を設定 */
-        }
+
+        /* ソーシャルアイコン */
         .social-icons {
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-top: 20px;
             margin-bottom: 60px;
         }
         .social-icons a {
             text-align: center;
             color: white;
             text-decoration: none;
-            flex-basis: auto;
+            display: inline-block;
+            padding: 8px 4px; /* タップ領域を確保 */
         }
         .social-icons a:visited {
             color: white;
@@ -137,71 +154,86 @@
             height: auto;
             margin-bottom: 5px;
         }
+
+        /* Spotify プレイリスト埋め込み */
         .spotify-playlist {
-            max-width: 1000px; /* 最大幅を1000pxに設定 */
-            margin: 20px auto; /* 上下に20px、左右は自動で中央寄せ */
-            padding: 0 20px; /* 左右に20pxのパディングを追加 */
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 20px;
         }
+        .spotify-playlist iframe {
+            width: 100%;
+            height: 152px;
+            border-radius: 12px;
+        }
+
+        /* セクションタイトル */
         .section-title {
             text-align: left;
             font-size: 1.2em;
             margin: 20px 0;
             padding-left: 10px;
             text-decoration: none;
-        }
-        a, a:visited {
+            display: block;
             color: white;
         }
-        a.section-title:hover {
+        .section-title:hover {
             text-decoration: none;
         }
-        .footer {
-            text-align: center; /* 中央揃え */
-            font-size: 0.8em; /* 標準サイズより少し小さめ */
-            color: white; /* 白色に変更 */
-            margin: 20px 0; /* 上下に20pxのマージン */
-            padding: 10px 0; /* 上下に10pxのパディング */
+
+        /* YouTube プレイリスト埋め込み */
+        .playlist-container {
+            margin: 0 auto 60px auto;
+            max-width: 1000px;
+            padding: 0 20px;
         }
+        .playlist-container iframe {
+            width: 100%;
+            height: calc(100vw * 9 / 16);
+            max-width: 1000px;
+            max-height: 563px;
+        }
+
+        /* フッター */
+        footer.footer {
+            text-align: center;
+            font-size: 0.8em;
+            color: white;
+            margin: 20px 0;
+            padding: 10px 0;
+        }
+
         /* スマホ版 */
         @media (max-width: 600px) {
             body {
                 font-size: 80%;
             }
-            .nav {
+            nav.nav {
                 display: grid;
                 grid-template-columns: repeat(5, 1fr);
                 gap: 10px;
                 justify-items: center;
             }
-            .nav a {
+            nav.nav a {
                 font-size: 16px;
+                padding: 6px 2px; /* タップ領域を確保 */
             }
-            .header h1 {
+            header h1 {
                 font-size: 1.5em;
             }
             .profile-text h2 {
-                font-size: 1.2rem; /* 24pxの80% */
-                margin-bottom: 7.5px; /* 1/4 の余白に設定 (現行余白が30pxの1/4) */
+                font-size: 1.2rem; /* 24px の 80% */
+                margin-bottom: 7.5px;
             }
             .profile-text p {
-                font-size: 1rem; /* 20pxの80% */
-                margin-top: 0; /* 余白の重複を防ぐため */
+                font-size: 1rem; /* 20px の 80% */
+                margin-bottom: 8px;
             }
-            .profile-text p.artist-info {
-                font-size: 0.8rem; /* 少々小さく設定 (16px相当) */
-                margin-bottom: 3px; /* 小さな余白を設定 */
-            }
-            .profile-text p.artist-info-2 {
-                font-size: 0.8rem; /* 少々小さく設定 (16px相当) */
-                margin-bottom: 3px; /* 小さな余白を設定 */
-            }
+            .profile-text p.artist-info,
+            .profile-text p.artist-info-2,
             .profile-text .official-artist {
-                font-size: 0.5rem; /* 少々小さく設定 (13px相当) */
-                margin-bottom: 10px; /* 小さな余白を設定 */
-            }
-            .profile-text .request {
-                font-size: 0.8rem; /* 少々小さく設定 (16px相当) */
-                margin-bottom: 3px; /* 小さな余白を設定 */
+                font-size: 0.8rem; /* 16px 相当 */
+                margin-bottom: 3px;
             }
             .profile-img {
                 width: 120px;
@@ -216,6 +248,7 @@
             .social-icons a {
                 width: 100%;
                 margin-bottom: 20px;
+                padding: 6px 2px; /* タップ領域を確保 */
             }
             .social-icons img {
                 max-width: 50px;
@@ -223,71 +256,91 @@
                 margin-bottom: 2px;
             }
             .content {
+                flex-direction: column;
                 padding: 0 10px;
-                flex-direction: row;
+                gap: 20px;
+                margin-bottom: 40px;
             }
         }
-        .playlist-container {
-            margin-top: 20px;
-            padding: 0 20px; /* 左右に余白を追加 */
-        }
-        .playlist-container iframe {
-            width: 100%;
-            height: calc(100vw * 9 / 16); /* 16:9 のアスペクト比を保つ */
-            max-height: 563px; /* 最大高さを設定 */
-            max-width: 1000px; /* 最大幅を設定 */
-        }
-
     </style>
 </head>
 <body>
-    <!--アクセス解析研究所-->
-    <script src="//accaii.com/kaichi/script.js" async></script><noscript><img src="//accaii.com/kaichi/script?guid=on"></noscript>
-    <!--アクセス解析研究所END-->
-     <!--<video autoplay muted loop playsinline class="background-video">
-        <source src="images/8bit_town.mp4" type="video/mp4">-->
-    </video>
-    <div class="header">
+    <script src="//accaii.com/kaichi/script.js" async></script>
+    <noscript>
+        <img src="//accaii.com/kaichi/script?guid=on" alt="アクセス解析">
+    </noscript>
+
+    <!-- ヘッダー -->
+    <header class="header">
         <h1>Kaichi Guitar Music</h1>
-        <div class="nav">
-            <a href="https://kaichi-naito.github.io/website/index.html">Home</a>
-            <a href="https://kaichi-naito.github.io/website/Discography.html">Discography</a>
-            <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank">Works</a>
-            <a href="https://kaichi-naito.github.io/website/Contact.html" target="_blank">Contact</a>
-            <!-- <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank">Contact</a> -->
-            <a href="https://kaichi-naito.github.io/website/freebgm.html">FREEBGM</a>
+        <nav class="nav" role="navigation">
+            <ul>
+                <li><a href="https://kaichi-naito.github.io/website/index.html">Home</a></li>
+                <li><a href="https://kaichi-naito.github.io/website/Discography.html">Discography</a></li>
+                <li><a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank">Works</a></li>
+                <li><a href="https://kaichi-naito.github.io/website/Contact.html" target="_blank">Contact</a></li>
+                <li><a href="https://kaichi-naito.github.io/website/freebgm.html">FREEBGM</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main role="main">
+        <!-- プロフィールセクション -->
+        <div class="content">
+            <div class="profile-img-container">
+                <img src="images/Kaichi_profile-image.jpg" alt="Kaichi プロフィール画像" class="profile-img" width="150" height="150">
+            </div>
+            <div class="profile-text">
+                <h2>Kaichi（内藤海地）</h2>
+                <p>ギタリスト／作曲家・プロデューサー。ロックとEDMを融合させたオリジナル楽曲をYouTubeやSpotifyで公開中。</p>
+                <p class="artist-info"><a href="https://avex.jp/muchoo/creator/detail.php?id=1002656" target="_blank">avex muchoo所属</a></p>
+                <p class="artist-info"><a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank">Hotone Audio オフィシャルアーティスト</a></p>
+            </div>
         </div>
-    </div>
-    <div class="content">
-        <div class="profile-img-container">
-            <img src="images/Kaichi_profile-image.jpg" alt="Kaichi" class="profile-img">
+
+        <!-- ソーシャルアイコンセクション -->
+        <div class="social-icons">
+            <a href="https://x.com/Kaichi_zZ" target="_blank" aria-label="X（旧Twitter）へ">
+                <img src="images/X_dot_logo.png" alt="X ロゴ" width="60" height="60">
+                <div>X(Twitter)</div>
+            </a>
+            <a href="https://www.instagram.com/kaichi_zz/" target="_blank" aria-label="Instagramへ">
+                <img src="images/instagram_dot_logo.png" alt="Instagram ロゴ" width="60" height="60">
+                <div>Instagram</div>
+            </a>
+            <a href="https://www.youtube.com/KaichizZ" target="_blank" aria-label="YouTubeへ">
+                <img src="images/Youtube_dot_logo.png" alt="YouTube ロゴ" width="60" height="60">
+                <div>YouTube</div>
+            </a>
+            <a href="https://space.bilibili.com/1471756997/channel/series" target="_blank" aria-label="BiliBiliへ">
+                <img src="images/bilibili_dot_icon.png" alt="BiliBili ロゴ" width="60" height="60">
+                <div>BiliBili</div>
+            </a>
+            <a href="https://open.spotify.com/artist/0zok75wIWAb9qQ0hofCT1h?si=QrD4CGKXSyGttC7-3nM-XA" target="_blank" aria-label="Spotifyへ">
+                <img src="images/spotify-icon.png" alt="Spotify ロゴ" width="60" height="60">
+                <div>Spotify</div>
+            </a>
+            <a href="https://music.apple.com/jp/artist/kaichi-naito/1542151566" target="_blank" aria-label="Apple Musicへ">
+                <img src="images/applemusic_dot_logo.png" alt="Apple Music ロゴ" width="60" height="60">
+                <div>Apple Music</div>
+            </a>
         </div>
-        <div class="profile-text">
-            <h2>Kaichi</h2>
-            <p>Guitar, write music.</p>
-            <p class="artist-info"><a href="https://avex.jp/muchoo/creator/detail.php?id=1002656" target="_blank">avex muchoo所属</a></p><br>
-            <p class="artist-info"><a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank">Hotone Audio</a></p>
-            <p class="artist-info-2"><a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank">オフィシャルアーティスト</a></p><br>
-            <!-- <p class="request"><a href="https://kaichi-naito.github.io/website/Job_request.html" target="_blank">ご依頼はこちら<br>Job request here</a></p> -->
-        </div>
-    </div>
-    <div class="social-icons">
-        <a href="https://x.com/Kaichi_zZ" target="_blank"><img src="images/X_dot_logo.png" alt="Twitter"><div>X(Twitter)</div></a>
-        <a href="https://www.instagram.com/kaichi_zz/" target="_blank"><img src="images/instagram_dot_logo.png" alt="Instagram"><div>Instagram</div></a>
-        <a href="https://www.youtube.com/KaichizZ" target="_blank"><img src="images/Youtube_dot_logo.png" alt="YouTube"><div>YouTube</div></a>
-        <a href="https://space.bilibili.com/1471756997/channel/series" target="_blank"><img src="images/bilibili_dot_icon.png" alt="BiliBili"><div>BiliBili</div></a>
-        <a href="https://open.spotify.com/artist/0zok75wIWAb9qQ0hofCT1h?si=QrD4CGKXSyGttC7-3nM-XA" target="_blank"><img src="images/spotify-icon.png" alt="Spotify"><div>Spotify</div></a>
-        <a href="https://music.apple.com/jp/artist/kaichi-naito/1542151566" target="_blank"><img src="images/applemusic_dot_logo.png" alt="Apple Music"><div>Apple Music</div></a>
-    </div> <!-- social-iconsを閉じる -->
-    <div class="spotify-playlist">
-    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/7zFYuDYTPticfPk8HaoBPg?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-    </div>
-    <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" target="_blank" class="section-title">　Original songs🎸</a>
-    <div class="playlist-container">
-        <iframe src="https://www.youtube.com/embed/videoseries?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" frameborder="0" allowfullscreen></iframe>
-    </div>
-        <div class="footer">
-        このサイトは本人によって頑張って作成されました
-    </div>
+
+        <!-- Spotify 埋め込みセクション -->
+        <section class="spotify-playlist">
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/7zFYuDYTPticfPk8HaoBPg?utm_source=generator" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </section>
+
+        <!-- Original songs セクション -->
+        <section class="playlist-container">
+            <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" target="_blank" class="section-title">Original songs 🎸</a>
+            <iframe loading="lazy" src="https://www.youtube.com/embed/videoseries?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" frameborder="0" allowfullscreen></iframe>
+        </section>
+    </main>
+
+    <!-- フッター -->
+    <footer class="footer" role="contentinfo">
+        <p>このサイトは本人によって頑張って作成されました</p>
+    </footer>
 </body>
 </html>
