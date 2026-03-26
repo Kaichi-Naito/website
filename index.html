@@ -129,7 +129,7 @@
         .social-icons-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            gap: 15px; /* PCでのデフォルト */
             text-align: center;
         }
         .social-item img {
@@ -162,7 +162,7 @@
             }
             .header-title { font-size: 1.8em; }
             .window {
-                width: 86% !important; /* 左右に散らす隙間を作るため少し細く */
+                width: 86% !important; /* スマホでも横幅を確保しつつabsoluteを維持 */
                 box-sizing: border-box;
             }
 
@@ -173,6 +173,18 @@
             .social-item img {
                 width: 32px !important;
                 height: 32px !important;
+            }
+
+            /* --- 新規追加：SNSボタン同士の間隔とボタン自体を狭める --- */
+            .social-icons-grid {
+                gap: 5px !important; /* 間隔を狭める */
+            }
+            .social-item {
+                padding: 4px 8px !important; /* ボタン自体を狭める */
+                font-size: 14px !important; /* 文字も少し小さく */
+            }
+            .social-item img {
+                margin-bottom: 2px !important; /* アイコン下のマージンを詰める */
             }
         }
     </style>
@@ -267,7 +279,7 @@
             if (isMobile) {
                 // スマホ用：縦に並べつつ、左右にジグザグに散らす
                 var currentTop = 180;
-                var gap = 15; // 少し間隔を詰めて乱雑感を出す
+                var gap = 15; // 乱雑感を出すために少し間隔を詰める
 
                 profile.style.left = '3%'; // 左寄り
                 profile.style.top = currentTop + 'px';
