@@ -51,11 +51,10 @@
             box-shadow: 1px 1px 0 0 #000000;
             padding: 2px;
             margin: 0; 
-            max-width: 95vw; /* PCでも画面外にはみ出しすぎないように */
+            max-width: 95vw;
             display: inline-block;
             text-align: left;
             position: absolute;
-            
             opacity: 0; 
             transition: transform 0.2s, opacity 0.4s ease-in;
         }
@@ -209,7 +208,7 @@
             border-color: #000080; 
         }
 
-        /* --- スマホ対応（横幅バグ修正版） --- */
+        /* --- スマホ対応（横幅バグ・パツパツ修正版） --- */
         @media (max-width: 800px) {
             body {
                 font-size: 14px;
@@ -219,13 +218,19 @@
                 margin-bottom: 15px;
             }
             
-            /* 横幅の強制引き伸ばしを削除し、画面より大きくならないガードだけ残す */
             .window {
                 max-width: 94vw !important; 
                 box-sizing: border-box;
             }
 
-            /* PHALUX用の中身調整（横幅強制を削除） */
+            /* --- 追加：スマホ用それぞれのウィンドウの横幅を強制的に小さく指定 --- */
+            #win-profile { width: 280px !important; }
+            #win-phalux { width: 140px !important; }
+            #win-social { width: 300px !important; }
+            #win-spotify { width: 320px !important; }
+            #win-youtube { width: 340px !important; }
+            /* ------------------------------------------------------------------ */
+
             #win-phalux .window-contents {
                 padding: 5px !important; 
             }
@@ -430,9 +435,8 @@
                 var currentTop = 180; 
                 var gap = 12;
 
-                // 左端から少しだけずらして散らす（はみ出さないように計算済み）
                 if(profile.style.display !== 'none') {
-                    profile.style.left = '3%';
+                    profile.style.left = '8%'; // 少し右に寄せてバランスを調整
                     profile.style.top = currentTop + 'px';
                     currentTop += profile.offsetHeight + gap;
                 }
@@ -442,12 +446,12 @@
                     currentTop += phalux.offsetHeight + gap;
                 }
                 if(social.style.display !== 'none') {
-                    social.style.left = '4%';
+                    social.style.left = '5%';
                     social.style.top = currentTop + 'px';
                     currentTop += social.offsetHeight + gap;
                 }
                 if(spotify.style.display !== 'none') {
-                    spotify.style.left = '2%';
+                    spotify.style.left = '4%';
                     spotify.style.top = currentTop + 'px';
                     currentTop += spotify.offsetHeight + gap;
                 }
@@ -568,7 +572,6 @@
                 windowElem.style.opacity = '0';
                 setTimeout(function() {
                     windowElem.style.display = 'none';
-                    // せり上がってくるバグの原因だった setInitialPositions() を削除しました！
                 }, 300);
             };
             btn.addEventListener('click', closeAction);
