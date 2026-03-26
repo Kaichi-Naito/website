@@ -122,7 +122,6 @@
             margin-bottom: 10px; height: 35px; box-shadow: inset 2px 2px 0px #808080;
         }
 
-        /* グリッドを3列に変更 */
         .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
         
         .win95-btn {
@@ -133,12 +132,6 @@
             color: black; text-decoration: none;
         }
         .win95-btn:active { border-color: #808080 #ffffff #ffffff #808080; padding: 7px 0 5px 0; }
-
-        .dm-link-btn {
-            grid-column: span 3; /* DMボタンを3列ぶち抜きに */
-            font-size: 14px;
-            color: blue !important;
-        }
 
         .footer {
             margin-top: 50px;
@@ -151,19 +144,24 @@
             pointer-events: none;
         }
 
+        /* スマホ版レスポンシブ設定：index.htmlに完全準拠 */
         @media (max-width: 800px) {
             h1 { font-size: 1.5em; margin-bottom: 30px; }
+            
+            /* アイコンの間隔をトップページと同じ 8px に修正 */
+            .nav {
+                display: flex;
+                justify-content: center;
+                gap: 8px; 
+                margin-bottom: 25px;
+            }
+            .desktop-icon { width: 60px; }
             .desktop-icon img { width: 34px !important; height: 34px !important; }
-            .desktop-icon span { font-size: 11px; }
+            .desktop-icon span { font-size: 11px; padding: 1px 2px; }
 
-            /* 電卓ウィンドウの幅を演算子ボタンがない分、さらにコンパクトに */
-            #win-calculator {
-                width: 200px !important; 
-            }
-            #win-calculator .win95-btn {
-                font-size: 14px;
-                padding: 4px 0;
-            }
+            /* 電卓縮小設定の維持 */
+            #win-calculator { width: 200px !important; }
+            #win-calculator .win95-btn { font-size: 14px; padding: 4px 0; }
         }
     </style>
 </head>
@@ -197,15 +195,12 @@
                 <div class="win95-btn num-btn" onclick="inputNum(7)">7</div>
                 <div class="win95-btn num-btn" onclick="inputNum(8)">8</div>
                 <div class="win95-btn num-btn" onclick="inputNum(9)">9</div>
-
                 <div class="win95-btn num-btn" onclick="inputNum(4)">4</div>
                 <div class="win95-btn num-btn" onclick="inputNum(5)">5</div>
                 <div class="win95-btn num-btn" onclick="inputNum(6)">6</div>
-
                 <div class="win95-btn num-btn" onclick="inputNum(1)">1</div>
                 <div class="win95-btn num-btn" onclick="inputNum(2)">2</div>
                 <div class="win95-btn num-btn" onclick="inputNum(3)">3</div>
-
                 <div class="win95-btn num-btn" onclick="inputNum(0)">0</div>
                 <div class="win95-btn" onclick="clearDisplay()">C</div>
                 <div class="win95-btn" style="color:red; font-weight:bold;" onclick="checkAnswer()">OK</div>
@@ -223,7 +218,6 @@
     <div class="footer">このサイトは本人によって頑張って作成されました</div>
 
     <script>
-        // サウンド・ドラッグロジックなどは以前のまま維持
         var mouseClickSound = new Audio('Sound/MouseClick.mp3');
         function playSound() { if (mouseClickSound) { mouseClickSound.currentTime = 0; mouseClickSound.play().catch(()=>{}); } }
         document.addEventListener('mousedown', (e) => { if (e.target.closest('.desktop-icon, .win95-btn, .close-button, .title-bar')) playSound(); });
@@ -260,7 +254,7 @@
             if (isMobile) {
                 msg.style.left = '5%'; msg.style.top = '150px';
                 calc.style.left = '10%'; calc.style.top = '280px';
-                dm.style.left = '15%'; dm.style.top = '620px'; /* dmの位置を電卓に合わせて調整 */
+                dm.style.left = '15%'; dm.style.top = '620px';
                 document.body.style.minHeight = '900px';
             } else {
                 msg.style.left = '15%'; msg.style.top = '200px';
