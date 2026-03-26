@@ -16,7 +16,7 @@
         @font-face {
             font-family: 'PixelMplus';
             src: url('https://kaichi-naito.github.io/website/fonts/PixelMplus10-Regular.ttf') format('truetype');
-            font-display: swap; /* ←ついでにフォントの読み込み待ちを防ぐ処理も入れておきました！ */
+            font-display: swap; 
         }
         body {
             font-family: 'PixelMplus', sans-serif;
@@ -24,7 +24,7 @@
             text-align: center;
             margin: 0;
             padding: 20px 0 50px 0;
-            background-color: #008080; /* Windows 95 Desktop Color */
+            background-color: #008080;
             background-image: url('images/8bit_star.png');
             background-blend-mode: overlay;
             background-size: cover;
@@ -34,7 +34,6 @@
             position: relative;
         }
 
-        /* --- Windows 95 UI Component --- */
         .window {
             background-color: #c0c0c0;
             border: 2px solid;
@@ -107,7 +106,6 @@
             padding: 7px 11px 5px 13px;
         }
 
-        /* --- デスクトップアイコン風ナビゲーション --- */
         .nav {
             display: flex;
             justify-content: center;
@@ -258,7 +256,7 @@
         </a>
     </div>
 
-    <div class="window" id="win-profile" style="width: 500px; z-index: 104;">
+    <div class="window" id="win-profile" style="width: 380px; z-index: 104;">
         <div class="title-bar draggable-cursor" id="handle-profile">
             <span>Profile.exe</span>
             <div class="close-button">×</div>
@@ -333,7 +331,7 @@
             var maxBottom = 0;
 
             if (isMobile) {
-                var currentTop = 220;
+                var currentTop = 220; 
                 var gap = 15;
 
                 if(profile.style.display !== 'none') {
