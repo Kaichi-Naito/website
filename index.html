@@ -214,7 +214,6 @@
             border-color: #000080; 
         }
 
-        /* --- スマホ対応（安全で綺麗なパーセント指定に変更） --- */
         @media (max-width: 800px) {
             body {
                 font-size: 14px;
@@ -228,10 +227,7 @@
                 box-sizing: border-box;
             }
 
-            /* --- 修正箇所：スマホ版Profileを280pxに固定 --- */
             #win-profile { width: 280px !important; }
-            /* ------------------------------------------------ */
-            
             #win-phalux { width: 45% !important; max-width: 160px !important; }
             #win-social { width: 90% !important; max-width: 350px !important; }
             #win-spotify { width: 92% !important; max-width: 360px !important; }
@@ -446,7 +442,6 @@
             var maxBottom = 0;
 
             if (isMobile) {
-                // --- 修正箇所：スマホ版の配置を縦に広く取り、階段状に散らす ---
                 if(profile.style.display !== 'none') {
                     profile.style.left = '4%';
                     profile.style.top = '150px';
@@ -459,10 +454,16 @@
                     social.style.left = '6%';
                     social.style.top = '380px';
                 }
+                
+                // --- 今回修正した箇所：スマホ版 CD_Player(Spotify) の右寄せ ---
                 if(spotify.style.display !== 'none') {
-                    spotify.style.left = '3%';
+                    // 画面の横幅からウィンドウ自体の横幅を引いて、右端から12pxの位置に配置
+                    var spWidth = spotify.offsetWidth || 320;
+                    spotify.style.left = (width - spWidth - 12) + 'px'; 
                     spotify.style.top = '550px';
                 }
+                // -------------------------------------------------------------
+
                 if(youtube.style.display !== 'none') {
                     youtube.style.left = '2%';
                     youtube.style.top = '730px';
@@ -470,9 +471,7 @@
                 } else {
                     maxBottom = 900;
                 }
-                // -------------------------------------------------------------
             } else {
-                // PC版の配置（一切変更していません）
                 if(profile.style.display !== 'none') {
                     profile.style.left = '8%';
                     profile.style.top = '120px';
