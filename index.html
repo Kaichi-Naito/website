@@ -55,6 +55,7 @@
             display: inline-block;
             text-align: left;
             position: absolute;
+            
             opacity: 0; 
             transition: transform 0.2s, opacity 0.4s ease-in;
         }
@@ -208,7 +209,7 @@
             border-color: #000080; 
         }
 
-        /* --- スマホ対応（横幅バグ・パツパツ修正版） --- */
+        /* --- スマホ対応（修正済み） --- */
         @media (max-width: 800px) {
             body {
                 font-size: 14px;
@@ -223,8 +224,8 @@
                 box-sizing: border-box;
             }
 
-            /* --- 追加：スマホ用それぞれのウィンドウの横幅を強制的に小さく指定 --- */
-            #win-profile { width: 280px !important; }
+            /* スマホ用それぞれのウィンドウの横幅を強制的に小さく指定 */
+            /* #win-profile はPC版の280pxをそのまま適用させるため、ここから削除 */
             #win-phalux { width: 140px !important; }
             #win-social { width: 300px !important; }
             #win-spotify { width: 320px !important; }
@@ -331,7 +332,7 @@
         </a>
     </div>
 
-    <div class="window" id="win-profile" style="width: 380px; z-index: 104;">
+    <div class="window" id="win-profile" style="width: 280px; z-index: 104;">
         <div class="title-bar draggable-cursor" id="handle-profile">
             <span>Profile.exe</span>
             <div class="close-button">×</div>
@@ -404,6 +405,7 @@
     </div>
 
     <script>
+        // --- クリック音の実装 ---
         var mouseClickSound = new Audio('Sound/MouseClick.mp3');
         
         function playClickSound() {
@@ -411,11 +413,13 @@
             mouseClickSound.play().catch(function(e) { /* ignore */ });
         }
 
+        // デスクトップアイコン、ボタン、タイトルバー、×ボタン、PHALUXロゴにクリック音を追加
         var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .phalux-link');
         clickTargets.forEach(function(target) {
             target.addEventListener('mousedown', playClickSound);
             target.addEventListener('touchstart', playClickSound, { passive: true });
         });
+        // ---------------------------------
 
         var highestZIndex = 110;
 
@@ -432,16 +436,17 @@
             var maxBottom = 0;
 
             if (isMobile) {
+                // スマホ版の配置（縦並び、左寄せ）
                 var currentTop = 180; 
                 var gap = 12;
 
                 if(profile.style.display !== 'none') {
-                    profile.style.left = '8%'; // 少し右に寄せてバランスを調整
+                    profile.style.left = '3%'; // 左端から少しだけずらす
                     profile.style.top = currentTop + 'px';
                     currentTop += profile.offsetHeight + gap;
                 }
                 if(phalux.style.display !== 'none') {
-                    phalux.style.left = '15%'; 
+                    phalux.style.left = '15%'; // 中身が小さいので少し右へ
                     phalux.style.top = currentTop + 'px';
                     currentTop += phalux.offsetHeight + gap;
                 }
@@ -451,7 +456,7 @@
                     currentTop += social.offsetHeight + gap;
                 }
                 if(spotify.style.display !== 'none') {
-                    spotify.style.left = '4%';
+                    spotify.style.left = '2%';
                     spotify.style.top = currentTop + 'px';
                     currentTop += spotify.offsetHeight + gap;
                 }
@@ -463,28 +468,70 @@
                     maxBottom = currentTop + 100;
                 }
             } else {
+                // PC版の配置（もっと散らす）
+
+                // 乱数生成用の関数
+                function getRandomInt(min, max) {
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                }
+
+                // 各ウィンドウの左位置と上位置をランダムに決定する
+
+                // 1. Profile.exe (左上、width 280px)
                 if(profile.style.display !== 'none') {
-                    profile.style.left = width * 0.15 + 'px';
-                    profile.style.top = '200px';
+                    profile.style.left = width * (getRandomInt(10, 20) / 100) + 'px'; 
+                    profile.style.top = getRandomInt(150, 250) + 'px';
                 }
-                if(social.style.display !== 'none') {
-                    social.style.left = width * 0.55 + 'px';
-                    social.style.top = '250px';
-                }
+
+                // 2. Phalux.band (右上、width 175px)
                 if(phalux.style.display !== 'none') {
-                    phalux.style.left = width * 0.60 + 'px'; 
-                    var phaluxTop = 250 + (social.offsetHeight || 150) + 40; 
-                    phalux.style.top = phaluxTop + 'px';
+                    phalux.style.left = width * (getRandomInt(70, 80) / 100) + 'px'; 
+                    phalux.style.top = getRandomInt(180, 280) + 'px';
                 }
+
+                // 3. Social_Media.lnk (中央左、width 450px)
+                if(social.style.display !== 'none') {
+                    social.style.left = width * (getRandomInt(30, 40) / 100) + 'px'; 
+                    social.style.top = getRandomInt(350, 450) + 'px';
+                }
+
+                // 4. CD_Player.exe (Spotify) (中央右、width 600px)
                 if(spotify.style.display !== 'none') {
-                    spotify.style.left = width * 0.20 + 'px';
-                    spotify.style.top = (200 + (profile.offsetHeight || 150) + 40) + 'px';
+                    spotify.style.left = width * (getRandomInt(60, 70) / 100) + 'px'; 
+                    spotify.style.top = getRandomInt(480, 580) + 'px';
                 }
+
+                // 5. Media_Player.avi (YouTube) (中央下、width 800px)
                 if(youtube.style.display !== 'none') {
-                    youtube.style.left = width * 0.10 + 'px';
-                    var ytTop = 200 + (profile.offsetHeight || 150) + (spotify.offsetHeight || 200) + 80;
+                    // YouTubeは非常に幅が広いので、画面中央に配置
+                    var ytWidth = 800; // HTMLで設定されている幅
+                    youtube.style.left = (width / 2) - (ytWidth / 2) + 'px'; 
+                    
+                    // 他のウィンドウの配置後の場所 (最下部) から少し下へ
+                    // maxBottomを計算してからyoutubeのtopを決める
+                    var ytTop = 750; // これくらいで様子を見る
                     youtube.style.top = ytTop + 'px';
-                    maxBottom = parseInt(youtube.style.top) + youtube.offsetHeight + 150;
+                    
+                    // maxBottomの計算
+                    // YouTube以外のウィンドウの最下部
+                    var currentMaxBottom = 0;
+                    if(profile.style.display !== 'none') currentMaxBottom = Math.max(currentMaxBottom, parseInt(profile.style.top) + profile.offsetHeight);
+                    if(phalux.style.display !== 'none') currentMaxBottom = Math.max(currentMaxBottom, parseInt(phalux.style.top) + phalux.offsetHeight);
+                    if(social.style.display !== 'none') currentMaxBottom = Math.max(currentMaxBottom, parseInt(social.style.top) + social.offsetHeight);
+                    if(spotify.style.display !== 'none') currentMaxBottom = Math.max(currentMaxBottom, parseInt(spotify.style.top) + spotify.offsetHeight);
+                    
+                    // YouTubeの高さを加算
+                    maxBottom = Math.max(currentMaxBottom, ytTop + youtube.offsetHeight);
+                    maxBottom += 150; // 余白
+                } else {
+                    // YouTubeがない場合
+                    maxBottom = Math.max(
+                        parseInt(profile.style.top) + profile.offsetHeight,
+                        parseInt(phalux.style.top) + phalux.offsetHeight,
+                        parseInt(social.style.top) + social.offsetHeight,
+                        parseInt(spotify.style.top) + spotify.offsetHeight
+                    );
+                    maxBottom += 150; // 余白
                 }
             }
 
@@ -572,6 +619,8 @@
                 windowElem.style.opacity = '0';
                 setTimeout(function() {
                     windowElem.style.display = 'none';
+                    // 閉じた後に全体の高さを再計算して無駄なスクロールを無くす
+                    // ただし、位置はそのままにするため setInitialPositions() は呼ばない
                 }, 300);
             };
             btn.addEventListener('click', closeAction);
