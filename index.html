@@ -22,7 +22,7 @@
             color: black;
             text-align: center;
             margin: 0;
-            padding: 20px 0;
+            padding: 20px 0 100px 0; /* 下部に余白を追加 */
             background-color: #008080; /* Windows 95 Desktop Color */
             background-image: url('images/8bit_star.png');
             background-blend-mode: overlay;
@@ -39,26 +39,18 @@
             border-color: #ffffff #808080 #808080 #ffffff;
             box-shadow: 1px 1px 0 0 #000000;
             padding: 2px;
-            margin: 0 auto 30px auto;
-            max-width: 90%;
+            margin: 0; /* マージンをリセット */
+            max-width: 95%; /* スマホでの幅を広げる */
             display: inline-block;
             text-align: left;
             position: absolute; /* ドラッグのために絶対配置 */
-            transition: transform 0.2s; /* リサイズ時の動きを滑らかに */
+            transition: transform 0.2s;
         }
 
         /* ドラッガブルにするタイトルバーのカーソル */
         .draggable-cursor {
             cursor: grab;
         }
-
-        /* 乱雑感を出すためのオフセットクラス */
-        .win95-scatter-left-lg { transform: translateX(-12%); }
-        .win95-scatter-left-md { transform: translateX(-7%); }
-        .win95-scatter-left-sm { transform: translateX(-3%); }
-        .win95-scatter-right-sm { transform: translateX(3%); }
-        .win95-scatter-right-md { transform: translateX(7%); }
-        .win95-scatter-right-lg { transform: translateX(12%); }
 
         .title-bar {
             background: linear-gradient(90deg, #000080, #1084d0);
@@ -170,14 +162,6 @@
             .header-title { font-size: 1.8em; }
             
             /* スマホでは全ウィンドウを中央寄せ＆画面幅に合わせる */
-            .win95-scatter-left-lg,
-            .win95-scatter-left-md,
-            .win95-scatter-left-sm,
-            .win95-scatter-right-sm,
-            .win95-scatter-right-md,
-            .win95-scatter-right-lg {
-                transform: translateX(0) !important;
-            }
             .window {
                 width: 100% !important;
                 position: relative !important; /* スマホでは絶対配置を解除 */
@@ -186,6 +170,7 @@
                 left: 0 !important;
                 top: 0 !important;
                 box-sizing: border-box;
+                margin-bottom: 30px; /* マージンを追加 */
             }
         }
     </style>
@@ -203,7 +188,7 @@
         <a href="freebgm.html" class="win95-btn">FREEBGM</a>
     </div>
 
-    <div class="window win95-scatter-left-md" id="win-profile" style="width: 500px;">
+    <div class="window" id="win-profile" style="width: 500px; z-index: 104;">
         <div class="title-bar draggable-cursor" id="handle-profile">
             <span>Profile.exe</span>
             <div class="close-button">×</div>
@@ -218,9 +203,7 @@
         </div>
     </div>
 
-    <br>
-
-    <div class="window win95-scatter-right-lg" id="win-social" style="width: 450px;">
+    <div class="window" id="win-social" style="width: 450px; z-index: 103;">
         <div class="title-bar draggable-cursor" id="handle-social">
             <span>Social_Media.lnk</span>
             <div class="close-button">×</div>
@@ -237,21 +220,17 @@
         </div>
     </div>
 
-    <br>
-
-    <div class="window win95-scatter-left-sm" id="win-spotify" style="width: 600px;">
+    <div class="window" id="win-spotify" style="width: 600px; z-index: 102;">
         <div class="title-bar draggable-cursor" id="handle-spotify">
             <span>CD_Player.exe</span>
             <div class="close-button">×</div>
         </div>
         <div class="window-contents">
-            <iframe src="https://open.spotify.com/embed/album/414HJT5311vIKZHsxh56S2?utm_source=generator" width="100%" height="152" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            <iframe src="http://googleusercontent.com/http://googleusercontent.com/spotify.com/3" width="100%" height="152" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         </div>
     </div>
 
-    <br>
-
-    <div class="window win95-scatter-right-sm" id="win-youtube" style="width: 800px;">
+    <div class="window" id="win-youtube" style="width: 800px; z-index: 101;">
         <div class="title-bar draggable-cursor" id="handle-youtube">
             <span>Media_Player.avi</span>
             <div class="close-button">×</div>
@@ -270,7 +249,33 @@
     </div>
 
     <script>
-        var highestZIndex = 100; // z-indexの初期最大値
+        var highestZIndex = 110; // z-indexの初期最大値 (初期ウィンドウより高く設定)
+
+        // 各ウィンドウの初期位置を設定 (デスクトップ上で散らす)
+        function setInitialPositions() {
+            var isMobile = window.matchMedia("(max-width: 600px)").matches;
+            if (!isMobile) { // PCのみ適用
+                var width = window.innerWidth;
+                var height = window.innerHeight;
+
+                document.getElementById('win-profile').style.left = width * 0.15 + 'px';
+                document.getElementById('win-profile').style.top = height * 0.20 + 'px';
+
+                document.getElementById('win-social').style.left = width * 0.55 + 'px';
+                document.getElementById('win-social').style.top = height * 0.25 + 'px';
+
+                document.getElementById('win-spotify').style.left = width * 0.20 + 'px';
+                document.getElementById('win-spotify').style.top = height * 0.60 + 'px';
+
+                document.getElementById('win-youtube').style.left = width * 0.10 + 'px';
+                document.getElementById('win-youtube').style.top = height * 0.85 + 'px';
+            }
+        }
+
+        // ページ読み込み時に初期位置を設定
+        window.onload = setInitialPositions;
+        // 画面サイズ変更時に初期位置を再設定 (オプション)
+        // window.onresize = setInitialPositions;
 
         // ドラッグを開始する関数 (z-indexを更新)
         function initDrag(targetId, handleId) {
@@ -319,8 +324,6 @@
 
                 target.style.left = offsetX + 'px';
                 target.style.top = offsetY + 'px';
-                target.win95ScatterLeftLg.transform.translateX = "0 !important";
-                target.style.margin = "0"; // マージンをリセット
             }
 
             function endDrag() {
