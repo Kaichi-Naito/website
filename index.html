@@ -214,7 +214,7 @@
             border-color: #000080; 
         }
 
-        /* --- スマホ対応 --- */
+        /* --- スマホ対応（安全で綺麗なパーセント指定に変更） --- */
         @media (max-width: 800px) {
             body {
                 font-size: 14px;
@@ -228,13 +228,14 @@
                 box-sizing: border-box;
             }
 
-            /* --- 修正箇所：スマホ版Profileを280pxに固定し、他は割合(%)で指定 --- */
+            /* --- 修正箇所：スマホ版Profileを280pxに固定 --- */
             #win-profile { width: 280px !important; }
+            /* ------------------------------------------------ */
+            
             #win-phalux { width: 45% !important; max-width: 160px !important; }
             #win-social { width: 90% !important; max-width: 350px !important; }
             #win-spotify { width: 92% !important; max-width: 360px !important; }
             #win-youtube { width: 96% !important; max-width: 380px !important; }
-            /* ------------------------------------------------------------- */
 
             #win-phalux .window-contents {
                 padding: 5px !important; 
@@ -445,33 +446,33 @@
             var maxBottom = 0;
 
             if (isMobile) {
-                // --- 修正箇所：スマホ版の配置を意図的に少しずつ重ねて散らす ---
+                // --- 修正箇所：スマホ版の配置を縦に広く取り、階段状に散らす ---
                 if(profile.style.display !== 'none') {
-                    profile.style.left = '3%';
-                    profile.style.top = '170px';
+                    profile.style.left = '4%';
+                    profile.style.top = '150px';
                 }
                 if(phalux.style.display !== 'none') {
-                    phalux.style.left = '50%'; 
-                    phalux.style.top = '240px';
+                    phalux.style.left = '52%'; 
+                    phalux.style.top = '260px';
                 }
                 if(social.style.display !== 'none') {
                     social.style.left = '6%';
-                    social.style.top = '320px';
+                    social.style.top = '380px';
                 }
                 if(spotify.style.display !== 'none') {
-                    spotify.style.left = '2%';
-                    spotify.style.top = '480px';
+                    spotify.style.left = '3%';
+                    spotify.style.top = '550px';
                 }
                 if(youtube.style.display !== 'none') {
-                    youtube.style.left = '4%';
-                    youtube.style.top = '620px';
-                    maxBottom = 620 + (youtube.offsetHeight || 400) + 100;
+                    youtube.style.left = '2%';
+                    youtube.style.top = '730px';
+                    maxBottom = 730 + (youtube.offsetHeight || 400) + 100;
                 } else {
                     maxBottom = 900;
                 }
                 // -------------------------------------------------------------
             } else {
-                // ここは一切変更していません (前回ご提示いただいたコードのまま)
+                // PC版の配置（一切変更していません）
                 if(profile.style.display !== 'none') {
                     profile.style.left = '8%';
                     profile.style.top = '120px';
