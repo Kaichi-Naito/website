@@ -26,7 +26,6 @@
             position: relative;
         }
 
-        /* 背景を10%暗くする設定 */
         body::before {
             content: "";
             position: fixed;
@@ -38,16 +37,14 @@
             z-index: -1;
         }
 
-        /* ヘッダータイトル：index.htmlと完全に一致させました */
         h1 {
             color: white;
             text-shadow: 2px 2px #000;
-            font-size: 2em; /* 2.5emから2emに修正 */
-            margin-bottom: 30px; /* 20pxから30pxに修正 */
+            font-size: 2em;
+            margin-bottom: 30px;
             padding-top: 0;
         }
 
-        /* ナビゲーション */
         .nav {
             display: flex;
             justify-content: center;
@@ -84,7 +81,6 @@
             border: 1px dotted #fff;
         }
 
-        /* ウィンドウ設定 */
         .window {
             background-color: #c0c0c0;
             border: 2px solid;
@@ -146,14 +142,33 @@
             pointer-events: none;
         }
 
-        /* スマホ版レスポンシブ：index.htmlと完全に一致させました */
+        /* スマホ版レスポンシブ設定 */
         @media (max-width: 800px) {
             h1 {
-                font-size: 1.5em; /* index.htmlと同じサイズ */
+                font-size: 1.5em;
                 margin-bottom: 30px;
             }
             .desktop-icon img { width: 34px !important; height: 34px !important; }
             .desktop-icon span { font-size: 11px; }
+
+            /* 電卓ウィンドウをスマホ時のみ約70%のサイズ（240px程度）に縮小 */
+            #win-calculator {
+                width: 240px !important; 
+            }
+            #win-calculator .window-contents {
+                padding: 10px;
+            }
+            #win-calculator .win95-btn {
+                font-size: 14px;
+                padding: 4px 0;
+            }
+            #win-calculator .calc-display {
+                font-size: 18px;
+                height: 28px;
+            }
+            #win-calculator #question {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -203,7 +218,6 @@
     <div class="footer">このサイトは本人によって頑張って作成されました</div>
 
     <script>
-        // サウンド・ドラッグ・初期配置ロジック（変更なし）
         var mouseClickSound = new Audio('Sound/MouseClick.mp3');
         function playSound() { if (mouseClickSound) { mouseClickSound.currentTime = 0; mouseClickSound.play().catch(()=>{}); } }
         document.addEventListener('mousedown', (e) => { if (e.target.closest('.desktop-icon, .win95-btn, .close-button, .title-bar')) playSound(); });
@@ -240,7 +254,7 @@
             if (isMobile) {
                 msg.style.left = '5%'; msg.style.top = '150px';
                 calc.style.left = '10%'; calc.style.top = '280px';
-                dm.style.left = '15%'; dm.style.top = '720px';
+                dm.style.left = '15%'; dm.style.top = '650px'; /* 電卓が小さくなった分、少し上に寄せました */
                 document.body.style.minHeight = '900px';
             } else {
                 msg.style.left = '15%'; msg.style.top = '200px';
@@ -260,7 +274,6 @@
             });
         };
 
-        // 電卓ロジック
         const display = document.getElementById('display');
         const questionBox = document.getElementById('question');
         let currentInput = "";
