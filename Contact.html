@@ -18,13 +18,13 @@
             margin: 0;
             padding: 20px 0 50px 0;
             background-color: #008080;
-            background-image: url('images/windows-95-background.jpg'); /* indexと同じ背景 */
+            background-image: url('images/windows-95-background.jpg');
             background-size: cover;
             background-attachment: fixed;
             min-height: 100vh;
         }
 
-        /* 共通：ウィンドウの基本スタイル */
+        /* ウィンドウの基本スタイル */
         .window {
             background-color: #c0c0c0;
             border: 2px solid;
@@ -34,8 +34,8 @@
             display: inline-block;
             text-align: left;
             margin: 40px auto;
-            max-width: 90vw;
-            width: 450px;
+            max-width: 95vw;
+            width: 320px; /* 電卓サイズに調整 */
         }
 
         .title-bar {
@@ -49,94 +49,83 @@
         }
 
         .window-contents {
-            padding: 20px;
+            padding: 10px;
             border: 1px solid #808080;
-            background-color: #ffffff; /* 入力画面っぽく白に */
+            background-color: #c0c0c0;
             margin: 2px;
         }
 
-        /* ナビゲーション（デスクトップアイコン風） */
-        .nav {
+        /* 電卓のディスプレイ部分 */
+        .calc-display {
+            background-color: #ffffff;
+            border: 2px inset #ffffff;
+            padding: 5px 10px;
+            text-align: right;
+            font-size: 24px;
+            margin-bottom: 15px;
+            height: 35px;
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-        .desktop-icon {
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            text-decoration: none;
-            color: white !important;
-            width: 80px;
-        }
-        .desktop-icon img {
-            width: 48px;
-            height: 48px;
-            image-rendering: pixelated;
-            margin-bottom: 5px;
-        }
-        .desktop-icon span {
-            font-size: 14px;
-            text-shadow: 1px 1px 0 #000;
-            padding: 2px 4px;
-        }
-        .desktop-icon:hover span {
-            background-color: #000080;
-            border: 1px dotted #fff;
+            justify-content: flex-end;
+            box-shadow: inset 2px 2px 0px #808080;
         }
 
-        /* 入力フォーム周り */
-        input[type="number"] {
-            padding: 5px;
-            border: 2px solid;
-            border-color: #808080 #ffffff #ffffff #808080;
-            font-family: 'PixelMplus', sans-serif;
-            width: 100px;
-            margin: 10px 0;
+        /* テンキーのグリッド */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
         }
 
+        /* Win95ボタン共通スタイル */
         .win95-btn {
             background-color: #c0c0c0;
             border: 2px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
-            padding: 4px 15px;
+            padding: 8px 0;
             font-family: 'PixelMplus', sans-serif;
             cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
         }
+
         .win95-btn:active {
             border-color: #808080 #ffffff #ffffff #808080;
-            padding: 5px 14px 3px 16px;
+            padding-top: 10px;
+            padding-bottom: 6px;
         }
 
-        .result-area {
-            margin-top: 15px;
-            font-weight: bold;
-            min-height: 1.2em;
-        }
+        /* 数字ボタンの色 */
+        .num-btn { color: #0000ff; }
+        /* 演算・機能ボタンの色 */
+        .func-btn { color: #ff0000; }
+        /* OKボタン（=ボタンの代わり） */
+        .ok-btn { grid-column: span 2; color: #ff0000; font-weight: bold; }
 
-        .dm-section {
-            margin-top: 30px;
-            padding-top: 15px;
-            border-top: 1px dashed #808080;
+        .question-text {
+            font-size: 14px;
+            margin-bottom: 10px;
             text-align: center;
+            background: #eee;
+            padding: 5px;
+            border: 1px inset #fff;
         }
 
-        .footer {
-            margin-top: 50px;
-            color: white;
-            font-size: 12px;
-            text-shadow: 1px 1px 2px #000;
+        .nav {
+            display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;
         }
+        .desktop-icon {
+            display: flex; flex-direction: column; align-items: center; text-decoration: none;
+            color: white !important; width: 80px;
+        }
+        .desktop-icon img { width: 48px; height: 48px; image-rendering: pixelated; margin-bottom: 5px; }
+        .desktop-icon span { font-size: 14px; text-shadow: 1px 1px 0 #000; padding: 2px 4px; }
+        .desktop-icon:hover span { background-color: #000080; border: 1px dotted #fff; }
 
-        @media (max-width: 500px) {
-            .window { width: 95%; }
-            .nav { gap: 10px; }
-            .desktop-icon { width: 65px; }
-            .desktop-icon img { width: 34px; height: 34px; }
-            .desktop-icon span { font-size: 11px; }
-        }
+        .footer { margin-top: 50px; color: white; font-size: 12px; text-shadow: 1px 1px 2px #000; }
     </style>
 </head>
 <body>
@@ -159,28 +148,40 @@
 
     <div class="window">
         <div class="title-bar">
-            <span>Contact.txt - Notepad</span>
-            <div style="font-size: 10px;">? ×</div>
+            <span>Calculator.exe</span>
+            <div style="font-size: 10px; cursor: pointer;">_ □ ×</div>
         </div>
         <div class="window-contents">
-            <h2 style="margin-top:0; font-size: 20px;">ご連絡先 / Contact</h2>
-            <p style="font-size: 14px; line-height: 1.6;">
-                スパム防止のため、クイズに答えるとメールアドレスが表示されます。<br>
-                Answer the test to see the email.
-            </p>
+            <div id="question-box" class="question-text">読み込み中…</div>
             
-            <div style="background:#f0f0f0; padding: 15px; border: 1px inset #808080;">
-                <p id="question" style="font-size: 18px; margin: 0;">読み込み中…</p>
-                <input type="number" id="answer" placeholder="??">
-                <button id="submit" class="win95-btn">送信 (OK)</button>
-                <div id="result" class="result-area"></div>
-            </div>
+            <div class="calc-display" id="display">0</div>
+            
+            <div class="keypad">
+                <div class="win95-btn func-btn" onclick="clearDisplay()">C</div>
+                <div class="win95-btn func-btn" onclick="backspace()">Back</div>
+                <div class="win95-btn func-btn" style="grid-column: span 2;">Contact Me</div>
 
-            <div class="dm-section">
-                <p style="font-size: 14px;">SNSでの連絡はこちら:</p>
-                <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank" style="color: blue; text-decoration: underline;">
-                    X(Twitter) DM
-                </a>
+                <div class="win95-btn num-btn" onclick="inputNum(7)">7</div>
+                <div class="win95-btn num-btn" onclick="inputNum(8)">8</div>
+                <div class="win95-btn num-btn" onclick="inputNum(9)">9</div>
+                <div class="win95-btn func-btn">/</div>
+
+                <div class="win95-btn num-btn" onclick="inputNum(4)">4</div>
+                <div class="win95-btn num-btn" onclick="inputNum(5)">5</div>
+                <div class="win95-btn num-btn" onclick="inputNum(6)">6</div>
+                <div class="win95-btn func-btn">*</div>
+
+                <div class="win95-btn num-btn" onclick="inputNum(1)">1</div>
+                <div class="win95-btn num-btn" onclick="inputNum(2)">2</div>
+                <div class="win95-btn num-btn" onclick="inputNum(3)">3</div>
+                <div class="win95-btn func-btn">-</div>
+
+                <div class="win95-btn num-btn" onclick="inputNum(0)">0</div>
+                <div class="win95-btn num-btn">+/-</div>
+                <div class="win95-btn num-btn">.</div>
+                <div class="win95-btn func-btn">+</div>
+
+                <div class="win95-btn ok-btn" style="grid-column: span 4;" onclick="checkAnswer()">ENTER (OK)</div>
             </div>
         </div>
     </div>
@@ -190,44 +191,60 @@
     </div>
 
     <script>
-        (function(){
-            const MIN = 1, MAX = 20;
-            const a = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
-            const b = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
-            const correct = a + b;
-            const encodedEmail = 'a2FpY2hpLm5haXRvQGdtYWlsLmNvbQ==';
-            let wrongCount = 0;
+        const display = document.getElementById('display');
+        const questionBox = document.getElementById('question-box');
+        
+        let currentInput = "";
+        let wrongCount = 0;
+        
+        // クイズの設定
+        const MIN = 1, MAX = 20;
+        const a = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
+        const b = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
+        const correct = a + b;
+        const encodedEmail = 'a2FpY2hpLm5haXRvQGdtYWlsLmNvbQ==';
 
-            document.getElementById('question').textContent = `${a} ＋ ${b} ＝ ？`;
+        questionBox.textContent = `Verify: ${a} ＋ ${b} ＝ ?`;
 
-            const submitBtn = document.getElementById('submit');
-            const answerInput = document.getElementById('answer');
-            const resultEl = document.getElementById('result');
+        function inputNum(num) {
+            if (currentInput.length < 8) {
+                currentInput += num;
+                display.textContent = currentInput;
+            }
+        }
 
-            function check() {
-                const userAns = parseInt(answerInput.value, 10);
-                if (userAns === correct) {
-                    const email = atob(encodedEmail);
-                    resultEl.innerHTML = '<span style="color: green; font-size: 18px;">Email: ' + email + '</span>';
-                    resultEl.style.color = "green";
+        function clearDisplay() {
+            currentInput = "";
+            display.textContent = "0";
+        }
+
+        function backspace() {
+            currentInput = currentInput.slice(0, -1);
+            display.textContent = currentInput || "0";
+        }
+
+        function checkAnswer() {
+            const userAns = parseInt(currentInput, 10);
+            
+            if (userAns === correct) {
+                const email = atob(encodedEmail);
+                questionBox.style.color = "blue";
+                questionBox.innerHTML = `SUCCESS!<br>${email}`;
+                display.textContent = "OK!";
+            } else {
+                wrongCount++;
+                if (wrongCount >= 3) {
+                    questionBox.style.color = "red";
+                    questionBox.textContent = "LOCKED. REFRESH PAGE.";
+                    display.textContent = "ERR";
+                    document.querySelectorAll('.win95-btn').forEach(btn => btn.style.pointerEvents = 'none');
                 } else {
-                    wrongCount++;
-                    if (wrongCount >= 3) {
-                        resultEl.textContent = 'Too many attempts.';
-                        submitBtn.disabled = true;
-                        answerInput.disabled = true;
-                    } else {
-                        resultEl.textContent = `不正解! 残り${3 - wrongCount}回`;
-                        resultEl.style.color = "red";
-                    }
+                    questionBox.style.color = "red";
+                    questionBox.textContent = `WRONG! (${3 - wrongCount} Left)`;
+                    clearDisplay();
                 }
             }
-
-            submitBtn.addEventListener('click', check);
-            answerInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') check();
-            });
-        })();
+        }
     </script>
 </body>
 </html>
