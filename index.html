@@ -22,7 +22,7 @@
             color: black;
             text-align: center;
             margin: 0;
-            padding: 20px 0 100px 0; /* 下部に余白を追加 */
+            padding: 20px 0 50px 0;
             background-color: #008080; /* Windows 95 Desktop Color */
             background-image: url('images/8bit_star.png');
             background-blend-mode: overlay;
@@ -30,6 +30,7 @@
             background-attachment: fixed;
             overflow-x: hidden; /* 横スクロールを防止 */
             z-index: 1;
+            position: relative;
         }
 
         /* --- Windows 95 UI Component --- */
@@ -39,15 +40,14 @@
             border-color: #ffffff #808080 #808080 #ffffff;
             box-shadow: 1px 1px 0 0 #000000;
             padding: 2px;
-            margin: 0; /* マージンをリセット */
-            max-width: 95%; /* スマホでの幅を広げる */
+            margin: 0; 
+            max-width: 95%;
             display: inline-block;
             text-align: left;
-            position: absolute; /* ドラッグのために絶対配置 */
+            position: absolute; /* 全デバイスでドラッグのために絶対配置 */
             transition: transform 0.2s;
         }
 
-        /* ドラッガブルにするタイトルバーのカーソル */
         .draggable-cursor {
             cursor: grab;
         }
@@ -83,7 +83,6 @@
             background-color: #c0c0c0;
         }
 
-        /* 立体ボタン */
         .win95-btn {
             background-color: #c0c0c0;
             border: 2px solid;
@@ -101,7 +100,6 @@
             padding: 7px 11px 5px 13px;
         }
 
-        /* --- Layout --- */
         .header-title {
             color: white;
             text-shadow: 2px 2px #000;
@@ -151,6 +149,9 @@
             margin-top: 50px;
             color: white;
             font-size: 12px;
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
         }
 
         /* スマホ対応 */
@@ -160,17 +161,9 @@
                 text-align: center;
             }
             .header-title { font-size: 1.8em; }
-            
-            /* スマホでは全ウィンドウを中央寄せ＆画面幅に合わせる */
             .window {
-                width: 100% !important;
-                position: relative !important; /* スマホでは絶対配置を解除 */
-                margin-left: auto !important;
-                margin-right: auto !important;
-                left: 0 !important;
-                top: 0 !important;
+                width: 90% !important; /* スマホでも横幅を確保しつつabsoluteを維持 */
                 box-sizing: border-box;
-                margin-bottom: 30px; /* マージンを追加 */
             }
         }
     </style>
@@ -226,7 +219,7 @@
             <div class="close-button">×</div>
         </div>
         <div class="window-contents">
-            <iframe src="http://googleusercontent.com/http://googleusercontent.com/spotify.com/3" width="100%" height="152" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            <iframe src="https://open.spotify.com/embed/album/414HJT5311vIKZHsxh56S2?utm_source=generator" width="100%" height="152" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         </div>
     </div>
 
@@ -249,35 +242,73 @@
     </div>
 
     <script>
-        var highestZIndex = 110; // z-indexの初期最大値 (初期ウィンドウより高く設定)
+        var highestZIndex = 110;
 
-        // 各ウィンドウの初期位置を設定 (デスクトップ上で散らす)
         function setInitialPositions() {
+            var width = window.innerWidth;
             var isMobile = window.matchMedia("(max-width: 600px)").matches;
-            if (!isMobile) { // PCのみ適用
-                var width = window.innerWidth;
-                var height = window.innerHeight;
 
-                document.getElementById('win-profile').style.left = width * 0.15 + 'px';
-                document.getElementById('win-profile').style.top = height * 0.20 + 'px';
+            var profile = document.getElementById('win-profile');
+            var social = document.getElementById('win-social');
+            var spotify = document.getElementById('win-spotify');
+            var youtube = document.getElementById('win-youtube');
 
-                document.getElementById('win-social').style.left = width * 0.55 + 'px';
-                document.getElementById('win-social').style.top = height * 0.25 + 'px';
+            var maxBottom = 0;
 
-                document.getElementById('win-spotify').style.left = width * 0.20 + 'px';
-                document.getElementById('win-spotify').style.top = height * 0.60 + 'px';
+            if (isMobile) {
+                // スマホ用：縦に綺麗に並べる
+                var currentTop = 180; // ヘッダーナビゲーションの下あたり
+                var gap = 30; // ウィンドウ間の余白
+                var leftPos = (width - profile.offsetWidth) / 2;
+                if(leftPos < 0) leftPos = 10;
 
-                document.getElementById('win-youtube').style.left = width * 0.10 + 'px';
-                document.getElementById('win-youtube').style.top = height * 0.85 + 'px';
+                profile.style.left = leftPos + 'px';
+                profile.style.top = currentTop + 'px';
+                currentTop += profile.offsetHeight + gap;
+
+                social.style.left = leftPos + 'px';
+                social.style.top = currentTop + 'px';
+                currentTop += social.offsetHeight + gap;
+
+                spotify.style.left = leftPos + 'px';
+                spotify.style.top = currentTop + 'px';
+                currentTop += spotify.offsetHeight + gap;
+
+                youtube.style.left = leftPos + 'px';
+                youtube.style.top = currentTop + 'px';
+                
+                maxBottom = currentTop + youtube.offsetHeight + 100;
+            } else {
+                // PC用：少し散らして配置
+                profile.style.left = width * 0.15 + 'px';
+                profile.style.top = '150px';
+
+                social.style.left = width * 0.55 + 'px';
+                social.style.top = '200px';
+
+                spotify.style.left = width * 0.20 + 'px';
+                spotify.style.top = (150 + profile.offsetHeight + 40) + 'px';
+
+                youtube.style.left = width * 0.10 + 'px';
+                youtube.style.top = (150 + profile.offsetHeight + spotify.offsetHeight + 80) + 'px';
+
+                maxBottom = parseInt(youtube.style.top) + youtube.offsetHeight + 150;
             }
+
+            // ウィンドウを動かしてもスクロール領域を確保する
+            document.body.style.minHeight = maxBottom + 'px';
         }
 
-        // ページ読み込み時に初期位置を設定
-        window.onload = setInitialPositions;
-        // 画面サイズ変更時に初期位置を再設定 (オプション)
-        // window.onresize = setInitialPositions;
+        // ページ読み込み時に位置を設定。フォント等の読み込みを待つために少し遅延させる
+        window.onload = function() {
+            setTimeout(setInitialPositions, 100);
+        };
+        
+        // 画面サイズが変わった時（スマホの縦横切り替えなど）に再計算
+        window.onresize = function() {
+            setTimeout(setInitialPositions, 100);
+        };
 
-        // ドラッグを開始する関数 (z-indexを更新)
         function initDrag(targetId, handleId) {
             var target = document.getElementById(targetId);
             var handle = document.getElementById(handleId);
@@ -285,27 +316,27 @@
             var initialX, initialY;
             var offsetX, offsetY;
 
+            // スマホのタッチとPCのマウス両対応
             handle.addEventListener('mousedown', startDragging);
-            handle.addEventListener('touchstart', startDragging, { passive: false }); // スマホ対応
+            handle.addEventListener('touchstart', startDragging, { passive: false });
 
             function startDragging(e) {
                 isDragging = true;
-                
-                // z-indexを更新し、クリックしたウィンドウを最前面に
                 highestZIndex++;
                 target.style.zIndex = highestZIndex;
 
                 if (e.type === 'touchstart') {
                     initialX = e.touches[0].clientX - target.offsetLeft;
                     initialY = e.touches[0].clientY - target.offsetTop;
-                    e.preventDefault(); // デフォルトのスクロール動作を防止
+                    // スマホでタイトルバーを触った時は画面スクロールを止める（ドラッグ優先）
+                    e.preventDefault(); 
                 } else {
                     initialX = e.clientX - target.offsetLeft;
                     initialY = e.clientY - target.offsetTop;
                 }
 
                 document.addEventListener('mousemove', dragging);
-                document.addEventListener('touchmove', dragging, { passive: false }); // スマホ対応
+                document.addEventListener('touchmove', dragging, { passive: false });
                 document.addEventListener('mouseup', endDrag);
                 document.addEventListener('touchend', endDrag);
             }
@@ -316,7 +347,7 @@
                 if (e.type === 'touchmove') {
                     offsetX = e.touches[0].clientX - initialX;
                     offsetY = e.touches[0].clientY - initialY;
-                    e.preventDefault(); // スクロール防止
+                    e.preventDefault(); 
                 } else {
                     offsetX = e.clientX - initialX;
                     offsetY = e.clientY - initialY;
@@ -335,7 +366,6 @@
             }
         }
 
-        // 各ウィンドウをドラッガブルに設定
         initDrag('win-profile', 'handle-profile');
         initDrag('win-social', 'handle-social');
         initDrag('win-spotify', 'handle-spotify');
