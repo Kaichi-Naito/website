@@ -33,7 +33,6 @@
             position: relative;
         }
 
-        /* --- 背景をほんのり暗くするフィルター（10%） --- */
         body::before {
             content: "";
             position: fixed;
@@ -326,6 +325,20 @@
         </div>
     </div>
 
+    <div class="window" id="win-phalux" style="width: 350px; z-index: 105;">
+        <div class="title-bar draggable-cursor" id="handle-phalux">
+            <span>PHALUX.band</span>
+            <div class="close-button">×</div>
+        </div>
+        <div class="window-contents" style="text-align: center;">
+            <a href="https://phalux.bitfan.id/" target="_blank">
+                <img src="images/PHALUX_logo.png" alt="PHALUX" style="width: 100%; max-width: 250px; height: auto; border: 2px solid #808080; display: block; margin: 0 auto 10px auto;">
+            </a>
+            <p style="margin: 0 0 10px 0; font-size: 14px;">Kaichi's Band "PHALUX"</p>
+            <a href="https://phalux.bitfan.id/" target="_blank" class="win95-btn" style="font-size: 14px;">Official Fanclub</a>
+        </div>
+    </div>
+
     <div class="window" id="win-social" style="width: 450px; z-index: 103;">
         <div class="title-bar draggable-cursor" id="handle-social">
             <span>Social_Media.lnk</span>
@@ -379,6 +392,7 @@
             var isMobile = window.matchMedia("(max-width: 600px)").matches;
 
             var profile = document.getElementById('win-profile');
+            var phalux = document.getElementById('win-phalux');
             var social = document.getElementById('win-social');
             var spotify = document.getElementById('win-spotify');
             var youtube = document.getElementById('win-youtube');
@@ -394,13 +408,18 @@
                     profile.style.top = currentTop + 'px';
                     currentTop += profile.offsetHeight + gap;
                 }
+                if(phalux.style.display !== 'none') {
+                    phalux.style.left = '12%'; // 少し右にずらす
+                    phalux.style.top = currentTop + 'px';
+                    currentTop += phalux.offsetHeight + gap;
+                }
                 if(social.style.display !== 'none') {
-                    social.style.left = '11%';
+                    social.style.left = '5%';
                     social.style.top = currentTop + 'px';
                     currentTop += social.offsetHeight + gap;
                 }
                 if(spotify.style.display !== 'none') {
-                    spotify.style.left = '4%';
+                    spotify.style.left = '2%';
                     spotify.style.top = currentTop + 'px';
                     currentTop += spotify.offsetHeight + gap;
                 }
@@ -420,13 +439,19 @@
                     social.style.left = width * 0.55 + 'px';
                     social.style.top = '250px';
                 }
+                if(phalux.style.display !== 'none') {
+                    phalux.style.left = width * 0.60 + 'px'; // 右側 (Socialの下あたり)
+                    phalux.style.top = (250 + (social.offsetHeight || 150) + 40) + 'px'; 
+                }
                 if(spotify.style.display !== 'none') {
                     spotify.style.left = width * 0.20 + 'px';
-                    spotify.style.top = (200 + profile.offsetHeight + 40) + 'px';
+                    spotify.style.top = (200 + (profile.offsetHeight || 150) + 40) + 'px';
                 }
                 if(youtube.style.display !== 'none') {
                     youtube.style.left = width * 0.10 + 'px';
-                    youtube.style.top = (200 + profile.offsetHeight + spotify.offsetHeight + 80) + 'px';
+                    // 他の要素の下に配置されるように計算
+                    var ytTop = 200 + (profile.offsetHeight || 150) + (spotify.offsetHeight || 200) + 80;
+                    youtube.style.top = ytTop + 'px';
                     maxBottom = parseInt(youtube.style.top) + youtube.offsetHeight + 150;
                 }
             }
@@ -492,6 +517,7 @@
         }
 
         initDrag('win-profile', 'handle-profile');
+        initDrag('win-phalux', 'handle-phalux'); // 新規追加
         initDrag('win-social', 'handle-social');
         initDrag('win-spotify', 'handle-spotify');
         initDrag('win-youtube', 'handle-youtube');
