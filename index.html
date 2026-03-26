@@ -16,6 +16,7 @@
         @font-face {
             font-family: 'PixelMplus';
             src: url('https://kaichi-naito.github.io/website/fonts/PixelMplus10-Regular.ttf') format('truetype');
+            font-display: swap; /* ←ついでにフォントの読み込み待ちを防ぐ処理も入れておきました！ */
         }
         body {
             font-family: 'PixelMplus', sans-serif;
@@ -89,7 +90,6 @@
             background-color: #c0c0c0;
         }
 
-        /* 汎用の立体ボタン（SNSアイコン等で使用） */
         .win95-btn {
             background-color: #c0c0c0;
             border: 2px solid;
@@ -107,11 +107,11 @@
             padding: 7px 11px 5px 13px;
         }
 
-        /* --- 新規追加：デスクトップアイコン風ナビゲーション --- */
+        /* --- デスクトップアイコン風ナビゲーション --- */
         .nav {
             display: flex;
             justify-content: center;
-            gap: 20px; /* アイコン間の余白 */
+            gap: 20px;
             flex-wrap: wrap;
             margin-bottom: 40px;
         }
@@ -127,10 +127,10 @@
         }
 
         .desktop-icon img {
-            width: 48px; /* 画像のサイズをここで強制統一 */
+            width: 48px;
             height: 48px;
-            object-fit: contain; /* アスペクト比を維持しつつ枠に収める */
-            image-rendering: pixelated; /* ドット感をくっきりさせる */
+            object-fit: contain;
+            image-rendering: pixelated;
             margin-bottom: 5px;
         }
 
@@ -139,16 +139,14 @@
             text-align: center;
             padding: 2px 4px;
             border: 1px dotted transparent;
-            text-shadow: 1px 1px 0 #000; /* デスクトップ特有の文字の影 */
+            text-shadow: 1px 1px 0 #000;
         }
 
-        /* マウスホバー時（またはタップ時）の選択表現 */
         .desktop-icon:hover span, .desktop-icon:active span {
-            background-color: #000080; /* Win95の選択色（青） */
+            background-color: #000080;
             color: white;
             border: 1px dotted #fff;
         }
-        /* ------------------------------------------------ */
 
         .header-title {
             color: white;
@@ -226,7 +224,6 @@
                 margin-bottom: 2px !important;
             }
             
-            /* スマホ時はアイコンの間隔を少し詰める */
             .nav {
                 gap: 10px;
             }
@@ -312,7 +309,7 @@
             <h3 style="margin-top:0;">Original songs🎸</h3>
             <div style="position:relative; padding-top: 56.25%;">
                 <iframe src="https://www.youtube.com/embed/videoseries?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" 
-                        style="position:absolute; top:0; left:0; width:100%; height:100%;" frameborder="0" allowfullscreen></iframe>
+                        style="position:absolute; top:0; left:0; width:100%; height:100%;" frameborder="0" allowfullscreen loading="lazy"></iframe>
             </div>
         </div>
     </div>
@@ -336,7 +333,7 @@
             var maxBottom = 0;
 
             if (isMobile) {
-                var currentTop = 220; // アイコン分少し下げる
+                var currentTop = 220;
                 var gap = 15;
 
                 if(profile.style.display !== 'none') {
