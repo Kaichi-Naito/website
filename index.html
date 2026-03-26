@@ -63,7 +63,6 @@
             margin-bottom: 2px;
         }
 
-        /* --- ×ボタンのスタイルと凹むアニメーション --- */
         .close-button {
             width: 16px;
             height: 14px;
@@ -75,11 +74,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer; /* ポインターに変更 */
+            cursor: pointer;
             font-weight: bold;
         }
         .close-button:active {
-            border-color: #808080 #ffffff #ffffff #808080; /* 押した時に凹む */
+            border-color: #808080 #ffffff #ffffff #808080;
             padding-top: 1px;
             padding-left: 1px;
         }
@@ -90,6 +89,7 @@
             background-color: #c0c0c0;
         }
 
+        /* 汎用の立体ボタン（SNSアイコン等で使用） */
         .win95-btn {
             background-color: #c0c0c0;
             border: 2px solid;
@@ -107,19 +107,54 @@
             padding: 7px 11px 5px 13px;
         }
 
+        /* --- 新規追加：デスクトップアイコン風ナビゲーション --- */
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* アイコン間の余白 */
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+        
+        .desktop-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: white !important;
+            width: 80px;
+            cursor: pointer;
+        }
+
+        .desktop-icon img {
+            width: 48px; /* 画像のサイズをここで強制統一 */
+            height: 48px;
+            object-fit: contain; /* アスペクト比を維持しつつ枠に収める */
+            image-rendering: pixelated; /* ドット感をくっきりさせる */
+            margin-bottom: 5px;
+        }
+
+        .desktop-icon span {
+            font-size: 14px;
+            text-align: center;
+            padding: 2px 4px;
+            border: 1px dotted transparent;
+            text-shadow: 1px 1px 0 #000; /* デスクトップ特有の文字の影 */
+        }
+
+        /* マウスホバー時（またはタップ時）の選択表現 */
+        .desktop-icon:hover span, .desktop-icon:active span {
+            background-color: #000080; /* Win95の選択色（青） */
+            color: white;
+            border: 1px dotted #fff;
+        }
+        /* ------------------------------------------------ */
+
         .header-title {
             color: white;
             text-shadow: 2px 2px #000;
             font-size: 2.5em;
             margin-bottom: 20px;
-        }
-
-        .nav {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
         }
 
         .profile-section {
@@ -190,6 +225,11 @@
             .social-item img {
                 margin-bottom: 2px !important;
             }
+            
+            /* スマホ時はアイコンの間隔を少し詰める */
+            .nav {
+                gap: 10px;
+            }
         }
     </style>
 </head>
@@ -199,11 +239,26 @@
     <h1 class="header-title">Kaichi Guitar Music</h1>
 
     <div class="nav">
-        <a href="index.html" class="win95-btn">Home</a>
-        <a href="Discography.html" class="win95-btn">Discography</a>
-        <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" class="win95-btn">Works</a>
-        <a href="Contact.html" class="win95-btn">Contact</a>
-        <a href="freebgm.html" class="win95-btn">FREEBGM</a>
+        <a href="index.html" class="desktop-icon">
+            <img src="images/gif/Computer.gif" alt="Home">
+            <span>Home</span>
+        </a>
+        <a href="Discography.html" class="desktop-icon">
+            <img src="images/gif/Disc.gif" alt="Discography">
+            <span>Discography</span>
+        </a>
+        <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" class="desktop-icon">
+            <img src="images/gif/Earth.gif" alt="Works">
+            <span>Works</span>
+        </a>
+        <a href="Contact.html" class="desktop-icon">
+            <img src="images/gif/window.gif" alt="Contact">
+            <span>Contact</span>
+        </a>
+        <a href="freebgm.html" class="desktop-icon">
+            <img src="images/gif/Sound.gif" alt="FREEBGM">
+            <span>FREEBGM</span>
+        </a>
     </div>
 
     <div class="window" id="win-profile" style="width: 500px; z-index: 104;">
@@ -269,7 +324,6 @@
     <script>
         var highestZIndex = 110;
 
-        // 初期位置の計算
         function setInitialPositions() {
             var width = window.innerWidth;
             var isMobile = window.matchMedia("(max-width: 600px)").matches;
@@ -282,10 +336,9 @@
             var maxBottom = 0;
 
             if (isMobile) {
-                var currentTop = 180;
+                var currentTop = 220; // アイコン分少し下げる
                 var gap = 15;
 
-                // 非表示状態のウィンドウがあると計算が狂うため、表示されているものだけ配置
                 if(profile.style.display !== 'none') {
                     profile.style.left = '3%';
                     profile.style.top = currentTop + 'px';
@@ -311,19 +364,19 @@
             } else {
                 if(profile.style.display !== 'none') {
                     profile.style.left = width * 0.15 + 'px';
-                    profile.style.top = '150px';
+                    profile.style.top = '200px';
                 }
                 if(social.style.display !== 'none') {
                     social.style.left = width * 0.55 + 'px';
-                    social.style.top = '200px';
+                    social.style.top = '250px';
                 }
                 if(spotify.style.display !== 'none') {
                     spotify.style.left = width * 0.20 + 'px';
-                    spotify.style.top = (150 + profile.offsetHeight + 40) + 'px';
+                    spotify.style.top = (200 + profile.offsetHeight + 40) + 'px';
                 }
                 if(youtube.style.display !== 'none') {
                     youtube.style.left = width * 0.10 + 'px';
-                    youtube.style.top = (150 + profile.offsetHeight + spotify.offsetHeight + 80) + 'px';
+                    youtube.style.top = (200 + profile.offsetHeight + spotify.offsetHeight + 80) + 'px';
                     maxBottom = parseInt(youtube.style.top) + youtube.offsetHeight + 150;
                 }
             }
@@ -334,7 +387,6 @@
         window.onload = function() { setTimeout(setInitialPositions, 100); };
         window.onresize = function() { setTimeout(setInitialPositions, 100); };
 
-        // ドラッグ機能
         function initDrag(targetId, handleId) {
             var target = document.getElementById(targetId);
             var handle = document.getElementById(handleId);
@@ -345,7 +397,6 @@
             handle.addEventListener('touchstart', startDragging, { passive: false });
 
             function startDragging(e) {
-                // ×ボタンを押した時はドラッグを発動させない
                 if(e.target.classList.contains('close-button')) return;
 
                 isDragging = true;
@@ -395,13 +446,10 @@
         initDrag('win-spotify', 'handle-spotify');
         initDrag('win-youtube', 'handle-youtube');
 
-        // --- 新規追加：×ボタンでウィンドウを閉じる機能 ---
         document.querySelectorAll('.close-button').forEach(function(btn) {
-            // ドラッグのイベントが裏で発動しないようにする
             btn.addEventListener('mousedown', function(e) { e.stopPropagation(); });
             btn.addEventListener('touchstart', function(e) { e.stopPropagation(); }, { passive: false });
             
-            // クリック/タップで非表示にする
             var closeAction = function(e) {
                 e.preventDefault();
                 var windowElem = this.closest('.window');
