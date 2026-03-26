@@ -3,333 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaichi Guitar Music</title>
-    <link rel="icon" href="images/favicon.png" type="image/png"> <!-- ファビコン -->
+    <title>Contact - Kaichi Guitar Music</title>
+    <link rel="icon" href="images/favicon.png" type="image/png">
     <style>
         @font-face {
             font-family: 'PixelMplus';
             src: url('https://kaichi-naito.github.io/website/fonts/PixelMplus10-Regular.ttf') format('truetype');
+            font-display: swap;
         }
         body {
             font-family: 'PixelMplus', sans-serif;
-            color: white;
+            color: black;
             text-align: center;
-            position: relative;
-            height: 100%;
             margin: 0;
-            padding: 0;
-            background: url('images/8bit_star.png') no-repeat center center fixed;
+            padding: 20px 0 50px 0;
+            background-color: #008080;
+            background-image: url('images/windows-95-background.jpg'); /* indexと同じ背景 */
             background-size: cover;
+            background-attachment: fixed;
+            min-height: 100vh;
         }
-/* 
-        .background-video {
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: -2;
-            object-fit: cover;
+
+        /* 共通：ウィンドウの基本スタイル */
+        .window {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            box-shadow: 1px 1px 0 0 #000000;
+            padding: 2px;
+            display: inline-block;
+            text-align: left;
+            margin: 40px auto;
+            max-width: 90vw;
+            width: 450px;
         }
-*/
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.2); /* 明るさを下げるための黒のオーバーレイ */
-            z-index: -1;
+
+        .title-bar {
+            background: linear-gradient(90deg, #000080, #1084d0);
+            padding: 3px 5px 3px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
         }
-        .header {
-            padding: 0px;
+
+        .window-contents {
+            padding: 20px;
+            border: 1px solid #808080;
+            background-color: #ffffff; /* 入力画面っぽく白に */
+            margin: 2px;
         }
-        .header h1 {
-            font-size: 2em;
-            margin-bottom: 30px;
-        }
+
+        /* ナビゲーション（デスクトップアイコン風） */
         .nav {
             display: flex;
             justify-content: center;
             gap: 20px;
+            flex-wrap: wrap;
             margin-bottom: 20px;
-            flex-wrap: nowrap;
         }
-        .nav a, .nav a:visited {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            white-space: nowrap; 
-        }
-        .nav a:hover {
-            text-decoration: underline;
-        }
-        .content {
-            max-width: 600px;
-            margin: auto;
+        .desktop-icon {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 40px;
-            gap: 30px;
-        }
-
-        .profile-img-container {
-            flex-shrink: 0;
-        }
-        .profile-img {
-            width: 150px;
-            height: auto;
-        }
-        .profile-text {
-            text-align: left;
-        }
-        .profile-text h2 {
-            font-size: 24px;
-            display: inline-block;
-            margin-right: 0;
-            margin-bottom: 7.5px; /* 1/4 の余白に設定 (現行余白が30pxの1/4) */
-        }
-        .profile-text p {
-            font-size: 20px;
-            margin-top: 0; /* 余白の重複を防ぐため */
-        }
-        .profile-text p.artist-info {
-            font-size: 16px; /* 少々小さく設定 */
-            margin-bottom: 3px; /* 小さな余白を設定 */
-        }
-        .profile-text p.artist-info-2 {
-            font-size: 14px; /* 少々小さく設定 */
-            margin-bottom: 3px; /* 小さな余白を設定 */
-        }
-        .profile-text .official-artist {
-            font-size: 13px; /* 少々小さく設定 */
-            display: block;
-            margin-bottom: 10px; /* 小さな余白を設定 */
-        }
-        .profile-text .request {
-            font-size: 16px; /* 少々小さく設定 */
-            margin-bottom: 3px; /* 小さな余白を設定 */
-        }
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-            margin-bottom: 60px;
-        }
-        .social-icons a {
-            text-align: center;
-            color: white;
             text-decoration: none;
-            flex-basis: auto;
+            color: white !important;
+            width: 80px;
         }
-        .social-icons a:visited {
-            color: white;
-        }
-        .social-icons img {
-            max-width: 60px;
-            max-height: 60px;
-            width: auto;
-            height: auto;
+        .desktop-icon img {
+            width: 48px;
+            height: 48px;
+            image-rendering: pixelated;
             margin-bottom: 5px;
         }
-        .spotify-playlist {
-            max-width: 1000px; /* 最大幅を1000pxに設定 */
-            margin: 20px auto; /* 上下に20px、左右は自動で中央寄せ */
-            padding: 0 20px; /* 左右に20pxのパディングを追加 */
+        .desktop-icon span {
+            font-size: 14px;
+            text-shadow: 1px 1px 0 #000;
+            padding: 2px 4px;
         }
-        .section-title {
-            text-align: left;
-            font-size: 1.2em;
-            margin: 20px 0;
-            padding-left: 10px;
-            text-decoration: none;
-        }
-        a, a:visited {
-            color: white;
-        }
-        .section {
-            padding: 20px;
-            border: 2px solid white;
-            background-color: rgba(0, 0, 0, 0.7);
-            margin-bottom: 20px;
+        .desktop-icon:hover span {
+            background-color: #000080;
+            border: 1px dotted #fff;
         }
 
-        .section h2 {
-            margin-top: 0;
+        /* 入力フォーム周り */
+        input[type="number"] {
+            padding: 5px;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            font-family: 'PixelMplus', sans-serif;
+            width: 100px;
+            margin: 10px 0;
         }
 
-        .section p {
-            margin-bottom: 10px;
+        .win95-btn {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 4px 15px;
+            font-family: 'PixelMplus', sans-serif;
+            cursor: pointer;
         }
-        a.section-title:hover {
-            text-decoration: none;
+        .win95-btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding: 5px 14px 3px 16px;
         }
+
+        .result-area {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 1.2em;
+        }
+
+        .dm-section {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px dashed #808080;
+            text-align: center;
+        }
+
         .footer {
-            text-align: center; /* 中央揃え */
-            font-size: 0.8em; /* 標準サイズより少し小さめ */
-            color: white; /* 白色に変更 */
-            margin: 20px 0; /* 上下に20pxのマージン */
-            padding: 10px 0; /* 上下に10pxのパディング */
-        }
-         .dm-link {
-            font-size: 1.2em;
-        }
-        /* スマホ版 */
-        @media (max-width: 600px) {
-            body {
-                font-size: 80%;
-            }
-            .nav {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 10px;
-                justify-items: center;
-            }
-            .nav a {
-                font-size: 16px;
-            }
-            .header h1 {
-                font-size: 1.5em;
-            }
-            .profile-text h2 {
-                font-size: 1.2rem; /* 24pxの80% */
-                margin-bottom: 7.5px; /* 1/4 の余白に設定 (現行余白が30pxの1/4) */
-            }
-            .profile-text p {
-                font-size: 1rem; /* 20pxの80% */
-                margin-top: 0; /* 余白の重複を防ぐため */
-            }
-            .profile-text p.artist-info {
-                font-size: 0.8rem; /* 少々小さく設定 (16px相当) */
-                margin-bottom: 3px; /* 小さな余白を設定 */
-            }
-            .profile-text p.artist-info-2 {
-                font-size: 0.8rem; /* 少々小さく設定 (16px相当) */
-                margin-bottom: 3px; /* 小さな余白を設定 */
-            }
-            .profile-text .official-artist {
-                font-size: 0.5rem; /* 少々小さく設定 (13px相当) */
-                margin-bottom: 10px; /* 小さな余白を設定 */
-            }
-            .profile-text .request {
-                font-size: 0.8rem; /* 少々小さく設定 (16px相当) */
-                margin-bottom: 3px; /* 小さな余白を設定 */
-            }
-            .profile-img {
-                width: 120px;
-                height: auto;
-            }
-            .social-icons {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-                justify-items: center;
-            }
-            .social-icons a {
-                width: 100%;
-                margin-bottom: 20px;
-            }
-            .social-icons img {
-                max-width: 50px;
-                max-height: 50px;
-                margin-bottom: 2px;
-            }
-            .content {
-                padding: 0 10px;
-                flex-direction: row;
-            }
-        }
-        .playlist-container {
-            margin-top: 20px;
-            padding: 0 20px; /* 左右に余白を追加 */
-        }
-        .playlist-container iframe {
-            width: 100%;
-            height: calc(100vw * 9 / 16); /* 16:9 のアスペクト比を保つ */
-            max-height: 563px; /* 最大高さを設定 */
-            max-width: 1000px; /* 最大幅を設定 */
+            margin-top: 50px;
+            color: white;
+            font-size: 12px;
+            text-shadow: 1px 1px 2px #000;
         }
 
+        @media (max-width: 500px) {
+            .window { width: 95%; }
+            .nav { gap: 10px; }
+            .desktop-icon { width: 65px; }
+            .desktop-icon img { width: 34px; height: 34px; }
+            .desktop-icon span { font-size: 11px; }
+        }
     </style>
 </head>
 <body>
-    <!--アクセス解析研究所-->
-    <script src="//accaii.com/kaichi/script.js" async></script><noscript><img src="//accaii.com/kaichi/script?guid=on"></noscript>
-    <!--アクセス解析研究所END-->
-     <!--<video autoplay muted loop playsinline class="background-video">
-        <source src="images/8bit_town.mp4" type="video/mp4">-->
-    </video>
-    <div class="header">
-        <h1>Kaichi Guitar Music</h1>
-        <div class="nav">
-            <a href="https://kaichi-naito.github.io/website/index.html">Home</a>
-            <a href="https://kaichi-naito.github.io/website/Discography.html">Discography</a>
-            <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank">Works</a>
-            <a href="https://kaichi-naito.github.io/website/Contact.html" target="_blank">Contact</a>
-            <!-- <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank">Contact</a> -->
-            <a href="https://kaichi-naito.github.io/website/freebgm.html">FREEBGM</a>
+    <script src="//accaii.com/kaichi/script.js" async></script>
+
+    <div class="nav">
+        <a href="index.html" class="desktop-icon">
+            <img src="images/gif/Computer.gif" alt="Home">
+            <span>Home</span>
+        </a>
+        <a href="Discography.html" class="desktop-icon">
+            <img src="images/gif/Disc.gif" alt="Discography">
+            <span>Discography</span>
+        </a>
+        <a href="freebgm.html" class="desktop-icon">
+            <img src="images/gif/Sound.gif" alt="FREEBGM">
+            <span>FREEBGM</span>
+        </a>
+    </div>
+
+    <div class="window">
+        <div class="title-bar">
+            <span>Contact.txt - Notepad</span>
+            <div style="font-size: 10px;">? ×</div>
+        </div>
+        <div class="window-contents">
+            <h2 style="margin-top:0; font-size: 20px;">ご連絡先 / Contact</h2>
+            <p style="font-size: 14px; line-height: 1.6;">
+                スパム防止のため、クイズに答えるとメールアドレスが表示されます。<br>
+                Answer the test to see the email.
+            </p>
+            
+            <div style="background:#f0f0f0; padding: 15px; border: 1px inset #808080;">
+                <p id="question" style="font-size: 18px; margin: 0;">読み込み中…</p>
+                <input type="number" id="answer" placeholder="??">
+                <button id="submit" class="win95-btn">送信 (OK)</button>
+                <div id="result" class="result-area"></div>
+            </div>
+
+            <div class="dm-section">
+                <p style="font-size: 14px;">SNSでの連絡はこちら:</p>
+                <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank" style="color: blue; text-decoration: underline;">
+                    X(Twitter) DM
+                </a>
+            </div>
         </div>
     </div>
-    <div class="content">
-        <div class="section">
-            <h2>ご連絡先</h2>
-            <h2>Contact</h2>
-            <p class="small-text">
-                以下のテストに答えるとメールアドレスが表示されます。<br>
-                Answer the Test below to display the email address.
-            </p>
-            <p id="question" class="small-text">読み込み中…</p>
-            <input type="number" id="answer" placeholder="ここに答えを入力">
-            <button id="submit">送信</button>
-            <p id="result"></p>
-            <p class="dm-link">
-                <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank">X(Twitter)のDMはこちら</a>
-            </p>
-        </div>
-    </div>
+
     <div class="footer">
         このサイトは本人によって頑張って作成されました
     </div>
 
     <script>
         (function(){
-            const MIN = 1;
-            const MAX = 20;
+            const MIN = 1, MAX = 20;
             const a = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
             const b = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
             const correct = a + b;
-            const encodedEmail = 'a2FpY2hpLm5haXRvQGdtYWlsLmNvbQ=='; // Base64 encode
+            const encodedEmail = 'a2FpY2hpLm5haXRvQGdtYWlsLmNvbQ==';
             let wrongCount = 0;
 
-            document.getElementById('question').textContent =
-                `${a} ＋ ${b} ＝ ？`;
+            document.getElementById('question').textContent = `${a} ＋ ${b} ＝ ？`;
 
             const submitBtn = document.getElementById('submit');
             const answerInput = document.getElementById('answer');
             const resultEl = document.getElementById('result');
 
-            submitBtn.addEventListener('click', function(){
+            function check() {
                 const userAns = parseInt(answerInput.value, 10);
                 if (userAns === correct) {
-                    // Base64デコードして表示
                     const email = atob(encodedEmail);
-                    resultEl.innerHTML =
-                        '<span style="color: yellow;">' + email + '</span>';
+                    resultEl.innerHTML = '<span style="color: green; font-size: 18px;">Email: ' + email + '</span>';
+                    resultEl.style.color = "green";
                 } else {
                     wrongCount++;
                     if (wrongCount >= 3) {
-                        resultEl.textContent = '回答回数の上限に達しました。';
+                        resultEl.textContent = 'Too many attempts.';
                         submitBtn.disabled = true;
                         answerInput.disabled = true;
                     } else {
-                        resultEl.textContent = `不正解です。残り${3 - wrongCount}回です。`;
+                        resultEl.textContent = `不正解! 残り${3 - wrongCount}回`;
+                        resultEl.style.color = "red";
                     }
                 }
+            }
+
+            submitBtn.addEventListener('click', check);
+            answerInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') check();
             });
         })();
     </script>
