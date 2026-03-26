@@ -44,7 +44,6 @@
             z-index: -1;
         }
 
-        /* アニメーションで安全に表示させる（JSエラーでも必ず表示される） */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -61,7 +60,7 @@
             display: inline-block;
             text-align: left;
             position: absolute;
-            animation: fadeIn 0.4s ease-in forwards; /* フワッと表示 */
+            animation: fadeIn 0.4s ease-in forwards; 
             transition: transform 0.2s;
         }
 
@@ -214,7 +213,6 @@
             border-color: #000080; 
         }
 
-        /* --- スマホ対応（安全で綺麗なパーセント指定に変更） --- */
         @media (max-width: 800px) {
             body {
                 font-size: 14px;
@@ -228,7 +226,6 @@
                 box-sizing: border-box;
             }
 
-            /* スマホで画面から絶対にはみ出さないように割合(%)で指定 */
             #win-profile { width: 85% !important; max-width: 320px !important; }
             #win-phalux { width: 45% !important; max-width: 160px !important; }
             #win-social { width: 90% !important; max-width: 350px !important; }
@@ -335,7 +332,7 @@
         </a>
     </div>
 
-    <div class="window" id="win-profile" style="width: 380px; z-index: 104;">
+    <div class="window" id="win-profile" style="width: 280px; z-index: 104;">
         <div class="title-bar draggable-cursor" id="handle-profile">
             <span>Profile.exe</span>
             <div class="close-button">×</div>
@@ -408,7 +405,6 @@
     </div>
 
     <script>
-        // エラー回避のために全体をtry-catchで囲む（BGM削除済み）
         var mouseClickSound;
 
         try {
@@ -424,7 +420,6 @@
             }
         }
 
-        // スマホで絶対エラーにならない書き方
         var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .phalux-link');
         for (var i = 0; i < clickTargets.length; i++) {
             clickTargets[i].addEventListener('mousedown', playClickSound);
@@ -477,30 +472,32 @@
                     maxBottom = currentTop + 100;
                 }
             } else {
-                // PC版の配置（画面全体に大きく散らばるように直接指定）
+                // --- PC版の配置を黄金バランスで散らす ---
                 if(profile.style.display !== 'none') {
-                    profile.style.left = '8%';
-                    profile.style.top = '120px';
-                }
-                if(phalux.style.display !== 'none') {
-                    phalux.style.left = '75%'; 
-                    phalux.style.top = '160px';
+                    profile.style.left = '5%';
+                    profile.style.top = '150px';
                 }
                 if(social.style.display !== 'none') {
-                    social.style.left = '60%'; 
-                    social.style.top = '350px';
+                    social.style.left = '45%'; 
+                    social.style.top = '180px';
+                }
+                if(phalux.style.display !== 'none') {
+                    phalux.style.left = '80%'; 
+                    phalux.style.top = '250px';
                 }
                 if(spotify.style.display !== 'none') {
-                    spotify.style.left = '15%'; 
-                    spotify.style.top = '450px';
+                    spotify.style.left = '8%'; 
+                    spotify.style.top = '420px';
                 }
                 if(youtube.style.display !== 'none') {
-                    youtube.style.left = 'max(5%, calc(50% - 400px))'; 
-                    youtube.style.top = '650px';
-                    maxBottom = 650 + (youtube.offsetHeight || 450) + 150;
+                    // 中央からやや右下に配置
+                    youtube.style.left = 'max(15%, calc(50% - 300px))'; 
+                    youtube.style.top = '500px';
+                    maxBottom = 500 + (youtube.offsetHeight || 450) + 150;
                 } else {
                     maxBottom = 1000;
                 }
+                // -----------------------------------------
             }
 
             if(maxBottom > 0) document.body.style.minHeight = maxBottom + 'px';
