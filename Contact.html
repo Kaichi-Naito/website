@@ -26,7 +26,6 @@
             position: relative;
         }
 
-        /* 背景を10%暗くする設定 (index.htmlと完全一致) */
         body::before {
             content: "";
             position: fixed;
@@ -35,17 +34,15 @@
             z-index: -1;
         }
 
-        /* ヘッダータイトル：index.htmlと完全に一致(文字間隔含む) */
         h1 {
             color: white;
             text-shadow: 2px 2px #000;
             font-size: 2em;
             margin-bottom: 30px;
             padding-top: 20px;
-            letter-spacing: -2px; /* 文字間隔を詰める */
+            letter-spacing: -2px;
         }
 
-        /* ナビゲーション (index.htmlと完全一致) */
         .nav {
             display: flex;
             justify-content: center;
@@ -63,8 +60,7 @@
             cursor: pointer;
         }
         .desktop-icon img {
-            width: 48px;
-            height: 48px;
+            width: 48px; height: 48px;
             object-fit: contain;
             image-rendering: pixelated;
             margin-bottom: 5px;
@@ -82,7 +78,6 @@
             border: 1px dotted #fff;
         }
 
-        /* ウィンドウ設定 */
         .window {
             background-color: #c0c0c0;
             border: 2px solid;
@@ -124,7 +119,6 @@
             margin-bottom: 10px; height: 35px; box-shadow: inset 2px 2px 0px #808080;
         }
 
-        /* 電卓用グリッド（演算子なしの3列） */
         .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
         
         .win95-btn {
@@ -147,25 +141,16 @@
             pointer-events: none;
         }
 
-        /* スマホ版レスポンシブ設定：index.htmlに完全準拠 */
         @media (max-width: 800px) {
             h1 { 
                 font-size: 1.5em; 
                 margin-bottom: 30px;
-                letter-spacing: -1px; /* スマホ用文字間隔 */
+                letter-spacing: -1px;
             }
-            
-            .nav {
-                display: flex;
-                justify-content: center;
-                gap: 8px; 
-                margin-bottom: 25px;
-            }
+            .nav { gap: 8px; margin-bottom: 25px; }
             .desktop-icon { width: 60px; }
             .desktop-icon img { width: 34px !important; height: 34px !important; }
             .desktop-icon span { font-size: 11px; padding: 1px 2px; }
-
-            /* 電卓縮小設定 (約70%) */
             #win-calculator { width: 200px !important; }
             #win-calculator .win95-btn { font-size: 14px; padding: 4px 0; }
             #win-calculator .calc-display { font-size: 18px; height: 28px; }
@@ -226,10 +211,13 @@
     <div class="footer">このサイトは本人によって頑張って作成されました</div>
 
     <script>
-        // サウンド・ドラッグ・閉じる機能
         var mouseClickSound = new Audio('Sound/MouseClick.mp3');
         function playSound() { if (mouseClickSound) { mouseClickSound.currentTime = 0; mouseClickSound.play().catch(()=>{}); } }
-        document.addEventListener('mousedown', (e) => { if (e.target.closest('.desktop-icon, .win95-btn, .close-button, .title-bar')) playSound(); });
+        
+        // クリック音の設定（全般）
+        document.addEventListener('mousedown', (e) => { 
+            if (e.target.closest('.desktop-icon, .win95-btn, .close-button, .title-bar')) playSound(); 
+        });
 
         var highestZIndex = 130;
         function initDrag(targetId, handleId) {
@@ -237,25 +225,39 @@
             var handle = document.getElementById(handleId);
             var isDragging = false;
             var initialX, initialY;
+
             handle.addEventListener('mousedown', startDragging);
             handle.addEventListener('touchstart', startDragging, { passive: false });
+
             function startDragging(e) {
                 if(e.target.classList.contains('close-button')) return;
-                isDragging = true; highestZIndex++; target.style.zIndex = highestZIndex;
+                
+                // ドラッグ開始時にも音を鳴らす
+                playSound();
+
+                isDragging = true; 
+                highestZIndex++; 
+                target.style.zIndex = highestZIndex;
                 var evt = e.type === 'touchstart' ? e.touches[0] : e;
-                initialX = evt.clientX - target.offsetLeft; initialY = evt.clientY - target.offsetTop;
-                document.addEventListener('mousemove', dragging); document.addEventListener('touchmove', dragging, { passive: false });
-                document.addEventListener('mouseup', endDrag); document.addEventListener('touchend', endDrag);
+                initialX = evt.clientX - target.offsetLeft; 
+                initialY = evt.clientY - target.offsetTop;
+                
+                document.addEventListener('mousemove', dragging); 
+                document.addEventListener('touchmove', dragging, { passive: false });
+                document.addEventListener('mouseup', endDrag); 
+                document.addEventListener('touchend', endDrag);
             }
+
             function dragging(e) {
                 if (!isDragging) return;
                 var evt = e.type === 'touchmove' ? e.touches[0] : e;
-                target.style.left = (evt.clientX - initialX) + 'px'; target.style.top = (evt.clientY - initialY) + 'px';
+                target.style.left = (evt.clientX - initialX) + 'px'; 
+                target.style.top = (evt.clientY - initialY) + 'px';
             }
+
             function endDrag() { isDragging = false; }
         }
 
-        // 初期配置設定
         function setInitialPositions() {
             var isMobile = window.innerWidth <= 800;
             var msg = document.getElementById('win-message');
@@ -284,7 +286,6 @@
             });
         };
 
-        // 電卓ロジック (演算なし)
         const display = document.getElementById('display');
         const questionBox = document.getElementById('question');
         let currentInput = "";
