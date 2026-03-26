@@ -121,7 +121,7 @@
             gap: 30px;
         }
         .profile-img {
-            width: 120px;
+            width: 120px; /* PCでのデフォルト */
             height: auto;
             border: 2px solid #808080;
         }
@@ -133,7 +133,7 @@
             text-align: center;
         }
         .social-item img {
-            width: 40px;
+            width: 40px; /* PCでのデフォルト */
             height: 40px;
             display: block;
             margin: 0 auto 5px;
@@ -164,6 +164,17 @@
             .window {
                 width: 90% !important; /* スマホでも横幅を確保しつつabsoluteを維持 */
                 box-sizing: border-box;
+            }
+
+            /* --- 画像系を80%に縮小 --- */
+            /* プロフィール画像: 120px * 0.8 = 96px */
+            .profile-img {
+                width: 96px !important;
+            }
+            /* SNSアイコン: 40px * 0.8 = 32px */
+            .social-item img {
+                width: 32px !important;
+                height: 32px !important;
             }
         }
     </style>
@@ -259,6 +270,7 @@
                 // スマホ用：縦に綺麗に並べる
                 var currentTop = 180; // ヘッダーナビゲーションの下あたり
                 var gap = 30; // ウィンドウ間の余白
+                // スマホでは画像が80%になるので、ウィンドウの幅もそれに合わせて少し調整される
                 var leftPos = (width - profile.offsetWidth) / 2;
                 if(leftPos < 0) leftPos = 10;
 
@@ -295,16 +307,13 @@
                 maxBottom = parseInt(youtube.style.top) + youtube.offsetHeight + 150;
             }
 
-            // ウィンドウを動かしてもスクロール領域を確保する
             document.body.style.minHeight = maxBottom + 'px';
         }
 
-        // ページ読み込み時に位置を設定。フォント等の読み込みを待つために少し遅延させる
         window.onload = function() {
             setTimeout(setInitialPositions, 100);
         };
         
-        // 画面サイズが変わった時（スマホの縦横切り替えなど）に再計算
         window.onresize = function() {
             setTimeout(setInitialPositions, 100);
         };
@@ -316,7 +325,6 @@
             var initialX, initialY;
             var offsetX, offsetY;
 
-            // スマホのタッチとPCのマウス両対応
             handle.addEventListener('mousedown', startDragging);
             handle.addEventListener('touchstart', startDragging, { passive: false });
 
@@ -328,7 +336,6 @@
                 if (e.type === 'touchstart') {
                     initialX = e.touches[0].clientX - target.offsetLeft;
                     initialY = e.touches[0].clientY - target.offsetTop;
-                    // スマホでタイトルバーを触った時は画面スクロールを止める（ドラッグ優先）
                     e.preventDefault(); 
                 } else {
                     initialX = e.clientX - target.offsetLeft;
