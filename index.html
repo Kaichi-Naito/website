@@ -28,7 +28,8 @@
             background-blend-mode: overlay;
             background-size: cover;
             background-attachment: fixed;
-            overflow-x: hidden; /* 要素をずらした際の横スクロールを防止 */
+            overflow-x: hidden; /* 横スクロールを防止 */
+            z-index: 1;
         }
 
         /* --- Windows 95 UI Component --- */
@@ -42,7 +43,13 @@
             max-width: 90%;
             display: inline-block;
             text-align: left;
+            position: absolute; /* ドラッグのために絶対配置 */
             transition: transform 0.2s; /* リサイズ時の動きを滑らかに */
+        }
+
+        /* ドラッガブルにするタイトルバーのカーソル */
+        .draggable-cursor {
+            cursor: grab;
         }
 
         /* 乱雑感を出すためのオフセットクラス */
@@ -154,7 +161,7 @@
             font-size: 12px;
         }
 
-        /* スマホ対応（ここで散らばりをリセットします） */
+        /* スマホ対応 */
         @media (max-width: 600px) {
             .profile-section {
                 flex-direction: column;
@@ -173,12 +180,17 @@
             }
             .window {
                 width: 100% !important;
+                position: relative !important; /* スマホでは絶対配置を解除 */
+                margin-left: auto !important;
+                margin-right: auto !important;
+                left: 0 !important;
+                top: 0 !important;
                 box-sizing: border-box;
             }
         }
     </style>
 </head>
-<body>
+<body id="win95-desktop">
     <script src="//accaii.com/kaichi/script.js" async></script>
 
     <h1 class="header-title">Kaichi Guitar Music</h1>
@@ -191,8 +203,8 @@
         <a href="freebgm.html" class="win95-btn">FREEBGM</a>
     </div>
 
-    <div class="window win95-scatter-left-md" style="width: 500px;">
-        <div class="title-bar">
+    <div class="window win95-scatter-left-md" id="win-profile" style="width: 500px;">
+        <div class="title-bar draggable-cursor" id="handle-profile">
             <span>Profile.exe</span>
             <div class="close-button">×</div>
         </div>
@@ -208,8 +220,8 @@
 
     <br>
 
-    <div class="window win95-scatter-right-lg" style="width: 450px;">
-        <div class="title-bar">
+    <div class="window win95-scatter-right-lg" id="win-social" style="width: 450px;">
+        <div class="title-bar draggable-cursor" id="handle-social">
             <span>Social_Media.lnk</span>
             <div class="close-button">×</div>
         </div>
@@ -227,8 +239,8 @@
 
     <br>
 
-    <div class="window win95-scatter-left-sm" style="width: 600px;">
-        <div class="title-bar">
+    <div class="window win95-scatter-left-sm" id="win-spotify" style="width: 600px;">
+        <div class="title-bar draggable-cursor" id="handle-spotify">
             <span>CD_Player.exe</span>
             <div class="close-button">×</div>
         </div>
@@ -239,8 +251,8 @@
 
     <br>
 
-    <div class="window win95-scatter-right-sm" style="width: 800px;">
-        <div class="title-bar">
+    <div class="window win95-scatter-right-sm" id="win-youtube" style="width: 800px;">
+        <div class="title-bar draggable-cursor" id="handle-youtube">
             <span>Media_Player.avi</span>
             <div class="close-button">×</div>
         </div>
@@ -256,5 +268,75 @@
     <div class="footer">
         このサイトは本人によって頑張って作成されました(Win95 Edition)
     </div>
+
+    <script>
+        var highestZIndex = 100; // z-indexの初期最大値
+
+        // ドラッグを開始する関数 (z-indexを更新)
+        function initDrag(targetId, handleId) {
+            var target = document.getElementById(targetId);
+            var handle = document.getElementById(handleId);
+            var isDragging = false;
+            var initialX, initialY;
+            var offsetX, offsetY;
+
+            handle.addEventListener('mousedown', startDragging);
+            handle.addEventListener('touchstart', startDragging, { passive: false }); // スマホ対応
+
+            function startDragging(e) {
+                isDragging = true;
+                
+                // z-indexを更新し、クリックしたウィンドウを最前面に
+                highestZIndex++;
+                target.style.zIndex = highestZIndex;
+
+                if (e.type === 'touchstart') {
+                    initialX = e.touches[0].clientX - target.offsetLeft;
+                    initialY = e.touches[0].clientY - target.offsetTop;
+                    e.preventDefault(); // デフォルトのスクロール動作を防止
+                } else {
+                    initialX = e.clientX - target.offsetLeft;
+                    initialY = e.clientY - target.offsetTop;
+                }
+
+                document.addEventListener('mousemove', dragging);
+                document.addEventListener('touchmove', dragging, { passive: false }); // スマホ対応
+                document.addEventListener('mouseup', endDrag);
+                document.addEventListener('touchend', endDrag);
+            }
+
+            function dragging(e) {
+                if (!isDragging) return;
+
+                if (e.type === 'touchmove') {
+                    offsetX = e.touches[0].clientX - initialX;
+                    offsetY = e.touches[0].clientY - initialY;
+                    e.preventDefault(); // スクロール防止
+                } else {
+                    offsetX = e.clientX - initialX;
+                    offsetY = e.clientY - initialY;
+                }
+
+                target.style.left = offsetX + 'px';
+                target.style.top = offsetY + 'px';
+                target.win95ScatterLeftLg.transform.translateX = "0 !important";
+                target.style.margin = "0"; // マージンをリセット
+            }
+
+            function endDrag() {
+                isDragging = false;
+                document.removeEventListener('mousemove', dragging);
+                document.removeEventListener('touchmove', dragging);
+                document.removeEventListener('mouseup', endDrag);
+                document.removeEventListener('touchend', endDrag);
+            }
+        }
+
+        // 各ウィンドウをドラッガブルに設定
+        initDrag('win-profile', 'handle-profile');
+        initDrag('win-social', 'handle-social');
+        initDrag('win-spotify', 'handle-spotify');
+        initDrag('win-youtube', 'handle-youtube');
+    </script>
 </body>
 </html>
