@@ -121,7 +121,10 @@
             padding: 5px 10px; text-align: right; font-size: 24px;
             margin-bottom: 10px; height: 35px; box-shadow: inset 2px 2px 0px #808080;
         }
-        .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+
+        /* グリッドを3列に変更 */
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        
         .win95-btn {
             background-color: #c0c0c0; border: 2px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
@@ -130,6 +133,12 @@
             color: black; text-decoration: none;
         }
         .win95-btn:active { border-color: #808080 #ffffff #ffffff #808080; padding: 7px 0 5px 0; }
+
+        .dm-link-btn {
+            grid-column: span 3; /* DMボタンを3列ぶち抜きに */
+            font-size: 14px;
+            color: blue !important;
+        }
 
         .footer {
             margin-top: 50px;
@@ -142,32 +151,18 @@
             pointer-events: none;
         }
 
-        /* スマホ版レスポンシブ設定 */
         @media (max-width: 800px) {
-            h1 {
-                font-size: 1.5em;
-                margin-bottom: 30px;
-            }
+            h1 { font-size: 1.5em; margin-bottom: 30px; }
             .desktop-icon img { width: 34px !important; height: 34px !important; }
             .desktop-icon span { font-size: 11px; }
 
-            /* 電卓ウィンドウをスマホ時のみ約70%のサイズ（240px程度）に縮小 */
+            /* 電卓ウィンドウの幅を演算子ボタンがない分、さらにコンパクトに */
             #win-calculator {
-                width: 240px !important; 
-            }
-            #win-calculator .window-contents {
-                padding: 10px;
+                width: 200px !important; 
             }
             #win-calculator .win95-btn {
                 font-size: 14px;
                 padding: 4px 0;
-            }
-            #win-calculator .calc-display {
-                font-size: 18px;
-                height: 28px;
-            }
-            #win-calculator #question {
-                font-size: 14px;
             }
         }
     </style>
@@ -193,17 +188,27 @@
         </div>
     </div>
 
-    <div class="window" id="win-calculator" style="width: 340px; z-index: 110;">
+    <div class="window" id="win-calculator" style="width: 280px; z-index: 110;">
         <div class="title-bar" id="handle-calculator"><span>Calculator.exe</span><div class="close-button">×</div></div>
         <div class="window-contents">
             <div id="question" style="text-align:center; margin-bottom:10px; font-size:16px; background:#eee; padding:5px; border:1px inset #fff;">読み込み中…</div>
             <div class="calc-display" id="display">0</div>
             <div class="keypad">
-                <div class="win95-btn" onclick="inputNum(7)">7</div><div class="win95-btn" onclick="inputNum(8)">8</div><div class="win95-btn" onclick="inputNum(9)">9</div><div class="win95-btn">/</div>
-                <div class="win95-btn" onclick="inputNum(4)">4</div><div class="win95-btn" onclick="inputNum(5)">5</div><div class="win95-btn" onclick="inputNum(6)">6</div><div class="win95-btn">*</div>
-                <div class="win95-btn" onclick="inputNum(1)">1</div><div class="win95-btn" onclick="inputNum(2)">2</div><div class="win95-btn" onclick="inputNum(3)">3</div><div class="win95-btn">-</div>
-                <div class="win95-btn" onclick="inputNum(0)">0</div><div class="win95-btn">.</div><div class="win95-btn" onclick="clearDisplay()">C</div><div class="win95-btn">+</div>
-                <div class="win95-btn" style="grid-column: span 4; color:red; font-weight:bold;" onclick="checkAnswer()">ENTER (OK)</div>
+                <div class="win95-btn num-btn" onclick="inputNum(7)">7</div>
+                <div class="win95-btn num-btn" onclick="inputNum(8)">8</div>
+                <div class="win95-btn num-btn" onclick="inputNum(9)">9</div>
+
+                <div class="win95-btn num-btn" onclick="inputNum(4)">4</div>
+                <div class="win95-btn num-btn" onclick="inputNum(5)">5</div>
+                <div class="win95-btn num-btn" onclick="inputNum(6)">6</div>
+
+                <div class="win95-btn num-btn" onclick="inputNum(1)">1</div>
+                <div class="win95-btn num-btn" onclick="inputNum(2)">2</div>
+                <div class="win95-btn num-btn" onclick="inputNum(3)">3</div>
+
+                <div class="win95-btn num-btn" onclick="inputNum(0)">0</div>
+                <div class="win95-btn" onclick="clearDisplay()">C</div>
+                <div class="win95-btn" style="color:red; font-weight:bold;" onclick="checkAnswer()">OK</div>
             </div>
         </div>
     </div>
@@ -218,6 +223,7 @@
     <div class="footer">このサイトは本人によって頑張って作成されました</div>
 
     <script>
+        // サウンド・ドラッグロジックなどは以前のまま維持
         var mouseClickSound = new Audio('Sound/MouseClick.mp3');
         function playSound() { if (mouseClickSound) { mouseClickSound.currentTime = 0; mouseClickSound.play().catch(()=>{}); } }
         document.addEventListener('mousedown', (e) => { if (e.target.closest('.desktop-icon, .win95-btn, .close-button, .title-bar')) playSound(); });
@@ -254,7 +260,7 @@
             if (isMobile) {
                 msg.style.left = '5%'; msg.style.top = '150px';
                 calc.style.left = '10%'; calc.style.top = '280px';
-                dm.style.left = '15%'; dm.style.top = '650px'; /* 電卓が小さくなった分、少し上に寄せました */
+                dm.style.left = '15%'; dm.style.top = '620px'; /* dmの位置を電卓に合わせて調整 */
                 document.body.style.minHeight = '900px';
             } else {
                 msg.style.left = '15%'; msg.style.top = '200px';
@@ -285,7 +291,7 @@
         function clearDisplay() { currentInput = ""; display.textContent = "0"; }
         function checkAnswer() {
             if (parseInt(currentInput) === correct) {
-                questionBox.innerHTML = "SUCCESS!<br>kaichi.naito@gmail.com";
+                questionBox.innerHTML = "kaichi.naito@gmail.com";
                 display.textContent = "OK!";
             } else {
                 questionBox.textContent = "WRONG"; clearDisplay();
