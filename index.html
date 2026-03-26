@@ -440,7 +440,7 @@
             var youtube = document.getElementById('win-youtube');
 
             var maxBottom = 0;
-
+  // ↓↓↓ ここから下がスマホ版の配置指定です ↓↓↓
             if (isMobile) {
                 if(profile.style.display !== 'none') {
                     profile.style.left = '4%';
@@ -448,14 +448,13 @@
                 }
                 if(phalux.style.display !== 'none') {
                     phalux.style.left = '52%'; 
-                    phalux.style.top = '260px';
+                    phalux.style.top = '300px';
                 }
                 if(social.style.display !== 'none') {
                     social.style.left = '6%';
-                    social.style.top = '380px';
+                    social.style.top = '420px';
                 }
                 
-                // --- 今回修正した箇所：スマホ版 CD_Player の位置を微妙に下に ---
                 if(spotify.style.display !== 'none') {
                     var spWidth = spotify.offsetWidth || 320;
                     spotify.style.left = (width - spWidth - 12) + 'px'; 
