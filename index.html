@@ -40,7 +40,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.1); /* 10%の暗さ */
+            background-color: rgba(0, 0, 0, 0.1); 
             z-index: -1;
         }
 
@@ -51,12 +51,11 @@
             box-shadow: 1px 1px 0 0 #000000;
             padding: 2px;
             margin: 0; 
-            max-width: 95%;
+            max-width: 95vw; /* PCでも画面外にはみ出しすぎないように */
             display: inline-block;
             text-align: left;
             position: absolute;
             
-            /* 初期状態を透明にし、フェードイン効果を追加 */
             opacity: 0; 
             transition: transform 0.2s, opacity 0.4s ease-in;
         }
@@ -210,7 +209,8 @@
             border-color: #000080; 
         }
 
-        @media (max-width: 600px) {
+        /* --- スマホ対応（横幅バグ修正版） --- */
+        @media (max-width: 800px) {
             body {
                 font-size: 14px;
             }
@@ -218,14 +218,14 @@
                 font-size: 1.6em;
                 margin-bottom: 15px;
             }
+            
+            /* 横幅の強制引き伸ばしを削除し、画面より大きくならないガードだけ残す */
             .window {
-                width: 88% !important;
+                max-width: 94vw !important; 
                 box-sizing: border-box;
             }
 
-            #win-phalux {
-                width: 44% !important; 
-            }
+            /* PHALUX用の中身調整（横幅強制を削除） */
             #win-phalux .window-contents {
                 padding: 5px !important; 
             }
@@ -399,7 +399,6 @@
     </div>
 
     <script>
-        // --- 復活させたクリック音の実装 ---
         var mouseClickSound = new Audio('Sound/MouseClick.mp3');
         
         function playClickSound() {
@@ -407,19 +406,17 @@
             mouseClickSound.play().catch(function(e) { /* ignore */ });
         }
 
-        // デスクトップアイコン、ボタン、タイトルバー、×ボタン、PHALUXロゴにクリック音を追加
         var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .phalux-link');
         clickTargets.forEach(function(target) {
             target.addEventListener('mousedown', playClickSound);
             target.addEventListener('touchstart', playClickSound, { passive: true });
         });
-        // ---------------------------------
 
         var highestZIndex = 110;
 
         function setInitialPositions() {
             var width = window.innerWidth;
-            var isMobile = window.matchMedia("(max-width: 600px)").matches;
+            var isMobile = window.matchMedia("(max-width: 800px)").matches;
 
             var profile = document.getElementById('win-profile');
             var phalux = document.getElementById('win-phalux');
@@ -433,18 +430,19 @@
                 var currentTop = 180; 
                 var gap = 12;
 
+                // 左端から少しだけずらして散らす（はみ出さないように計算済み）
                 if(profile.style.display !== 'none') {
                     profile.style.left = '3%';
                     profile.style.top = currentTop + 'px';
                     currentTop += profile.offsetHeight + gap;
                 }
                 if(phalux.style.display !== 'none') {
-                    phalux.style.left = '12%'; 
+                    phalux.style.left = '15%'; 
                     phalux.style.top = currentTop + 'px';
                     currentTop += phalux.offsetHeight + gap;
                 }
                 if(social.style.display !== 'none') {
-                    social.style.left = '5%';
+                    social.style.left = '4%';
                     social.style.top = currentTop + 'px';
                     currentTop += social.offsetHeight + gap;
                 }
@@ -454,7 +452,7 @@
                     currentTop += spotify.offsetHeight + gap;
                 }
                 if(youtube.style.display !== 'none') {
-                    youtube.style.left = '9%';
+                    youtube.style.left = '3%';
                     youtube.style.top = currentTop + 'px';
                     maxBottom = currentTop + youtube.offsetHeight + 100;
                 } else {
@@ -488,7 +486,6 @@
 
             if(maxBottom > 0) document.body.style.minHeight = maxBottom + 'px';
 
-            // 位置が決まった直後に全ウィンドウをフェードインさせる
             setTimeout(function() {
                 var allWindows = document.querySelectorAll('.window');
                 allWindows.forEach(function(win) {
@@ -571,7 +568,7 @@
                 windowElem.style.opacity = '0';
                 setTimeout(function() {
                     windowElem.style.display = 'none';
-                    setInitialPositions();
+                    // せり上がってくるバグの原因だった setInitialPositions() を削除しました！
                 }, 300);
             };
             btn.addEventListener('click', closeAction);
