@@ -385,6 +385,24 @@
     </div>
 
     <script>
+        // --- 新規追加：クリック音の実装 ---
+        var mouseClickSound = new Audio('Sound/MouseClick.mp3');
+        
+        function playClickSound() {
+            mouseClickSound.currentTime = 0; // 連続クリックしても頭から再生されるようにする
+            // ブラウザの自動再生ブロック回避のため、エラーが出ても無視する処理
+            mouseClickSound.play().catch(function(e) { /* ignore */ });
+        }
+
+        // デスクトップアイコン、ボタン、タイトルバー、×ボタンにクリック音を追加
+        // スマホ(touchstart)とPC(mousedown)の両方に対応
+        var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar');
+        clickTargets.forEach(function(target) {
+            target.addEventListener('mousedown', playClickSound);
+            target.addEventListener('touchstart', playClickSound, { passive: true });
+        });
+        // ---------------------------------
+
         var highestZIndex = 110;
 
         function setInitialPositions() {
@@ -409,7 +427,7 @@
                     currentTop += profile.offsetHeight + gap;
                 }
                 if(phalux.style.display !== 'none') {
-                    phalux.style.left = '12%'; // 少し右にずらす
+                    phalux.style.left = '12%'; 
                     phalux.style.top = currentTop + 'px';
                     currentTop += phalux.offsetHeight + gap;
                 }
@@ -440,7 +458,7 @@
                     social.style.top = '250px';
                 }
                 if(phalux.style.display !== 'none') {
-                    phalux.style.left = width * 0.60 + 'px'; // 右側 (Socialの下あたり)
+                    phalux.style.left = width * 0.60 + 'px'; 
                     phalux.style.top = (250 + (social.offsetHeight || 150) + 40) + 'px'; 
                 }
                 if(spotify.style.display !== 'none') {
@@ -449,7 +467,6 @@
                 }
                 if(youtube.style.display !== 'none') {
                     youtube.style.left = width * 0.10 + 'px';
-                    // 他の要素の下に配置されるように計算
                     var ytTop = 200 + (profile.offsetHeight || 150) + (spotify.offsetHeight || 200) + 80;
                     youtube.style.top = ytTop + 'px';
                     maxBottom = parseInt(youtube.style.top) + youtube.offsetHeight + 150;
@@ -517,7 +534,7 @@
         }
 
         initDrag('win-profile', 'handle-profile');
-        initDrag('win-phalux', 'handle-phalux'); // 新規追加
+        initDrag('win-phalux', 'handle-phalux'); 
         initDrag('win-social', 'handle-social');
         initDrag('win-spotify', 'handle-spotify');
         initDrag('win-youtube', 'handle-youtube');
