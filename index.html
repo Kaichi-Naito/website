@@ -121,7 +121,7 @@
             gap: 30px;
         }
         .profile-img {
-            width: 120px; /* PCでのデフォルト */
+            width: 120px;
             height: auto;
             border: 2px solid #808080;
         }
@@ -133,7 +133,7 @@
             text-align: center;
         }
         .social-item img {
-            width: 40px; /* PCでのデフォルト */
+            width: 40px;
             height: 40px;
             display: block;
             margin: 0 auto 5px;
@@ -162,16 +162,14 @@
             }
             .header-title { font-size: 1.8em; }
             .window {
-                width: 90% !important; /* スマホでも横幅を確保しつつabsoluteを維持 */
+                width: 86% !important; /* 左右に散らす隙間を作るため少し細く */
                 box-sizing: border-box;
             }
 
             /* --- 画像系を80%に縮小 --- */
-            /* プロフィール画像: 120px * 0.8 = 96px */
             .profile-img {
                 width: 96px !important;
             }
-            /* SNSアイコン: 40px * 0.8 = 32px */
             .social-item img {
                 width: 32px !important;
                 height: 32px !important;
@@ -267,26 +265,23 @@
             var maxBottom = 0;
 
             if (isMobile) {
-                // スマホ用：縦に綺麗に並べる
-                var currentTop = 180; // ヘッダーナビゲーションの下あたり
-                var gap = 30; // ウィンドウ間の余白
-                // スマホでは画像が80%になるので、ウィンドウの幅もそれに合わせて少し調整される
-                var leftPos = (width - profile.offsetWidth) / 2;
-                if(leftPos < 0) leftPos = 10;
+                // スマホ用：縦に並べつつ、左右にジグザグに散らす
+                var currentTop = 180;
+                var gap = 15; // 少し間隔を詰めて乱雑感を出す
 
-                profile.style.left = leftPos + 'px';
+                profile.style.left = '3%'; // 左寄り
                 profile.style.top = currentTop + 'px';
                 currentTop += profile.offsetHeight + gap;
 
-                social.style.left = leftPos + 'px';
+                social.style.left = '11%'; // 右寄り
                 social.style.top = currentTop + 'px';
                 currentTop += social.offsetHeight + gap;
 
-                spotify.style.left = leftPos + 'px';
+                spotify.style.left = '4%'; // 左寄り
                 spotify.style.top = currentTop + 'px';
                 currentTop += spotify.offsetHeight + gap;
 
-                youtube.style.left = leftPos + 'px';
+                youtube.style.left = '9%'; // 右寄り
                 youtube.style.top = currentTop + 'px';
                 
                 maxBottom = currentTop + youtube.offsetHeight + 100;
