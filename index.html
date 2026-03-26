@@ -28,7 +28,7 @@
             background-blend-mode: overlay;
             background-size: cover;
             background-attachment: fixed;
-            overflow-x: hidden; /* 横スクロールを防止 */
+            overflow-x: hidden;
             z-index: 1;
             position: relative;
         }
@@ -44,7 +44,7 @@
             max-width: 95%;
             display: inline-block;
             text-align: left;
-            position: absolute; /* 全デバイスでドラッグのために絶対配置 */
+            position: absolute;
             transition: transform 0.2s;
         }
 
@@ -63,6 +63,7 @@
             margin-bottom: 2px;
         }
 
+        /* --- ×ボタンのスタイルと凹むアニメーション --- */
         .close-button {
             width: 16px;
             height: 14px;
@@ -74,7 +75,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: default;
+            cursor: pointer; /* ポインターに変更 */
+            font-weight: bold;
+        }
+        .close-button:active {
+            border-color: #808080 #ffffff #ffffff #808080; /* 押した時に凹む */
+            padding-top: 1px;
+            padding-left: 1px;
         }
 
         .window-contents {
@@ -129,7 +136,7 @@
         .social-icons-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px; /* PCでのデフォルト */
+            gap: 15px;
             text-align: center;
         }
         .social-item img {
@@ -154,7 +161,6 @@
             width: 100%;
         }
 
-        /* スマホ対応 */
         @media (max-width: 600px) {
             .profile-section {
                 flex-direction: column;
@@ -162,11 +168,10 @@
             }
             .header-title { font-size: 1.8em; }
             .window {
-                width: 86% !important; /* スマホでも横幅を確保しつつabsoluteを維持 */
+                width: 86% !important;
                 box-sizing: border-box;
             }
 
-            /* --- 画像系を80%に縮小 --- */
             .profile-img {
                 width: 96px !important;
             }
@@ -175,16 +180,15 @@
                 height: 32px !important;
             }
 
-            /* --- 新規追加：SNSボタン同士の間隔とボタン自体を狭める --- */
             .social-icons-grid {
-                gap: 5px !important; /* 間隔を狭める */
+                gap: 5px !important;
             }
             .social-item {
-                padding: 4px 8px !important; /* ボタン自体を狭める */
-                font-size: 14px !important; /* 文字も少し小さく */
+                padding: 4px 8px !important;
+                font-size: 14px !important;
             }
             .social-item img {
-                margin-bottom: 2px !important; /* アイコン下のマージンを詰める */
+                margin-bottom: 2px !important;
             }
         }
     </style>
@@ -265,6 +269,7 @@
     <script>
         var highestZIndex = 110;
 
+        // 初期位置の計算
         function setInitialPositions() {
             var width = window.innerWidth;
             var isMobile = window.matchMedia("(max-width: 600px)").matches;
@@ -277,65 +282,72 @@
             var maxBottom = 0;
 
             if (isMobile) {
-                // スマホ用：縦に並べつつ、左右にジグザグに散らす
                 var currentTop = 180;
-                var gap = 15; // 乱雑感を出すために少し間隔を詰める
+                var gap = 15;
 
-                profile.style.left = '3%'; // 左寄り
-                profile.style.top = currentTop + 'px';
-                currentTop += profile.offsetHeight + gap;
-
-                social.style.left = '11%'; // 右寄り
-                social.style.top = currentTop + 'px';
-                currentTop += social.offsetHeight + gap;
-
-                spotify.style.left = '4%'; // 左寄り
-                spotify.style.top = currentTop + 'px';
-                currentTop += spotify.offsetHeight + gap;
-
-                youtube.style.left = '9%'; // 右寄り
-                youtube.style.top = currentTop + 'px';
-                
-                maxBottom = currentTop + youtube.offsetHeight + 100;
+                // 非表示状態のウィンドウがあると計算が狂うため、表示されているものだけ配置
+                if(profile.style.display !== 'none') {
+                    profile.style.left = '3%';
+                    profile.style.top = currentTop + 'px';
+                    currentTop += profile.offsetHeight + gap;
+                }
+                if(social.style.display !== 'none') {
+                    social.style.left = '11%';
+                    social.style.top = currentTop + 'px';
+                    currentTop += social.offsetHeight + gap;
+                }
+                if(spotify.style.display !== 'none') {
+                    spotify.style.left = '4%';
+                    spotify.style.top = currentTop + 'px';
+                    currentTop += spotify.offsetHeight + gap;
+                }
+                if(youtube.style.display !== 'none') {
+                    youtube.style.left = '9%';
+                    youtube.style.top = currentTop + 'px';
+                    maxBottom = currentTop + youtube.offsetHeight + 100;
+                } else {
+                    maxBottom = currentTop + 100;
+                }
             } else {
-                // PC用：少し散らして配置
-                profile.style.left = width * 0.15 + 'px';
-                profile.style.top = '150px';
-
-                social.style.left = width * 0.55 + 'px';
-                social.style.top = '200px';
-
-                spotify.style.left = width * 0.20 + 'px';
-                spotify.style.top = (150 + profile.offsetHeight + 40) + 'px';
-
-                youtube.style.left = width * 0.10 + 'px';
-                youtube.style.top = (150 + profile.offsetHeight + spotify.offsetHeight + 80) + 'px';
-
-                maxBottom = parseInt(youtube.style.top) + youtube.offsetHeight + 150;
+                if(profile.style.display !== 'none') {
+                    profile.style.left = width * 0.15 + 'px';
+                    profile.style.top = '150px';
+                }
+                if(social.style.display !== 'none') {
+                    social.style.left = width * 0.55 + 'px';
+                    social.style.top = '200px';
+                }
+                if(spotify.style.display !== 'none') {
+                    spotify.style.left = width * 0.20 + 'px';
+                    spotify.style.top = (150 + profile.offsetHeight + 40) + 'px';
+                }
+                if(youtube.style.display !== 'none') {
+                    youtube.style.left = width * 0.10 + 'px';
+                    youtube.style.top = (150 + profile.offsetHeight + spotify.offsetHeight + 80) + 'px';
+                    maxBottom = parseInt(youtube.style.top) + youtube.offsetHeight + 150;
+                }
             }
 
-            document.body.style.minHeight = maxBottom + 'px';
+            if(maxBottom > 0) document.body.style.minHeight = maxBottom + 'px';
         }
 
-        window.onload = function() {
-            setTimeout(setInitialPositions, 100);
-        };
-        
-        window.onresize = function() {
-            setTimeout(setInitialPositions, 100);
-        };
+        window.onload = function() { setTimeout(setInitialPositions, 100); };
+        window.onresize = function() { setTimeout(setInitialPositions, 100); };
 
+        // ドラッグ機能
         function initDrag(targetId, handleId) {
             var target = document.getElementById(targetId);
             var handle = document.getElementById(handleId);
             var isDragging = false;
-            var initialX, initialY;
-            var offsetX, offsetY;
+            var initialX, initialY, offsetX, offsetY;
 
             handle.addEventListener('mousedown', startDragging);
             handle.addEventListener('touchstart', startDragging, { passive: false });
 
             function startDragging(e) {
+                // ×ボタンを押した時はドラッグを発動させない
+                if(e.target.classList.contains('close-button')) return;
+
                 isDragging = true;
                 highestZIndex++;
                 target.style.zIndex = highestZIndex;
@@ -357,7 +369,6 @@
 
             function dragging(e) {
                 if (!isDragging) return;
-
                 if (e.type === 'touchmove') {
                     offsetX = e.touches[0].clientX - initialX;
                     offsetY = e.touches[0].clientY - initialY;
@@ -366,7 +377,6 @@
                     offsetX = e.clientX - initialX;
                     offsetY = e.clientY - initialY;
                 }
-
                 target.style.left = offsetX + 'px';
                 target.style.top = offsetY + 'px';
             }
@@ -384,6 +394,23 @@
         initDrag('win-social', 'handle-social');
         initDrag('win-spotify', 'handle-spotify');
         initDrag('win-youtube', 'handle-youtube');
+
+        // --- 新規追加：×ボタンでウィンドウを閉じる機能 ---
+        document.querySelectorAll('.close-button').forEach(function(btn) {
+            // ドラッグのイベントが裏で発動しないようにする
+            btn.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+            btn.addEventListener('touchstart', function(e) { e.stopPropagation(); }, { passive: false });
+            
+            // クリック/タップで非表示にする
+            var closeAction = function(e) {
+                e.preventDefault();
+                var windowElem = this.closest('.window');
+                windowElem.style.display = 'none';
+            };
+            btn.addEventListener('click', closeAction);
+            btn.addEventListener('touchend', closeAction);
+        });
+
     </script>
 </body>
 </html>
