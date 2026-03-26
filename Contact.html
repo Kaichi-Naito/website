@@ -88,6 +88,7 @@
             display: inline-block;
             text-align: left;
             position: absolute;
+            touch-action: none; /* スマホのスクロール干渉防止 */
         }
 
         .title-bar {
@@ -142,11 +143,7 @@
         }
 
         @media (max-width: 800px) {
-            h1 { 
-                font-size: 1.5em; 
-                margin-bottom: 30px;
-                letter-spacing: -1px;
-            }
+            h1 { font-size: 1.5em; margin-bottom: 30px; letter-spacing: -1px; }
             .nav { gap: 8px; margin-bottom: 25px; }
             .desktop-icon { width: 60px; }
             .desktop-icon img { width: 34px !important; height: 34px !important; }
@@ -214,10 +211,14 @@
         var mouseClickSound = new Audio('Sound/MouseClick.mp3');
         function playSound() { if (mouseClickSound) { mouseClickSound.currentTime = 0; mouseClickSound.play().catch(()=>{}); } }
         
-        // クリック音の設定（全般）
+        // PCのクリック音
         document.addEventListener('mousedown', (e) => { 
             if (e.target.closest('.desktop-icon, .win95-btn, .close-button, .title-bar')) playSound(); 
         });
+        // スマホのタッチ音
+        document.addEventListener('touchstart', (e) => { 
+            if (e.target.closest('.desktop-icon, .win95-btn, .close-button, .title-bar')) playSound(); 
+        }, { passive: true });
 
         var highestZIndex = 130;
         function initDrag(targetId, handleId) {
@@ -232,7 +233,7 @@
             function startDragging(e) {
                 if(e.target.classList.contains('close-button')) return;
                 
-                // ドラッグ開始時にも音を鳴らす
+                // ドラッグ開始時に確実に音を鳴らす
                 playSound();
 
                 isDragging = true; 
