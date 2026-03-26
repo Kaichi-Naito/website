@@ -455,12 +455,11 @@
                     social.style.top = '380px';
                 }
                 
-                // --- 今回修正した箇所：スマホ版 CD_Player(Spotify) の右寄せ ---
+                // --- 今回修正した箇所：スマホ版 CD_Player の位置を微妙に下に ---
                 if(spotify.style.display !== 'none') {
-                    // 画面の横幅からウィンドウ自体の横幅を引いて、右端から12pxの位置に配置
                     var spWidth = spotify.offsetWidth || 320;
                     spotify.style.left = (width - spWidth - 12) + 'px'; 
-                    spotify.style.top = '550px';
+                    spotify.style.top = '580px'; // ← 550px から 580px に下げました
                 }
                 // -------------------------------------------------------------
 
