@@ -23,12 +23,12 @@
             text-align: center;
             margin: 0;
             padding: 20px 0;
-            /* Windows 95 デスクトップカラー */
-            background-color: #008080;
-            background-image: url('images/8bit_star.png'); /* 既存の背景を薄く重ねる */
+            background-color: #008080; /* Windows 95 Desktop Color */
+            background-image: url('images/8bit_star.png');
             background-blend-mode: overlay;
             background-size: cover;
             background-attachment: fixed;
+            overflow-x: hidden; /* 要素をずらした際の横スクロールを防止 */
         }
 
         /* --- Windows 95 UI Component --- */
@@ -42,7 +42,16 @@
             max-width: 90%;
             display: inline-block;
             text-align: left;
+            transition: transform 0.2s; /* リサイズ時の動きを滑らかに */
         }
+
+        /* 乱雑感を出すためのオフセットクラス */
+        .win95-scatter-left-lg { transform: translateX(-12%); }
+        .win95-scatter-left-md { transform: translateX(-7%); }
+        .win95-scatter-left-sm { transform: translateX(-3%); }
+        .win95-scatter-right-sm { transform: translateX(3%); }
+        .win95-scatter-right-md { transform: translateX(7%); }
+        .win95-scatter-right-lg { transform: translateX(12%); }
 
         .title-bar {
             background: linear-gradient(90deg, #000080, #1084d0);
@@ -136,6 +145,7 @@
         iframe {
             border: 2px solid #808080;
             background: #000;
+            display: block;
         }
 
         .footer {
@@ -144,13 +154,27 @@
             font-size: 12px;
         }
 
-        /* スマホ対応 */
+        /* スマホ対応（ここで散らばりをリセットします） */
         @media (max-width: 600px) {
             .profile-section {
                 flex-direction: column;
                 text-align: center;
             }
             .header-title { font-size: 1.8em; }
+            
+            /* スマホでは全ウィンドウを中央寄せ＆画面幅に合わせる */
+            .win95-scatter-left-lg,
+            .win95-scatter-left-md,
+            .win95-scatter-left-sm,
+            .win95-scatter-right-sm,
+            .win95-scatter-right-md,
+            .win95-scatter-right-lg {
+                transform: translateX(0) !important;
+            }
+            .window {
+                width: 100% !important;
+                box-sizing: border-box;
+            }
         }
     </style>
 </head>
@@ -167,7 +191,7 @@
         <a href="freebgm.html" class="win95-btn">FREEBGM</a>
     </div>
 
-    <div class="window" style="width: 500px;">
+    <div class="window win95-scatter-left-md" style="width: 500px;">
         <div class="title-bar">
             <span>Profile.exe</span>
             <div class="close-button">×</div>
@@ -177,7 +201,6 @@
             <div class="profile-text">
                 <h2 style="margin:0 0 10px 0;">Kaichi</h2>
                 <p style="margin:0 0 15px 0;">Guitar, write music.</p>
-                <a href="https://avex.jp/muchoo/creator/detail.php?id=1002656" target="_blank" style="font-size: 14px; color: blue;">avex muchoo所属</a><br>
                 <a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank" style="font-size: 14px; color: blue;">Hotone Official Artist</a>
             </div>
         </div>
@@ -185,7 +208,7 @@
 
     <br>
 
-    <div class="window" style="width: 450px;">
+    <div class="window win95-scatter-right-lg" style="width: 450px;">
         <div class="title-bar">
             <span>Social_Media.lnk</span>
             <div class="close-button">×</div>
@@ -204,7 +227,7 @@
 
     <br>
 
-    <div class="window" style="width: 600px;">
+    <div class="window win95-scatter-left-sm" style="width: 600px;">
         <div class="title-bar">
             <span>CD_Player.exe</span>
             <div class="close-button">×</div>
@@ -216,7 +239,7 @@
 
     <br>
 
-    <div class="window" style="width: 800px;">
+    <div class="window win95-scatter-right-sm" style="width: 800px;">
         <div class="title-bar">
             <span>Media_Player.avi</span>
             <div class="close-button">×</div>
