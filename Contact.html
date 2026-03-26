@@ -13,20 +13,21 @@
         }
         body {
             font-family: 'PixelMplus', sans-serif;
-            color: white; /* ベースを白に */
+            color: black;
             text-align: center;
             margin: 0;
-            padding: 0;
+            padding: 20px 0 0 0; /* 下部パディングはフッター用に調整 */
             background-color: #008080;
             background-image: url('images/windows-95-background.jpg');
             background-size: cover;
             background-attachment: fixed;
             min-height: 100vh;
+            overflow-x: hidden;
             position: relative;
             z-index: 1;
         }
 
-        /* 背景を10%暗くする設定 (index.htmlと完全一致) */
+        /* 背景を10%暗くする設定 (index.htmlより移植) */
         body::before {
             content: "";
             position: fixed;
@@ -38,16 +39,15 @@
             z-index: -1;
         }
 
-        /* ヘッダー設定 (index.htmlと完全一致) */
-        h1 {
-            font-size: 2em;
-            margin-bottom: 30px;
-            padding-top: 20px;
-            text-shadow: 2px 2px #000;
+        .header-title {
             color: white;
+            text-shadow: 2px 2px #000;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            pointer-events: none;
         }
 
-        /* ナビゲーション (index.htmlと完全一致) */
+        /* ナビゲーション (index.htmlと完全に一致) */
         .nav {
             display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 40px;
         }
@@ -59,7 +59,7 @@
         .desktop-icon span { font-size: 14px; text-align: center; padding: 2px 4px; border: 1px dotted transparent; text-shadow: 1px 1px 0 #000; }
         .desktop-icon:hover span { background-color: #000080; color: white; border: 1px dotted #fff; }
 
-        /* ウィンドウ設定 (index.htmlと完全一致) */
+        /* ウィンドウ設定 (index.htmlと完全に一致) */
         .window {
             background-color: #c0c0c0;
             border: 2px solid;
@@ -69,7 +69,6 @@
             position: absolute;
             text-align: left;
             display: inline-block;
-            color: black; /* ウィンドウ内は黒文字 */
         }
         .title-bar {
             background: linear-gradient(90deg, #000080, #1084d0);
@@ -87,10 +86,16 @@
             color: black; font-size: 10px; display: flex; justify-content: center; align-items: center;
             cursor: pointer; font-weight: bold;
         }
+        .close-button:active { border-color: #808080 #ffffff #ffffff #808080; padding-top: 1px; padding-left: 1px; }
 
         .window-contents { padding: 15px; border: 1px solid #808080; background-color: #c0c0c0; }
 
-        /* 電卓・ボタン設定 */
+        /* 初期位置 */
+        #win-message { width: 320px; z-index: 120; }
+        #win-calculator { width: 340px; z-index: 110; }
+        #win-social-dm { width: 280px; z-index: 115; }
+
+        /* 電卓パーツ */
         .calc-display {
             background-color: #ffffff; border: 2px inset #ffffff;
             padding: 5px 10px; text-align: right; font-size: 24px;
@@ -105,12 +110,15 @@
             color: black; text-decoration: none;
         }
         .win95-btn:active { border-color: #808080 #ffffff #ffffff #808080; padding: 7px 0 5px 0; }
+        .num-btn { color: #0000ff; }
+        .func-btn { color: #ff0000; }
+        .ok-btn { grid-column: span 4; color: #ff0000; font-weight: bold; }
 
-        /* フッター */
+        /* フッターを最下部に固定 (index.htmlと一致) */
         .footer {
             margin-top: 50px;
             color: white;
-            font-size: 0.8em;
+            font-size: 12px;
             position: absolute;
             bottom: 20px;
             width: 100%;
@@ -118,17 +126,8 @@
             pointer-events: none;
         }
 
-        /* スマホ版設定 (ここをindex.htmlと完全に合わせました) */
         @media (max-width: 800px) {
-            h1 {
-                font-size: 1.5em; /* トップページと同じサイズ */
-                margin-bottom: 30px;
-            }
-            .nav {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 10px;
-            }
+            .header-title { font-size: 1.6em; }
             .desktop-icon { width: 60px; }
             .desktop-icon img { width: 34px; height: 34px; }
             .desktop-icon span { font-size: 11px; }
@@ -137,47 +136,219 @@
     </style>
 </head>
 <body id="win95-desktop">
-    <h1>Kaichi Guitar Music</h1>
+    <script src="//accaii.com/kaichi/script.js" async></script>
+
+    <h1 class="header-title">Kaichi Guitar Music</h1>
 
     <div class="nav">
-        <a href="index.html" class="desktop-icon"><img src="images/gif/Computer.gif" alt="Home"><span>Home</span></a>
-        <a href="Discography.html" class="desktop-icon"><img src="images/gif/Disc.gif" alt="Discography"><span>Discography</span></a>
-        <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" class="desktop-icon"><img src="images/gif/Earth.gif" alt="Works"><span>Works</span></a>
-        <a href="Contact.html" class="desktop-icon"><img src="images/gif/window.gif" alt="Contact"><span>Contact</span></a>
-        <a href="freebgm.html" class="desktop-icon"><img src="images/gif/Sound.gif" alt="FREEBGM"><span>FREEBGM</span></a>
+        <a href="index.html" class="desktop-icon">
+            <img src="images/gif/Computer.gif" alt="Home"><span>Home</span>
+        </a>
+        <a href="Discography.html" class="desktop-icon">
+            <img src="images/gif/Disc.gif" alt="Discography"><span>Discography</span>
+        </a>
+        <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" class="desktop-icon">
+            <img src="images/gif/Earth.gif" alt="Works"><span>Works</span>
+        </a>
+        <a href="Contact.html" class="desktop-icon">
+            <img src="images/gif/window.gif" alt="Contact"><span>Contact</span>
+        </a>
+        <a href="freebgm.html" class="desktop-icon">
+            <img src="images/gif/Sound.gif" alt="FREEBGM"><span>FREEBGM</span>
+        </a>
     </div>
 
     <div class="window" id="win-message">
-        <div class="title-bar" id="handle-message"><span>Message</span><div class="close-button">×</div></div>
-        <div class="window-contents">以下のテストに答えるとメールアドレスが表示されます。<br><small>Answer the Test below to display the email address.</small></div>
+        <div class="title-bar draggable-cursor" id="handle-message">
+            <span>Message</span>
+            <div class="close-button">×</div>
+        </div>
+        <div class="window-contents" style="font-size: 13px;">
+            以下のテストに答えるとメールアドレスが表示されます。<br>
+            <small>Answer the Test below to display the email address.</small>
+        </div>
     </div>
 
     <div class="window" id="win-calculator">
-        <div class="title-bar" id="handle-calculator"><span>Calculator.exe</span><div class="close-button">×</div></div>
+        <div class="title-bar draggable-cursor" id="handle-calculator">
+            <span>Calculator.exe</span>
+            <div class="close-button">×</div>
+        </div>
         <div class="window-contents">
-            <div id="question" style="text-align:center; margin-bottom:10px; font-size:16px; background:#eee; padding:5px; border:1px inset #fff;">読み込み中…</div>
+            <div id="question" style="text-align:center; margin-bottom:10px; font-size:16px; background:#eee; padding:5px; border:1px inset #fff;">
+                読み込み中…
+            </div>
             <div class="calc-display" id="display">0</div>
             <div class="keypad">
-                <div class="win95-btn" onclick="inputNum(1)">1</div>
-                <div class="win95-btn" onclick="inputNum(2)">2</div>
-                <div class="win95-btn" onclick="inputNum(3)">3</div>
-                <div class="win95-btn" style="color:red" onclick="checkAnswer()">OK</div>
+                <div class="win95-btn func-btn" onclick="clearDisplay()">C</div>
+                <div class="win95-btn func-btn" onclick="backspace()">Back</div>
+                <div class="win95-btn func-btn" style="grid-column: span 2; font-size:12px; cursor:default;">Contact Me</div>
+
+                <div class="win95-btn num-btn" onclick="inputNum(7)">7</div>
+                <div class="win95-btn num-btn" onclick="inputNum(8)">8</div>
+                <div class="win95-btn num-btn" onclick="inputNum(9)">9</div>
+                <div class="win95-btn func-btn">/</div>
+
+                <div class="win95-btn num-btn" onclick="inputNum(4)">4</div>
+                <div class="win95-btn num-btn" onclick="inputNum(5)">5</div>
+                <div class="win95-btn num-btn" onclick="inputNum(6)">6</div>
+                <div class="win95-btn func-btn">*</div>
+
+                <div class="win95-btn num-btn" onclick="inputNum(1)">1</div>
+                <div class="win95-btn num-btn" onclick="inputNum(2)">2</div>
+                <div class="win95-btn num-btn" onclick="inputNum(3)">3</div>
+                <div class="win95-btn func-btn">-</div>
+
+                <div class="win95-btn num-btn" onclick="inputNum(0)">0</div>
+                <div class="win95-btn num-btn">+/-</div><div class="win95-btn num-btn">.</div>
+                <div class="win95-btn func-btn">+</div>
+
+                <div class="win95-btn ok-btn" onclick="checkAnswer()">ENTER (OK)</div>
             </div>
         </div>
     </div>
 
     <div class="window" id="win-social-dm">
-        <div class="title-bar" id="handle-social-dm"><span>Social</span><div class="close-button">×</div></div>
+        <div class="title-bar draggable-cursor" id="handle-social-dm">
+            <span>Social</span>
+            <div class="close-button">×</div>
+        </div>
         <div class="window-contents" style="text-align: center;">
-            <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank" class="win95-btn" style="color: blue !important; display: block; padding: 5px;">X(Twitter)のDMはこちら</a>
+            <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank" class="win95-btn" style="font-size: 14px; width: 90%; color: blue !important;">
+                X(Twitter)のDMはこちら
+            </a>
         </div>
     </div>
 
-    <div class="footer">このサイトは本人によって頑張って作成されました</div>
+    <div class="footer">
+        このサイトは本人によって頑張って作成されました
+    </div>
 
     <script>
-        // 前述の initDrag などのスクリプトをここに含めてください
-        // setInitialPositions 内の数値を調整して、スマホでの並びを綺麗にできます。
+        // サウンド設定 (index.htmlとパスを統一)
+        const mouseClickSound = new Audio('Sound/MouseClick.mp3');
+        function playSound() {
+            if (mouseClickSound) {
+                mouseClickSound.currentTime = 0;
+                mouseClickSound.play().catch(()=>{});
+            }
+        }
+
+        // 全てのクリック対象に音を付与
+        document.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.desktop-icon, .win95-btn, .close-button, .title-bar')) {
+                playSound();
+            }
+        });
+
+        // ドラッグ機能 (index.htmlのinitDragを完全移植)
+        let highestZIndex = 130;
+        function initDrag(targetId, handleId) {
+            var target = document.getElementById(targetId);
+            var handle = document.getElementById(handleId);
+            var isDragging = false;
+            var initialX, initialY, offsetX, offsetY;
+
+            handle.addEventListener('mousedown', startDragging);
+            handle.addEventListener('touchstart', startDragging, { passive: false });
+
+            function startDragging(e) {
+                if(e.target.classList.contains('close-button')) return;
+                isDragging = true;
+                highestZIndex++;
+                target.style.zIndex = highestZIndex;
+
+                if (e.type === 'touchstart') {
+                    initialX = e.touches[0].clientX - target.offsetLeft;
+                    initialY = e.touches[0].clientY - target.offsetTop;
+                    e.preventDefault(); 
+                } else {
+                    initialX = e.clientX - target.offsetLeft;
+                    initialY = e.clientY - target.offsetTop;
+                }
+
+                document.addEventListener('mousemove', dragging);
+                document.addEventListener('touchmove', dragging, { passive: false });
+                document.addEventListener('mouseup', endDrag);
+                document.addEventListener('touchend', endDrag);
+            }
+
+            function dragging(e) {
+                if (!isDragging) return;
+                if (e.type === 'touchmove') {
+                    offsetX = e.touches[0].clientX - initialX;
+                    offsetY = e.touches[0].clientY - initialY;
+                    e.preventDefault(); 
+                } else {
+                    offsetX = e.clientX - initialX;
+                    offsetY = e.clientY - initialY;
+                }
+                target.style.left = offsetX + 'px';
+                target.style.top = offsetY + 'px';
+            }
+
+            function endDrag() {
+                isDragging = false;
+                document.removeEventListener('mousemove', dragging);
+                document.removeEventListener('touchmove', dragging);
+            }
+        }
+
+        // 初期位置の設定
+        function setInitialPositions() {
+            const isMobile = window.innerWidth <= 800;
+            const msg = document.getElementById('win-message');
+            const calc = document.getElementById('win-calculator');
+            const dm = document.getElementById('win-social-dm');
+
+            if (isMobile) {
+                msg.style.left = '5%'; msg.style.top = '140px';
+                calc.style.left = '50%'; calc.style.top = '240px'; calc.style.transform = 'translateX(-50%)';
+                dm.style.left = '10%'; dm.style.top = '620px';
+                document.body.style.minHeight = '950px'; // モバイル時のスクロール領域確保
+            } else {
+                msg.style.left = '15%'; msg.style.top = '230px';
+                calc.style.left = '45%'; calc.style.top = '300px';
+                dm.style.left = '70%'; dm.style.top = '530px';
+                document.body.style.minHeight = '1000px';
+            }
+        }
+
+        window.onload = () => {
+            setInitialPositions();
+            initDrag('win-message', 'handle-message');
+            initDrag('win-calculator', 'handle-calculator');
+            initDrag('win-social-dm', 'handle-social-dm');
+
+            // 閉じるボタン (index.htmlと同様)
+            document.querySelectorAll('.close-button').forEach(btn => {
+                btn.onclick = function() { this.closest('.window').style.display = 'none'; };
+            });
+        };
+
+        // 電卓ロジック
+        const display = document.getElementById('display');
+        const questionBox = document.getElementById('question');
+        let currentInput = "";
+        let wrongCount = 0;
+        const a = Math.floor(Math.random() * 20) + 1;
+        const b = Math.floor(Math.random() * 20) + 1;
+        const correct = a + b;
+        questionBox.textContent = `${a} ＋ ${b} ＝ ？`;
+
+        function inputNum(num) { currentInput += num; display.textContent = currentInput; }
+        function clearDisplay() { currentInput = ""; display.textContent = "0"; }
+        function backspace() { currentInput = currentInput.slice(0, -1); display.textContent = currentInput || "0"; }
+        function checkAnswer() {
+            if (parseInt(currentInput) === correct) {
+                questionBox.innerHTML = "SUCCESS!<br>kaichi.naito@gmail.com";
+                display.textContent = "OK!";
+            } else {
+                wrongCount++;
+                questionBox.textContent = wrongCount >= 3 ? "LOCKED" : `WRONG (${3-wrongCount} left)`;
+                clearDisplay();
+            }
+        }
     </script>
 </body>
 </html>
