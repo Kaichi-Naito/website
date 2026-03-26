@@ -408,28 +408,14 @@
     </div>
 
     <script>
-        // エラー回避のために全体をtry-catchで囲む
-        var backBGM, mouseClickSound;
-        var bgmStarted = false;
+        // エラー回避のために全体をtry-catchで囲む（BGM削除済み）
+        var mouseClickSound;
 
         try {
-            backBGM = new Audio('Sound/backBGM_2.mp3');
-            backBGM.loop = true;
-            backBGM.volume = 0.1;
             mouseClickSound = new Audio('Sound/MouseClick.mp3');
         } catch(e) {
             console.log("Audio load skipped");
         }
-        
-        function startBGM() {
-            if (!bgmStarted && backBGM) {
-                backBGM.play().catch(function(e) {});
-                bgmStarted = true;
-            }
-        }
-        
-        document.addEventListener('mousedown', startBGM, { once: true });
-        document.addEventListener('touchstart', startBGM, { once: true });
         
         function playClickSound() {
             if (mouseClickSound) {
@@ -438,7 +424,7 @@
             }
         }
 
-        // スマホで絶対エラーにならない書き方に変更
+        // スマホで絶対エラーにならない書き方
         var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .phalux-link');
         for (var i = 0; i < clickTargets.length; i++) {
             clickTargets[i].addEventListener('mousedown', playClickSound);
@@ -469,7 +455,7 @@
                     currentTop += (profile.offsetHeight || 250) + gap;
                 }
                 if(phalux.style.display !== 'none') {
-                    phalux.style.left = '50%'; // 右側に散らす
+                    phalux.style.left = '50%'; 
                     phalux.style.top = currentTop + 'px';
                     currentTop += (phalux.offsetHeight || 150) + gap;
                 }
@@ -497,19 +483,19 @@
                     profile.style.top = '120px';
                 }
                 if(phalux.style.display !== 'none') {
-                    phalux.style.left = '75%'; // 右上
+                    phalux.style.left = '75%'; 
                     phalux.style.top = '160px';
                 }
                 if(social.style.display !== 'none') {
-                    social.style.left = '60%'; // 右下寄り
+                    social.style.left = '60%'; 
                     social.style.top = '350px';
                 }
                 if(spotify.style.display !== 'none') {
-                    spotify.style.left = '15%'; // 左下寄り
+                    spotify.style.left = '15%'; 
                     spotify.style.top = '450px';
                 }
                 if(youtube.style.display !== 'none') {
-                    youtube.style.left = 'max(5%, calc(50% - 400px))'; // 画面中央付近
+                    youtube.style.left = 'max(5%, calc(50% - 400px))'; 
                     youtube.style.top = '650px';
                     maxBottom = 650 + (youtube.offsetHeight || 450) + 150;
                 } else {
