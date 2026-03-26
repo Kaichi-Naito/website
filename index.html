@@ -203,7 +203,13 @@
             text-shadow: 1px 1px 2px #000; 
         }
 
-        /* --- スマホ対応（70%縮小版） --- */
+        /* --- 新規追加：PHALUXロゴリンクのホバー効果 --- */
+        .window-contents a.phalux-link:hover img {
+            border-color: #000080; /* Win95の選択色（青）に */
+        }
+        /* ------------------------------------------- */
+
+        /* --- スマホ対応（70%縮小版 + PHALUXウィンドウ個別調整） --- */
         @media (max-width: 600px) {
             body {
                 font-size: 14px;
@@ -216,6 +222,18 @@
                 width: 88% !important;
                 box-sizing: border-box;
             }
+
+            /* --- 新規追加：PHALUXウィンドウのスマホ個別調整 --- */
+            #win-phalux {
+                width: 44% !important; /* 他のウィンドウの約半分に */
+            }
+            #win-phalux .window-contents {
+                padding: 5px !important; /* さらにギュッと詰める */
+            }
+            #win-phalux .window-contents img {
+                max-width: 100px !important; /* ロゴを小さく */
+            }
+            /* ----------------------------------------------- */
 
             .title-bar {
                 font-size: 12px;
@@ -325,18 +343,12 @@
         </div>
     </div>
 
-    <div class="window" id="win-phalux" style="width: 350px; z-index: 105;">
-        <div class="title-bar draggable-cursor" id="handle-phalux">
+    <div class="window" id="win-phalux" style="width: 175px; z-index: 105;"> <div class="title-bar draggable-cursor" id="handle-phalux">
             <span>PHALUX.band</span>
             <div class="close-button">×</div>
         </div>
-        <div class="window-contents" style="text-align: center;">
-            <a href="https://phalux.bitfan.id/" target="_blank">
-                <img src="images/PHALUX_logo.png" alt="PHALUX" style="width: 100%; max-width: 250px; height: auto; border: 2px solid #808080; display: block; margin: 0 auto 10px auto;">
-            </a>
-            <p style="margin: 0 0 10px 0; font-size: 14px;">Kaichi's Band "PHALUX"</p>
-            <a href="https://phalux.bitfan.id/" target="_blank" class="win95-btn" style="font-size: 14px;">Official Fanclub</a>
-        </div>
+        <div class="window-contents" style="text-align: center; padding: 10px;"> <a href="https://phalux.bitfan.id/" target="_blank" class="phalux-link"> <img src="images/PHALUX_logo.png" alt="PHALUX" style="width: 100%; max-width: 150px; height: auto; border: 2px solid #808080; display: block; margin: 0 auto;"> </a>
+            </div>
     </div>
 
     <div class="window" id="win-social" style="width: 450px; z-index: 103;">
@@ -385,24 +397,6 @@
     </div>
 
     <script>
-        // --- 新規追加：クリック音の実装 ---
-        var mouseClickSound = new Audio('Sound/MouseClick.mp3');
-        
-        function playClickSound() {
-            mouseClickSound.currentTime = 0; // 連続クリックしても頭から再生されるようにする
-            // ブラウザの自動再生ブロック回避のため、エラーが出ても無視する処理
-            mouseClickSound.play().catch(function(e) { /* ignore */ });
-        }
-
-        // デスクトップアイコン、ボタン、タイトルバー、×ボタンにクリック音を追加
-        // スマホ(touchstart)とPC(mousedown)の両方に対応
-        var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar');
-        clickTargets.forEach(function(target) {
-            target.addEventListener('mousedown', playClickSound);
-            target.addEventListener('touchstart', playClickSound, { passive: true });
-        });
-        // ---------------------------------
-
         var highestZIndex = 110;
 
         function setInitialPositions() {
@@ -459,7 +453,9 @@
                 }
                 if(phalux.style.display !== 'none') {
                     phalux.style.left = width * 0.60 + 'px'; 
-                    phalux.style.top = (250 + (social.offsetHeight || 150) + 40) + 'px'; 
+                    // Socialウィンドウの下に配置されるように計算 (Socialの高さを加算)
+                    var phaluxTop = 250 + (social.offsetHeight || 150) + 40; 
+                    phalux.style.top = phaluxTop + 'px';
                 }
                 if(spotify.style.display !== 'none') {
                     spotify.style.left = width * 0.20 + 'px';
