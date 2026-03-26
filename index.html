@@ -26,7 +26,6 @@
             padding: 20px 0 50px 0;
             background-color: #008080;
             background-image: url('images/windows-95-background.jpg');
-            background-blend-mode: overlay;
             background-size: cover;
             background-attachment: fixed;
             overflow-x: hidden;
@@ -190,40 +189,89 @@
             position: absolute;
             bottom: 20px;
             width: 100%;
+            text-shadow: 1px 1px 2px #000; 
         }
 
+        /* --- スマホ対応（70%縮小版） --- */
         @media (max-width: 600px) {
-            .profile-section {
-                flex-direction: column;
-                text-align: center;
+            body {
+                font-size: 14px; /* 全体的なベースの文字サイズを少し縮小 */
             }
-            .header-title { font-size: 1.8em; }
+            .header-title { 
+                font-size: 1.6em; /* 2.5emの約65〜70% */
+                margin-bottom: 15px;
+            }
             .window {
-                width: 86% !important;
+                width: 88% !important; /* 両端の余白を確保しつつスマートに */
                 box-sizing: border-box;
             }
 
-            .profile-img {
-                width: 96px !important;
+            /* ウィンドウのタイトルバーも少し縮小 */
+            .title-bar {
+                font-size: 12px;
+                padding: 2px 4px 2px 6px;
             }
-            .social-item img {
-                width: 32px !important;
-                height: 32px !important;
+            .close-button {
+                width: 14px;
+                height: 12px;
+                font-size: 9px;
             }
 
+            /* ウィンドウ内の余白調整 */
+            .window-contents {
+                padding: 8px; /* さらにギュッと詰める */
+            }
+            .profile-section {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px; /* 隙間を縮小 */
+            }
+            .profile-text h2 {
+                font-size: 1.2em; /* 文字を縮小 */
+                margin: 0 0 4px 0 !important;
+            }
+            .profile-text p {
+                font-size: 0.9em; /* 文字を縮小 */
+                margin: 0 0 8px 0 !important;
+            }
+            .profile-text a {
+                font-size: 12px !important; /* 文字を縮小 */
+            }
+
+            /* 画像系の70%縮小 */
+            .profile-img {
+                width: 84px !important; /* 120pxの70% */
+            }
+            
+            /* SNSアイコンの70%縮小 */
             .social-icons-grid {
-                gap: 5px !important;
+                gap: 4px !important;
             }
             .social-item {
-                padding: 4px 8px !important;
-                font-size: 14px !important;
+                padding: 3px 6px !important;
+                font-size: 12px !important; /* 16pxの約75% */
             }
             .social-item img {
+                width: 28px !important; /* 40pxの70% */
+                height: 28px !important;
                 margin-bottom: 2px !important;
             }
             
+            /* デスクトップアイコンの70%縮小 */
             .nav {
-                gap: 10px;
+                gap: 8px;
+                margin-bottom: 25px;
+            }
+            .desktop-icon {
+                width: 60px; /* 全体の枠を縮小 */
+            }
+            .desktop-icon img {
+                width: 34px !important; /* 48pxの約70% */
+                height: 34px !important;
+            }
+            .desktop-icon span {
+                font-size: 11px; /* 14pxの約80%（これ以上小さいと読めないため） */
+                padding: 1px 2px;
             }
         }
     </style>
@@ -331,8 +379,9 @@
             var maxBottom = 0;
 
             if (isMobile) {
-                var currentTop = 220; 
-                var gap = 15;
+                // メニューアイコン群が小さくなった分、開始位置を上に調整 (220 -> 180)
+                var currentTop = 180; 
+                var gap = 12; // ウィンドウ間の隙間も少し狭める
 
                 if(profile.style.display !== 'none') {
                     profile.style.left = '3%';
@@ -449,6 +498,9 @@
                 e.preventDefault();
                 var windowElem = this.closest('.window');
                 windowElem.style.display = 'none';
+                
+                // 閉じた後に全体の高さを再計算して無駄なスクロールを無くす
+                setTimeout(setInitialPositions, 50);
             };
             btn.addEventListener('click', closeAction);
             btn.addEventListener('touchend', closeAction);
