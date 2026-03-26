@@ -16,12 +16,13 @@
             color: black;
             text-align: center;
             margin: 0;
-            padding: 20px 0 50px 0;
+            padding: 20px 0 100px 0;
             background-color: #008080;
             background-image: url('images/windows-95-background.jpg');
             background-size: cover;
             background-attachment: fixed;
             min-height: 100vh;
+            overflow: hidden; /* ドラッグ範囲外へのスクロール防止 */
         }
 
         .site-title {
@@ -29,11 +30,12 @@
             color: white;
             text-shadow: 2px 2px 0 #000;
             margin-bottom: 20px;
+            pointer-events: none;
         }
 
         /* ナビゲーション */
         .nav {
-            display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 30px;
+            display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 40px;
         }
         .desktop-icon {
             display: flex; flex-direction: column; align-items: center; text-decoration: none;
@@ -43,14 +45,7 @@
         .desktop-icon span { font-size: 12px; text-shadow: 1px 1px 0 #000; padding: 2px 4px; }
         .desktop-icon:hover span { background-color: #000080; border: 1px dotted #fff; }
 
-        /* コンテナ（ウィンドウを重ねる用） */
-        .window-container {
-            position: relative;
-            display: inline-block;
-            margin-top: 20px;
-        }
-
-        /* ウィンドウ共通スタイル */
+        /* ウィンドウ基本設定 */
         .win95-window {
             background-color: #c0c0c0;
             border: 2px solid;
@@ -58,6 +53,8 @@
             box-shadow: 1px 1px 0 0 #000000;
             padding: 2px;
             text-align: left;
+            position: absolute; /* ドラッグのために絶対配置 */
+            cursor: default;
         }
         .title-bar {
             background: linear-gradient(90deg, #000080, #1084d0);
@@ -67,65 +64,42 @@
             align-items: center;
             color: white;
             font-size: 14px;
+            cursor: move; /* 掴める合図 */
+            user-select: none;
         }
+        .close-btn { 
+            font-size: 10px; cursor: pointer; border: 1px solid #fff; 
+            padding: 0 4px; background: #c0c0c0; color: black; 
+            box-shadow: 1px 1px 0 #000; line-height: 12px;
+        }
+        .close-btn:active { box-shadow: inset 1px 1px 0 #000; padding: 1px 3px -1px 5px; }
 
-        /* 案内ウィンドウ（上に重ねる） */
-        .info-window {
-            position: absolute;
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 280px;
-            z-index: 10;
-        }
-        .info-content {
-            padding: 15px;
-            font-size: 13px;
-            line-height: 1.5;
-        }
+        .window-contents { padding: 10px; border: 1px solid #808080; margin: 2px; }
 
-        /* 電卓ウィンドウ */
-        .calc-window {
-            width: 320px;
-            margin-top: 60px; /* 案内ウィンドウとの被りを調整 */
-        }
+        /* 初期配置 */
+        #info-win { width: 300px; top: 180px; left: 10%; z-index: 10; }
+        #calc-win { width: 320px; top: 250px; left: 50%; transform: translateX(-50%); z-index: 5; }
+        #dm-win { width: 250px; top: 500px; left: 60%; z-index: 8; }
 
+        /* 電卓パーツ */
         .calc-display {
-            background-color: #ffffff;
-            border: 2px inset #ffffff;
-            padding: 5px 10px;
-            text-align: right;
-            font-size: 24px;
-            margin-bottom: 10px;
-            height: 35px;
-            box-shadow: inset 2px 2px 0px #808080;
+            background-color: #ffffff; border: 2px inset #ffffff;
+            padding: 5px 10px; text-align: right; font-size: 24px;
+            margin-bottom: 10px; height: 35px; box-shadow: inset 2px 2px 0px #808080;
         }
-
-        .keypad {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-        }
-
+        .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
         .win95-btn {
-            background-color: #c0c0c0;
-            border: 2px solid;
+            background-color: #c0c0c0; border: 2px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
-            padding: 8px 0;
-            font-family: 'PixelMplus', sans-serif;
-            cursor: pointer;
-            text-align: center;
+            padding: 8px 0; font-family: 'PixelMplus', sans-serif;
+            cursor: pointer; text-align: center; font-size: 16px;
         }
         .win95-btn:active { border-color: #808080 #ffffff #ffffff #808080; padding: 9px 0 7px 0; }
-        
         .num-btn { color: #0000ff; }
         .func-btn { color: #ff0000; }
         .ok-btn { grid-column: span 4; color: #ff0000; font-weight: bold; }
 
-        .footer { margin-top: 50px; color: white; font-size: 12px; }
-
-        .dm-section { margin-top: 20px; text-align: center; }
-        .dm-section a { color: white; text-decoration: underline; }
+        .footer { position: fixed; bottom: 20px; width: 100%; color: white; font-size: 12px; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -151,73 +125,119 @@
         </a>
     </div>
 
-    <div class="window-container">
-        <div class="win95-window info-window">
-            <div class="title-bar"><span>Message</span><div style="cursor:pointer">×</div></div>
-            <div class="info-content">
-                以下のテストに答えるとメールアドレスが表示されます。<br>
-                <small>Answer the Test below to display the email address.</small>
-            </div>
+    <div class="win95-window draggable" id="info-win">
+        <div class="title-bar">
+            <span>Message</span>
+            <div class="close-btn" onclick="closeWindow('info-win')">×</div>
         </div>
+        <div class="window-contents" style="font-size: 13px;">
+            以下のテストに答えるとメールアドレスが表示されます。<br>
+            <small>Answer the Test below to display the email address.</small>
+        </div>
+    </div>
 
-        <div class="win95-window calc-window">
-            <div class="title-bar">
-                <span>Calculator.exe</span>
-                <div style="cursor:pointer">_ □ ×</div>
+    <div class="win95-window draggable" id="calc-win">
+        <div class="title-bar">
+            <span>Calculator.exe</span>
+            <div class="close-btn" onclick="closeWindow('calc-win')">×</div>
+        </div>
+        <div class="window-contents">
+            <div id="question" style="text-align:center; margin-bottom:10px; font-size:16px; background:#eee; padding:5px; border:1px inset #fff;">
+                読み込み中…
             </div>
-            <div style="padding:10px; border:1px solid #808080; margin:2px;">
-                <div id="question" style="text-align:center; margin-bottom:10px; font-size:14px; background:#eee; padding:5px; border:1px inset #fff;">
-                    読み込み中…
-                </div>
-                <div class="calc-display" id="display">0</div>
-                <div class="keypad">
-                    <div class="win95-btn func-btn" onclick="playSound(); clearDisplay()">C</div>
-                    <div class="win95-btn func-btn" onclick="playSound(); backspace()">Back</div>
-                    <div class="win95-btn func-btn" style="grid-column: span 2; font-size:12px;">Contact</div>
-
-                    <div class="win95-btn num-btn" onclick="playSound(); inputNum(7)">7</div>
-                    <div class="win95-btn num-btn" onclick="playSound(); inputNum(8)">8</div>
-                    <div class="win95-btn num-btn" onclick="playSound(); inputNum(9)">9</div>
-                    <div class="win95-btn func-btn">/</div>
-
-                    <div class="win95-btn num-btn" onclick="playSound(); inputNum(4)">4</div>
-                    <div class="win95-btn num-btn" onclick="playSound(); inputNum(5)">5</div>
-                    <div class="win95-btn num-btn" onclick="playSound(); inputNum(6)">6</div>
-                    <div class="win95-btn func-btn">*</div>
-
-                    <div class="win95-btn num-btn" onclick="playSound(); inputNum(1)">1</div>
-                    <div class="win95-btn num-btn" onclick="playSound(); inputNum(2)">2</div>
-                    <div class="win95-btn num-btn" onclick="playSound(); inputNum(3)">3</div>
-                    <div class="win95-btn func-btn">-</div>
-
-                    <div class="win95-btn num-btn" onclick="playSound(); inputNum(0)">0</div>
-                    <div class="win95-btn num-btn">+/-</div><div class="win95-btn num-btn">.</div>
-                    <div class="win95-btn func-btn">+</div>
-
-                    <div class="win95-btn ok-btn" onclick="playSound(); checkAnswer()">ENTER (OK)</div>
-                </div>
+            <div class="calc-display" id="display">0</div>
+            <div class="keypad">
+                <div class="win95-btn func-btn" onclick="playSound(); clearDisplay()">C</div>
+                <div class="win95-btn func-btn" onclick="playSound(); backspace()">Back</div>
+                <div class="win95-btn func-btn" style="grid-column: span 2; font-size:12px;">Contact</div>
+                <div class="win95-btn num-btn" onclick="playSound(); inputNum(7)">7</div>
+                <div class="win95-btn num-btn" onclick="playSound(); inputNum(8)">8</div>
+                <div class="win95-btn num-btn" onclick="playSound(); inputNum(9)">9</div>
+                <div class="win95-btn func-btn">/</div>
+                <div class="win95-btn num-btn" onclick="playSound(); inputNum(4)">4</div>
+                <div class="win95-btn num-btn" onclick="playSound(); inputNum(5)">5</div>
+                <div class="win95-btn num-btn" onclick="playSound(); inputNum(6)">6</div>
+                <div class="win95-btn func-btn">*</div>
+                <div class="win95-btn num-btn" onclick="playSound(); inputNum(1)">1</div>
+                <div class="win95-btn num-btn" onclick="playSound(); inputNum(2)">2</div>
+                <div class="win95-btn num-btn" onclick="playSound(); inputNum(3)">3</div>
+                <div class="win95-btn func-btn">-</div>
+                <div class="win95-btn num-btn" onclick="playSound(); inputNum(0)">0</div>
+                <div class="win95-btn num-btn">+/-</div><div class="win95-btn num-btn">.</div>
+                <div class="win95-btn func-btn">+</div>
+                <div class="win95-btn ok-btn" onclick="playSound(); checkAnswer()">ENTER (OK)</div>
             </div>
         </div>
     </div>
 
-    <div class="dm-section">
-        <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank" onclick="playSound()">X(Twitter)のDMはこちら</a>
+    <div class="win95-window draggable" id="dm-win">
+        <div class="title-bar">
+            <span>Social</span>
+            <div class="close-btn" onclick="closeWindow('dm-win')">×</div>
+        </div>
+        <div class="window-contents" style="text-align: center;">
+            <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank" onclick="playSound()" style="color: blue; font-size: 14px;">
+                X(Twitter)のDMはこちら
+            </a>
+        </div>
     </div>
 
     <div class="footer">このサイトは本人によって頑張って作成されました</div>
 
     <script>
+        // サウンド
         const clickSound = new Audio('https://kaichi-naito.github.io/website/sounds/click.mp3'); 
-        function playSound() {
-            clickSound.currentTime = 0;
-            clickSound.play().catch(() => {});
+        function playSound() { clickSound.currentTime = 0; clickSound.play().catch(()=>{}); }
+
+        // ウィンドウ操作機能
+        let highestZ = 20;
+
+        function closeWindow(id) {
+            playSound();
+            document.getElementById(id).style.display = 'none';
         }
 
+        document.querySelectorAll('.draggable').forEach(win => {
+            const titleBar = win.querySelector('.title-bar');
+            
+            titleBar.onmousedown = function(e) {
+                // 前面に持ってくる
+                highestZ++;
+                win.style.zIndex = highestZ;
+
+                let shiftX = e.clientX - win.getBoundingClientRect().left;
+                let shiftY = e.clientY - win.getBoundingClientRect().top;
+
+                function moveAt(pageX, pageY) {
+                    win.style.left = pageX - shiftX + 'px';
+                    win.style.top = pageY - shiftY + 'px';
+                    win.style.transform = 'none'; // 中央寄せ解除
+                }
+
+                function onMouseMove(e) { moveAt(e.pageX, e.pageY); }
+
+                document.addEventListener('mousemove', onMouseMove);
+
+                document.onmouseup = function() {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.onmouseup = null;
+                };
+            };
+
+            // クリックだけでも前面に来るように
+            win.onmousedown = function() {
+                highestZ++;
+                win.style.zIndex = highestZ;
+            };
+
+            titleBar.ondragstart = function() { return false; };
+        });
+
+        // 電卓ロジック
         const display = document.getElementById('display');
         const questionBox = document.getElementById('question');
         let currentInput = "";
         let wrongCount = 0;
-        
         const MIN = 1, MAX = 20;
         const a = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
         const b = Math.floor(Math.random() * (MAX - MIN + 1)) + MIN;
@@ -226,12 +246,7 @@
 
         questionBox.textContent = `${a} ＋ ${b} ＝ ？`;
 
-        function inputNum(num) {
-            if (currentInput.length < 8) {
-                currentInput += num;
-                display.textContent = currentInput;
-            }
-        }
+        function inputNum(num) { if (currentInput.length < 8) { currentInput += num; display.textContent = currentInput; } }
         function clearDisplay() { currentInput = ""; display.textContent = "0"; }
         function backspace() { currentInput = currentInput.slice(0, -1); display.textContent = currentInput || "0"; }
 
@@ -240,7 +255,7 @@
             if (userAns === correct) {
                 const email = atob(encodedEmail);
                 questionBox.style.color = "blue";
-                questionBox.innerHTML = `SUCCESS!<br><span style="background:yellow">${email}</span>`;
+                questionBox.innerHTML = `SUCCESS!<br><span style="background:yellow; padding:0 5px;">${email}</span>`;
                 display.textContent = "OK!";
             } else {
                 wrongCount++;
