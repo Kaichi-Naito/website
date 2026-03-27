@@ -3,9 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kaichi（内藤海地）へのコンタクトページ。ご依頼やお問い合わせはこちらから。">  
+    <meta property="og:title" content="Contact - Kaichi Guitar Music">
+    <meta property="og:description" content="Kaichi（内藤海地）へのコンタクトページ。ご依頼やお問い合わせはこちらから。">
+    <meta property="og:image" content="https://kaichi-naito.github.io/website/images/Kaichi_profile-image.jpg">
+    <meta property="og:url" content="https://kaichi-naito.github.io/website/Contact.html">
+    <meta property="og:type" content="website">
+    <meta http-equiv="Cache-Control" content="max-age=31536000">
     <title>Contact - Kaichi Guitar Music</title>
     <link rel="icon" href="images/favicon.png" type="image/png">
     <style>
+        /* --- index.html と完全に同一のベースCSS --- */
         @font-face {
             font-family: 'PixelMplus';
             src: url('https://kaichi-naito.github.io/website/fonts/PixelMplus10-Regular.ttf') format('truetype');
@@ -29,53 +37,17 @@
         body::before {
             content: "";
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background-color: rgba(0, 0, 0, 0.1); 
             z-index: -1;
         }
 
-        h1 {
-            color: white;
-            text-shadow: 2px 2px #000;
-            font-size: 2em;
-            margin-bottom: 30px;
-            padding-top: 20px;
-            letter-spacing: -2px;
-        }
-
-        .nav {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
-        }
-        .desktop-icon {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: white !important;
-            width: 80px;
-            cursor: pointer;
-        }
-        .desktop-icon img {
-            width: 48px; height: 48px;
-            object-fit: contain;
-            image-rendering: pixelated;
-            margin-bottom: 5px;
-        }
-        .desktop-icon span {
-            font-size: 14px;
-            text-align: center;
-            padding: 2px 4px;
-            border: 1px dotted transparent;
-            text-shadow: 1px 1px 0 #000;
-        }
-        .desktop-icon:hover span {
-            background-color: #000080;
-            color: white;
-            border: 1px dotted #fff;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .window {
@@ -84,11 +56,17 @@
             border-color: #ffffff #808080 #808080 #ffffff;
             box-shadow: 1px 1px 0 0 #000000;
             padding: 2px;
+            margin: 0; 
             max-width: 95vw;
             display: inline-block;
             text-align: left;
             position: absolute;
-            touch-action: none; /* スマホのスクロール干渉防止 */
+            animation: fadeIn 0.4s ease-in forwards;
+            transition: transform 0.2s;
+        }
+
+        .draggable-cursor {
+            cursor: grab;
         }
 
         .title-bar {
@@ -99,37 +77,98 @@
             align-items: center;
             color: white;
             font-size: 14px;
-            cursor: grab;
+            margin-bottom: 2px;
         }
 
         .close-button {
-            width: 16px; height: 14px;
+            width: 16px;
+            height: 14px;
             background-color: #c0c0c0;
             border: 1px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
-            color: black; font-size: 10px;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; font-weight: bold;
+            color: black;
+            font-size: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .close-button:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding-top: 1px;
+            padding-left: 1px;
         }
 
-        .window-contents { padding: 15px; border: 1px solid #808080; background-color: #c0c0c0; }
-
-        .calc-display {
-            background-color: #ffffff; border: 2px inset #ffffff;
-            padding: 5px 10px; text-align: right; font-size: 24px;
-            margin-bottom: 10px; height: 35px; box-shadow: inset 2px 2px 0px #808080;
+        .window-contents {
+            padding: 15px;
+            border: 1px solid #808080;
+            background-color: #c0c0c0;
         }
 
-        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
-        
         .win95-btn {
-            background-color: #c0c0c0; border: 2px solid;
+            background-color: #c0c0c0;
+            border: 2px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
-            padding: 6px 0; font-family: 'PixelMplus', sans-serif;
-            cursor: pointer; text-align: center; font-size: 16px;
-            color: black; text-decoration: none;
+            padding: 6px 12px;
+            color: black !important;
+            text-decoration: none !important;
+            display: inline-block;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
         }
-        .win95-btn:active { border-color: #808080 #ffffff #ffffff #808080; padding: 7px 0 5px 0; }
+        .win95-btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding: 7px 11px 5px 13px;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+        
+        .desktop-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: white !important;
+            width: 80px;
+            cursor: pointer;
+        }
+
+        .desktop-icon img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            margin-bottom: 5px;
+        }
+
+        .desktop-icon span {
+            font-size: 14px;
+            text-align: center;
+            padding: 2px 4px;
+            border: 1px dotted transparent;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .desktop-icon:hover span, .desktop-icon:active span {
+            background-color: #000080;
+            color: white;
+            border: 1px dotted #fff;
+        }
+
+        .header-title {
+            color: white;
+            text-shadow: 2px 2px #000;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
 
         .footer {
             margin-top: 50px;
@@ -138,155 +177,258 @@
             position: absolute;
             bottom: 20px;
             width: 100%;
-            text-shadow: 1px 1px 2px #000;
-            pointer-events: none;
+            text-shadow: 1px 1px 2px #000; 
         }
 
+        /* --- コンタクトページ専用の追加CSS（電卓パーツ） --- */
+        .calc-display {
+            background-color: #ffffff; border: 2px inset #ffffff;
+            padding: 5px 10px; text-align: right; font-size: 24px;
+            margin-bottom: 10px; height: 35px; box-shadow: inset 2px 2px 0px #808080;
+        }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        .win95-calc-btn { /* .win95-btnの余白が干渉しないよう専用クラス化 */
+            background-color: #c0c0c0; border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 6px 0; font-family: 'PixelMplus', sans-serif;
+            cursor: pointer; text-align: center; font-size: 16px;
+            color: black;
+        }
+        .win95-calc-btn:active { border-color: #808080 #ffffff #ffffff #808080; padding: 7px 0 5px 0; }
+
+        /* --- スマホ用レスポンシブ --- */
         @media (max-width: 800px) {
-            h1 { font-size: 1.5em; margin-bottom: 30px; letter-spacing: -1px; }
+            body { font-size: 14px; }
+            .header-title { font-size: 1.6em; margin-bottom: 15px; }
+            .window { box-sizing: border-box; }
+            .title-bar { font-size: 12px; padding: 2px 4px 2px 6px; }
+            .close-button { width: 14px; height: 12px; font-size: 9px; }
+            .window-contents { padding: 8px; }
             .nav { gap: 8px; margin-bottom: 25px; }
             .desktop-icon { width: 60px; }
             .desktop-icon img { width: 34px !important; height: 34px !important; }
             .desktop-icon span { font-size: 11px; padding: 1px 2px; }
+
+            /* 電卓ウィンドウ縮小設定 */
             #win-calculator { width: 200px !important; }
-            #win-calculator .win95-btn { font-size: 14px; padding: 4px 0; }
+            #win-calculator .win95-calc-btn { font-size: 14px; padding: 4px 0; }
             #win-calculator .calc-display { font-size: 18px; height: 28px; }
-            #win-calculator .window-contents { padding: 10px; }
         }
     </style>
 </head>
 <body id="win95-desktop">
     <script src="//accaii.com/kaichi/script.js" async></script>
 
-    <h1>Kaichi Guitar Music</h1>
+    <h1 class="header-title">Kaichi Guitar Music</h1>
 
     <div class="nav">
-        <a href="index.html" class="desktop-icon"><img src="images/gif/Computer.gif" alt="Home"><span>Home</span></a>
-        <a href="Discography.html" class="desktop-icon"><img src="images/gif/Disc.gif" alt="Discography"><span>Discography</span></a>
-        <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" class="desktop-icon"><img src="images/gif/Earth.gif" alt="Works"><span>Works</span></a>
-        <a href="Contact.html" class="desktop-icon"><img src="images/gif/window.gif" alt="Contact"><span>Contact</span></a>
-        <a href="freebgm.html" class="desktop-icon"><img src="images/gif/Sound.gif" alt="FREEBGM"><span>FREEBGM</span></a>
+        <a href="index.html" class="desktop-icon">
+            <img src="images/gif/Computer.gif" alt="Home"><span>Home</span>
+        </a>
+        <a href="Discography.html" class="desktop-icon">
+            <img src="images/gif/Disc.gif" alt="Discography"><span>Discography</span>
+        </a>
+        <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" class="desktop-icon">
+            <img src="images/gif/Earth.gif" alt="Works"><span>Works</span>
+        </a>
+        <a href="Contact.html" class="desktop-icon">
+            <img src="images/gif/window.gif" alt="Contact"><span>Contact</span>
+        </a>
+        <a href="freebgm.html" class="desktop-icon">
+            <img src="images/gif/Sound.gif" alt="FREEBGM"><span>FREEBGM</span>
+        </a>
     </div>
 
-    <div class="window" id="win-message" style="width: 320px; z-index: 120;">
-        <div class="title-bar" id="handle-message"><span>Message</span><div class="close-button">×</div></div>
+    <div class="window" id="win-message" style="width: 320px; z-index: 103;">
+        <div class="title-bar draggable-cursor" id="handle-message">
+            <span>Message</span><div class="close-button">×</div>
+        </div>
         <div class="window-contents" style="font-size: 13px;">
             以下のテストに答えるとメールアドレスが表示されます。<br>
             <small>Answer the Test below to display the email address.</small>
         </div>
     </div>
 
-    <div class="window" id="win-calculator" style="width: 280px; z-index: 110;">
-        <div class="title-bar" id="handle-calculator"><span>Calculator.exe</span><div class="close-button">×</div></div>
+    <div class="window" id="win-calculator" style="width: 280px; z-index: 102;">
+        <div class="title-bar draggable-cursor" id="handle-calculator">
+            <span>Calculator.exe</span><div class="close-button">×</div>
+        </div>
         <div class="window-contents">
             <div id="question" style="text-align:center; margin-bottom:10px; font-size:16px; background:#eee; padding:5px; border:1px inset #fff;">読み込み中…</div>
             <div class="calc-display" id="display">0</div>
             <div class="keypad">
-                <div class="win95-btn" onclick="inputNum(7)">7</div>
-                <div class="win95-btn" onclick="inputNum(8)">8</div>
-                <div class="win95-btn" onclick="inputNum(9)">9</div>
-                <div class="win95-btn" onclick="inputNum(4)">4</div>
-                <div class="win95-btn" onclick="inputNum(5)">5</div>
-                <div class="win95-btn" onclick="inputNum(6)">6</div>
-                <div class="win95-btn" onclick="inputNum(1)">1</div>
-                <div class="win95-btn" onclick="inputNum(2)">2</div>
-                <div class="win95-btn" onclick="inputNum(3)">3</div>
-                <div class="win95-btn" onclick="inputNum(0)">0</div>
-                <div class="win95-btn" onclick="clearDisplay()">C</div>
-                <div class="win95-btn" style="color:red; font-weight:bold;" onclick="checkAnswer()">OK</div>
+                <div class="win95-calc-btn click-target" onclick="inputNum(7)">7</div>
+                <div class="win95-calc-btn click-target" onclick="inputNum(8)">8</div>
+                <div class="win95-calc-btn click-target" onclick="inputNum(9)">9</div>
+                <div class="win95-calc-btn click-target" onclick="inputNum(4)">4</div>
+                <div class="win95-calc-btn click-target" onclick="inputNum(5)">5</div>
+                <div class="win95-calc-btn click-target" onclick="inputNum(6)">6</div>
+                <div class="win95-calc-btn click-target" onclick="inputNum(1)">1</div>
+                <div class="win95-calc-btn click-target" onclick="inputNum(2)">2</div>
+                <div class="win95-calc-btn click-target" onclick="inputNum(3)">3</div>
+                <div class="win95-calc-btn click-target" onclick="inputNum(0)">0</div>
+                <div class="win95-calc-btn click-target" onclick="clearDisplay()">C</div>
+                <div class="win95-calc-btn click-target" style="color:red; font-weight:bold;" onclick="checkAnswer()">OK</div>
             </div>
         </div>
     </div>
 
-    <div class="window" id="win-social-dm" style="width: 280px; z-index: 115;">
-        <div class="title-bar" id="handle-social-dm"><span>Social</span><div class="close-button">×</div></div>
+    <div class="window" id="win-social-dm" style="width: 280px; z-index: 101;">
+        <div class="title-bar draggable-cursor" id="handle-social-dm">
+            <span>Social</span><div class="close-button">×</div>
+        </div>
         <div class="window-contents" style="text-align: center;">
-            <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank" class="win95-btn" style="font-size: 14px; width: 90%; color: blue !important; display: block;">X(Twitter)のDMはこちら</a>
+            <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank" class="win95-btn" style="font-size: 14px; width: 85%; color: blue !important; margin: 0 auto;">X(Twitter)のDMはこちら</a>
         </div>
     </div>
 
-    <div class="footer">このサイトは本人によって頑張って作成されました</div>
+    <div class="footer">
+        このサイトは本人によって頑張って作成されました
+    </div>
 
     <script>
-        var mouseClickSound = new Audio('Sound/MouseClick.mp3');
-        function playSound() { if (mouseClickSound) { mouseClickSound.currentTime = 0; mouseClickSound.play().catch(()=>{}); } }
-        
-        // PCのクリック音
-        document.addEventListener('mousedown', (e) => { 
-            if (e.target.closest('.desktop-icon, .win95-btn, .close-button, .title-bar')) playSound(); 
-        });
-        // スマホのタッチ音
-        document.addEventListener('touchstart', (e) => { 
-            if (e.target.closest('.desktop-icon, .win95-btn, .close-button, .title-bar')) playSound(); 
-        }, { passive: true });
+        // --- index.html と完全に同一のJS基盤 ---
+        var mouseClickSound;
 
-        var highestZIndex = 130;
+        try {
+            mouseClickSound = new Audio('Sound/MouseClick.mp3');
+        } catch(e) {
+            console.log("Audio load skipped");
+        }
+        
+        function playClickSound() {
+            if (mouseClickSound) {
+                mouseClickSound.currentTime = 0; 
+                mouseClickSound.play().catch(function(e) {});
+            }
+        }
+
+        // 電卓ボタン用に追加したクラス（click-target）も含めて音を鳴らす
+        var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .click-target');
+        for (var i = 0; i < clickTargets.length; i++) {
+            clickTargets[i].addEventListener('mousedown', playClickSound);
+            clickTargets[i].addEventListener('touchstart', playClickSound, { passive: true });
+        }
+
+        var highestZIndex = 110;
+
+        function setInitialPositions() {
+            var width = window.innerWidth;
+            var isMobile = window.matchMedia("(max-width: 800px)").matches;
+
+            var msg = document.getElementById('win-message');
+            var calc = document.getElementById('win-calculator');
+            var dm = document.getElementById('win-social-dm');
+
+            var maxBottom = 0;
+
+            if (isMobile) {
+                if(msg.style.display !== 'none') {
+                    msg.style.left = '5%'; msg.style.top = '140px';
+                }
+                if(calc.style.display !== 'none') {
+                    calc.style.left = '10%'; calc.style.top = '270px';
+                }
+                if(dm.style.display !== 'none') {
+                    dm.style.left = '15%'; dm.style.top = '580px';
+                    maxBottom = 580 + (dm.offsetHeight || 100) + 100;
+                } else {
+                    maxBottom = 800;
+                }
+            } else {
+                if(msg.style.display !== 'none') {
+                    msg.style.left = '15%'; msg.style.top = '200px';
+                }
+                if(calc.style.display !== 'none') {
+                    calc.style.left = '45%'; calc.style.top = '250px';
+                }
+                if(dm.style.display !== 'none') {
+                    dm.style.left = '70%'; dm.style.top = '480px';
+                    maxBottom = 480 + (dm.offsetHeight || 150) + 150;
+                } else {
+                    maxBottom = 900;
+                }
+            }
+
+            if(maxBottom > 0) document.body.style.minHeight = maxBottom + 'px';
+        }
+
+        window.onload = function() { setTimeout(setInitialPositions, 100); };
+        window.onresize = function() { setTimeout(setInitialPositions, 100); };
+
         function initDrag(targetId, handleId) {
             var target = document.getElementById(targetId);
             var handle = document.getElementById(handleId);
             var isDragging = false;
-            var initialX, initialY;
+            var initialX, initialY, offsetX, offsetY;
 
             handle.addEventListener('mousedown', startDragging);
             handle.addEventListener('touchstart', startDragging, { passive: false });
 
             function startDragging(e) {
                 if(e.target.classList.contains('close-button')) return;
-                
-                // ドラッグ開始時に確実に音を鳴らす
-                playSound();
 
-                isDragging = true; 
-                highestZIndex++; 
+                isDragging = true;
+                highestZIndex++;
                 target.style.zIndex = highestZIndex;
-                var evt = e.type === 'touchstart' ? e.touches[0] : e;
-                initialX = evt.clientX - target.offsetLeft; 
-                initialY = evt.clientY - target.offsetTop;
-                
-                document.addEventListener('mousemove', dragging); 
+
+                if (e.type === 'touchstart') {
+                    initialX = e.touches[0].clientX - target.offsetLeft;
+                    initialY = e.touches[0].clientY - target.offsetTop;
+                    e.preventDefault(); 
+                } else {
+                    initialX = e.clientX - target.offsetLeft;
+                    initialY = e.clientY - target.offsetTop;
+                }
+
+                document.addEventListener('mousemove', dragging);
                 document.addEventListener('touchmove', dragging, { passive: false });
-                document.addEventListener('mouseup', endDrag); 
+                document.addEventListener('mouseup', endDrag);
                 document.addEventListener('touchend', endDrag);
             }
 
             function dragging(e) {
                 if (!isDragging) return;
-                var evt = e.type === 'touchmove' ? e.touches[0] : e;
-                target.style.left = (evt.clientX - initialX) + 'px'; 
-                target.style.top = (evt.clientY - initialY) + 'px';
+                if (e.type === 'touchmove') {
+                    offsetX = e.touches[0].clientX - initialX;
+                    offsetY = e.touches[0].clientY - initialY;
+                    e.preventDefault(); 
+                } else {
+                    offsetX = e.clientX - initialX;
+                    offsetY = e.clientY - initialY;
+                }
+                target.style.left = offsetX + 'px';
+                target.style.top = offsetY + 'px';
             }
 
-            function endDrag() { isDragging = false; }
-        }
-
-        function setInitialPositions() {
-            var isMobile = window.innerWidth <= 800;
-            var msg = document.getElementById('win-message');
-            var calc = document.getElementById('win-calculator');
-            var dm = document.getElementById('win-social-dm');
-            if (isMobile) {
-                msg.style.left = '5%'; msg.style.top = '150px';
-                calc.style.left = '10%'; calc.style.top = '280px';
-                dm.style.left = '15%'; dm.style.top = '600px';
-                document.body.style.minHeight = '900px';
-            } else {
-                msg.style.left = '15%'; msg.style.top = '200px';
-                calc.style.left = '45%'; calc.style.top = '250px';
-                dm.style.left = '70%'; dm.style.top = '480px';
-                document.body.style.minHeight = '1000px';
+            function endDrag() {
+                isDragging = false;
+                document.removeEventListener('mousemove', dragging);
+                document.removeEventListener('touchmove', dragging);
+                document.removeEventListener('mouseup', endDrag);
+                document.removeEventListener('touchend', endDrag);
             }
         }
 
-        window.onload = () => {
-            setInitialPositions();
-            initDrag('win-message', 'handle-message');
-            initDrag('win-calculator', 'handle-calculator');
-            initDrag('win-social-dm', 'handle-social-dm');
-            document.querySelectorAll('.close-button').forEach(btn => {
-                btn.onclick = function() { this.closest('.window').style.display = 'none'; };
-            });
-        };
+        initDrag('win-message', 'handle-message');
+        initDrag('win-calculator', 'handle-calculator');
+        initDrag('win-social-dm', 'handle-social-dm');
 
+        var closeBtns = document.querySelectorAll('.close-button');
+        for(var j = 0; j < closeBtns.length; j++) {
+            closeBtns[j].addEventListener('mousedown', function(e) { e.stopPropagation(); });
+            closeBtns[j].addEventListener('touchstart', function(e) { e.stopPropagation(); }, { passive: false });
+            
+            var closeAction = function(e) {
+                e.preventDefault();
+                var windowElem = this.closest('.window');
+                windowElem.style.display = 'none';
+            };
+            closeBtns[j].addEventListener('click', closeAction);
+            closeBtns[j].addEventListener('touchend', closeAction);
+        }
+
+        // --- コンタクトページ専用ロジック（電卓） ---
         const display = document.getElementById('display');
         const questionBox = document.getElementById('question');
         let currentInput = "";
@@ -294,6 +436,7 @@
         const b = Math.floor(Math.random() * 20) + 1;
         const correct = a + b;
         questionBox.textContent = `${a} ＋ ${b} ＝ ？`;
+        
         function inputNum(num) { currentInput += num; display.textContent = currentInput; }
         function clearDisplay() { currentInput = ""; display.textContent = "0"; }
         function checkAnswer() {
