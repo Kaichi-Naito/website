@@ -423,14 +423,11 @@
             }
         }
 
-        // PCのクリック音（特定の場所だけ鳴らす）
         var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .phalux-link');
         for (var i = 0; i < clickTargets.length; i++) {
             clickTargets[i].addEventListener('mousedown', playClickSound);
+            clickTargets[i].addEventListener('touchstart', playClickSound, { passive: true });
         }
-
-        // スマホのタッチ音（画面のどこを触っても鳴らす仕様に変更！）
-        document.addEventListener('touchstart', playClickSound, { passive: true });
 
         var highestZIndex = 110;
 
@@ -476,7 +473,7 @@
             } else {
              // ↓↓↓ ここから下がPC版の配置指定です ↓↓↓
                 if(profile.style.display !== 'none') {
-                    profile.style.left = '28%';
+                    profile.style.left = '25%';
                     profile.style.top = '200px';
                 }
                 if(phalux.style.display !== 'none') {
@@ -492,7 +489,7 @@
                     spotify.style.top = '450px';
                 }
                 if(youtube.style.display !== 'none') {
-                    youtube.style.left = '40%'; 
+                    youtube.style.left = 'max(5%, calc(50% - 400px))'; 
                     youtube.style.top = '700px';
                     maxBottom = 650 + (youtube.offsetHeight || 450) + 150;
                 } else {
