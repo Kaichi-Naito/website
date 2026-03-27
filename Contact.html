@@ -290,7 +290,7 @@
             <span>Error.exe</span><div class="close-button">×</div>
         </div>
         <div class="window-contents" style="text-align: center;">
-            <div style="font-size: 32px; margin-bottom: 10px;">⚠️</div>
+            <img src="images/mark_attention.png" alt="Warning" style="width: 48px; height: 48px; margin-bottom: 10px; image-rendering: pixelated;">
             <p style="margin: 0 0 5px 0; font-size: 14px; font-weight: bold;">答えが間違っています。</p>
             <p style="margin: 0 0 15px 0; font-size: 12px;">Incorrect answer.</p>
             <div class="win95-btn click-target" onclick="retryCalc()" style="width: 100px; margin: 0 auto; display: block;">Retry</div>
@@ -346,7 +346,7 @@
             var calc = document.getElementById('win-calculator');
             var dm = document.getElementById('win-social-dm');
             var mail = document.getElementById('win-mail');
-            var warning = document.getElementById('win-warning'); // 追加
+            var warning = document.getElementById('win-warning');
 
             var maxBottom = 0;
 
@@ -365,7 +365,7 @@
                     maxBottom = 800;
                 }
                 mail.style.left = '10%'; mail.style.top = '350px';
-                warning.style.left = '10%'; warning.style.top = '320px'; // エラーウィンドウの位置
+                warning.style.left = '10%'; warning.style.top = '320px';
             } else {
                 /* 💻 PC版の位置設定 */
                 if(msg.style.display !== 'none') {
@@ -381,7 +381,7 @@
                     maxBottom = 900;
                 }
                 mail.style.left = '40%'; mail.style.top = '400px';
-                warning.style.left = '46%'; warning.style.top = '400px'; // エラーウィンドウの位置
+                warning.style.left = '46%'; warning.style.top = '400px';
             }
 
             if(maxBottom > 0) document.body.style.minHeight = maxBottom + 'px';
@@ -449,7 +449,7 @@
         initDrag('win-calculator', 'handle-calculator');
         initDrag('win-social-dm', 'handle-social-dm');
         initDrag('win-mail', 'handle-mail');
-        initDrag('win-warning', 'handle-warning'); // エラーウィンドウをドラッグ可能に
+        initDrag('win-warning', 'handle-warning');
 
         var closeBtns = document.querySelectorAll('.close-button');
         for(var j = 0; j < closeBtns.length; j++) {
