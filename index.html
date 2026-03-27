@@ -410,6 +410,8 @@
 
         try {
             mouseClickSound = new Audio('Sound/MouseClick.mp3');
+            mouseClickSound.preload = 'auto'; // 追加：事前に読み込んで準備しておく
+            mouseClickSound.load();           // 追加：強制的にロードを開始させる
         } catch(e) {
             console.log("Audio load skipped");
         }
