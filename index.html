@@ -413,8 +413,8 @@
 
         try {
             mouseClickSound = new Audio('Sound/MouseClick.mp3');
-            mouseClickSound.preload = 'auto'; // 追加：事前に読み込んで準備しておく
-            mouseClickSound.load();           // 追加：強制的にロードを開始させる
+            mouseClickSound.preload = 'auto'; 
+            mouseClickSound.load();           
         } catch(e) {
             console.log("Audio load skipped");
         }
@@ -445,7 +445,6 @@
             var youtube = document.getElementById('win-youtube');
 
             var maxBottom = 0;
-  // ↓↓↓ ここから下がスマホ版の配置指定です ↓↓↓
             if (isMobile) {
                 if(profile.style.display !== 'none') {
                     profile.style.left = '4%';
@@ -474,7 +473,6 @@
                     maxBottom = 900;
                 }
             } else {
-             // ↓↓↓ ここから下がPC版の配置指定です ↓↓↓
                 if(profile.style.display !== 'none') {
                     profile.style.left = '28%';
                     profile.style.top = '200px';
@@ -580,73 +578,116 @@
             closeBtns[j].addEventListener('touchend', closeAction);
         }
 
-        // --- 飛び回るNyan Catのアニメーションとクリック処理 ---
+        // --- 飛び回るNyan Catのアニメーションと増殖処理 ---
         var catSound;
         try {
             catSound = new Audio('Sound/CatMeow.mp3');
             catSound.preload = 'auto';
         } catch(e) {}
 
-        var nyanCat = document.getElementById('nyan-cat');
-        var catX = window.innerWidth / 2;
-        var catY = window.innerHeight / 2;
-        var catVx = 3; // 横の移動スピード
-        var catVy = 2; // 縦の移動スピード
-        var isCatActive = true;
+        var cats = [];
 
-        function animateCat() {
-            if (!isCatActive || !nyanCat) return;
+        function setupCat(catElement, startX, startY, startVx, startVy) {
+            var catObj = {
+                element: catElement,
+                x: startX,
+                y: startY,
+                vx: startVx,
+                vy: startVy
+            };
+            cats.push(catObj);
 
+            function catchCat(e) {
+                e.preventDefault(); // スマホの誤作動防止
+                
+                // 鳴き声を鳴らす
+                if (catSound) {
+                    catSound.currentTime = 0;
+                    catSound.play().catch(function(err){});
+                }
+
+                // 増殖アクション: 触られた猫自身もランダムに方向を変えて逃げる
+                catObj.vx = (Math.random() * 4 + 2) * (Math.random() < 0.5 ? 1 : -1);
+                catObj.vy = (Math.random() * 3 + 1) * (Math.random() < 0.5 ? 1 : -1);
+                
+                // 新しく生まれる猫のスピード
+                var newVx = (Math.random() * 4 + 2) * (Math.random() < 0.5 ? 1 : -1);
+                var newVy = (Math.random() * 3 + 1) * (Math.random() < 0.5 ? 1 : -1);
+
+                // 新しいNyan Catの画像要素を生成
+                var newCat = document.createElement('img');
+                newCat.src = 'images/gif/Nyancat.gif';
+                newCat.alt = 'Nyan Cat';
+                newCat.style.position = 'fixed';
+                newCat.style.width = '80px';
+                newCat.style.height = 'auto';
+                newCat.style.zIndex = '9999';
+                newCat.style.cursor = 'pointer';
+                newCat.style.display = 'block';
+                newCat.style.imageRendering = 'pixelated';
+                
+                // 初期位置をタップした猫と同じ（分裂したように見せる）位置に設定
+                newCat.style.left = catObj.x + 'px';
+                newCat.style.top = catObj.y + 'px';
+                
+                // 画面に追加してセットアップ
+                document.body.appendChild(newCat);
+                setupCat(newCat, catObj.x, catObj.y, newVx, newVy);
+            }
+
+            catElement.addEventListener('mousedown', catchCat);
+            catElement.addEventListener('touchstart', catchCat, { passive: false });
+        }
+
+        // 最初の1匹目のセットアップ
+        var originalCat = document.getElementById('nyan-cat');
+        if (originalCat) {
+            var startX = window.innerWidth / 2;
+            var startY = window.innerHeight / 2;
+            setupCat(originalCat, startX, startY, 3, 2);
+        }
+
+        function animateCats() {
             var w = window.innerWidth;
             var h = window.innerHeight;
-            var catW = nyanCat.offsetWidth || 80;
-            var catH = nyanCat.offsetHeight || 50;
 
-            catX += catVx;
-            catY += catVy;
+            // 全ての猫の座標を計算して動かす
+            for (var i = 0; i < cats.length; i++) {
+                var cat = cats[i];
+                var catW = cat.element.offsetWidth || 80;
+                var catH = cat.element.offsetHeight || 50;
 
-            // 画面の端に当たったら跳ね返る（進行方向に応じて反転させる）
-            if (catX + catW > w) { 
-                catX = w - catW; 
-                catVx *= -1; 
-                nyanCat.style.transform = 'scaleX(-1)'; 
-            } else if (catX < 0) { 
-                catX = 0; 
-                catVx *= -1; 
-                nyanCat.style.transform = 'scaleX(1)'; 
+                cat.x += cat.vx;
+                cat.y += cat.vy;
+
+                // 画面の端に当たったら跳ね返る（進行方向に応じて反転させる）
+                if (cat.x + catW > w) { 
+                    cat.x = w - catW; 
+                    cat.vx *= -1; 
+                    cat.element.style.transform = 'scaleX(-1)'; 
+                } else if (cat.x < 0) { 
+                    cat.x = 0; 
+                    cat.vx *= -1; 
+                    cat.element.style.transform = 'scaleX(1)'; 
+                }
+
+                if (cat.y + catH > h) { 
+                    cat.y = h - catH; 
+                    cat.vy *= -1; 
+                } else if (cat.y < 0) { 
+                    cat.y = 0; 
+                    cat.vy *= -1; 
+                }
+
+                cat.element.style.left = cat.x + 'px';
+                cat.element.style.top = cat.y + 'px';
             }
 
-            if (catY + catH > h) { 
-                catY = h - catH; 
-                catVy *= -1; 
-            } else if (catY < 0) { 
-                catY = 0; 
-                catVy *= -1; 
-            }
-
-            nyanCat.style.left = catX + 'px';
-            nyanCat.style.top = catY + 'px';
-
-            requestAnimationFrame(animateCat);
+            requestAnimationFrame(animateCats);
         }
         
         // アニメーションを開始
-        requestAnimationFrame(animateCat);
-
-        // タップされた時の処理
-        function catchCat(e) {
-            e.preventDefault(); // スマホの誤作動防止
-            isCatActive = false; // アニメーションを止める
-            nyanCat.style.display = 'none'; // 画像を消す
-            
-            if (catSound) {
-                catSound.currentTime = 0;
-                catSound.play().catch(function(err){});
-            }
-        }
-
-        nyanCat.addEventListener('mousedown', catchCat);
-        nyanCat.addEventListener('touchstart', catchCat, { passive: false });
+        requestAnimationFrame(animateCats);
 
     </script>
 </body>
