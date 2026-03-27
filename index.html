@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="keywords" content="ギター, 作曲, 内藤海地, Kaichi, Kaichi Naito, PHALUX, Windows95">
-    <meta name="description" content="PHALUXのKaichiの各SNSやプロフィールまとめ。ギター演奏・オリジナル楽曲を紹介する。最新楽曲の視聴も可能です。">  
+    <meta name="description" content="Kaichi（内藤海地）によるギター演奏・オリジナル楽曲を紹介する公式サイト。YouTube・Spotifyで最新楽曲をお楽しみください。">  
     <meta property="og:title" content="Kaichi Guitar Music">
-    <meta property="og:description" content="Kaichiのオリジナル楽曲・ギター演奏動画を公開中。">
-    <meta property="og:image" content="https://kaichi-naito.github.io/website/images/card-image.jpg">
+    <meta property="og:description" content="Kaichi（内藤海地）のオリジナル楽曲・ギター演奏動画を公開中。">
+    <meta property="og:image" content="https://kaichi-naito.github.io/website/images/Kaichi_profile-image.jpg">
     <meta property="og:url" content="https://kaichi-naito.github.io/website/index.html">
     <meta property="og:type" content="website">
     <meta http-equiv="Cache-Control" content="max-age=31536000">
     <title>Kaichi Guitar Music</title>
-    <link rel="icon" href="images/card-image.jpg" type="image/jpg">
+    <link rel="icon" href="images/favicon.png" type="image/png">
     <style>
         /* --- index.html と完全に同一のベースCSS --- */
         @font-face {
@@ -216,6 +215,95 @@
             border-color: #000080; 
         }
 
+        /* --- タスクバー全体のデザイン --- */
+        #win95-taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 32px;
+            background-color: #c0c0c0;
+            border-top: 2px solid #ffffff;
+            box-shadow: 0 -1px 0 0 #000000;
+            z-index: 150;
+            display: flex;
+            align-items: center;
+            padding: 0 4px;
+            box-sizing: border-box;
+            box-shadow: inset 1px 1px 0 #fff;
+        }
+
+        /* --- スタートボタン（画像版） --- */
+        #taskbar-start-btn {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            height: 24px;
+            padding: 0 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        #taskbar-start-btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding: 1px 1px 0 3px;
+        }
+        #taskbar-start-btn img {
+            image-rendering: pixelated;
+            height: 18px; /* スタートボタンの高さに合わせる */
+            width: auto;
+        }
+
+        #taskbar-tasks {
+            display: flex;
+            gap: 4px;
+            margin-left: 6px;
+            overflow: hidden;
+            height: 24px;
+        }
+        .win95-taskbar-tab {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            height: 24px;
+            width: 120px;
+            padding: 0 4px;
+            font-size: 12px;
+            color: black;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        #taskbar-tray {
+            margin-left: auto;
+            border-top: 1px solid #808080;
+            border-left: 1px solid #808080;
+            border-right: 1px solid #ffffff;
+            border-bottom: 1px solid #ffffff;
+            background-color: #c0c0c0;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 8px;
+            box-sizing: border-box;
+        }
+        #taskbar-tray img {
+            image-rendering: pixelated;
+        }
+        #tray-clock {
+            font-size: 12px;
+            color: black;
+            width: 40px;
+            text-align: right;
+        }
+
         @media (max-width: 800px) {
             body {
                 font-size: 14px;
@@ -303,6 +391,46 @@
             .desktop-icon span {
                 font-size: 11px; 
                 padding: 1px 2px;
+            }
+
+            /* スマホ版のタスクバー調整 */
+            #win95-taskbar {
+                height: 26px;
+                padding: 0 2px;
+            }
+            #taskbar-start-btn {
+                height: 20px;
+                padding: 0 2px;
+            }
+            #taskbar-start-btn:active {
+                padding: 1px 1px 0 3px;
+            }
+            #taskbar-start-btn img {
+                height: 14px !important;
+            }
+            #taskbar-tasks {
+                height: 20px;
+                gap: 2px;
+                margin-left: 2px;
+            }
+            .win95-taskbar-tab {
+                width: 70px;
+                font-size: 10px;
+                height: 20px;
+                padding: 0 2px;
+            }
+            #taskbar-tray {
+                height: 20px;
+                padding: 0 4px;
+                gap: 3px;
+            }
+            #taskbar-tray img {
+                width: 12px !important;
+                height: 12px !important;
+            }
+            #tray-clock {
+                font-size: 10px;
+                width: 28px;
             }
         }
     </style>
@@ -397,13 +525,27 @@
         <div class="window-contents">
             <h3 style="margin-top:0;">Original songs🎸</h3>
             <div style="position:relative; padding-top: 56.25%;">
-                <iframe src="https://www.youtube.com/embed/videoseries?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" 
+                <iframe src="https://www.youtube.com/embed/videoseries?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" 
                         style="position:absolute; top:0; left:0; width:100%; height:100%;" frameborder="0" allowfullscreen loading="lazy"></iframe>
             </div>
         </div>
     </div>
 
     <img id="nyan-cat" src="images/gif/Nyancat.gif" alt="Nyan Cat" style="position: fixed; width: 80px; height: auto; z-index: 9999; cursor: pointer; display: block; image-rendering: pixelated; top: 50%; left: 50%;">
+
+    <div id="win95-taskbar">
+        <button id="taskbar-start-btn" class="win95-taskbar-btn click-target">
+            <img src="images/start.png" alt="Start">
+        </button>
+        <div id="taskbar-tasks">
+            <div class="win95-taskbar-tab">Profile.exe</div>
+            <div class="win95-taskbar-tab">CD_Player.exe</div>
+        </div>
+        <div id="taskbar-tray">
+            <img src="images/volume-icon.png" alt="Volume" width="16" height="16">
+            <div id="tray-clock">14:33</div>
+        </div>
+    </div>
 
     <div class="footer">
         このサイトは本人によって頑張って作成されました
@@ -427,7 +569,8 @@
             }
         }
 
-        var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .phalux-link');
+        // タスクバーのボタンも音の対象に含める
+        var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .phalux-link, .click-target');
         for (var i = 0; i < clickTargets.length; i++) {
             clickTargets[i].addEventListener('mousedown', playClickSound);
             clickTargets[i].addEventListener('touchstart', playClickSound, { passive: true });
@@ -599,23 +742,15 @@
             cats.push(catObj);
 
             function catchCat(e) {
-                e.preventDefault(); // スマホの誤作動防止
-                
-                // 鳴き声を鳴らす
+                e.preventDefault(); 
                 if (catSound) {
                     catSound.currentTime = 0;
                     catSound.play().catch(function(err){});
                 }
-
-                // 増殖アクション: 触られた猫自身もランダムに方向を変えて逃げる
                 catObj.vx = (Math.random() * 4 + 2) * (Math.random() < 0.5 ? 1 : -1);
                 catObj.vy = (Math.random() * 3 + 1) * (Math.random() < 0.5 ? 1 : -1);
-                
-                // 新しく生まれる猫のスピード
                 var newVx = (Math.random() * 4 + 2) * (Math.random() < 0.5 ? 1 : -1);
                 var newVy = (Math.random() * 3 + 1) * (Math.random() < 0.5 ? 1 : -1);
-
-                // 新しいNyan Catの画像要素を生成
                 var newCat = document.createElement('img');
                 newCat.src = 'images/gif/Nyancat.gif';
                 newCat.alt = 'Nyan Cat';
@@ -626,21 +761,15 @@
                 newCat.style.cursor = 'pointer';
                 newCat.style.display = 'block';
                 newCat.style.imageRendering = 'pixelated';
-                
-                // 初期位置をタップした猫と同じ（分裂したように見せる）位置に設定
                 newCat.style.left = catObj.x + 'px';
                 newCat.style.top = catObj.y + 'px';
-                
-                // 画面に追加してセットアップ
                 document.body.appendChild(newCat);
                 setupCat(newCat, catObj.x, catObj.y, newVx, newVy);
             }
-
             catElement.addEventListener('mousedown', catchCat);
             catElement.addEventListener('touchstart', catchCat, { passive: false });
         }
 
-        // 最初の1匹目のセットアップ
         var originalCat = document.getElementById('nyan-cat');
         if (originalCat) {
             var startX = window.innerWidth / 2;
@@ -651,17 +780,12 @@
         function animateCats() {
             var w = window.innerWidth;
             var h = window.innerHeight;
-
-            // 全ての猫の座標を計算して動かす
             for (var i = 0; i < cats.length; i++) {
                 var cat = cats[i];
                 var catW = cat.element.offsetWidth || 80;
                 var catH = cat.element.offsetHeight || 50;
-
                 cat.x += cat.vx;
                 cat.y += cat.vy;
-
-                // 画面の端に当たったら跳ね返る（進行方向に応じて反転させる）
                 if (cat.x + catW > w) { 
                     cat.x = w - catW; 
                     cat.vx *= -1; 
@@ -671,7 +795,6 @@
                     cat.vx *= -1; 
                     cat.element.style.transform = 'scaleX(1)'; 
                 }
-
                 if (cat.y + catH > h) { 
                     cat.y = h - catH; 
                     cat.vy *= -1; 
@@ -679,17 +802,27 @@
                     cat.y = 0; 
                     cat.vy *= -1; 
                 }
-
                 cat.element.style.left = cat.x + 'px';
                 cat.element.style.top = cat.y + 'px';
             }
-
             requestAnimationFrame(animateCats);
         }
-        
-        // アニメーションを開始
         requestAnimationFrame(animateCats);
 
+        // --- システムトレイの時計を動かす処理 ---
+        function updateTrayClock() {
+            var clock = document.getElementById('tray-clock');
+            if (clock) {
+                var now = new Date();
+                var hours = now.getHours();
+                var minutes = now.getMinutes();
+                if (hours < 10) hours = '0' + hours;
+                if (minutes < 10) minutes = '0' + minutes;
+                clock.textContent = hours + ':' + minutes;
+            }
+        }
+        updateTrayClock();
+        setInterval(updateTrayClock, 60000);
     </script>
 </body>
 </html>
