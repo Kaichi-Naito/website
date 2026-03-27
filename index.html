@@ -13,6 +13,7 @@
     <title>Kaichi Guitar Music</title>
     <link rel="icon" href="images/favicon.png" type="image/png">
     <style>
+        /* --- index.html と完全に同一のベースCSS --- */
         @font-face {
             font-family: 'PixelMplus';
             src: url('https://kaichi-naito.github.io/website/fonts/PixelMplus10-Regular.ttf') format('truetype');
@@ -401,6 +402,8 @@
         </div>
     </div>
 
+    <img id="nyan-cat" src="images/gif/Nyancat.gif" alt="Nyan Cat" style="position: fixed; width: 80px; height: auto; z-index: 9999; cursor: pointer; display: block; image-rendering: pixelated; top: 50%; left: 50%;">
+
     <div class="footer">
         このサイトは本人によって頑張って作成されました
     </div>
@@ -473,7 +476,7 @@
             } else {
              // ↓↓↓ ここから下がPC版の配置指定です ↓↓↓
                 if(profile.style.display !== 'none') {
-                    profile.style.left = '25%';
+                    profile.style.left = '28%';
                     profile.style.top = '200px';
                 }
                 if(phalux.style.display !== 'none') {
@@ -489,7 +492,7 @@
                     spotify.style.top = '450px';
                 }
                 if(youtube.style.display !== 'none') {
-                    youtube.style.left = 'max(5%, calc(50% - 400px))'; 
+                    youtube.style.left = '40%'; 
                     youtube.style.top = '700px';
                     maxBottom = 650 + (youtube.offsetHeight || 450) + 150;
                 } else {
@@ -576,6 +579,74 @@
             closeBtns[j].addEventListener('click', closeAction);
             closeBtns[j].addEventListener('touchend', closeAction);
         }
+
+        // --- 飛び回るNyan Catのアニメーションとクリック処理 ---
+        var catSound;
+        try {
+            catSound = new Audio('Sound/CatMeow.mp3');
+            catSound.preload = 'auto';
+        } catch(e) {}
+
+        var nyanCat = document.getElementById('nyan-cat');
+        var catX = window.innerWidth / 2;
+        var catY = window.innerHeight / 2;
+        var catVx = 3; // 横の移動スピード
+        var catVy = 2; // 縦の移動スピード
+        var isCatActive = true;
+
+        function animateCat() {
+            if (!isCatActive || !nyanCat) return;
+
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+            var catW = nyanCat.offsetWidth || 80;
+            var catH = nyanCat.offsetHeight || 50;
+
+            catX += catVx;
+            catY += catVy;
+
+            // 画面の端に当たったら跳ね返る（進行方向に応じて反転させる）
+            if (catX + catW > w) { 
+                catX = w - catW; 
+                catVx *= -1; 
+                nyanCat.style.transform = 'scaleX(-1)'; 
+            } else if (catX < 0) { 
+                catX = 0; 
+                catVx *= -1; 
+                nyanCat.style.transform = 'scaleX(1)'; 
+            }
+
+            if (catY + catH > h) { 
+                catY = h - catH; 
+                catVy *= -1; 
+            } else if (catY < 0) { 
+                catY = 0; 
+                catVy *= -1; 
+            }
+
+            nyanCat.style.left = catX + 'px';
+            nyanCat.style.top = catY + 'px';
+
+            requestAnimationFrame(animateCat);
+        }
+        
+        // アニメーションを開始
+        requestAnimationFrame(animateCat);
+
+        // タップされた時の処理
+        function catchCat(e) {
+            e.preventDefault(); // スマホの誤作動防止
+            isCatActive = false; // アニメーションを止める
+            nyanCat.style.display = 'none'; // 画像を消す
+            
+            if (catSound) {
+                catSound.currentTime = 0;
+                catSound.play().catch(function(err){});
+            }
+        }
+
+        nyanCat.addEventListener('mousedown', catchCat);
+        nyanCat.addEventListener('touchstart', catchCat, { passive: false });
 
     </script>
 </body>
