@@ -423,11 +423,14 @@
             }
         }
 
+        // PCのクリック音（特定の場所だけ鳴らす）
         var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .phalux-link');
         for (var i = 0; i < clickTargets.length; i++) {
             clickTargets[i].addEventListener('mousedown', playClickSound);
-            clickTargets[i].addEventListener('touchstart', playClickSound, { passive: true });
         }
+
+        // スマホのタッチ音（画面のどこを触っても鳴らす仕様に変更！）
+        document.addEventListener('touchstart', playClickSound, { passive: true });
 
         var highestZIndex = 110;
 
