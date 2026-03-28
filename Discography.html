@@ -16,8 +16,7 @@
     <link rel="icon" href="images/card-image.jpg" type="image/jpg">
     <style>
         :root {
-            color-scheme: light only;
-            supported-color-schemes: light;
+            color-scheme: light;
         }
         * {
             forced-color-adjust: none !important; /* ブラウザの強制カラー変更を拒否 */
@@ -218,33 +217,6 @@
             .album-info h3 { font-size: 1.2em; margin-bottom: 5px; }
             .album-info p { font-size: 12px; }
             .links img { width: 36px !important; height: 36px !important; }
-        }
-        /* --- 強制ダークモード完全無効化（微小グラデーションハック） --- */
-        @media (prefers-color-scheme: dark) {
-            /* 1. AIに見破られないよう、わずかに違うグレー（#c0c0c0と#bfbfbf）のグラデーションにする */
-            .window, .window-contents, .close-button, #win95-taskbar, #taskbar-start-btn, .win95-taskbar-tab, #taskbar-tray {
-                background-color: transparent !important;
-                background-image: linear-gradient(to bottom, #c0c0c0, #bfbfbf) !important;
-            }
-
-            /* 2. 文字色は引き続き強制的に黒 */
-            .window-contents, .album-info, .album-info p, .album-info h3, .win95-taskbar-tab, #tray-clock, .close-button {
-                -webkit-text-fill-color: black !important;
-                color: black !important;
-                text-shadow: none !important;
-            }
-            
-            /* 3. タグの青色 */
-            .artist-tag {
-                -webkit-text-fill-color: #0000ff !important;
-                color: #0000ff !important;
-            }
-            
-            /* 4. タイトルバーの文字 */
-            .title-bar {
-                -webkit-text-fill-color: white !important;
-                color: white !important;
-            }
         }
     </style>
 </head>
