@@ -16,6 +16,11 @@
         :root {
             color-scheme: light;
         }
+        /* 横スクロール防止用の追加 */
+        html {
+            overflow-x: hidden;
+            width: 100vw;
+        }
         /* --- index.html と完全に同一のベースCSS --- */
         @font-face {
             font-family: 'PixelMplus';
@@ -33,6 +38,7 @@
             background-size: cover;
             background-attachment: fixed;
             overflow-x: hidden;
+            width: 100%;
             z-index: 1;
             position: relative;
         }
@@ -93,11 +99,9 @@
             background-image: url('images/×.png');
             background-repeat: no-repeat;
             background-position: center;
-            background-size: 20px; /* ★ここで×の大きさを調整できます */
+            background-size: 20px; 
             
-            /* 文字を隠す（これだけでOK） */
             color: transparent; 
-            /* ボタンらしさ */
             cursor: pointer;
         }
         .close-button:active {
@@ -181,7 +185,7 @@
             color: white;
             font-size: 12px;
             position: absolute;
-            bottom: 20px;
+            bottom: 60px;
             width: 100%;
             text-shadow: 1px 1px 2px #000; 
         }
@@ -193,7 +197,7 @@
             margin-bottom: 10px; height: 35px; box-shadow: inset 2px 2px 0px #808080;
         }
         .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
-        .win95-calc-btn { /* .win95-btnの余白が干渉しないよう専用クラス化 */
+        .win95-calc-btn { 
             background-color: #c0c0c0; border: 2px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
             padding: 6px 0; font-family: 'PixelMplus', sans-serif;
@@ -201,6 +205,33 @@
             color: black;
         }
         .win95-calc-btn:active { border-color: #808080 #ffffff #ffffff #808080; padding: 7px 0 5px 0; }
+
+        /* --- 追加：タスクバーデザイン --- */
+        #win95-taskbar {
+            position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: 32px;
+            padding-bottom: env(safe-area-inset-bottom); box-sizing: border-box; 
+            background-color: #c0c0c0; border-top: 2px solid #ffffff;
+            box-shadow: 0 -1px 0 0 #000000; z-index: 10000; display: flex; align-items: center; padding: 0 4px;
+        }
+        #taskbar-start-btn {
+            background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff;
+            height: 24px; padding: 0 2px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-sizing: border-box;
+        }
+        #taskbar-start-btn:active { border-color: #808080 #ffffff #ffffff #808080; padding: 1px 1px 0 3px; }
+        #taskbar-start-btn img { image-rendering: pixelated; height: 18px; width: auto; }
+        #taskbar-tasks { display: flex; gap: 4px; margin-left: 6px; overflow: hidden; height: 24px; }
+        .win95-taskbar-tab {
+            background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff;
+            height: 24px; width: 120px; padding: 0 4px; font-size: 12px; color: black; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; box-sizing: border-box;
+        }
+        #taskbar-tray {
+            margin-left: auto; border-top: 1px solid #808080; border-left: 1px solid #808080;
+            border-right: 1px solid #ffffff; border-bottom: 1px solid #ffffff;
+            background-color: #c0c0c0; height: 24px; display: flex; align-items: center; gap: 6px; padding: 0 8px; box-sizing: border-box;
+        }
+        #taskbar-tray img { width: 30px; height: 30px; image-rendering: pixelated; }
+        #tray-clock { font-size: 14px; color: black; width: 46px; text-align: right; }
 
         /* --- スマホ用レスポンシブ --- */
         @media (max-width: 800px) {
@@ -215,10 +246,17 @@
             .desktop-icon img { width: 34px !important; height: 34px !important; }
             .desktop-icon span { font-size: 11px; padding: 1px 2px; }
 
-            /* 電卓ウィンドウ縮小設定 */
             #win-calculator { width: 200px !important; }
             #win-calculator .win95-calc-btn { font-size: 14px; padding: 4px 0; }
             #win-calculator .calc-display { font-size: 18px; height: 28px; }
+
+            /* 追加：スマホ用タスクバー */
+            #win95-taskbar { height: 28px; }
+            #taskbar-start-btn { height: 22px; }
+            #taskbar-start-btn img { height: 16px !important; }
+            .win95-taskbar-tab { width: 90px; font-size: 10px; height: 22px; }
+            #taskbar-tray img { width: 28px; height: 28px; }
+            #tray-clock { font-size: 12px; width: 36px; }
         }
     </style>
 </head>
@@ -312,26 +350,38 @@
         </div>
     </div>
 
+    <div id="win95-taskbar">
+        <button id="taskbar-start-btn" class="win95-taskbar-btn click-target">
+            <img src="images/start.png" alt="Start">
+        </button>
+        <div id="taskbar-tasks">
+            <div class="win95-taskbar-tab">Calculator</div>
+            <div class="win95-taskbar-tab">Contact</div>
+        </div>
+        <div id="taskbar-tray">
+            <img src="images/volume-icon.png" alt="Volume" width="15" height="15">
+            <div id="tray-clock">00:00</div>
+        </div>
+    </div>
+
     <div class="footer">
         このサイトは本人によって頑張って作成されました
     </div>
 
     <script>
-        // --- index.html と完全に同一のJS基盤 ---
+        // --- 共通JS ---
         var mouseClickSound;
         var errorSound;
 
         try {
             mouseClickSound = new Audio('Sound/MouseClick.mp3');
-            mouseClickSound.preload = 'auto'; // 追加：事前に読み込んで準備しておく
-            mouseClickSound.load();           // 追加：強制的にロードを開始させる
+            mouseClickSound.preload = 'auto';
+            mouseClickSound.load();
             
             errorSound = new Audio('Sound/Error_2.mp3');
             errorSound.preload = 'auto';
             errorSound.load();
-        } catch(e) {
-            console.log("Audio load skipped");
-        }
+        } catch(e) {}
         
         function playClickSound() {
             if (mouseClickSound) {
@@ -340,8 +390,7 @@
             }
         }
 
-        // 電卓ボタン用に追加したクラス（click-target）も含めて音を鳴らす
-        var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .click-target');
+        var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .click-target, .win95-calc-btn');
         for (var i = 0; i < clickTargets.length; i++) {
             clickTargets[i].addEventListener('mousedown', playClickSound);
             clickTargets[i].addEventListener('touchstart', playClickSound, { passive: true });
@@ -352,49 +401,32 @@
         function setInitialPositions() {
             var width = window.innerWidth;
             var isMobile = window.matchMedia("(max-width: 800px)").matches;
-
             var msg = document.getElementById('win-message');
             var calc = document.getElementById('win-calculator');
             var dm = document.getElementById('win-social-dm');
             var mail = document.getElementById('win-mail');
             var warning = document.getElementById('win-warning');
-
             var maxBottom = 0;
 
             if (isMobile) {
-                /* 📱 スマホ版の位置設定 */
-                if(msg.style.display !== 'none') {
-                    msg.style.left = '5%'; msg.style.top = '160px';
-                }
-                if(calc.style.display !== 'none') {
-                    calc.style.left = '10%'; calc.style.top = '270px';
-                }
+                if(msg.style.display !== 'none') { msg.style.left = '5%'; msg.style.top = '160px'; }
+                if(calc.style.display !== 'none') { calc.style.left = '10%'; calc.style.top = '270px'; }
                 if(dm.style.display !== 'none') {
                     dm.style.left = '15%'; dm.style.top = '580px';
                     maxBottom = 580 + (dm.offsetHeight || 100) + 100;
-                } else {
-                    maxBottom = 800;
-                }
+                } else { maxBottom = 800; }
                 mail.style.left = '10%'; mail.style.top = '350px';
-                warning.style.left = '10%'; warning.style.top = '320px'; // エラーウィンドウの位置
+                warning.style.left = '10%'; warning.style.top = '320px';
             } else {
-                /* 💻 PC版の位置設定 */
-                if(msg.style.display !== 'none') {
-                    msg.style.left = '35%'; msg.style.top = '200px';
-                }
-                if(calc.style.display !== 'none') {
-                    calc.style.left = '45%'; calc.style.top = '350px';
-                }
+                if(msg.style.display !== 'none') { msg.style.left = '35%'; msg.style.top = '200px'; }
+                if(calc.style.display !== 'none') { calc.style.left = '45%'; calc.style.top = '350px'; }
                 if(dm.style.display !== 'none') {
                     dm.style.left = '50%'; dm.style.top = '650px';
                     maxBottom = 480 + (dm.offsetHeight || 150) + 350;
-                } else {
-                    maxBottom = 900;
-                }
+                } else { maxBottom = 900; }
                 mail.style.left = '40%'; mail.style.top = '400px';
-                warning.style.left = '46%'; warning.style.top = '400px'; // エラーウィンドウの位置
+                warning.style.left = '46%'; warning.style.top = '400px';
             }
-
             if(maxBottom > 0) document.body.style.minHeight = maxBottom + 'px';
         }
 
@@ -406,54 +438,35 @@
             var handle = document.getElementById(handleId);
             if (!target || !handle) return; 
             var isDragging = false;
-            var initialX, initialY, offsetX, offsetY;
+            var initialX, initialY;
 
             handle.addEventListener('mousedown', startDragging);
             handle.addEventListener('touchstart', startDragging, { passive: false });
 
             function startDragging(e) {
                 if(e.target.classList.contains('close-button')) return;
-
                 isDragging = true;
                 highestZIndex++;
                 target.style.zIndex = highestZIndex;
-
-                if (e.type === 'touchstart') {
-                    initialX = e.touches[0].clientX - target.offsetLeft;
-                    initialY = e.touches[0].clientY - target.offsetTop;
-                    e.preventDefault(); 
-                } else {
-                    initialX = e.clientX - target.offsetLeft;
-                    initialY = e.clientY - target.offsetTop;
-                }
-
+                var clientX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX;
+                var clientY = (e.type === 'touchstart') ? e.touches[0].clientY : e.clientY;
+                initialX = clientX - target.offsetLeft;
+                initialY = clientY - target.offsetTop;
+                if(e.type === 'touchstart') e.preventDefault();
                 document.addEventListener('mousemove', dragging);
                 document.addEventListener('touchmove', dragging, { passive: false });
                 document.addEventListener('mouseup', endDrag);
                 document.addEventListener('touchend', endDrag);
             }
-
             function dragging(e) {
                 if (!isDragging) return;
-                if (e.type === 'touchmove') {
-                    offsetX = e.touches[0].clientX - initialX;
-                    offsetY = e.touches[0].clientY - initialY;
-                    e.preventDefault(); 
-                } else {
-                    offsetX = e.clientX - initialX;
-                    offsetY = e.clientY - initialY;
-                }
-                target.style.left = offsetX + 'px';
-                target.style.top = offsetY + 'px';
+                var cx = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
+                var cy = (e.type === 'touchmove') ? e.touches[0].clientY : e.clientY;
+                target.style.left = (cx - initialX) + 'px';
+                target.style.top = (cy - initialY) + 'px';
+                if(e.type === 'touchmove') e.preventDefault();
             }
-
-            function endDrag() {
-                isDragging = false;
-                document.removeEventListener('mousemove', dragging);
-                document.removeEventListener('touchmove', dragging);
-                document.removeEventListener('mouseup', endDrag);
-                document.removeEventListener('touchend', endDrag);
-            }
+            function endDrag() { isDragging = false; }
         }
 
         initDrag('win-message', 'handle-message');
@@ -466,17 +479,12 @@
         for(var j = 0; j < closeBtns.length; j++) {
             closeBtns[j].addEventListener('mousedown', function(e) { e.stopPropagation(); });
             closeBtns[j].addEventListener('touchstart', function(e) { e.stopPropagation(); }, { passive: false });
-            
-            var closeAction = function(e) {
-                e.preventDefault();
-                var windowElem = this.closest('.window');
-                windowElem.style.display = 'none';
-            };
+            var closeAction = function(e) { e.preventDefault(); this.closest('.window').style.display = 'none'; };
             closeBtns[j].addEventListener('click', closeAction);
             closeBtns[j].addEventListener('touchend', closeAction);
         }
 
-        // --- コンタクトページ専用ロジック（電卓） ---
+        // --- 電卓ロジック ---
         const display = document.getElementById('display');
         const questionBox = document.getElementById('question');
         let currentInput = "";
@@ -487,38 +495,39 @@
         
         function inputNum(num) { currentInput += num; display.textContent = currentInput; }
         function clearDisplay() { currentInput = ""; display.textContent = "0"; }
-        
-        // リトライボタンを押した時の処理
         function retryCalc() {
-            var warningWin = document.getElementById('win-warning');
-            warningWin.style.display = 'none'; // エラーウィンドウを隠す
-            questionBox.textContent = `${a} ＋ ${b} ＝ ？`; // 質問テキストを元に戻す
-            clearDisplay(); // 電卓をクリア
+            document.getElementById('win-warning').style.display = 'none';
+            questionBox.textContent = `${a} ＋ ${b} ＝ ？`;
+            clearDisplay();
         }
-
         function checkAnswer() {
             if (parseInt(currentInput) === correct) {
                 questionBox.textContent = "SUCCESS";
                 display.textContent = "OK!";
-                
                 var mailWin = document.getElementById('win-mail');
                 highestZIndex++;
                 mailWin.style.zIndex = highestZIndex;
                 mailWin.style.display = 'inline-block';
             } else {
-                // 不正解時にエラーウィンドウを表示
                 var warningWin = document.getElementById('win-warning');
                 highestZIndex++;
                 warningWin.style.zIndex = highestZIndex;
                 warningWin.style.display = 'inline-block';
-
-                // エラー音を鳴らす
-                if (errorSound) {
-                    errorSound.currentTime = 0;
-                    errorSound.play().catch(function(e) {});
-                }
+                if (errorSound) { errorSound.currentTime = 0; errorSound.play().catch(function(){}); }
             }
         }
+
+        // --- 追加：時計更新 ---
+        function updateTrayClock() {
+            var clock = document.getElementById('tray-clock');
+            if (clock) {
+                var now = new Date();
+                var h = now.getHours(), m = now.getMinutes();
+                clock.textContent = (h<10?'0'+h:h) + ':' + (m<10?'0'+m:m);
+            }
+        }
+        updateTrayClock(); 
+        setInterval(updateTrayClock, 60000);
     </script>
 </body>
 </html>
