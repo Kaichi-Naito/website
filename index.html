@@ -84,9 +84,20 @@
             background-color: #c0c0c0;
             border: 1px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
-            color: black; font-size: 10px;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; font-weight: bold;
+            /* --- 画像の設定 --- */
+            background-image: url('images/×.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 12px; /* ★ここで×の大きさを調整できます */
+            
+            /* --- 元のテキスト（×）を隠す設定 --- */
+            color: transparent; 
+            font-size: 0;
+            
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            cursor: pointer;
         }
         .close-button:active {
             border-color: #808080 #ffffff #ffffff #808080;
