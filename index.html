@@ -334,16 +334,32 @@
             var maxBottom = 0;
 
             if (isMobile) {
-                if(profile.style.display !== 'none') { profile.style.left = '4%'; profile.style.top = '150px'; }
-                if(phalux.style.display !== 'none') { phalux.style.left = '52%'; phalux.style.top = '250px'; }
-                if(social.style.display !== 'none') { social.style.left = '5%'; social.style.top = '420px'; }
-                if(spotify.style.display !== 'none') {
-                    spotify.style.left = '5%'; spotify.style.top = '660px';
+                if(profile.style.display !== 'none') {
+                    profile.style.left = '4%';
+                    profile.style.top = '150px';
                 }
+                if(phalux.style.display !== 'none') {
+                    phalux.style.left = '52%'; 
+                    phalux.style.top = '250px';
+                }
+                if(social.style.display !== 'none') {
+                    social.style.left = '15%';
+                    social.style.top = '420px';
+                }
+                
+                if(spotify.style.display !== 'none') {
+                    var spWidth = spotify.offsetWidth || 320;
+                    spotify.style.left = (width - spWidth - 22) + 'px'; 
+                    spotify.style.top = '620px';
+                }
+
                 if(youtube.style.display !== 'none') {
-                    youtube.style.left = '2.5%'; youtube.style.top = '880px';
-                    maxBottom = 880 + (youtube.offsetHeight || 400) + 120;
-                } else { maxBottom = 1100; }
+                    youtube.style.left = '2%';
+                    youtube.style.top = '730px';
+                    maxBottom = 730 + (youtube.offsetHeight || 400) + 100;
+                } else {
+                    maxBottom = 900;
+                }
             } else {
                 if(profile.style.display !== 'none') { profile.style.left = '28%'; profile.style.top = '200px'; }
                 if(phalux.style.display !== 'none') { phalux.style.left = '75%'; phalux.style.top = '170px'; }
