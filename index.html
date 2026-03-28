@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="keywords" content="ギター, 作曲, 内藤海地, Kaichi, Kaichi Naito, PHALUX, Windows95">
     <meta name="description" content="PHALUXのKaichiの各SNSやプロフィールまとめ。ギター演奏・オリジナル楽曲を紹介する。最新楽曲の視聴も可能です。">  
     <meta property="og:title" content="Kaichi Guitar Music">
@@ -14,7 +14,7 @@
     <title>Kaichi Guitar Music</title>
     <link rel="icon" href="images/card-image.jpg" type="image/jpg">
     <style>
-        /* --- index.html と完全に同一のベースCSS --- */
+        /* --- index.html ベースCSS --- */
         @font-face {
             font-family: 'PixelMplus';
             src: url('https://kaichi-naito.github.io/website/fonts/PixelMplus10-Regular.ttf') format('truetype');
@@ -25,7 +25,7 @@
             color: black;
             text-align: center;
             margin: 0;
-            padding: 20px 0 50px 0;
+            padding: 20px 0 calc(50px + env(safe-area-inset-bottom)) 0;
             background-color: #008080;
             background-image: url('images/windows-95-background.jpg');
             background-size: cover;
@@ -34,24 +34,17 @@
             z-index: 1;
             position: relative;
         }
-
         body::before {
             content: "";
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.1); 
             z-index: -1;
         }
-
-        /* アニメーションで安全に表示させる（JSエラーでも必ず表示される） */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-
         .window {
             background-color: #c0c0c0;
             border: 2px solid;
@@ -63,14 +56,10 @@
             display: inline-block;
             text-align: left;
             position: absolute;
-            animation: fadeIn 0.4s ease-in forwards; /* フワッと表示 */
+            animation: fadeIn 0.4s ease-in forwards; 
             transition: transform 0.2s;
         }
-
-        .draggable-cursor {
-            cursor: grab;
-        }
-
+        .draggable-cursor { cursor: grab; }
         .title-bar {
             background: linear-gradient(90deg, #000080, #1084d0);
             padding: 3px 5px 3px 8px;
@@ -81,229 +70,119 @@
             font-size: 14px;
             margin-bottom: 2px;
         }
-
         .close-button {
-            width: 16px;
-            height: 14px;
+            width: 16px; height: 14px;
             background-color: #c0c0c0;
             border: 1px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
-            color: black;
-            font-size: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-weight: bold;
+            color: black; font-size: 10px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; font-weight: bold;
         }
         .close-button:active {
             border-color: #808080 #ffffff #ffffff #808080;
-            padding-top: 1px;
-            padding-left: 1px;
+            padding-top: 1px; padding-left: 1px;
         }
-
         .window-contents {
             padding: 15px;
             border: 1px solid #808080;
             background-color: #c0c0c0;
         }
-
         .win95-btn {
-            background-color: #c0c0c0;
-            border: 2px solid;
+            background-color: #c0c0c0; border: 2px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
-            padding: 6px 12px;
-            color: black !important;
-            text-decoration: none !important;
-            display: inline-block;
-            font-size: 16px;
-            margin: 5px;
-            cursor: pointer;
+            padding: 6px 12px; color: black !important;
+            text-decoration: none !important; display: inline-block;
+            font-size: 16px; margin: 5px; cursor: pointer;
         }
         .win95-btn:active {
             border-color: #808080 #ffffff #ffffff #808080;
             padding: 7px 11px 5px 13px;
         }
-
-        .nav {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
-        }
-        
+        .nav { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 40px; }
         .desktop-icon {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: white !important;
-            width: 80px;
-            cursor: pointer;
+            display: flex; flex-direction: column; align-items: center;
+            text-decoration: none; color: white !important; width: 80px; cursor: pointer;
         }
-
-        .desktop-icon img {
-            width: 48px;
-            height: 48px;
-            object-fit: contain;
-            image-rendering: pixelated;
-            margin-bottom: 5px;
+        .desktop-icon img { width: 48px; height: 48px; object-fit: contain; image-rendering: pixelated; margin-bottom: 5px; }
+        .desktop-icon span { font-size: 14px; text-align: center; padding: 2px 4px; border: 1px dotted transparent; text-shadow: 1px 1px 0 #000; }
+        .desktop-icon:hover span, .desktop-icon:active span { background-color: #000080; color: white; border: 1px dotted #fff; }
+        .header-title { color: white; text-shadow: 2px 2px #000; font-size: 2.5em; margin-bottom: 20px; }
+        .profile-section { display: flex; align-items: center; gap: 30px; }
+        .profile-img { width: 120px; height: auto; border: none; }
+        .social-icons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center; }
+        .social-item img { width: 40px; height: 40px; display: block; margin: 0 auto 5px; }
+        iframe { border: 2px solid #808080; background: #000; display: block; }
+        .footer { margin-top: 50px; color: white; font-size: 12px; position: absolute; bottom: 60px; width: 100%; text-shadow: 1px 1px 2px #000; }
+        
+        /* --- タスクバーデザイン --- */
+        #win95-taskbar {
+            position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: 32px;
+            padding-bottom: env(safe-area-inset-bottom); box-sizing: content-box; 
+            background-color: #c0c0c0; border-top: 2px solid #ffffff;
+            box-shadow: 0 -1px 0 0 #000000; z-index: 10000; display: flex; align-items: center; padding: 0 4px;
         }
-
-        .desktop-icon span {
-            font-size: 14px;
-            text-align: center;
-            padding: 2px 4px;
-            border: 1px dotted transparent;
-            text-shadow: 1px 1px 0 #000;
+        #taskbar-start-btn {
+            background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff;
+            height: 24px; padding: 0 2px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-sizing: border-box;
         }
-
-        .desktop-icon:hover span, .desktop-icon:active span {
-            background-color: #000080;
-            color: white;
-            border: 1px dotted #fff;
+        #taskbar-start-btn:active { border-color: #808080 #ffffff #ffffff #808080; padding: 1px 1px 0 3px; }
+        #taskbar-start-btn img { image-rendering: pixelated; height: 18px; width: auto; }
+        #taskbar-tasks { display: flex; gap: 4px; margin-left: 6px; overflow: hidden; height: 24px; }
+        .win95-taskbar-tab {
+            background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff;
+            height: 24px; width: 120px; padding: 0 4px; font-size: 12px; color: black; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; box-sizing: border-box;
         }
-
-        .header-title {
-            color: white;
-            text-shadow: 2px 2px #000;
-            font-size: 2.5em;
-            margin-bottom: 20px;
+        #taskbar-tray {
+            margin-left: auto; border-top: 1px solid #808080; border-left: 1px solid #808080;
+            border-right: 1px solid #ffffff; border-bottom: 1px solid #ffffff;
+            background-color: #c0c0c0; height: 24px; display: flex; align-items: center; gap: 6px; padding: 0 8px; box-sizing: border-box;
         }
-
-        .profile-section {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-        .profile-img {
-            width: 120px;
-            height: auto;
-            border: none; /* 枠線を消す */
-        }
-
-        .social-icons-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            text-align: center;
-        }
-        .social-item img {
-            width: 40px;
-            height: 40px;
-            display: block;
-            margin: 0 auto 5px;
-        }
-
-        iframe {
-            border: 2px solid #808080;
-            background: #000;
-            display: block;
-        }
-
-        .footer {
-            margin-top: 50px;
-            color: white;
-            font-size: 12px;
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            text-shadow: 1px 1px 2px #000; 
-        }
-
-        .window-contents a.phalux-link:hover img {
-            border-color: #000080; 
-        }
+        #tray-clock { font-size: 12px; color: black; width: 40px; text-align: right; }
 
         @media (max-width: 800px) {
-            body {
-                font-size: 14px;
-            }
-            .header-title { 
-                font-size: 1.6em;
-                margin-bottom: 15px;
-            }
+            body { font-size: 14px; }
+            .header-title { font-size: 1.6em; margin-bottom: 15px; }
+            .window { box-sizing: border-box; }
             
-            .window {
-                box-sizing: border-box;
-            }
-
             #win-profile { width: 200px !important; }
             #win-phalux { width: 45% !important; max-width: 160px !important; }
             #win-social { width: 90% !important; max-width: 350px !important; }
             #win-spotify { width: 92% !important; max-width: 360px !important; }
             #win-youtube { width: 96% !important; max-width: 380px !important; }
-
-            #win-phalux .window-contents {
-                padding: 5px !important; 
-            }
-            #win-phalux .window-contents img {
-                max-width: 100px !important; 
-            }
-
-            .title-bar {
-                font-size: 12px;
-                padding: 2px 4px 2px 6px;
-            }
-            .close-button {
-                width: 14px;
-                height: 12px;
-                font-size: 9px;
-            }
-
-            .window-contents {
-                padding: 8px; 
-            }
-            .profile-section {
-                flex-direction: column;
-                text-align: center;
-                gap: 8px; 
-            }
-            .profile-text h2 {
-                font-size: 1.2em;
-                margin: 0 0 4px 0 !important;
-            }
-            .profile-text p {
-                font-size: 0.9em;
-                margin: 0 0 8px 0 !important;
-            }
-            .profile-text a {
-                font-size: 12px !important; 
-            }
-
-            .profile-img {
-                width: 84px !important; 
-            }
+            #win-nyan-special { width: 90% !important; max-width: 360px !important; }
             
-            .social-icons-grid {
-                gap: 4px !important;
-            }
-            .social-item {
-                padding: 3px 6px !important;
-                font-size: 12px !important; 
-            }
-            .social-item img {
-                width: 28px !important; 
-                height: 28px !important;
-                margin-bottom: 2px !important;
-            }
+            #win-phalux .window-contents { padding: 5px !important; }
+            #win-phalux .window-contents img { max-width: 100px !important; }
+
+            .title-bar { font-size: 12px; padding: 2px 4px 2px 6px; }
+            .close-button { width: 14px; height: 12px; font-size: 9px; }
+            .window-contents { padding: 8px; }
             
-            .nav {
-                gap: 8px;
-                margin-bottom: 25px;
-            }
-            .desktop-icon {
-                width: 60px;
-            }
-            .desktop-icon img {
-                width: 34px !important; 
-                height: 34px !important;
-            }
-            .desktop-icon span {
-                font-size: 11px; 
-                padding: 1px 2px;
-            }
+            /* --- バグの原因だった「消えていた箇所」を復元 --- */
+            .profile-section { flex-direction: column; text-align: center; gap: 8px; }
+            .profile-text h2 { font-size: 1.2em; margin: 0 0 4px 0 !important; }
+            .profile-text p { font-size: 0.9em; margin: 0 0 8px 0 !important; }
+            .profile-text a { font-size: 12px !important; }
+            .profile-img { width: 84px !important; }
+            
+            .social-icons-grid { gap: 4px !important; }
+            .social-item { padding: 3px 6px !important; font-size: 12px !important; }
+            .social-item img { width: 28px !important; height: 28px !important; margin-bottom: 2px !important; }
+            /* ----------------------------------------------- */
+
+            .nav { gap: 8px; margin-bottom: 25px; }
+            .desktop-icon { width: 60px; }
+            .desktop-icon img { width: 34px !important; height: 34px !important; }
+            .desktop-icon span { font-size: 11px; padding: 1px 2px; }
+
+            /* スマホ用タスクバー */
+            #win95-taskbar { height: 28px; }
+            #taskbar-start-btn { height: 22px; }
+            #taskbar-start-btn img { height: 16px !important; }
+            .win95-taskbar-tab { width: 70px; font-size: 10px; height: 22px; }
+            #tray-clock { font-size: 10px; width: 30px; }
         }
     </style>
 </head>
@@ -314,31 +193,25 @@
 
     <div class="nav">
         <a href="index.html" class="desktop-icon">
-            <img src="images/gif/Computer.gif" alt="Home">
-            <span>Home</span>
+            <img src="images/gif/Computer.gif" alt="Home"><span>Home</span>
         </a>
         <a href="Discography.html" class="desktop-icon">
-            <img src="images/gif/Disc.gif" alt="Discography">
-            <span>Discography</span>
+            <img src="images/gif/Disc.gif" alt="Discography"><span>Discography</span>
         </a>
         <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" class="desktop-icon">
-            <img src="images/gif/Earth.gif" alt="Works">
-            <span>Works</span>
+            <img src="images/gif/Earth.gif" alt="Works"><span>Works</span>
         </a>
         <a href="Contact.html" class="desktop-icon">
-            <img src="images/gif/window.gif" alt="Contact">
-            <span>Contact</span>
+            <img src="images/gif/window.gif" alt="Contact"><span>Contact</span>
         </a>
         <a href="freebgm.html" class="desktop-icon">
-            <img src="images/gif/Sound.gif" alt="FREEBGM">
-            <span>FREEBGM</span>
+            <img src="images/gif/Sound.gif" alt="FREEBGM"><span>FREEBGM</span>
         </a>
     </div>
 
     <div class="window" id="win-profile" style="width: 380px; z-index: 104;">
         <div class="title-bar draggable-cursor" id="handle-profile">
-            <span>Profile.exe</span>
-            <div class="close-button">×</div>
+            <span>Profile.exe</span><div class="close-button">×</div>
         </div>
         <div class="window-contents profile-section">
             <img src="images/DotGuitar.png" alt="Kaichi" class="profile-img">
@@ -352,8 +225,7 @@
 
     <div class="window" id="win-phalux" style="width: 175px; z-index: 105;"> 
         <div class="title-bar draggable-cursor" id="handle-phalux">
-            <span>PHALUX.band</span>
-            <div class="close-button">×</div>
+            <span>PHALUX.band</span><div class="close-button">×</div>
         </div>
         <div class="window-contents" style="text-align: center; padding: 10px;"> 
             <a href="https://phalux.bitfan.id/" target="_blank" class="phalux-link"> 
@@ -364,8 +236,7 @@
 
     <div class="window" id="win-social" style="width: 450px; z-index: 103;">
         <div class="title-bar draggable-cursor" id="handle-social">
-            <span>Social_Media.lnk</span>
-            <div class="close-button">×</div>
+            <span>Social_Media.lnk</span><div class="close-button">×</div>
         </div>
         <div class="window-contents">
             <div class="social-icons-grid">
@@ -381,8 +252,7 @@
 
     <div class="window" id="win-spotify" style="width: 600px; z-index: 102;">
         <div class="title-bar draggable-cursor" id="handle-spotify">
-            <span>CD_Player.exe</span>
-            <div class="close-button">×</div>
+            <span>CD_Player.exe</span><div class="close-button">×</div>
         </div>
         <div class="window-contents">
             <iframe src="https://open.spotify.com/embed/album/414HJT5311vIKZHsxh56S2?utm_source=generator" width="100%" height="152" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
@@ -391,8 +261,7 @@
 
     <div class="window" id="win-youtube" style="width: 800px; z-index: 101;">
         <div class="title-bar draggable-cursor" id="handle-youtube">
-            <span>Media_Player.avi</span>
-            <div class="close-button">×</div>
+            <span>Media_Player.avi</span><div class="close-button">×</div>
         </div>
         <div class="window-contents">
             <h3 style="margin-top:0;">Original songs🎸</h3>
@@ -403,7 +272,31 @@
         </div>
     </div>
 
-    <img id="nyan-cat" src="images/gif/Nyancat.gif" alt="Nyan Cat" style="position: fixed; width: 80px; height: auto; z-index: 9999; cursor: pointer; display: block; image-rendering: pixelated; top: 50%; left: 50%;">
+    <div class="window" id="win-nyan-special" style="width: 480px; z-index: 20000; display: none;">
+        <div class="title-bar draggable-cursor" id="handle-nyan-special">
+            <span>Nyan_Art.png</span><div class="close-button">×</div>
+        </div>
+        <div class="window-contents" style="background-color: #000; padding: 10px; text-align: center;">
+            <img src="images/NyanCatAA.png" alt="Nyan Cat Art" style="width: 100%; height: auto; display: block; margin: 0 auto;">
+            <p style="color: #fff; font-size: 10px; text-align: center; margin-top: 10px;">NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! </p>
+        </div>
+    </div>
+
+    <img id="nyan-cat" src="images/gif/Nyancat.gif" alt="Nyan Cat" style="position: fixed; width: 80px; height: auto; z-index: 10001; cursor: pointer; display: block; image-rendering: pixelated; top: 50%; left: 50%;">
+
+    <div id="win95-taskbar">
+        <button id="taskbar-start-btn" class="win95-taskbar-btn click-target">
+            <img src="images/start.png" alt="Start">
+        </button>
+        <div id="taskbar-tasks">
+            <div class="win95-taskbar-tab">Profile.exe</div>
+            <div class="win95-taskbar-tab">CD_Player.exe</div>
+        </div>
+        <div id="taskbar-tray">
+            <img src="images/volume-icon.png" alt="Volume" width="16" height="16">
+            <div id="tray-clock">00:00</div>
+        </div>
+    </div>
 
     <div class="footer">
         このサイトは本人によって頑張って作成されました
@@ -411,23 +304,18 @@
 
     <script>
         var mouseClickSound;
-
         try {
             mouseClickSound = new Audio('Sound/MouseClick.mp3');
-            mouseClickSound.preload = 'auto'; 
-            mouseClickSound.load();           
-        } catch(e) {
-            console.log("Audio load skipped");
-        }
+            mouseClickSound.preload = 'auto'; mouseClickSound.load();           
+        } catch(e) {}
         
         function playClickSound() {
             if (mouseClickSound) {
-                mouseClickSound.currentTime = 0; 
-                mouseClickSound.play().catch(function(e) {});
+                mouseClickSound.currentTime = 0; mouseClickSound.play().catch(function(e) {});
             }
         }
 
-        var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .phalux-link');
+        var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .phalux-link, .click-target');
         for (var i = 0; i < clickTargets.length; i++) {
             clickTargets[i].addEventListener('mousedown', playClickSound);
             clickTargets[i].addEventListener('touchstart', playClickSound, { passive: true });
@@ -438,67 +326,34 @@
         function setInitialPositions() {
             var width = window.innerWidth;
             var isMobile = window.matchMedia("(max-width: 800px)").matches;
-
             var profile = document.getElementById('win-profile');
             var phalux = document.getElementById('win-phalux');
             var social = document.getElementById('win-social');
             var spotify = document.getElementById('win-spotify');
             var youtube = document.getElementById('win-youtube');
-
             var maxBottom = 0;
+
             if (isMobile) {
-                if(profile.style.display !== 'none') {
-                    profile.style.left = '4%';
-                    profile.style.top = '150px';
-                }
-                if(phalux.style.display !== 'none') {
-                    phalux.style.left = '52%'; 
-                    phalux.style.top = '250px';
-                }
-                if(social.style.display !== 'none') {
-                    social.style.left = '15%';
-                    social.style.top = '420px';
-                }
-                
+                if(profile.style.display !== 'none') { profile.style.left = '4%'; profile.style.top = '150px'; }
+                if(phalux.style.display !== 'none') { phalux.style.left = '52%'; phalux.style.top = '250px'; }
+                if(social.style.display !== 'none') { social.style.left = '5%'; social.style.top = '420px'; }
                 if(spotify.style.display !== 'none') {
-                    var spWidth = spotify.offsetWidth || 320;
-                    spotify.style.left = (width - spWidth - 22) + 'px'; 
-                    spotify.style.top = '620px';
+                    spotify.style.left = '5%'; spotify.style.top = '660px';
                 }
-
                 if(youtube.style.display !== 'none') {
-                    youtube.style.left = '2%';
-                    youtube.style.top = '730px';
-                    maxBottom = 730 + (youtube.offsetHeight || 400) + 100;
-                } else {
-                    maxBottom = 900;
-                }
+                    youtube.style.left = '2.5%'; youtube.style.top = '880px';
+                    maxBottom = 880 + (youtube.offsetHeight || 400) + 120;
+                } else { maxBottom = 1100; }
             } else {
-                if(profile.style.display !== 'none') {
-                    profile.style.left = '28%';
-                    profile.style.top = '200px';
-                }
-                if(phalux.style.display !== 'none') {
-                    phalux.style.left = '75%'; 
-                    phalux.style.top = '170px';
-                }
-                if(social.style.display !== 'none') {
-                    social.style.left = '57%'; 
-                    social.style.top = '350px';
-                }
-                if(spotify.style.display !== 'none') {
-                    spotify.style.left = '15%'; 
-                    spotify.style.top = '450px';
-                }
+                if(profile.style.display !== 'none') { profile.style.left = '28%'; profile.style.top = '200px'; }
+                if(phalux.style.display !== 'none') { phalux.style.left = '75%'; phalux.style.top = '170px'; }
+                if(social.style.display !== 'none') { social.style.left = '57%'; social.style.top = '350px'; }
+                if(spotify.style.display !== 'none') { spotify.style.left = '15%'; spotify.style.top = '450px'; }
                 if(youtube.style.display !== 'none') {
-                    youtube.style.left = '40%'; 
-                    youtube.style.top = '700px';
+                    youtube.style.left = '40%'; youtube.style.top = '700px';
                     maxBottom = 650 + (youtube.offsetHeight || 450) + 150;
-                } else {
-                    maxBottom = 1000;
-                }
+                } else { maxBottom = 1000; }
             }
-
             if(maxBottom > 0) document.body.style.minHeight = maxBottom + 'px';
         }
 
@@ -509,54 +364,34 @@
             var target = document.getElementById(targetId);
             var handle = document.getElementById(handleId);
             var isDragging = false;
-            var initialX, initialY, offsetX, offsetY;
-
+            var initialX, initialY;
             handle.addEventListener('mousedown', startDragging);
             handle.addEventListener('touchstart', startDragging, { passive: false });
 
             function startDragging(e) {
                 if(e.target.classList.contains('close-button')) return;
-
                 isDragging = true;
                 highestZIndex++;
                 target.style.zIndex = highestZIndex;
-
-                if (e.type === 'touchstart') {
-                    initialX = e.touches[0].clientX - target.offsetLeft;
-                    initialY = e.touches[0].clientY - target.offsetTop;
-                    e.preventDefault(); 
-                } else {
-                    initialX = e.clientX - target.offsetLeft;
-                    initialY = e.clientY - target.offsetTop;
-                }
-
+                var clientX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX;
+                var clientY = (e.type === 'touchstart') ? e.touches[0].clientY : e.clientY;
+                initialX = clientX - target.offsetLeft;
+                initialY = clientY - target.offsetTop;
+                if(e.type === 'touchstart') e.preventDefault();
                 document.addEventListener('mousemove', dragging);
                 document.addEventListener('touchmove', dragging, { passive: false });
                 document.addEventListener('mouseup', endDrag);
                 document.addEventListener('touchend', endDrag);
             }
-
             function dragging(e) {
                 if (!isDragging) return;
-                if (e.type === 'touchmove') {
-                    offsetX = e.touches[0].clientX - initialX;
-                    offsetY = e.touches[0].clientY - initialY;
-                    e.preventDefault(); 
-                } else {
-                    offsetX = e.clientX - initialX;
-                    offsetY = e.clientY - initialY;
-                }
-                target.style.left = offsetX + 'px';
-                target.style.top = offsetY + 'px';
+                var cx = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
+                var cy = (e.type === 'touchmove') ? e.touches[0].clientY : e.clientY;
+                target.style.left = (cx - initialX) + 'px';
+                target.style.top = (cy - initialY) + 'px';
+                if(e.type === 'touchmove') e.preventDefault();
             }
-
-            function endDrag() {
-                isDragging = false;
-                document.removeEventListener('mousemove', dragging);
-                document.removeEventListener('touchmove', dragging);
-                document.removeEventListener('mouseup', endDrag);
-                document.removeEventListener('touchend', endDrag);
-            }
+            function endDrag() { isDragging = false; document.removeEventListener('mousemove', dragging); document.removeEventListener('touchmove', dragging); }
         }
 
         initDrag('win-profile', 'handle-profile');
@@ -564,132 +399,76 @@
         initDrag('win-social', 'handle-social');
         initDrag('win-spotify', 'handle-spotify');
         initDrag('win-youtube', 'handle-youtube');
+        initDrag('win-nyan-special', 'handle-nyan-special');
 
         var closeBtns = document.querySelectorAll('.close-button');
         for(var j = 0; j < closeBtns.length; j++) {
             closeBtns[j].addEventListener('mousedown', function(e) { e.stopPropagation(); });
             closeBtns[j].addEventListener('touchstart', function(e) { e.stopPropagation(); }, { passive: false });
-            
-            var closeAction = function(e) {
-                e.preventDefault();
-                var windowElem = this.closest('.window');
-                windowElem.style.display = 'none';
-            };
+            var closeAction = function(e) { e.preventDefault(); this.closest('.window').style.display = 'none'; };
             closeBtns[j].addEventListener('click', closeAction);
             closeBtns[j].addEventListener('touchend', closeAction);
         }
 
-        // --- 飛び回るNyan Catのアニメーションと増殖処理 ---
-        var catSound;
-        try {
-            catSound = new Audio('Sound/CatMeow.mp3');
-            catSound.preload = 'auto';
-        } catch(e) {}
-
+        // --- Nyan Cat増殖 ＆ 10匹イベント ---
+        var catSound; try { catSound = new Audio('Sound/CatMeow.mp3'); catSound.preload = 'auto'; } catch(e) {}
         var cats = [];
-
         function setupCat(catElement, startX, startY, startVx, startVy) {
-            var catObj = {
-                element: catElement,
-                x: startX,
-                y: startY,
-                vx: startVx,
-                vy: startVy
-            };
+            var catObj = { element: catElement, x: startX, y: startY, vx: startVx, vy: startVy };
             cats.push(catObj);
 
-            function catchCat(e) {
-                e.preventDefault(); // スマホの誤作動防止
-                
-                // 鳴き声を鳴らす
-                if (catSound) {
-                    catSound.currentTime = 0;
-                    catSound.play().catch(function(err){});
-                }
-
-                // 増殖アクション: 触られた猫自身もランダムに方向を変えて逃げる
-                catObj.vx = (Math.random() * 4 + 2) * (Math.random() < 0.5 ? 1 : -1);
-                catObj.vy = (Math.random() * 3 + 1) * (Math.random() < 0.5 ? 1 : -1);
-                
-                // 新しく生まれる猫のスピード
-                var newVx = (Math.random() * 4 + 2) * (Math.random() < 0.5 ? 1 : -1);
-                var newVy = (Math.random() * 3 + 1) * (Math.random() < 0.5 ? 1 : -1);
-
-                // 新しいNyan Catの画像要素を生成
-                var newCat = document.createElement('img');
-                newCat.src = 'images/gif/Nyancat.gif';
-                newCat.alt = 'Nyan Cat';
-                newCat.style.position = 'fixed';
-                newCat.style.width = '80px';
-                newCat.style.height = 'auto';
-                newCat.style.zIndex = '9999';
-                newCat.style.cursor = 'pointer';
-                newCat.style.display = 'block';
-                newCat.style.imageRendering = 'pixelated';
-                
-                // 初期位置をタップした猫と同じ（分裂したように見せる）位置に設定
-                newCat.style.left = catObj.x + 'px';
-                newCat.style.top = catObj.y + 'px';
-                
-                // 画面に追加してセットアップ
-                document.body.appendChild(newCat);
-                setupCat(newCat, catObj.x, catObj.y, newVx, newVy);
+            if (cats.length === 10) {
+                var specialWin = document.getElementById('win-nyan-special');
+                specialWin.style.display = 'inline-block';
+                specialWin.style.left = '50%'; specialWin.style.top = '50%';
+                specialWin.style.transform = 'translate(-50%, -50%)';
+                highestZIndex++; specialWin.style.zIndex = highestZIndex;
             }
 
+            function catchCat(e) {
+                e.preventDefault(); 
+                if (catSound) { catSound.currentTime = 0; catSound.play().catch(function(){}); }
+                catObj.vx = (Math.random() * 4 + 2) * (Math.random() < 0.5 ? 1 : -1);
+                catObj.vy = (Math.random() * 3 + 1) * (Math.random() < 0.5 ? 1 : -1);
+                var newCat = document.createElement('img');
+                newCat.src = 'images/gif/Nyancat.gif';
+                newCat.style.position = 'fixed'; newCat.style.width = '80px'; newCat.style.zIndex = '10001';
+                newCat.style.cursor = 'pointer'; newCat.style.imageRendering = 'pixelated';
+                newCat.style.left = catObj.x + 'px'; newCat.style.top = catObj.y + 'px';
+                document.body.appendChild(newCat);
+                setupCat(newCat, catObj.x, catObj.y, (Math.random()*4+2)*(Math.random()<0.5?1:-1), (Math.random()*3+1)*(Math.random()<0.5?1:-1));
+            }
             catElement.addEventListener('mousedown', catchCat);
             catElement.addEventListener('touchstart', catchCat, { passive: false });
         }
-
-        // 最初の1匹目のセットアップ
         var originalCat = document.getElementById('nyan-cat');
-        if (originalCat) {
-            var startX = window.innerWidth / 2;
-            var startY = window.innerHeight / 2;
-            setupCat(originalCat, startX, startY, 3, 2);
-        }
+        if (originalCat) setupCat(originalCat, window.innerWidth / 2, window.innerHeight / 2, 3, 2);
 
         function animateCats() {
-            var w = window.innerWidth;
-            var h = window.innerHeight;
-
-            // 全ての猫の座標を計算して動かす
+            var w = window.innerWidth, h = window.innerHeight;
             for (var i = 0; i < cats.length; i++) {
                 var cat = cats[i];
-                var catW = cat.element.offsetWidth || 80;
-                var catH = cat.element.offsetHeight || 50;
-
-                cat.x += cat.vx;
-                cat.y += cat.vy;
-
-                // 画面の端に当たったら跳ね返る（進行方向に応じて反転させる）
-                if (cat.x + catW > w) { 
-                    cat.x = w - catW; 
-                    cat.vx *= -1; 
-                    cat.element.style.transform = 'scaleX(-1)'; 
-                } else if (cat.x < 0) { 
-                    cat.x = 0; 
-                    cat.vx *= -1; 
-                    cat.element.style.transform = 'scaleX(1)'; 
-                }
-
-                if (cat.y + catH > h) { 
-                    cat.y = h - catH; 
-                    cat.vy *= -1; 
-                } else if (cat.y < 0) { 
-                    cat.y = 0; 
-                    cat.vy *= -1; 
-                }
-
-                cat.element.style.left = cat.x + 'px';
-                cat.element.style.top = cat.y + 'px';
+                cat.x += cat.vx; cat.y += cat.vy;
+                if (cat.x + 80 > w) { cat.x = w - 80; cat.vx *= -1; cat.element.style.transform = 'scaleX(-1)'; }
+                else if (cat.x < 0) { cat.x = 0; cat.vx *= -1; cat.element.style.transform = 'scaleX(1)'; }
+                if (cat.y + 50 > h) { cat.y = h - 50; cat.vy *= -1; }
+                else if (cat.y < 0) { cat.y = 0; cat.vy *= -1; }
+                cat.element.style.left = cat.x + 'px'; cat.element.style.top = cat.y + 'px';
             }
-
             requestAnimationFrame(animateCats);
         }
-        
-        // アニメーションを開始
         requestAnimationFrame(animateCats);
 
+        // --- 時計更新 ---
+        function updateTrayClock() {
+            var clock = document.getElementById('tray-clock');
+            if (clock) {
+                var now = new Date();
+                var h = now.getHours(), m = now.getMinutes();
+                clock.textContent = (h<10?'0'+h:h) + ':' + (m<10?'0'+m:m);
+            }
+        }
+        updateTrayClock(); setInterval(updateTrayClock, 60000);
     </script>
 </body>
 </html>
