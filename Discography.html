@@ -219,12 +219,12 @@
             .album-info p { font-size: 12px; }
             .links img { width: 36px !important; height: 36px !important; }
         }
-        /* --- 強制ダークモード完全無効化（テキストで書いた偽装画像ハック） --- */
+        /* --- 強制ダークモード完全無効化（微小グラデーションハック） --- */
         @media (prefers-color-scheme: dark) {
-            /* 1. 背景を「暗号化されたグレーの画像データ」で塗りつぶし、反転を完全ブロック */
+            /* 1. AIに見破られないよう、わずかに違うグレー（#c0c0c0と#bfbfbf）のグラデーションにする */
             .window, .window-contents, .close-button, #win95-taskbar, #taskbar-start-btn, .win95-taskbar-tab, #taskbar-tray {
                 background-color: transparent !important;
-                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' fill='%23c0c0c0'/%3E%3C/svg%3E") !important;
+                background-image: linear-gradient(to bottom, #c0c0c0, #bfbfbf) !important;
             }
 
             /* 2. 文字色は引き続き強制的に黒 */
