@@ -130,7 +130,9 @@
 
         /* --- 曲単体ウィンドウの専用CSS --- */
         .song-window {
-            width: 550px; /* 単体ウィンドウの幅 */
+            width: 550px;
+            top: -9999px;  /* ←追加：JSが並べるまで画面の遥か上に隠す */
+            left: -9999px; /* ←追加：JSが並べるまで画面の遥か左に隠す */
         }
         .discography-section {
             display: flex;
