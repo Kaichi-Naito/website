@@ -196,7 +196,7 @@
             .desktop-icon span { font-size: 11px; padding: 1px 2px; }
 
             /* ディスコグラフィー曲ウィンドウ（スマホ用） */
-            .song-window { width: 95vw !important; max-width: 600px !important; }
+            .song-window { width: 88vw !important; max-width: 400px !important; }
             .discography-section {
                 flex-direction: row; 
                 margin: 5px 0;
@@ -587,7 +587,9 @@
                 var el = document.getElementById(songWins[i]);
                 if (el && el.style.display !== 'none') {
                     if (isMobile) {
-                        el.style.left = '2.5%';
+                        // スマホ版もジグザグにズラす
+                        var mobileOffset = (i % 2 === 0) ? 2 : 8; 
+                        el.style.left = mobileOffset + '%';
                     } else {
                         // PC版：真ん中を中心に、左右に少しだけ交互にズラす（開いてる感の演出）
                         var offset = (i % 2 === 0) ? -20 : 20; 
