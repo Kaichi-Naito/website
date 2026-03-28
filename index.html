@@ -343,6 +343,7 @@
             var youtube = document.getElementById('win-youtube');
             var maxBottom = 0;
 
+            // --- スマホ版のウィンドウサイズ設定 ---
             if (isMobile) {
                 if(profile.style.display !== 'none') {
                     profile.style.left = '4%';
@@ -358,8 +359,7 @@
                 }
                 
                 if(spotify.style.display !== 'none') {
-                    var spWidth = spotify.offsetWidth || 320;
-                    spotify.style.left = (width - spWidth - 22) + 'px'; 
+                    social.style.left = '30%';
                     spotify.style.top = '620px';
                 }
 
