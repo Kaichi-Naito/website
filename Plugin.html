@@ -333,6 +333,108 @@
             color: #333;
         }
 
+        .web-dsp-panel {
+            margin-top: 16px;
+            border: 2px groove #ffffff;
+            padding: 16px 12px 12px;
+            position: relative;
+            background: #c0c0c0;
+        }
+
+        .web-dsp-title {
+            position: absolute;
+            top: -9px;
+            left: 10px;
+            padding: 0 6px;
+            background: #c0c0c0;
+            font-size: 13px;
+        }
+
+        .web-dsp-note {
+            margin: 0 0 10px 0;
+            font-size: 11px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .web-control-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(135px, 1fr));
+            gap: 8px 10px;
+        }
+
+        .web-control {
+            border: 1px solid #808080;
+            background: #d4d0c8;
+            padding: 7px 8px;
+            min-width: 0;
+        }
+
+        .web-control label {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .web-control input[type="range"] {
+            width: 100%;
+            margin: 0;
+        }
+
+        .web-control select {
+            width: 100%;
+            font-family: 'PixelMplus', sans-serif;
+            font-size: 11px;
+            background: white;
+            color: black;
+            border: 2px inset #fff;
+            height: 24px;
+        }
+
+        .web-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 42px;
+        }
+
+        .web-switch label {
+            margin: 0;
+        }
+
+        .web-eq-grid {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(6, minmax(90px, 1fr));
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .web-meter {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 8px;
+            align-items: center;
+            font-size: 10px;
+        }
+
+        .web-meter-track {
+            height: 12px;
+            background: #000;
+            border: 2px inset #fff;
+            overflow: hidden;
+        }
+
+        #web-input-meter-fill {
+            width: 0%;
+            height: 100%;
+            background: #00aa00;
+            transition: width 60ms linear;
+        }
+
         .plugin-top {
             display: grid;
             grid-template-columns: 240px 1fr;
@@ -677,6 +779,14 @@
                 width: 100%;
             }
 
+            .web-control-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .web-eq-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
             .plugin-top {
                 grid-template-columns: 1fr;
             }
@@ -854,7 +964,7 @@
                         </tr>
                         <tr>
                             <th>Browser Demo</th>
-                            <td><span class="status-dev">Sample Loop UI Ready / DSP Preparing</span></td>
+                            <td><span class="status-dev" id="browser-demo-status">Loading Web DSP...</span></td>
                         </tr>
                     </table>
 
@@ -870,7 +980,106 @@
                     </div>
 
                     <div class="small-note">
-                        ※ サンプル再生UIは実装済みです。SNAPのWeb DSP接続と配布ファイルは今後追加します。
+                        ※ Web試奏版はSNAP v0.4.80のDSPをブラウザ向けに移植したものです。VST3バイナリそのものを読み込んでいるわけではありません。
+                    </div>
+                </div>
+            </div>
+
+            <div class="web-dsp-panel">
+                <span class="web-dsp-title">SNAP WEB CONTROLS</span>
+                <p class="web-dsp-note">
+                    再生中のサンプル音は、ここで設定したSNAP DSPをリアルタイムで通って再生されます。
+                    初期値はVST3 v0.4.80のdefaultに合わせています。
+                </p>
+
+                <div class="web-control-grid">
+                    <div class="web-meter">
+                        <span>IN</span>
+                        <div class="web-meter-track"><div id="web-input-meter-fill"></div></div>
+                        <span>0 dB</span>
+                    </div>
+
+                    <div class="web-control">
+                        <label>INPUT TRIM <span data-snap-value="inputTrim">0</span></label>
+                        <input type="range" min="-18" max="18" step="0.1" value="0" data-snap-param="inputTrim">
+                    </div>
+                    <div class="web-control">
+                        <label>GATE <span data-snap-value="gate">1</span></label>
+                        <input type="range" min="0" max="10" step="0.1" value="1" data-snap-param="gate">
+                    </div>
+                    <div class="web-control">
+                        <label>SIGNAL</label>
+                        <select data-snap-param="signalMode"><option value="0" selected>MONO</option><option value="1">STEREO</option></select>
+                    </div>
+                    <div class="web-control">
+                        <label>DRIVE CPU</label>
+                        <select data-snap-param="driveCpuHigh"><option value="0">LOW (4x)</option><option value="1" selected>HIGH (8x)</option></select>
+                    </div>
+
+                    <div class="web-control web-switch">
+                        <label>COMP <span data-snap-value="compOn">ON</span></label>
+                        <input type="checkbox" checked data-snap-param="compOn">
+                    </div>
+                    <div class="web-control">
+                        <label>COMP <span data-snap-value="comp">5</span></label>
+                        <input type="range" min="0" max="10" step="0.1" value="5" data-snap-param="comp">
+                    </div>
+                    <div class="web-control">
+                        <label>COMP TONE <span data-snap-value="compTone">5</span></label>
+                        <input type="range" min="0" max="10" step="0.1" value="5" data-snap-param="compTone">
+                    </div>
+                    <div class="web-control">
+                        <label>COMP VOL <span data-snap-value="compVol">5</span></label>
+                        <input type="range" min="0" max="10" step="0.1" value="5" data-snap-param="compVol">
+                    </div>
+
+                    <div class="web-control web-switch">
+                        <label>DRIVE <span data-snap-value="driveOn">ON</span></label>
+                        <input type="checkbox" checked data-snap-param="driveOn">
+                    </div>
+                    <div class="web-control">
+                        <label>DRIVE <span data-snap-value="drive">5</span></label>
+                        <input type="range" min="0" max="10" step="0.1" value="5" data-snap-param="drive">
+                    </div>
+                    <div class="web-control">
+                        <label>SNAP <span data-snap-value="snap">5</span></label>
+                        <input type="range" min="0" max="10" step="0.1" value="5" data-snap-param="snap">
+                    </div>
+                    <div class="web-control">
+                        <label>TONE <span data-snap-value="tone">5</span></label>
+                        <input type="range" min="0" max="10" step="0.1" value="5" data-snap-param="tone">
+                    </div>
+                    <div class="web-control">
+                        <label>VOL <span data-snap-value="level">5</span></label>
+                        <input type="range" min="0" max="10" step="0.1" value="5" data-snap-param="level">
+                    </div>
+                    <div class="web-control web-switch">
+                        <label>BOOST <span data-snap-value="boost">OFF</span></label>
+                        <input type="checkbox" data-snap-param="boost">
+                    </div>
+                    <div class="web-control">
+                        <label>CAB</label>
+                        <select data-snap-param="cabMode">
+                            <option value="0" selected>OFF</option><option value="1">A</option><option value="2">B</option><option value="3">C</option><option value="4">D</option>
+                        </select>
+                    </div>
+                    <div class="web-control web-switch">
+                        <label>EQ <span data-snap-value="eqOn">OFF</span></label>
+                        <input type="checkbox" data-snap-param="eqOn">
+                    </div>
+
+                    <div class="web-eq-grid">
+                        <div class="web-control"><label>31 <span data-snap-value="eq31">0</span></label><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq31"></div>
+                        <div class="web-control"><label>62 <span data-snap-value="eq62">0</span></label><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq62"></div>
+                        <div class="web-control"><label>125 <span data-snap-value="eq125">0</span></label><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq125"></div>
+                        <div class="web-control"><label>250 <span data-snap-value="eq250">0</span></label><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq250"></div>
+                        <div class="web-control"><label>500 <span data-snap-value="eq500">0</span></label><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq500"></div>
+                        <div class="web-control"><label>1k <span data-snap-value="eq1k">0</span></label><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq1k"></div>
+                        <div class="web-control"><label>2k <span data-snap-value="eq2k">0</span></label><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq2k"></div>
+                        <div class="web-control"><label>4k <span data-snap-value="eq4k">0</span></label><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq4k"></div>
+                        <div class="web-control"><label>8k <span data-snap-value="eq8k">0</span></label><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq8k"></div>
+                        <div class="web-control"><label>16k <span data-snap-value="eq16k">0</span></label><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq16k"></div>
+                        <div class="web-control"><label>EQ OUT <span data-snap-value="eqOut">0</span></label><input type="range" min="-18" max="18" step="0.1" value="0" data-snap-param="eqOut"></div>
                     </div>
                 </div>
             </div>
@@ -956,6 +1165,8 @@
         このサイトは本人によって頑張って作成されました
     </div>
 
+    <script src="Plugin/snap-web/snap-web.js"></script>
+
     <script>
         var mouseClickSound;
 
@@ -994,26 +1205,26 @@
                 snap.style.top = '190px';
 
                 install.style.left = '3%';
-                install.style.top = '910px';
+                install.style.top = '1380px';
 
                 changelog.style.left = '3%';
-                changelog.style.top = '1190px';
+                changelog.style.top = '1660px';
 
-                document.body.style.minHeight = '1480px';
+                document.body.style.minHeight = '1940px';
             } else {
                 snap.style.left = '50%';
                 snap.style.top = '185px';
                 snap.style.transform = 'translateX(-50%)';
 
                 install.style.left = '18%';
-                install.style.top = '750px';
+                install.style.top = '1120px';
                 install.style.transform = '';
 
                 changelog.style.left = '57%';
-                changelog.style.top = '750px';
+                changelog.style.top = '1120px';
                 changelog.style.transform = '';
 
-                document.body.style.minHeight = '1090px';
+                document.body.style.minHeight = '1450px';
             }
         }
 
@@ -1130,8 +1341,8 @@
            例:
            SNAP_sample_Strum.wav -> Strum.wav
 
-           現在はHTMLAudioElementで直接ループ再生。
-           WebAssembly版SNAP完成後は、ここをSNAP DSP経由に差し替えます。
+           HTMLAudioElementをWeb Audioへ取り込み、AudioWorklet内の
+           SNAP WebAssembly DSPを通してループ再生します。
         --------------------------------------------------------- */
         var sampleAudio = document.getElementById('snap-sample-audio');
         var samplePlayBtn = document.getElementById('sample-play-btn');
@@ -1158,18 +1369,19 @@
 
         function setSampleUi(isPlaying) {
             if (!samplePlayBtn || !sampleSelect) return;
+            var dspState = (window.snapWebEngine && window.snapWebEngine.ready) ? 'READY' : 'LOADING';
 
             if (isPlaying) {
                 samplePlayBtn.textContent = '■ STOP SAMPLE';
                 if (sampleEngineStatus) {
                     sampleEngineStatus.textContent =
-                        'PLAYING / LOOP ON / SNAP WEB DSP: PREPARING';
+                        'PLAYING / LOOP ON / SNAP WEB DSP: ' + dspState;
                 }
             } else {
                 samplePlayBtn.textContent = '▶ PLAY SAMPLE';
                 if (sampleEngineStatus) {
                     sampleEngineStatus.textContent =
-                        'LOOP ON / SNAP WEB DSP: PREPARING';
+                        'LOOP ON / SNAP WEB DSP: ' + dspState;
                 }
             }
         }
@@ -1334,16 +1546,23 @@
         }
 
         if (samplePlayBtn && sampleAudio) {
-            samplePlayBtn.addEventListener('click', function() {
+            samplePlayBtn.addEventListener('click', async function() {
                 if (!sampleSelect || !sampleSelect.value) return;
 
                 if (sampleAudio.paused) {
-                    sampleAudio.play().catch(function() {
+                    try {
+                        if (window.snapWebEngine) {
+                            sampleEngineStatus.textContent = 'STARTING SNAP WEB DSP...';
+                            await window.snapWebEngine.resume();
+                        }
+                        await sampleAudio.play();
+                    } catch (error) {
+                        console.error(error);
                         if (sampleEngineStatus) {
                             sampleEngineStatus.textContent =
                                 'PLAYBACK ERROR — ' + getSelectedSampleName();
                         }
-                    });
+                    }
                 } else {
                     sampleAudio.pause();
                     sampleAudio.currentTime = 0;
