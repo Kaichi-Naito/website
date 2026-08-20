@@ -713,7 +713,7 @@
 
             <!--
                 SAMPLE PLAYER
-                /Plugin/samplesound/SNAP_sample_arpeggio.wav を置くと、このボタンからループ再生できます。
+                Plugin/samplesound/SNAP_sample_arpeggio.wav を置くと、このボタンからループ再生できます。
 
                 現段階では通常のAudio要素で再生する仮配線です。
                 WebAssembly版SNAP完成後は、
@@ -750,7 +750,7 @@
                 <audio id="snap-sample-audio"
                        preload="auto"
                        loop
-                       src="/Plugin/samplesound/SNAP_sample_arpeggio.wav"></audio>
+                       src="Plugin/samplesound/SNAP_sample_arpeggio.wav"></audio>
             </div>
 
             <div class="plugin-top">
@@ -1073,7 +1073,7 @@
 
         /* ---------------------------------------------------------
            SNAP ARPEGGIO PLAYER
-           現在は /Plugin/samplesound/SNAP_sample_arpeggio.wav の通常ループ再生。
+           現在は Plugin/samplesound/SNAP_sample_arpeggio.wav の通常ループ再生。
            SNAP WebAssembly版が完成したら、このaudio直再生ではなく
            AudioWorklet/WASM DSP経由へ差し替える。
         --------------------------------------------------------- */
@@ -1121,7 +1121,7 @@
                     sampleAudio.play().catch(function() {
                         if (sampleStatus) {
                             sampleStatus.textContent =
-                                'PLACE: /Plugin/samplesound/SNAP_sample_arpeggio.wav';
+                                'PLACE: Plugin/samplesound/SNAP_sample_arpeggio.wav';
                         }
                     });
                 } else {
