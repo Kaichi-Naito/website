@@ -18,6 +18,9 @@
         cabMode:0
     };
 
+
+    const PRESETS = Object.freeze({"default":{"inputTrim":0,"gate":1,"comp":5,"compVol":5,"compTone":5,"compOn":1,"drive":5,"snap":5,"tone":5,"level":5,"driveOn":1,"boost":0,"eqOn":0,"eq31":0,"eq62":0,"eq125":0,"eq250":0,"eq500":0,"eq1k":0,"eq2k":0,"eq4k":0,"eq8k":0,"eq16k":0,"eqOut":0,"signalMode":0,"cabMode":0},"Chime":{"inputTrim":0,"gate":3.0,"comp":7.210000038146973,"compVol":5.0,"compTone":6.440000057220459,"compOn":1,"drive":8.84000015258789,"snap":8.079999923706055,"tone":3.449999809265137,"level":7.259999752044678,"driveOn":1,"boost":0,"eqOn":1,"eq31":-2.829999923706055,"eq62":1.159999847412109,"eq125":4.090000152587891,"eq250":3.739999771118164,"eq500":-3.65000057220459,"eq1k":0,"eq2k":-3.060000419616699,"eq4k":4.090000152587891,"eq8k":7.719999313354492,"eq16k":7.600000381469727,"eqOut":0,"signalMode":0,"cabMode":3},"Clean":{"inputTrim":0,"gate":0.199999988079071,"comp":5.0,"compVol":7.859999656677246,"compTone":6.369999885559082,"compOn":1,"drive":7.789999961853027,"snap":4.029999732971191,"tone":3.799999952316284,"level":6.210000038146973,"driveOn":0,"boost":0,"eqOn":0,"eq31":-2.829999923706055,"eq62":1.159999847412109,"eq125":4.090000152587891,"eq250":3.739999771118164,"eq500":-3.65000057220459,"eq1k":0,"eq2k":-3.060000419616699,"eq4k":4.090000152587891,"eq8k":7.719999313354492,"eq16k":7.600000381469727,"eqOut":0,"signalMode":0,"cabMode":0},"CleanShred":{"inputTrim":0,"gate":3.0,"comp":7.449999809265137,"compVol":8.949999809265137,"compTone":6.369999885559082,"compOn":1,"drive":7.789999961853027,"snap":4.029999732971191,"tone":3.799999952316284,"level":6.210000038146973,"driveOn":0,"boost":0,"eqOn":0,"eq31":-2.829999923706055,"eq62":1.159999847412109,"eq125":4.090000152587891,"eq250":3.739999771118164,"eq500":-3.65000057220459,"eq1k":0,"eq2k":-3.060000419616699,"eq4k":4.090000152587891,"eq8k":7.719999313354492,"eq16k":7.600000381469727,"eqOut":0,"signalMode":0,"cabMode":0},"CleanShredAmp":{"inputTrim":0,"gate":3.0,"comp":7.449999809265137,"compVol":8.949999809265137,"compTone":8.579999923706055,"compOn":1,"drive":7.789999961853027,"snap":4.029999732971191,"tone":3.799999952316284,"level":6.210000038146973,"driveOn":0,"boost":0,"eqOn":1,"eq31":-2.829999923706055,"eq62":1.159999847412109,"eq125":2.409999847412109,"eq250":2.059999465942383,"eq500":-3.65000057220459,"eq1k":0,"eq2k":-3.060000419616699,"eq4k":4.090000152587891,"eq8k":7.719999313354492,"eq16k":7.600000381469727,"eqOut":0,"signalMode":0,"cabMode":4},"Dist":{"inputTrim":0,"gate":3.0,"comp":4.069999694824219,"compVol":5.0,"compTone":5.0,"compOn":0,"drive":6.829999923706055,"snap":7.559999942779541,"tone":8.029999732971191,"level":7.289999961853027,"driveOn":1,"boost":1,"eqOn":1,"eq31":-2.829999923706055,"eq62":1.159999847412109,"eq125":6.079999923706055,"eq250":3.029999732971191,"eq500":-0.8400001525878906,"eq1k":0,"eq2k":-6.309999942779541,"eq4k":-0.1100006103515625,"eq8k":9.969999313354492,"eq16k":7.529998779296875,"eqOut":0,"signalMode":0,"cabMode":1}});
+
     class SnapWebEngine {
         constructor(audioElement) {
             this.audioElement = audioElement;
@@ -36,6 +39,7 @@
             this.status = document.getElementById('sample-engine-status');
             this.browserStatus = document.getElementById('browser-demo-status');
             this.meterFill = document.getElementById('web-input-meter-fill');
+            this.meterValue = document.getElementById('web-meter-value');
         }
 
         setStatus(text) {
@@ -189,27 +193,210 @@
         }
 
         updateMeter(db) {
-            if (!this.meterFill) return;
-            const v = Math.max(-60, Math.min(0, Number(db) || -60));
-            this.meterFill.style.width = (((v + 60) / 60) * 100).toFixed(1) + '%';
+            const raw = Number(db);
+            const v = Number.isFinite(raw) ? Math.max(-60, Math.min(0, raw)) : -60;
+            if (this.meterFill) {
+                this.meterFill.style.width = (((v + 60) / 60) * 100).toFixed(1) + '%';
+            }
+            if (this.meterValue) {
+                this.meterValue.textContent = v <= -59.5 ? '-inf' : v.toFixed(1);
+            }
         }
+    }
+
+
+    function updateRangeVisual(el) {
+        if (!el || el.type !== 'range') return;
+        const min = Number(el.min || 0);
+        const max = Number(el.max || 10);
+        const value = Number(el.value);
+        const t = max > min ? Math.max(0, Math.min(1, (value - min) / (max - min))) : 0;
+        const angle = -135 + t * 270;
+
+        const knob = el.closest('.snap-knob, .snap-gate-knob');
+        if (knob) knob.style.setProperty('--knob-angle', angle + 'deg');
+    }
+
+    function updateSwitchVisual(name, value) {
+        const on = Number(value) >= 0.5;
+        document.querySelectorAll('[data-switch-visual="' + name + '"]').forEach(node => {
+            node.classList.toggle('is-on', on);
+        });
+
+        if (name === 'eqOn') {
+            const eq = document.getElementById('snap-eq-sliders');
+            if (eq) eq.classList.toggle('is-off', !on);
+        }
+    }
+
+    function syncSegmentVisual(name, value) {
+        document.querySelectorAll('[data-segment-param="' + name + '"]').forEach(group => {
+            group.querySelectorAll('label').forEach(label => {
+                const radio = label.querySelector('input[type="radio"]');
+                const selected = radio && Number(radio.value) === Number(value);
+                label.classList.toggle('is-selected', selected);
+                if (radio) radio.checked = selected;
+            });
+        });
+    }
+
+    function setupSegmentControls(engine) {
+        document.querySelectorAll('[data-segment-param]').forEach(group => {
+            const name = group.dataset.segmentParam;
+            const hiddenSelect = group.querySelector('[data-snap-param="' + name + '"]');
+
+            group.querySelectorAll('label').forEach(label => {
+                const radio = label.querySelector('input[type="radio"]');
+                if (!radio) return;
+                label.addEventListener('click', () => {
+                    if (!hiddenSelect) return;
+                    hiddenSelect.value = radio.value;
+                    hiddenSelect.dispatchEvent(new Event('change', { bubbles:true }));
+                    syncSegmentVisual(name, radio.value);
+                });
+            });
+        });
+    }
+
+    function setupKnobDragging() {
+        document.querySelectorAll('.snap-knob input[type="range"], .snap-gate-knob input[type="range"]').forEach(el => {
+            updateRangeVisual(el);
+            let startY = 0;
+            let startValue = 0;
+            let dragging = false;
+
+            el.addEventListener('pointerdown', e => {
+                dragging = true;
+                startY = e.clientY;
+                startValue = Number(el.value);
+                el.setPointerCapture(e.pointerId);
+                e.preventDefault();
+            });
+
+            el.addEventListener('pointermove', e => {
+                if (!dragging) return;
+                const min = Number(el.min);
+                const max = Number(el.max);
+                const span = max - min;
+                const delta = (startY - e.clientY) / 120 * span;
+                let next = Math.max(min, Math.min(max, startValue + delta));
+                const step = Number(el.step || 0.1);
+                next = Math.round(next / step) * step;
+                el.value = String(next);
+                el.dispatchEvent(new Event('input', { bubbles:true }));
+                e.preventDefault();
+            });
+
+            const stop = e => {
+                dragging = false;
+                try { el.releasePointerCapture(e.pointerId); } catch (_) {}
+            };
+            el.addEventListener('pointerup', stop);
+            el.addEventListener('pointercancel', stop);
+            el.addEventListener('wheel', e => {
+                e.preventDefault();
+                const step = Number(el.step || 0.1);
+                const min = Number(el.min);
+                const max = Number(el.max);
+                const dir = e.deltaY < 0 ? 1 : -1;
+                const next = Math.max(min, Math.min(max, Number(el.value) + dir * step));
+                el.value = String(next);
+                el.dispatchEvent(new Event('input', { bubbles:true }));
+            }, { passive:false });
+        });
+    }
+
+    function setupSettingsUi(engine) {
+        const panel = document.getElementById('snap-vst-settings');
+        const open = document.getElementById('snap-settings-open');
+        const close = document.getElementById('snap-settings-close');
+
+        if (open && panel) open.addEventListener('click', () => panel.classList.add('is-open'));
+        if (close && panel) close.addEventListener('click', () => panel.classList.remove('is-open'));
+
+        const reset = document.getElementById('snap-eq-reset');
+        if (reset) {
+            reset.addEventListener('click', () => {
+                ['eq31','eq62','eq125','eq250','eq500','eq1k','eq2k','eq4k','eq8k','eq16k','eqOut']
+                    .forEach(name => {
+                        engine.setParam(name, 0);
+                        updateControlUi(name, 0);
+                    });
+                markPresetDirty();
+            });
+        }
+    }
+
+    function updateControlUi(name, value) {
+        const el = document.querySelector('[data-snap-param="' + name + '"]');
+        if (!el) return;
+
+        if (el.type === 'checkbox') el.checked = Number(value) >= 0.5;
+        else el.value = String(value);
+
+        document.querySelectorAll('[data-snap-value="' + name + '"]').forEach(valueEl => {
+            if (el.type === 'checkbox') valueEl.textContent = Number(value) >= 0.5 ? 'ON' : 'OFF';
+            else valueEl.textContent = String(Math.round(Number(value) * 100) / 100);
+        });
+
+        updateRangeVisual(el);
+        updateSwitchVisual(name, value);
+        syncSegmentVisual(name, value);
+    }
+
+    function applyPreset(engine, presetName) {
+        const preset = PRESETS[presetName];
+        if (!preset) return;
+
+        Object.entries(preset).forEach(([name, value]) => {
+            engine.setParam(name, value);
+            updateControlUi(name, value);
+        });
+
+        const dirty = document.getElementById('web-preset-dirty');
+        if (dirty) dirty.textContent = '';
+    }
+
+    function markPresetDirty() {
+        const dirty = document.getElementById('web-preset-dirty');
+        if (dirty) dirty.textContent = '*';
     }
 
     function bindControls(engine) {
         document.querySelectorAll('[data-snap-param]').forEach(el => {
             const name = el.dataset.snapParam;
             const valueEl = document.querySelector('[data-snap-value="' + name + '"]');
-            const update = () => {
+
+            const update = (dirty) => {
                 let value;
                 if (el.type === 'checkbox') value = el.checked ? 1 : 0;
                 else value = Number(el.value);
+
                 engine.setParam(name, value);
-                if (valueEl) valueEl.textContent = el.type === 'checkbox' ? (value ? 'ON' : 'OFF') : value;
+
+                document.querySelectorAll('[data-snap-value="' + name + '"]').forEach(node => {
+                    if (el.type === 'checkbox') node.textContent = value ? 'ON' : 'OFF';
+                    else node.textContent = String(Math.round(Number(value) * 100) / 100);
+                });
+
+                updateRangeVisual(el);
+                updateSwitchVisual(name, value);
+                syncSegmentVisual(name, value);
+
+                if (dirty) markPresetDirty();
             };
-            el.addEventListener('input', update);
-            el.addEventListener('change', update);
-            update();
+
+            el.addEventListener('input', () => update(true));
+            el.addEventListener('change', () => update(true));
+            update(false);
         });
+
+        const presetSelect = document.getElementById('web-preset-select');
+        if (presetSelect) {
+            presetSelect.addEventListener('change', () => {
+                applyPreset(engine, presetSelect.value);
+            });
+        }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -218,6 +405,12 @@
         const engine = new SnapWebEngine(audio);
         window.snapWebEngine = engine;
         bindControls(engine);
+        setupSegmentControls(engine);
+        setupKnobDragging();
+        setupSettingsUi(engine);
+
+        Object.entries(DEFAULTS).forEach(([name,value]) => updateControlUi(name,value));
+
         // Construct the graph immediately so the media element never bypasses SNAP.
         engine.init().catch(() => {});
     });
