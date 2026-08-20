@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="keywords" content="ギター, VST, VST3, プラグイン, SNAP, Kaichi, Kaichi Naito, PHALUX">
+    <meta name="description" content="Kaichiが制作するギター用プラグインの配布・試奏ページ。">
+    <meta property="og:title" content="Kaichi Plugins">
+    <meta property="og:description" content="Kaichiが制作するギター用プラグインの配布・試奏ページ。">
+    <meta property="og:image" content="https://kaichi-naito.github.io/website/images/card-image.jpg">
+    <meta property="og:url" content="https://kaichi-naito.github.io/website/Plugin.html">
+    <meta property="og:type" content="website">
+    <title>Kaichi Plugins</title>
+    <link rel="icon" href="images/card-image.jpg" type="image/jpg">
+
+    <style>
+        :root { color-scheme: light; }
+
+        html {
+            overflow-x: hidden;
+            width: 100vw;
+        }
+
+        @font-face {
+            font-family: 'PixelMplus';
+            src: url('https://kaichi-naito.github.io/website/fonts/PixelMplus10-Regular.ttf') format('truetype');
+            font-display: swap;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'PixelMplus', sans-serif;
+            color: black;
+            text-align: center;
+            margin: 0;
+            padding: 20px 0 calc(60px + env(safe-area-inset-bottom)) 0;
+            background-color: #008080;
+            background-image: url('images/windows-95-background.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            overflow-x: hidden;
+            width: 100%;
+            min-height: 1180px;
+            z-index: 1;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.1);
+            z-index: -1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .header-title {
+            color: white;
+            text-shadow: 2px 2px #000;
+            font-size: 2.5em;
+            margin: 0 0 20px 0;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 35px;
+            padding: 0 12px;
+        }
+
+        .desktop-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: white !important;
+            width: 80px;
+            cursor: pointer;
+        }
+
+        .desktop-icon img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            margin-bottom: 5px;
+        }
+
+        .desktop-icon span {
+            font-size: 14px;
+            text-align: center;
+            padding: 2px 4px;
+            border: 1px dotted transparent;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .desktop-icon:hover span,
+        .desktop-icon:active span,
+        .desktop-icon.current span {
+            background-color: #000080;
+            color: white;
+            border: 1px dotted #fff;
+        }
+
+        .window {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            box-shadow: 1px 1px 0 0 #000000;
+            padding: 2px;
+            max-width: 95vw;
+            display: inline-block;
+            text-align: left;
+            position: absolute;
+            animation: fadeIn 0.4s ease-in forwards;
+        }
+
+        .draggable-cursor { cursor: grab; }
+
+        .title-bar {
+            background: linear-gradient(90deg, #000080, #1084d0);
+            padding: 3px 5px 3px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+            margin-bottom: 2px;
+            user-select: none;
+        }
+
+        .close-button {
+            width: 16px;
+            height: 14px;
+            font-size: 13px;
+            background-color: #c0c0c0;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            background-image: url('images/×.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 20px;
+            color: transparent;
+            cursor: pointer;
+            flex: 0 0 auto;
+        }
+
+        .close-button:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding-top: 1px;
+            padding-left: 1px;
+        }
+
+        .window-contents {
+            padding: 15px;
+            border: 1px solid #808080;
+            background-color: #c0c0c0;
+        }
+
+        .win95-btn {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 7px 14px;
+            color: black !important;
+            text-decoration: none !important;
+            display: inline-block;
+            font-family: 'PixelMplus', sans-serif;
+            font-size: 15px;
+            margin: 5px 4px;
+            cursor: pointer;
+        }
+
+        .win95-btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        .win95-btn.primary {
+            font-weight: bold;
+            outline: 1px dotted #000;
+            outline-offset: -5px;
+        }
+
+        .win95-btn.is-disabled {
+            color: #666 !important;
+            text-shadow: 1px 1px #fff;
+            cursor: default;
+        }
+
+        .group-box {
+            border: 2px groove #fff;
+            padding: 14px;
+            margin-top: 14px;
+            position: relative;
+        }
+
+        .group-box-title {
+            display: inline-block;
+            background: #c0c0c0;
+            padding: 0 5px;
+            position: absolute;
+            top: -9px;
+            left: 10px;
+            font-size: 13px;
+        }
+
+        .sample-player {
+            margin: 0 0 16px 0;
+            border: 2px groove #ffffff;
+            padding: 15px 14px 12px;
+            position: relative;
+            background: #c0c0c0;
+        }
+
+        .sample-player-title {
+            position: absolute;
+            top: -9px;
+            left: 10px;
+            padding: 0 6px;
+            background: #c0c0c0;
+            font-size: 13px;
+        }
+
+        .sample-player-row {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .sample-play-btn {
+            min-width: 150px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .sample-display {
+            min-height: 42px;
+            background: #000;
+            border: 2px inset #ffffff;
+            color: #00ff66;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 5px 10px;
+            line-height: 1.35;
+            overflow: hidden;
+        }
+
+        .sample-display-main {
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sample-display-sub {
+            color: #a8a8a8;
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        .sample-loop-indicator {
+            border: 2px inset #ffffff;
+            background: #d4d0c8;
+            padding: 8px 10px;
+            min-width: 86px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .sample-loop-indicator .lamp {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #008000;
+            border: 1px solid #004000;
+            margin-right: 5px;
+            vertical-align: -1px;
+        }
+
+        .sample-help {
+            margin-top: 8px;
+            font-size: 11px;
+            line-height: 1.55;
+            color: #333;
+        }
+
+        .plugin-top {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .snap-product-panel {
+            min-height: 250px;
+            background: #111;
+            color: white;
+            border: 2px inset #fff;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .snap-product-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 30% 30%, rgba(100, 230, 255, 0.45), transparent 32%),
+                radial-gradient(circle at 80% 65%, rgba(255, 110, 220, 0.28), transparent 28%),
+                linear-gradient(135deg, #08283d, #101010 60%);
+        }
+
+        .snap-product-panel > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .snap-logo {
+            font-family: Arial, sans-serif;
+            font-weight: 900;
+            font-size: 54px;
+            letter-spacing: -3px;
+            line-height: 1;
+        }
+
+        .snap-subtitle {
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            letter-spacing: 2px;
+            opacity: 0.85;
+            margin-top: 7px;
+        }
+
+        .pedal-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .fake-pedal {
+            flex: 1;
+            height: 104px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.09);
+            padding: 9px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .fake-knobs {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .fake-knob {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #bbb;
+            background: #222;
+            box-shadow: 0 2px 3px rgba(0,0,0,.7);
+        }
+
+        .plugin-copy h2 {
+            margin: 0 0 4px 0;
+            font-size: 28px;
+        }
+
+        .plugin-copy .lead {
+            font-size: 15px;
+            line-height: 1.8;
+            margin: 12px 0;
+        }
+
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            background: #fff;
+            font-size: 13px;
+        }
+
+        .spec-table th,
+        .spec-table td {
+            border: 1px solid #808080;
+            padding: 7px 9px;
+            text-align: left;
+        }
+
+        .spec-table th {
+            width: 130px;
+            background: #d4d0c8;
+        }
+
+        .status-ready {
+            color: #006400;
+            font-weight: bold;
+        }
+
+        .status-dev {
+            color: #7a5000;
+            font-weight: bold;
+        }
+
+        .demo-box {
+            background: #000;
+            border: 2px inset #fff;
+            padding: 16px;
+            color: #00ff66;
+            min-height: 180px;
+            font-family: 'PixelMplus', monospace;
+        }
+
+        .demo-box .demo-heading {
+            font-size: 20px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .demo-progress {
+            width: 100%;
+            height: 18px;
+            border: 2px inset #c0c0c0;
+            background: #111;
+            margin: 16px 0 12px;
+            padding: 2px;
+        }
+
+        .demo-progress-inner {
+            width: 36%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                #00aa00 0,
+                #00aa00 10px,
+                #005500 10px,
+                #005500 12px
+            );
+        }
+
+        .install-list {
+            margin: 8px 0 0 20px;
+            padding: 0;
+            line-height: 1.9;
+        }
+
+        .small-note {
+            font-size: 11px;
+            color: #333;
+            line-height: 1.5;
+            margin-top: 10px;
+        }
+
+        .changelog {
+            background: #fff;
+            border: 2px inset #fff;
+            padding: 10px 12px;
+            font-family: 'PixelMplus', monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            max-height: 180px;
+            overflow: auto;
+        }
+
+        .footer {
+            color: white;
+            font-size: 12px;
+            position: absolute;
+            bottom: 52px;
+            width: 100%;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        #win95-taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 32px;
+            padding-bottom: env(safe-area-inset-bottom);
+            box-sizing: content-box;
+            background-color: #c0c0c0;
+            border-top: 2px solid #ffffff;
+            box-shadow: 0 -1px 0 0 #000000;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+
+        #taskbar-start-btn {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            height: 24px;
+            padding: 0 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        #taskbar-start-btn img {
+            image-rendering: pixelated;
+            height: 18px;
+            width: auto;
+        }
+
+        #taskbar-tasks {
+            display: flex;
+            gap: 4px;
+            margin-left: 6px;
+            overflow: hidden;
+            height: 24px;
+        }
+
+        .win95-taskbar-tab {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            height: 24px;
+            min-width: 130px;
+            max-width: 190px;
+            padding: 0 7px;
+            font-size: 12px;
+            color: black;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+        }
+
+        #taskbar-tray {
+            margin-left: auto;
+            border-top: 1px solid #808080;
+            border-left: 1px solid #808080;
+            border-right: 1px solid #ffffff;
+            border-bottom: 1px solid #ffffff;
+            background-color: #c0c0c0;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 8px;
+        }
+
+        #taskbar-tray img {
+            width: 30px;
+            height: 30px;
+            image-rendering: pixelated;
+        }
+
+        #tray-clock {
+            font-size: 14px;
+            color: black;
+            width: 46px;
+            text-align: right;
+        }
+
+        @media (max-width: 800px) {
+            body {
+                font-size: 14px;
+                min-height: 1470px;
+            }
+
+            .header-title {
+                font-size: 1.6em;
+                margin-bottom: 15px;
+            }
+
+            .nav {
+                gap: 8px;
+                margin-bottom: 25px;
+            }
+
+            .desktop-icon { width: 54px; }
+            .desktop-icon img {
+                width: 34px !important;
+                height: 34px !important;
+            }
+            .desktop-icon span {
+                font-size: 10px;
+                padding: 1px 2px;
+            }
+
+            .title-bar {
+                font-size: 12px;
+                padding: 2px 4px 2px 6px;
+            }
+
+            .close-button {
+                width: 14px;
+                height: 12px;
+            }
+
+            .window-contents { padding: 9px; }
+
+            #win-snap,
+            #win-install,
+            #win-changelog {
+                width: 94% !important;
+                max-width: 390px !important;
+            }
+
+            .sample-player-row {
+                grid-template-columns: 1fr;
+                gap: 7px;
+            }
+
+            .sample-play-btn {
+                width: 100%;
+                margin: 0;
+            }
+
+            .sample-loop-indicator {
+                width: 100%;
+            }
+
+            .plugin-top {
+                grid-template-columns: 1fr;
+            }
+
+            .snap-product-panel {
+                min-height: 205px;
+            }
+
+            .snap-logo { font-size: 44px; }
+
+            .plugin-copy h2 { font-size: 22px; }
+
+            .spec-table th { width: 105px; }
+
+            #win95-taskbar { height: 28px; }
+            #taskbar-start-btn { height: 22px; }
+            #taskbar-start-btn img { height: 16px !important; }
+            .win95-taskbar-tab {
+                min-width: 80px;
+                max-width: 120px;
+                font-size: 10px;
+                height: 22px;
+            }
+            #taskbar-tray img {
+                width: 28px;
+                height: 28px;
+            }
+            #tray-clock {
+                font-size: 12px;
+                width: 36px;
+            }
+        }
+    </style>
+</head>
+
+<body id="win95-desktop">
+    <script src="//accaii.com/kaichi/script.js" async></script>
+
+    <h1 class="header-title">Kaichi Guitar Music</h1>
+
+    <!--
+        このページ完成後、index.html側にも同じPluginリンクを追加する想定です。
+        アイコンは既存サイト内に必ず存在する Computer.gif を一旦使用しています。
+    -->
+    <div class="nav">
+        <a href="index.html" class="desktop-icon">
+            <img src="images/gif/Computer.gif" alt="Home"><span>Home</span>
+        </a>
+        <a href="Discography.html" class="desktop-icon">
+            <img src="images/gif/Disc.gif" alt="Discography"><span>Discography</span>
+        </a>
+        <a href="Plugin.html" class="desktop-icon current">
+            <img src="images/gif/Computer.gif" alt="Plugin"><span>Plugin</span>
+        </a>
+        <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" class="desktop-icon">
+            <img src="images/gif/Earth.gif" alt="Works"><span>Works</span>
+        </a>
+        <a href="Contact.html" class="desktop-icon">
+            <img src="images/gif/window.gif" alt="Contact"><span>Contact</span>
+        </a>
+        <a href="freebgm.html" class="desktop-icon">
+            <img src="images/gif/Sound.gif" alt="FREEBGM"><span>FREEBGM</span>
+        </a>
+    </div>
+
+    <!-- SNAP メインウィンドウ -->
+    <div class="window" id="win-snap" style="width: 860px; z-index: 106;">
+        <div class="title-bar draggable-cursor" id="handle-snap">
+            <span>SNAP_Plugin.exe</span><div class="close-button">×</div>
+        </div>
+
+        <div class="window-contents">
+
+            <!--
+                SAMPLE PLAYER
+                Audio/SNAP_sample_phrase.wav を置くと、このボタンからループ再生できます。
+
+                現段階では通常のAudio要素で再生する仮配線です。
+                WebAssembly版SNAP完成後は、
+                AudioBufferSource -> AudioWorklet/WASM(SNAP DSP) -> AudioContext.destination
+                へ差し替える想定です。
+            -->
+            <div class="sample-player">
+                <span class="sample-player-title">SAMPLE_PHRASE.wav</span>
+
+                <div class="sample-player-row">
+                    <button type="button" class="win95-btn sample-play-btn" id="sample-play-btn">
+                        ▶ PLAY SAMPLE
+                    </button>
+
+                    <div class="sample-display">
+                        <div class="sample-display-main" id="sample-status">
+                            READY — CLICK PLAY
+                        </div>
+                        <div class="sample-display-sub" id="sample-engine-status">
+                            LOOP ON / SNAP WEB DSP: PREPARING
+                        </div>
+                    </div>
+
+                    <div class="sample-loop-indicator">
+                        <span class="lamp"></span>LOOP
+                    </div>
+                </div>
+
+                <div class="sample-help">
+                    サンプルフレーズをループ再生しながら、下のSNAPを操作して音の変化を試せるようにする予定です。
+                    最終版では再生音をブラウザ上のSNAP DSPへリアルタイムで通します。
+                </div>
+
+                <audio id="snap-sample-audio"
+                       preload="auto"
+                       loop
+                       src="Audio/SNAP_sample_phrase.wav"></audio>
+            </div>
+
+            <div class="plugin-top">
+                <div class="snap-product-panel" aria-label="SNAP plugin visual">
+                    <div>
+                        <div class="snap-logo">SNAP</div>
+                        <div class="snap-subtitle">GUITAR EFFECT PLUGIN</div>
+                    </div>
+
+                    <div class="pedal-row">
+                        <div class="fake-pedal">
+                            <span>COMP</span>
+                            <div class="fake-knobs">
+                                <span class="fake-knob"></span>
+                                <span class="fake-knob"></span>
+                            </div>
+                        </div>
+                        <div class="fake-pedal">
+                            <span>DRIVE</span>
+                            <div class="fake-knobs">
+                                <span class="fake-knob"></span>
+                                <span class="fake-knob"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="plugin-copy">
+                    <h2>SNAP</h2>
+                    <div>Guitar Effect Plugin by Kaichi Naito</div>
+
+                    <p class="lead">
+                        自分がギターを弾く中で欲しかった機能をまとめて作っている、
+                        ギター向けのVST3プラグインです。
+                        COMP / DRIVE / SNAP / CAB / EQ などを1つの画面から操作できます。
+                    </p>
+
+                    <table class="spec-table">
+                        <tr>
+                            <th>Latest Version</th>
+                            <td>v0.4.80</td>
+                        </tr>
+                        <tr>
+                            <th>Format</th>
+                            <td>VST3</td>
+                        </tr>
+                        <tr>
+                            <th>OS</th>
+                            <td>Windows 64-bit</td>
+                        </tr>
+                        <tr>
+                            <th>Browser Demo</th>
+                            <td><span class="status-dev">Sample Loop UI Ready / DSP Preparing</span></td>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top: 12px;">
+                        <!--
+                            配布開始時:
+                            1. href を実ファイルに変更
+                            2. is-disabled を削除
+                            3. id=download-vst3 のclick処理を削除
+                        -->
+                        <a href="#" id="download-vst3" class="win95-btn primary is-disabled">Download VST3</a>
+                        <button type="button" class="win95-btn" id="focus-sample-btn">Try in Browser</button>
+                    </div>
+
+                    <div class="small-note">
+                        ※ サンプル再生UIは実装済みです。SNAPのWeb DSP接続と配布ファイルは今後追加します。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- インストール -->
+    <div class="window" id="win-install" style="width: 430px; z-index: 103;">
+        <div class="title-bar draggable-cursor" id="handle-install">
+            <span>README_SNAP.txt</span><div class="close-button">×</div>
+        </div>
+        <div class="window-contents">
+            <div class="group-box">
+                <span class="group-box-title">INSTALL</span>
+                <ol class="install-list">
+                    <li>SNAPのZIPファイルをダウンロード</li>
+                    <li>ZIPを展開</li>
+                    <li>SNAP.vst3 をVST3フォルダへコピー</li>
+                    <li>DAW側でVST3を再スキャン</li>
+                    <li>エフェクト一覧からSNAPを読み込む</li>
+                </ol>
+
+                <div class="small-note">
+                    Windows標準VST3フォルダ:<br>
+                    C:\Program Files\Common Files\VST3
+                </div>
+            </div>
+
+            <div class="group-box">
+                <span class="group-box-title">CONTENTS</span>
+                <div style="line-height:1.8;">
+                    ・COMP<br>
+                    ・DRIVE / BOOST<br>
+                    ・SNAP transient control<br>
+                    ・CAB selection<br>
+                    ・9-band EQ<br>
+                    ・GATE<br>
+                    ・Preset
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Changelog -->
+    <div class="window" id="win-changelog" style="width: 430px; z-index: 102;">
+        <div class="title-bar draggable-cursor" id="handle-changelog">
+            <span>CHANGELOG.log</span><div class="close-button">×</div>
+        </div>
+        <div class="window-contents">
+            <div class="changelog">
+                SNAP v0.4.80<br>
+                ------------------------------<br>
+                ・VST3 development build<br>
+                ・COMP / DRIVE pedal UI<br>
+                ・SNAP control 0 - 10<br>
+                ・CAB / EQ / GATE<br>
+                ・Preset system<br>
+                ・DRIVE CPU LOW / HIGH<br>
+                ・Browser demo: preparing...<br>
+                <br>
+                この欄は今後、公開版の更新履歴に使用します。
+            </div>
+        </div>
+    </div>
+
+    <div id="win95-taskbar">
+        <button id="taskbar-start-btn" class="click-target">
+            <img src="images/start.png" alt="Start">
+        </button>
+
+        <div id="taskbar-tasks">
+            <div class="win95-taskbar-tab">SNAP_Plugin.exe</div>
+            <div class="win95-taskbar-tab">SAMPLE_PHRASE.wav</div>
+        </div>
+
+        <div id="taskbar-tray">
+            <img src="images/volume-icon.png" alt="Volume">
+            <div id="tray-clock">00:00</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        このサイトは本人によって頑張って作成されました
+    </div>
+
+    <script>
+        var mouseClickSound;
+
+        try {
+            mouseClickSound = new Audio('Sound/MouseClick.mp3');
+            mouseClickSound.preload = 'auto';
+            mouseClickSound.load();
+        } catch(e) {}
+
+        function playClickSound() {
+            if (!mouseClickSound) return;
+            mouseClickSound.currentTime = 0;
+            mouseClickSound.play().catch(function() {});
+        }
+
+        var clickTargets = document.querySelectorAll(
+            '.desktop-icon, .win95-btn, .close-button, .title-bar, .click-target'
+        );
+
+        for (var i = 0; i < clickTargets.length; i++) {
+            clickTargets[i].addEventListener('mousedown', playClickSound);
+            clickTargets[i].addEventListener('touchstart', playClickSound, { passive: true });
+        }
+
+        var highestZIndex = 120;
+
+        function setInitialPositions() {
+            var isMobile = window.matchMedia("(max-width: 800px)").matches;
+
+            var snap = document.getElementById('win-snap');
+            var install = document.getElementById('win-install');
+            var changelog = document.getElementById('win-changelog');
+
+            if (isMobile) {
+                snap.style.left = '3%';
+                snap.style.top = '190px';
+
+                install.style.left = '3%';
+                install.style.top = '910px';
+
+                changelog.style.left = '3%';
+                changelog.style.top = '1190px';
+
+                document.body.style.minHeight = '1480px';
+            } else {
+                snap.style.left = '50%';
+                snap.style.top = '185px';
+                snap.style.transform = 'translateX(-50%)';
+
+                install.style.left = '18%';
+                install.style.top = '750px';
+                install.style.transform = '';
+
+                changelog.style.left = '57%';
+                changelog.style.top = '750px';
+                changelog.style.transform = '';
+
+                document.body.style.minHeight = '1090px';
+            }
+        }
+
+        window.addEventListener('load', function() {
+            setTimeout(setInitialPositions, 80);
+        });
+
+        window.addEventListener('resize', function() {
+            setTimeout(setInitialPositions, 80);
+        });
+
+        function initDrag(targetId, handleId) {
+            var target = document.getElementById(targetId);
+            var handle = document.getElementById(handleId);
+
+            if (!target || !handle) return;
+
+            var isDragging = false;
+            var initialX = 0;
+            var initialY = 0;
+
+            handle.addEventListener('mousedown', startDragging);
+            handle.addEventListener('touchstart', startDragging, { passive: false });
+
+            function startDragging(e) {
+                if (e.target.classList.contains('close-button')) return;
+
+                isDragging = true;
+                highestZIndex++;
+                target.style.zIndex = highestZIndex;
+
+                /* ドラッグ開始時は中央寄せ用transformを解除 */
+                if (target.style.transform) {
+                    var rect = target.getBoundingClientRect();
+                    target.style.transform = '';
+                    target.style.left = rect.left + 'px';
+                    target.style.top = rect.top + 'px';
+                }
+
+                var clientX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX;
+                var clientY = (e.type === 'touchstart') ? e.touches[0].clientY : e.clientY;
+
+                initialX = clientX - target.offsetLeft;
+                initialY = clientY - target.offsetTop;
+
+                if (e.type === 'touchstart') e.preventDefault();
+
+                document.addEventListener('mousemove', dragging);
+                document.addEventListener('touchmove', dragging, { passive: false });
+                document.addEventListener('mouseup', endDrag);
+                document.addEventListener('touchend', endDrag);
+            }
+
+            function dragging(e) {
+                if (!isDragging) return;
+
+                var clientX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
+                var clientY = (e.type === 'touchmove') ? e.touches[0].clientY : e.clientY;
+
+                target.style.left = (clientX - initialX) + 'px';
+                target.style.top = (clientY - initialY) + 'px';
+
+                if (e.type === 'touchmove') e.preventDefault();
+            }
+
+            function endDrag() {
+                isDragging = false;
+                document.removeEventListener('mousemove', dragging);
+                document.removeEventListener('touchmove', dragging);
+            }
+        }
+
+        initDrag('win-snap', 'handle-snap');
+        initDrag('win-install', 'handle-install');
+        initDrag('win-changelog', 'handle-changelog');
+
+        var closeBtns = document.querySelectorAll('.close-button');
+
+        for (var j = 0; j < closeBtns.length; j++) {
+            closeBtns[j].addEventListener('mousedown', function(e) {
+                e.stopPropagation();
+            });
+
+            closeBtns[j].addEventListener('touchstart', function(e) {
+                e.stopPropagation();
+            }, { passive: false });
+
+            var closeAction = function(e) {
+                e.preventDefault();
+                var windowElement = this.closest('.window');
+                if (windowElement) windowElement.style.display = 'none';
+            };
+
+            closeBtns[j].addEventListener('click', closeAction);
+            closeBtns[j].addEventListener('touchend', closeAction);
+        }
+
+        /* 配布開始まではDownloadを無効化 */
+        var downloadBtn = document.getElementById('download-vst3');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', function(e) {
+                if (downloadBtn.classList.contains('is-disabled')) {
+                    e.preventDefault();
+                    alert('SNAP VST3 は現在配布準備中です。');
+                }
+            });
+        }
+
+        /* ---------------------------------------------------------
+           SAMPLE PHRASE PLAYER
+           現在は Audio/SNAP_sample_phrase.wav の通常ループ再生。
+           SNAP WebAssembly版が完成したら、このaudio直再生ではなく
+           AudioWorklet/WASM DSP経由へ差し替える。
+        --------------------------------------------------------- */
+        var sampleAudio = document.getElementById('snap-sample-audio');
+        var samplePlayBtn = document.getElementById('sample-play-btn');
+        var sampleStatus = document.getElementById('sample-status');
+        var focusSampleBtn = document.getElementById('focus-sample-btn');
+
+        function setSampleUi(isPlaying) {
+            if (!samplePlayBtn || !sampleStatus) return;
+
+            if (isPlaying) {
+                samplePlayBtn.textContent = '■ STOP SAMPLE';
+                sampleStatus.textContent = 'PLAYING — SAMPLE PHRASE (LOOP)';
+            } else {
+                samplePlayBtn.textContent = '▶ PLAY SAMPLE';
+                sampleStatus.textContent = 'READY — CLICK PLAY';
+            }
+        }
+
+        if (sampleAudio) {
+            sampleAudio.loop = true;
+
+            sampleAudio.addEventListener('play', function() {
+                setSampleUi(true);
+            });
+
+            sampleAudio.addEventListener('pause', function() {
+                setSampleUi(false);
+            });
+
+            sampleAudio.addEventListener('error', function() {
+                if (sampleStatus) {
+                    sampleStatus.textContent = 'SAMPLE FILE NOT FOUND';
+                }
+                if (samplePlayBtn) {
+                    samplePlayBtn.textContent = '▶ PLAY SAMPLE';
+                }
+            });
+        }
+
+        if (samplePlayBtn && sampleAudio) {
+            samplePlayBtn.addEventListener('click', function() {
+                if (sampleAudio.paused) {
+                    sampleAudio.play().catch(function() {
+                        if (sampleStatus) {
+                            sampleStatus.textContent =
+                                'PLACE: Audio/SNAP_sample_phrase.wav';
+                        }
+                    });
+                } else {
+                    sampleAudio.pause();
+                    sampleAudio.currentTime = 0;
+                }
+            });
+        }
+
+        if (focusSampleBtn) {
+            focusSampleBtn.addEventListener('click', function() {
+                var player = document.querySelector('.sample-player');
+                if (!player) return;
+
+                player.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+
+                if (samplePlayBtn) {
+                    setTimeout(function() {
+                        samplePlayBtn.focus();
+                    }, 350);
+                }
+            });
+        }
+
+
+        function updateTrayClock() {
+            var clock = document.getElementById('tray-clock');
+            if (!clock) return;
+
+            var now = new Date();
+            var h = now.getHours();
+            var m = now.getMinutes();
+
+            clock.textContent =
+                (h < 10 ? '0' + h : h) + ':' +
+                (m < 10 ? '0' + m : m);
+        }
+
+        updateTrayClock();
+        setInterval(updateTrayClock, 60000);
+    </script>
+</body>
+</html>
