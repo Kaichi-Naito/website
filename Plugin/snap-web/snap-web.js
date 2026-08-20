@@ -33,6 +33,7 @@
             this.convolverA = null;
             this.convolverB = null;
             this.master = null;
+            this.limiter = null;
             this.ready = false;
             this.initPromise = null;
             this.params = { ...DEFAULTS };
@@ -73,6 +74,17 @@
                 });
 
                 this.master = this.context.createGain();
+                // Web-demo-only final output lift. This AudioContext contains only the SNAP
+                // sample player, so the Windows95 click/GUI sounds are intentionally untouched.
+                this.master.gain.value = Math.pow(10, 6.0 / 20.0); // +6 dB
+
+                this.limiter = this.context.createDynamicsCompressor();
+                this.limiter.threshold.value = -1.0;
+                this.limiter.knee.value = 0.0;
+                this.limiter.ratio.value = 20.0;
+                this.limiter.attack.value = 0.003;
+                this.limiter.release.value = 0.08;
+
                 this.dryGain = this.context.createGain();
                 this.cabAGain = this.context.createGain();
                 this.cabBGain = this.context.createGain();
@@ -85,7 +97,7 @@
                 this.worklet.connect(this.dryGain).connect(this.master);
                 this.worklet.connect(this.convolverA).connect(this.cabAGain).connect(this.master);
                 this.worklet.connect(this.convolverB).connect(this.cabBGain).connect(this.master);
-                this.master.connect(this.context.destination);
+                this.master.connect(this.limiter).connect(this.context.destination);
 
                 this.worklet.port.onmessage = (event) => {
                     const data = event.data || {};
