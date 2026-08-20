@@ -228,6 +228,48 @@
             font-size: 13px;
         }
 
+        .sample-display-select-wrap {
+            position: relative;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .sample-display-select {
+            width: 100%;
+            min-width: 0;
+            height: 24px;
+            margin: 0;
+            padding: 0 34px 0 0;
+            border: 0;
+            outline: 0;
+            background-color: #000;
+            color: #00ff66;
+            font-family: 'PixelMplus', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        .sample-display-select-wrap::after {
+            content: "▼";
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-52%);
+            color: #00ff66;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        .sample-display-select option {
+            background: #000;
+            color: #00ff66;
+        }
+
         .sample-player-row {
             display: grid;
             grid-template-columns: auto 1fr auto;
@@ -254,13 +296,6 @@
             overflow: hidden;
         }
 
-        .sample-display-main {
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
         .sample-display-sub {
             color: #a8a8a8;
             font-size: 10px;
@@ -268,23 +303,27 @@
         }
 
         .sample-loop-indicator {
-            border: 2px inset #ffffff;
-            background: #d4d0c8;
-            padding: 8px 10px;
-            min-width: 86px;
-            text-align: center;
-            font-size: 12px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            background: #c0c0c0;
+            width: 48px;
+            height: 38px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: default;
         }
 
-        .sample-loop-indicator .lamp {
-            display: inline-block;
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background: #008000;
-            border: 1px solid #004000;
-            margin-right: 5px;
-            vertical-align: -1px;
+        .sample-loop-indicator svg {
+            width: 27px;
+            height: 27px;
+            display: block;
+            fill: none;
+            stroke: #111111;
+            stroke-width: 2.2;
+            stroke-linecap: square;
+            stroke-linejoin: miter;
         }
 
         .sample-help {
@@ -713,44 +752,56 @@
 
             <!--
                 SAMPLE PLAYER
-                Plugin/samplesound/SNAP_sample_arpeggio.wav を置くと、このボタンからループ再生できます。
+                GitHub APIから Plugin/samplesound/ のファイル一覧を取得し、
+                "SNAP_sample_" で始まる .wav を自動でプルダウンへ追加します。
 
-                現段階では通常のAudio要素で再生する仮配線です。
+                表示名:
+                SNAP_sample_Strum.wav -> Strum.wav
+
+                現段階では通常のAudio要素でループ再生します。
                 WebAssembly版SNAP完成後は、
                 AudioBufferSource -> AudioWorklet/WASM(SNAP DSP) -> AudioContext.destination
                 へ差し替える想定です。
             -->
             <div class="sample-player">
-                <span class="sample-player-title">SNAP_sample_arpeggio.wav</span>
+                <span class="sample-player-title">SAMPLE PLAYER</span>
 
                 <div class="sample-player-row">
-                    <button type="button" class="win95-btn sample-play-btn" id="sample-play-btn">
+                    <button type="button" class="win95-btn sample-play-btn" id="sample-play-btn" disabled>
                         ▶ PLAY SAMPLE
                     </button>
 
                     <div class="sample-display">
-                        <div class="sample-display-main" id="sample-status">
-                            READY — CLICK PLAY
+                        <div class="sample-display-select-wrap">
+                            <select id="sample-select"
+                                    class="sample-display-select"
+                                    aria-label="Sample sound">
+                                <option value="">Loading samples...</option>
+                            </select>
                         </div>
                         <div class="sample-display-sub" id="sample-engine-status">
                             LOOP ON / SNAP WEB DSP: PREPARING
                         </div>
                     </div>
 
-                    <div class="sample-loop-indicator">
-                        <span class="lamp"></span>LOOP
+                    <div class="sample-loop-indicator" title="Loop playback" aria-label="Loop playback">
+                        <svg viewBox="0 0 32 32" aria-hidden="true">
+                            <path d="M7 11 H22 C25 11 27 13 27 16" />
+                            <path d="M23 7 L27 11 L23 15" />
+                            <path d="M25 21 H10 C7 21 5 19 5 16" />
+                            <path d="M9 25 L5 21 L9 17" />
+                        </svg>
                     </div>
                 </div>
 
                 <div class="sample-help">
-                    サンプルアルペジオをループ再生しながら、下のSNAPを操作して音の変化を試せるようにする予定です。
-                    最終版では再生音をブラウザ上のSNAP DSPへリアルタイムで通します。
+                    プルダウンからサンプルフレーズを選び、ループ再生しながらSNAPを試せるようにする予定です。
+                    「SNAP_sample_」より後ろのファイル名だけを表示します。
                 </div>
 
                 <audio id="snap-sample-audio"
                        preload="auto"
-                       loop
-                       src="Plugin/samplesound/SNAP_sample_arpeggio.wav"></audio>
+                       loop></audio>
             </div>
 
             <div class="plugin-top">
@@ -892,7 +943,7 @@
 
         <div id="taskbar-tasks">
             <div class="win95-taskbar-tab">SNAP_Plugin.exe</div>
-            <div class="win95-taskbar-tab">SNAP_sample_arpeggio.wav</div>
+            <div class="win95-taskbar-tab">SAMPLE PLAYER</div>
         </div>
 
         <div id="taskbar-tray">
@@ -1072,26 +1123,183 @@
         }
 
         /* ---------------------------------------------------------
-           SNAP ARPEGGIO PLAYER
-           現在は Plugin/samplesound/SNAP_sample_arpeggio.wav の通常ループ再生。
-           SNAP WebAssembly版が完成したら、このaudio直再生ではなく
-           AudioWorklet/WASM DSP経由へ差し替える。
+           SAMPLE PLAYER
+           GitHub APIで Plugin/samplesound/ を取得して、
+           SNAP_sample_*.wav を自動でプルダウンへ追加します。
+
+           例:
+           SNAP_sample_Strum.wav -> Strum.wav
+
+           現在はHTMLAudioElementで直接ループ再生。
+           WebAssembly版SNAP完成後は、ここをSNAP DSP経由に差し替えます。
         --------------------------------------------------------- */
         var sampleAudio = document.getElementById('snap-sample-audio');
         var samplePlayBtn = document.getElementById('sample-play-btn');
-        var sampleStatus = document.getElementById('sample-status');
+        var sampleSelect = document.getElementById('sample-select');
+        var sampleEngineStatus = document.getElementById('sample-engine-status');
         var focusSampleBtn = document.getElementById('focus-sample-btn');
 
+        var SAMPLE_PREFIX = 'SNAP_sample_';
+        var SAMPLE_FOLDER = 'Plugin/samplesound/';
+        var SAMPLE_API =
+            'https://api.github.com/repos/kaichi-naito/website/contents/Plugin/samplesound';
+
+        function getSampleDisplayName(fileName) {
+            if (fileName.indexOf(SAMPLE_PREFIX) === 0) {
+                return fileName.substring(SAMPLE_PREFIX.length);
+            }
+            return fileName;
+        }
+
+        function getSelectedSampleName() {
+            if (!sampleSelect || !sampleSelect.value) return '';
+            return getSampleDisplayName(sampleSelect.value);
+        }
+
         function setSampleUi(isPlaying) {
-            if (!samplePlayBtn || !sampleStatus) return;
+            if (!samplePlayBtn || !sampleSelect) return;
 
             if (isPlaying) {
                 samplePlayBtn.textContent = '■ STOP SAMPLE';
-                sampleStatus.textContent = 'PLAYING — SNAP ARPEGGIO (LOOP)';
+                if (sampleEngineStatus) {
+                    sampleEngineStatus.textContent =
+                        'PLAYING / LOOP ON / SNAP WEB DSP: PREPARING';
+                }
             } else {
                 samplePlayBtn.textContent = '▶ PLAY SAMPLE';
-                sampleStatus.textContent = 'READY — CLICK PLAY';
+                if (sampleEngineStatus) {
+                    sampleEngineStatus.textContent =
+                        'LOOP ON / SNAP WEB DSP: PREPARING';
+                }
             }
+        }
+
+        function setAudioSourceFromFileName(fileName, resumePlayback) {
+            if (!sampleAudio || !fileName) return;
+
+            sampleAudio.pause();
+            sampleAudio.currentTime = 0;
+
+            /*
+                Plugin.html は /website/Plugin.html にあるので、
+                この相対パスは
+                /website/Plugin/samplesound/<filename>
+                を指します。
+            */
+            sampleAudio.src = new URL(
+                SAMPLE_FOLDER + encodeURIComponent(fileName),
+                window.location.href
+            ).href;
+
+            sampleAudio.load();
+
+            if (resumePlayback) {
+                sampleAudio.play().catch(function() {
+                    if (sampleEngineStatus) {
+                        sampleEngineStatus.textContent =
+                            'PLAYBACK ERROR — ' + getSampleDisplayName(fileName);
+                    }
+                });
+            } else {
+                setSampleUi(false);
+            }
+        }
+
+        function populateSampleSelect(files) {
+            if (!sampleSelect) return;
+
+            var sampleFiles = files
+                .filter(function(file) {
+                    return file &&
+                           file.type === 'file' &&
+                           typeof file.name === 'string' &&
+                           file.name.indexOf(SAMPLE_PREFIX) === 0 &&
+                           /\.wav$/i.test(file.name);
+                })
+                .sort(function(a, b) {
+                    return a.name.localeCompare(b.name, 'ja');
+                });
+
+            sampleSelect.innerHTML = '';
+
+            if (sampleFiles.length === 0) {
+                var noneOption = document.createElement('option');
+                noneOption.value = '';
+                noneOption.textContent = 'No SNAP samples found';
+                sampleSelect.appendChild(noneOption);
+
+                if (samplePlayBtn) samplePlayBtn.disabled = true;
+                if (sampleEngineStatus) sampleEngineStatus.textContent = 'NO SAMPLE FILES FOUND';
+                return;
+            }
+
+            sampleFiles.forEach(function(file) {
+                var option = document.createElement('option');
+                option.value = file.name;
+                option.textContent = getSampleDisplayName(file.name);
+                sampleSelect.appendChild(option);
+            });
+
+            /*
+                arpeggioがあれば初期選択。
+                なければアルファベット順の先頭を使います。
+            */
+            var preferred = sampleFiles.find(function(file) {
+                return file.name === 'SNAP_sample_arpeggio.wav';
+            });
+
+            sampleSelect.value = preferred ? preferred.name : sampleFiles[0].name;
+
+            if (samplePlayBtn) samplePlayBtn.disabled = false;
+            setAudioSourceFromFileName(sampleSelect.value, false);
+        }
+
+        function loadSampleList() {
+            if (sampleEngineStatus) {
+                sampleEngineStatus.textContent = 'LOADING SAMPLE LIST...';
+            }
+
+            fetch(SAMPLE_API, {
+                headers: {
+                    'Accept': 'application/vnd.github+json'
+                }
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('GitHub API HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(function(files) {
+                if (!Array.isArray(files)) {
+                    throw new Error('Unexpected GitHub API response');
+                }
+                populateSampleSelect(files);
+            })
+            .catch(function(error) {
+                console.error('Could not load sample list:', error);
+
+                /*
+                    GitHub APIが一時的に使えない場合のフォールバック。
+                    既存のarpeggioだけは直接再生できるようにします。
+                */
+                if (sampleSelect) {
+                    sampleSelect.innerHTML = '';
+
+                    var fallbackOption = document.createElement('option');
+                    fallbackOption.value = 'SNAP_sample_arpeggio.wav';
+                    fallbackOption.textContent = 'arpeggio.wav';
+                    sampleSelect.appendChild(fallbackOption);
+                }
+
+                if (samplePlayBtn) samplePlayBtn.disabled = false;
+                setAudioSourceFromFileName('SNAP_sample_arpeggio.wav', false);
+
+                if (sampleEngineStatus) {
+                    sampleEngineStatus.textContent =
+                        'LOOP ON / SNAP WEB DSP: PREPARING';
+                }
+            });
         }
 
         if (sampleAudio) {
@@ -1106,8 +1314,9 @@
             });
 
             sampleAudio.addEventListener('error', function() {
-                if (sampleStatus) {
-                    sampleStatus.textContent = 'SAMPLE FILE NOT FOUND';
+                if (sampleEngineStatus) {
+                    sampleEngineStatus.textContent =
+                        'SAMPLE FILE NOT FOUND — ' + (getSelectedSampleName() || '');
                 }
                 if (samplePlayBtn) {
                     samplePlayBtn.textContent = '▶ PLAY SAMPLE';
@@ -1115,13 +1324,24 @@
             });
         }
 
+        if (sampleSelect) {
+            sampleSelect.addEventListener('change', function() {
+                if (!sampleSelect.value) return;
+
+                var wasPlaying = sampleAudio && !sampleAudio.paused;
+                setAudioSourceFromFileName(sampleSelect.value, wasPlaying);
+            });
+        }
+
         if (samplePlayBtn && sampleAudio) {
             samplePlayBtn.addEventListener('click', function() {
+                if (!sampleSelect || !sampleSelect.value) return;
+
                 if (sampleAudio.paused) {
                     sampleAudio.play().catch(function() {
-                        if (sampleStatus) {
-                            sampleStatus.textContent =
-                                'PLACE: Plugin/samplesound/SNAP_sample_arpeggio.wav';
+                        if (sampleEngineStatus) {
+                            sampleEngineStatus.textContent =
+                                'PLAYBACK ERROR — ' + getSelectedSampleName();
                         }
                     });
                 } else {
@@ -1148,6 +1368,8 @@
                 }
             });
         }
+
+        loadSampleList();
 
 
         function updateTrayClock() {
