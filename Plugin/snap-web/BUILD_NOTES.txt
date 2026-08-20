@@ -1,0 +1,12 @@
+SNAP Web DSP build notes
+
+This module is deliberately freestanding (no Emscripten runtime required).
+Example build with LLVM/clang 17+ and wasm-ld:
+
+clang --target=wasm32 -O3 -ffreestanding -fno-stack-protector -nostdlib \
+  snap_dsp.c \
+  -Wl,--no-entry -Wl,--export-memory -Wl,--allow-undefined \
+  -Wl,--initial-memory=1048576 -Wl,--max-memory=16777216 \
+  -o snap_dsp.wasm
+
+Math functions are WebAssembly imports supplied by snap-worklet.js.
