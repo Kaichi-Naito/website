@@ -713,7 +713,7 @@
 
             <!--
                 SAMPLE PLAYER
-                Audio/SNAP_sample_phrase.wav を置くと、このボタンからループ再生できます。
+                /Plugin/samplesound/SNAP_sample_arpeggio.wav を置くと、このボタンからループ再生できます。
 
                 現段階では通常のAudio要素で再生する仮配線です。
                 WebAssembly版SNAP完成後は、
@@ -721,7 +721,7 @@
                 へ差し替える想定です。
             -->
             <div class="sample-player">
-                <span class="sample-player-title">SAMPLE_PHRASE.wav</span>
+                <span class="sample-player-title">SNAP_sample_arpeggio.wav</span>
 
                 <div class="sample-player-row">
                     <button type="button" class="win95-btn sample-play-btn" id="sample-play-btn">
@@ -743,14 +743,14 @@
                 </div>
 
                 <div class="sample-help">
-                    サンプルフレーズをループ再生しながら、下のSNAPを操作して音の変化を試せるようにする予定です。
+                    サンプルアルペジオをループ再生しながら、下のSNAPを操作して音の変化を試せるようにする予定です。
                     最終版では再生音をブラウザ上のSNAP DSPへリアルタイムで通します。
                 </div>
 
                 <audio id="snap-sample-audio"
                        preload="auto"
                        loop
-                       src="Audio/SNAP_sample_phrase.wav"></audio>
+                       src="/Plugin/samplesound/SNAP_sample_arpeggio.wav"></audio>
             </div>
 
             <div class="plugin-top">
@@ -892,7 +892,7 @@
 
         <div id="taskbar-tasks">
             <div class="win95-taskbar-tab">SNAP_Plugin.exe</div>
-            <div class="win95-taskbar-tab">SAMPLE_PHRASE.wav</div>
+            <div class="win95-taskbar-tab">SNAP_sample_arpeggio.wav</div>
         </div>
 
         <div id="taskbar-tray">
@@ -1072,8 +1072,8 @@
         }
 
         /* ---------------------------------------------------------
-           SAMPLE PHRASE PLAYER
-           現在は Audio/SNAP_sample_phrase.wav の通常ループ再生。
+           SNAP ARPEGGIO PLAYER
+           現在は /Plugin/samplesound/SNAP_sample_arpeggio.wav の通常ループ再生。
            SNAP WebAssembly版が完成したら、このaudio直再生ではなく
            AudioWorklet/WASM DSP経由へ差し替える。
         --------------------------------------------------------- */
@@ -1087,7 +1087,7 @@
 
             if (isPlaying) {
                 samplePlayBtn.textContent = '■ STOP SAMPLE';
-                sampleStatus.textContent = 'PLAYING — SAMPLE PHRASE (LOOP)';
+                sampleStatus.textContent = 'PLAYING — SNAP ARPEGGIO (LOOP)';
             } else {
                 samplePlayBtn.textContent = '▶ PLAY SAMPLE';
                 sampleStatus.textContent = 'READY — CLICK PLAY';
@@ -1121,7 +1121,7 @@
                     sampleAudio.play().catch(function() {
                         if (sampleStatus) {
                             sampleStatus.textContent =
-                                'PLACE: Audio/SNAP_sample_phrase.wav';
+                                'PLACE: /Plugin/samplesound/SNAP_sample_arpeggio.wav';
                         }
                     });
                 } else {
