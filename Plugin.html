@@ -1563,7 +1563,7 @@
         }
     
         /* =========================================================
-           SNAP WEB UI r8.6 — matched against SNAP v0.4.80 editor
+           SNAP WEB UI r8.7 — matched against SNAP v0.4.80 editor
            ========================================================= */
         .snap-vst-ui { container-type: inline-size; }
 
@@ -2308,7 +2308,7 @@
     </div>
 
     <!-- SNAP メインウィンドウ -->
-    <div class="window" id="win-sample" style="width: 860px; z-index: 107;">
+    <div class="window" id="win-sample" style="width: 860px; z-index: 118;">
         <div class="title-bar draggable-cursor" id="handle-sample">
             <span>SAMPLE_PLAYER.exe</span><div class="close-button">×</div>
         </div>
@@ -2371,7 +2371,7 @@
         </div>
     </div>
 
-    <div class="window" id="win-snap" style="width: 860px; z-index: 106;">
+    <div class="window" id="win-snap" style="width: 860px; z-index: 120;">
         <div class="title-bar draggable-cursor" id="handle-snap">
             <span>SNAP_Plugin.exe</span><div class="close-button">×</div>
         </div>
@@ -2562,7 +2562,7 @@
                             <span id="web-preset-dirty"></span>
                         </div>
 
-                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r8.6</span>
+                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r8.7</span>
                     </div>
 
                     <!-- SETTINGS -->
@@ -2748,7 +2748,7 @@
                     </div>
     </div>
 
-    <div class="window notepad-window" id="win-install" style="width: 760px; z-index: 104;">
+    <div class="window notepad-window" id="win-install" style="width: 760px; z-index: 116;">
         <div class="title-bar draggable-cursor" id="handle-install">
             <span>SNAP_README.txt - Notepad</span><div class="close-button">×</div>
         </div>
@@ -2909,42 +2909,67 @@
                 return;
             }
 
-            var baseLeft = Math.max(40, Math.round((window.innerWidth - 1260) / 2));
-            var sampleTop = 52;
-            var sampleLeft = baseLeft;
-            var snapTop = 180;
-            var snapLeft = baseLeft + 210;
-            var installTop = snapTop + (snap ? snap.offsetHeight || 620 : 620) - 55;
-            var installLeft = baseLeft + 8;
-            var changelogTop = installTop + (install ? install.offsetHeight || 520 : 520) + 26;
-            var changelogLeft = baseLeft + 34;
+            var viewportW = window.innerWidth || 1600;
+            var viewportH = window.innerHeight || 900;
+
+            var sampleWidth = sample ? (sample.offsetWidth || 860) : 860;
+            var snapWidth = snap ? (snap.offsetWidth || 860) : 860;
+            var installWidth = install ? (install.offsetWidth || 760) : 760;
+
+            var sampleHeight = sample ? (sample.offsetHeight || 190) : 190;
+            var snapHeight = snap ? (snap.offsetHeight || 660) : 660;
+            var installHeight = install ? (install.offsetHeight || 520) : 520;
+            var changelogHeight = changelog ? (changelog.offsetHeight || 280) : 280;
+
+            function clamp(value, min, max) {
+                return Math.min(Math.max(value, min), max);
+            }
+
+            /* Match the reference layout from the provided screenshot as closely as possible. */
+            var sampleLeft = clamp(Math.round(viewportW * 0.064), 40, Math.max(40, viewportW - sampleWidth - 20));
+            var sampleTop = clamp(Math.round(viewportH * 0.058), 32, 140);
+
+            var snapLeft = clamp(Math.round(viewportW * 0.337), sampleLeft + 220, Math.max(sampleLeft + 220, viewportW - snapWidth - 20));
+            var snapTop = clamp(Math.round(viewportH * 0.200), sampleTop + 95, 260);
+
+            var installLeft = clamp(Math.round(viewportW * 0.067), 42, Math.max(42, viewportW - installWidth - 20));
+            var installTop = snapTop + snapHeight - 82;
+            installTop = clamp(installTop, snapTop + 340, Math.max(snapTop + 340, viewportH - 180));
+
+            var changelogLeft = installLeft + 26;
+            var changelogTop = installTop + installHeight + 22;
 
             if (sample) {
                 sample.style.left = sampleLeft + 'px';
                 sample.style.top = sampleTop + 'px';
-            }
-
-            if (snap) {
-                snap.style.left = snapLeft + 'px';
-                snap.style.top = snapTop + 'px';
+                sample.style.zIndex = '118';
             }
 
             if (install) {
                 install.style.left = installLeft + 'px';
                 install.style.top = installTop + 'px';
+                install.style.zIndex = '116';
+            }
+
+            if (snap) {
+                snap.style.left = snapLeft + 'px';
+                snap.style.top = snapTop + 'px';
+                snap.style.zIndex = '120';
             }
 
             if (changelog) {
                 changelog.style.left = changelogLeft + 'px';
                 changelog.style.top = changelogTop + 'px';
+                changelog.style.zIndex = '110';
             }
+
+            highestZIndex = 120;
 
             var bottoms = windows.filter(Boolean).map(function(win) {
                 return (parseInt(win.style.top, 10) || 0) + (win.offsetHeight || 300);
             });
             var maxBottom = bottoms.length ? Math.max.apply(null, bottoms) : 1200;
             document.body.style.minHeight = (maxBottom + 80) + 'px';
-        }
         }
 
         window.addEventListener('load', function() {
