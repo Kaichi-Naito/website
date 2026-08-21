@@ -410,33 +410,33 @@
         .snap-vst-brand-row {
             display: flex;
             align-items: baseline;
-            gap: 9px;
+            gap: 6px;
             white-space: nowrap;
         }
 
         .snap-vst-brand-main {
-            font-size: clamp(20px, 2.75vw, 35px);
+            font-size: clamp(19px, 2.35vw, 31px);
             font-weight: 900;
             letter-spacing: .2px;
         }
 
         .snap-vst-dev {
-            font-size: clamp(7px, .82vw, 11px);
+            font-size: clamp(6px, .68vw, 9px);
             font-weight: 800;
-            letter-spacing: .2px;
-            color: rgba(36,39,43,.52);
+            letter-spacing: .15px;
+            color: rgba(36,39,43,.50);
         }
 
         .snap-vst-brand-sub {
             margin-top: 5px;
-            font-size: clamp(8px, 1.05vw, 14px);
+            font-size: clamp(7px, .92vw, 12px);
             font-weight: 700;
             color: rgba(36,39,43,.62);
         }
 
         .snap-vst-meter-area {
             position: absolute;
-            left: 19.7%;
+            left: 21.0%;
             top: 5.4%;
             width: 72.4%;
             height: 11.7%;
@@ -1043,26 +1043,42 @@
             color: white;
         }
 
-        .snap-fixed-setting {
-            display: inline-flex;
+        .snap-cpu-fixed {
+            display: flex;
+            gap: 8px;
             align-items: center;
-            justify-content: center;
-            min-width: 92px;
+        }
+
+        .snap-cpu-choice {
+            min-width: 86px;
             height: 28px;
-            padding: 5px 14px;
+            padding: 5px 13px;
             border: 1px solid #88929b;
             border-radius: 7px;
-            background: #56bfd0;
-            color: #fff;
+            text-align: center;
             font-size: 12px;
             font-weight: 800;
+            line-height: 16px;
+        }
+
+        .snap-cpu-choice.low {
+            background: #56bfd0;
+            color: #fff;
+        }
+
+        .snap-cpu-choice.high {
+            background: #31373e;
+            color: rgba(255,255,255,.34);
+            border-color: rgba(136,146,155,.45);
+            cursor: not-allowed;
         }
 
         .snap-fixed-note {
-            margin-left: 8px;
-            color: rgba(255,255,255,.46);
+            margin-left: 2px;
+            color: rgba(255,255,255,.42);
             font-size: 10px;
             font-weight: 700;
+            white-space: nowrap;
         }
 
         .snap-eq-header {
@@ -1075,7 +1091,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            min-width: 88px;
+            min-width: 108px;
             height: 28px;
             padding: 4px 12px;
             border: 1px solid #88929b;
@@ -1155,7 +1171,47 @@
             direction: rtl;
             -webkit-appearance: slider-vertical;
             appearance: slider-vertical;
-            accent-color: #59bfd0;
+            accent-color: var(--eq-color, #59bfd0);
+        }
+
+        .snap-eq-band input[type="range"]::-webkit-slider-runnable-track {
+            background: linear-gradient(
+                to top,
+                color-mix(in srgb, var(--eq-color) 92%, transparent),
+                color-mix(in srgb, var(--eq-color) 35%, #20252b)
+            );
+            border-radius: 6px;
+            width: 8px;
+        }
+
+        .snap-eq-band input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 0;
+            background: var(--eq-color);
+            box-shadow: 0 0 0 1px rgba(255,255,255,.15);
+        }
+
+        .snap-eq-band input[type="range"]::-moz-range-track {
+            background: color-mix(in srgb, var(--eq-color) 35%, #20252b);
+            border-radius: 6px;
+            width: 8px;
+        }
+
+        .snap-eq-band input[type="range"]::-moz-range-progress {
+            background: var(--eq-color);
+            border-radius: 6px;
+            width: 8px;
+        }
+
+        .snap-eq-band input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border: 0;
+            border-radius: 50%;
+            background: var(--eq-color);
         }
 
         .snap-eq-band .eq-value {
@@ -1274,6 +1330,20 @@
             margin: 8px 0 0 20px;
             padding: 0;
             line-height: 1.9;
+        }
+
+        .plugin-copy .lead {
+            font-size: 11px;
+            line-height: 1.65 !important;
+            color: #222;
+        }
+
+        .plugin-copy .lead p {
+            margin: 0 0 9px 0;
+        }
+
+        .plugin-copy .lead strong {
+            font-weight: 700;
         }
 
         .small-note {
@@ -1593,7 +1663,7 @@
                     <div class="snap-vst-brand">
                         <div class="snap-vst-brand-row">
                             <div class="snap-vst-brand-main">SNAP</div>
-                            <div class="snap-vst-dev">Dev Ver.</div>
+                            <div class="snap-vst-dev">Web Ver.</div>
                         </div>
                         <div class="snap-vst-brand-sub">Kaichi Naito</div>
                     </div>
@@ -1756,7 +1826,7 @@
                             <span id="web-preset-dirty"></span>
                         </div>
 
-                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r5</span>
+                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r6</span>
                     </div>
 
                     <!-- SETTINGS -->
@@ -1779,8 +1849,9 @@
 
                         <div class="snap-settings-row">
                             <label>DRIVE CPU</label>
-                            <div>
-                                <span class="snap-fixed-setting">LOW</span>
+                            <div class="snap-cpu-fixed" aria-label="Drive CPU: LOW fixed on Web">
+                                <span class="snap-cpu-choice low">LOW</span>
+                                <span class="snap-cpu-choice high" title="Web versionでは選択できません">HIGH</span>
                                 <span class="snap-fixed-note">Web fixed / 4×</span>
                             </div>
                         </div>
@@ -1789,8 +1860,8 @@
                             <label>EQ</label>
                             <div class="snap-eq-header">
                                 <label class="snap-eq-toggle" data-switch-visual="eqOn">
-                                    <span>EQ</span>
-                                    <input type="checkbox" data-snap-param="eqOn" aria-label="EQ">
+                                    <span>EQ ON/OFF</span>
+                                    <input type="checkbox" data-snap-param="eqOn" aria-label="EQ ON/OFF">
                                 </label>
                                 <button type="button" class="snap-eq-reset" id="snap-eq-reset">RESET</button>
                             </div>
@@ -1798,17 +1869,17 @@
 
                         <div class="snap-eq-area">
                             <div class="snap-eq-sliders is-off" id="snap-eq-sliders">
-                                <div class="snap-eq-band"><span class="freq">31</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq31"><span class="eq-value" data-snap-value="eq31">0</span></div>
-                                <div class="snap-eq-band"><span class="freq">62</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq62"><span class="eq-value" data-snap-value="eq62">0</span></div>
-                                <div class="snap-eq-band"><span class="freq">125</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq125"><span class="eq-value" data-snap-value="eq125">0</span></div>
-                                <div class="snap-eq-band"><span class="freq">250</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq250"><span class="eq-value" data-snap-value="eq250">0</span></div>
-                                <div class="snap-eq-band"><span class="freq">500</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq500"><span class="eq-value" data-snap-value="eq500">0</span></div>
-                                <div class="snap-eq-band"><span class="freq">1k</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq1k"><span class="eq-value" data-snap-value="eq1k">0</span></div>
-                                <div class="snap-eq-band"><span class="freq">2k</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq2k"><span class="eq-value" data-snap-value="eq2k">0</span></div>
-                                <div class="snap-eq-band"><span class="freq">4k</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq4k"><span class="eq-value" data-snap-value="eq4k">0</span></div>
-                                <div class="snap-eq-band"><span class="freq">8k</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq8k"><span class="eq-value" data-snap-value="eq8k">0</span></div>
-                                <div class="snap-eq-band"><span class="freq">16k</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq16k"><span class="eq-value" data-snap-value="eq16k">0</span></div>
-                                <div class="snap-eq-band"><span class="freq">VOL</span><input type="range" min="-18" max="18" step="0.1" value="0" data-snap-param="eqOut"><span class="eq-value" data-snap-value="eqOut">0</span></div>
+                                <div class="snap-eq-band"><span class="freq">31</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq31" style="--eq-color:#F54949;"><span class="eq-value" data-snap-value="eq31">0</span></div>
+                                <div class="snap-eq-band"><span class="freq">62</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq62" style="--eq-color:#F5A849;"><span class="eq-value" data-snap-value="eq62">0</span></div>
+                                <div class="snap-eq-band"><span class="freq">125</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq125" style="--eq-color:#E3F549;"><span class="eq-value" data-snap-value="eq125">0</span></div>
+                                <div class="snap-eq-band"><span class="freq">250</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq250" style="--eq-color:#84F549;"><span class="eq-value" data-snap-value="eq250">0</span></div>
+                                <div class="snap-eq-band"><span class="freq">500</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq500" style="--eq-color:#49F56D;"><span class="eq-value" data-snap-value="eq500">0</span></div>
+                                <div class="snap-eq-band"><span class="freq">1k</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq1k" style="--eq-color:#49F5CC;"><span class="eq-value" data-snap-value="eq1k">0</span></div>
+                                <div class="snap-eq-band"><span class="freq">2k</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq2k" style="--eq-color:#49BFF5;"><span class="eq-value" data-snap-value="eq2k">0</span></div>
+                                <div class="snap-eq-band"><span class="freq">4k</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq4k" style="--eq-color:#4961F5;"><span class="eq-value" data-snap-value="eq4k">0</span></div>
+                                <div class="snap-eq-band"><span class="freq">8k</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq8k" style="--eq-color:#9149F5;"><span class="eq-value" data-snap-value="eq8k">0</span></div>
+                                <div class="snap-eq-band"><span class="freq">16k</span><input type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq16k" style="--eq-color:#EF49F5;"><span class="eq-value" data-snap-value="eq16k">0</span></div>
+                                <div class="snap-eq-band"><span class="freq">VOL</span><input type="range" min="-18" max="18" step="0.1" value="0" data-snap-param="eqOut" style="--eq-color:#F5499C;"><span class="eq-value" data-snap-value="eqOut">0</span></div>
                             </div>
                             <div class="snap-eq-off-label">OFF</div>
                         </div>
@@ -1825,7 +1896,7 @@
             <div class="plugin-copy" style="margin-top:16px;">
                 <h2>SNAP</h2>
                 <div>Guitar Effect Plugin by Kaichi Naito</div>
-                <div class="lead" style="line-height:1.9;">
+                <div class="lead">
                     <p><strong>SNAP</strong> は、タイトで輪郭のある<strong>モダンクランチサウンド</strong>を作ることに特化して開発した、ギタリスト向けのエフェクタープラグインです。</p>
 
                     <p>コンプレッサーとオーバードライブをひとつにまとめ、音作りの中心となる独自の <strong>「SNAP」コントロール</strong>を搭載。</p>
