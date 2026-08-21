@@ -85,7 +85,11 @@ class SnapWebProcessor extends AudioWorkletProcessor {
         }
 
         if ((++this.meterCounter & 7) === 0) {
-            this.port.postMessage({ type: 'meter', db: this.exports.snap_get_input_peak_db() });
+            this.port.postMessage({
+                type: 'meter',
+                db: this.exports.snap_get_input_peak_db(),
+                gateClosed: Boolean(this.exports.snap_get_gate_closed())
+            });
         }
         return true;
     }

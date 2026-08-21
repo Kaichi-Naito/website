@@ -112,6 +112,7 @@
                         }
                     } else if (data.type === 'meter') {
                         this.updateMeter(data.db);
+                        this.updateGateVisual(Boolean(data.gateClosed));
                     } else if (data.type === 'error') {
                         this.setStatus('SNAP WEB DSP ERROR');
                         console.error('SNAP worklet:', data.message);
@@ -160,6 +161,7 @@
         }
 
         setParam(name, value) {
+            if (name === 'signalMode' || name === 'driveCpuHigh') value = 0;
             this.params[name] = Number(value);
             const map = {
                 inputTrim:P.INPUT_TRIM, gate:P.GATE, comp:P.COMP, compVol:P.COMP_VOL,
@@ -214,6 +216,11 @@
                 this.meterValue.textContent = v <= -59.5 ? '-inf' : v.toFixed(1);
             }
         }
+
+        updateGateVisual(closed) {
+            const gate = document.querySelector('.snap-gate-knob');
+            if (gate) gate.classList.toggle('gate-closed', Boolean(closed));
+        }
     }
 
 
@@ -227,6 +234,12 @@
 
         const knob = el.closest('.snap-knob, .snap-gate-knob');
         if (knob) knob.style.setProperty('--knob-angle', angle + 'deg');
+
+        const eqFader = el.closest('.snap-eq-fader');
+        if (eqFader) {
+            const topPct = (1 - t) * 100;
+            eqFader.style.setProperty('--eq-top', topPct.toFixed(3) + '%');
+        }
     }
 
     function updateSwitchVisual(name, value) {
@@ -259,7 +272,7 @@
 
             group.querySelectorAll('label').forEach(label => {
                 const radio = label.querySelector('input[type="radio"]');
-                if (!radio) return;
+                if (!radio || radio.disabled || label.classList.contains('is-disabled')) return;
                 label.addEventListener('click', () => {
                     if (!hiddenSelect) return;
                     hiddenSelect.value = radio.value;
@@ -365,8 +378,10 @@
             updateControlUi(name, value);
         });
 
-        // Web version is intentionally fixed to DRIVE CPU LOW (4x oversampling).
+        // Web version is intentionally fixed to MONO and DRIVE CPU LOW.
+        engine.setParam('signalMode', 0);
         engine.setParam('driveCpuHigh', 0);
+        updateControlUi('signalMode', 0);
 
         const dirty = document.getElementById('web-preset-dirty');
         if (dirty) dirty.textContent = '';

@@ -296,6 +296,7 @@ __attribute__((export_name("snap_get_input_r"))) unsigned int snap_get_input_r(v
 __attribute__((export_name("snap_get_output_l"))) unsigned int snap_get_output_l(void){ return (unsigned int)(unsigned long)outL; }
 __attribute__((export_name("snap_get_output_r"))) unsigned int snap_get_output_r(void){ return (unsigned int)(unsigned long)outR; }
 __attribute__((export_name("snap_get_input_peak_db"))) float snap_get_input_peak_db(void){ return inputPeakDb; }
+__attribute__((export_name("snap_get_gate_closed"))) int snap_get_gate_closed(void){ return (p.gate > 0.01f && !gateIsOpen) ? 1 : 0; }
 
 static void process_gate(float* L,float* R,int n){
     int i; float closed=db_to_gain(-90.0f);
