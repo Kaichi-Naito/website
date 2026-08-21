@@ -1563,7 +1563,7 @@
         }
     
         /* =========================================================
-           SNAP WEB UI r8.2 — matched against SNAP v0.4.80 editor
+           SNAP WEB UI r8.5 — matched against SNAP v0.4.80 editor
            ========================================================= */
         .snap-vst-ui { container-type: inline-size; }
 
@@ -2012,7 +2012,143 @@
             bottom: 2.0% !important;
         }
 
-</style>
+
+        /* =========================================================
+           v0.84 MOBILE LAYOUT
+           Keep the complete window inside the viewport and preserve
+           the original SNAP editor aspect ratio (1240 : 790).
+        ========================================================= */
+        @media (max-width: 800px) {
+            html,
+            body {
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow-x: hidden !important;
+            }
+
+            body {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+
+            .window {
+                box-sizing: border-box !important;
+                max-width: calc(100vw - 12px) !important;
+            }
+
+            #win-snap {
+                width: calc(100vw - 12px) !important;
+                max-width: none !important;
+                box-sizing: border-box !important;
+            }
+
+            #win-snap .window-contents {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
+                padding: 6px !important;
+            }
+
+            .sample-player {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                padding: 12px 8px 8px !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            .sample-player-row {
+                width: 100% !important;
+                grid-template-columns: 1fr !important;
+                gap: 6px !important;
+            }
+
+            .sample-play-btn,
+            .sample-display,
+            .sample-loop-indicator {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            .sample-display-select-wrap,
+            .sample-display-select {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .sample-help {
+                overflow-wrap: anywhere;
+            }
+
+            .snap-vst-shell {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                padding: 4px !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                overflow: hidden !important;
+            }
+
+            /*
+               Critical fix:
+               the previous mobile rule forced min-height:280px.
+               On a ~350px-wide phone this destroyed the 1240:790 ratio
+               and made COMP/DRIVE look tall and narrow.
+            */
+            .snap-vst-ui {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-height: 0 !important;
+                height: auto !important;
+                aspect-ratio: 1240 / 790 !important;
+                overflow: hidden !important;
+            }
+
+            /* Keep desktop editor geometry; only scale the whole editor. */
+            .snap-pedal {
+                top: 22.532% !important;
+                width: 27.419% !important;
+                height: 65.570% !important;
+            }
+
+            .snap-pedal.comp {
+                left: 19.113% !important;
+            }
+
+            .snap-pedal.drive {
+                left: 53.548% !important;
+            }
+
+            /*
+               Settings is part of the same editor canvas, so it also scales
+               proportionally instead of forcing a separate phone geometry.
+            */
+            .snap-vst-settings {
+                box-sizing: border-box !important;
+            }
+
+            #win-install,
+            #win-changelog {
+                width: calc(100vw - 12px) !important;
+                max-width: none !important;
+                box-sizing: border-box !important;
+            }
+
+            #win-nyan-special {
+                max-width: calc(100vw - 12px) !important;
+            }
+        }
+
+    \n        /* =========================================================\n           v0.85 separate windows / XP Notepad-style README\n        ========================================================= */\n        .notepad-window .window-contents {\n            padding: 0;\n            background: #ece9d8;\n        }\n\n        .notepad-contents {\n            padding: 0 !important;\n            background: #ece9d8;\n        }\n\n        .notepad-menu {\n            display: flex;\n            gap: 18px;\n            padding: 5px 10px 4px;\n            font-size: 14px;\n            line-height: 1.2;\n            color: #000;\n            border-bottom: 1px solid #b6b6b6;\n            background: #f4f4f4;\n            user-select: none;\n        }\n\n        .notepad-sheet {\n            margin: 10px;\n            padding: 14px 16px;\n            background: #ffffff;\n            border: 1px solid #7f9db9;\n            box-shadow: inset 1px 1px 0 #ffffff;\n            color: #111;\n            font-family: 'MS UI Gothic', 'Tahoma', sans-serif;\n            line-height: 1.55;\n        }\n\n        .notepad-sheet h2 {\n            margin: 0 0 6px;\n            font-size: 22px;\n            font-weight: 700;\n            letter-spacing: 0.3px;\n        }\n\n        .notepad-subtitle {\n            font-size: 13px;\n            margin-bottom: 12px;\n        }\n\n        .notepad-body {\n            font-size: 13px;\n        }\n\n        .notepad-body p {\n            margin: 0 0 12px;\n        }\n\n        .notepad-meta {\n            margin-top: 16px;\n            padding-top: 12px;\n            border-top: 1px solid #d9d9d9;\n            font-size: 13px;\n            line-height: 1.8;\n        }\n\n        .notepad-meta span:first-child {\n            display: inline-block;\n            min-width: 120px;\n            font-weight: 700;\n        }\n\n        .notepad-actions {\n            display: flex;\n            gap: 10px;\n            flex-wrap: wrap;\n            padding: 0 10px 10px;\n        }\n\n        @media (max-width: 800px) {\n            #win-sample,\n            #win-snap,\n            #win-install,\n            #win-changelog {\n                width: calc(100vw - 12px) !important;\n                max-width: none !important;\n                box-sizing: border-box !important;\n            }\n\n            .notepad-menu {\n                gap: 12px;\n                font-size: 12px;\n                padding-left: 8px;\n                padding-right: 8px;\n            }\n\n            .notepad-sheet {\n                margin: 8px;\n                padding: 10px 12px;\n            }\n\n            .notepad-sheet h2 {\n                font-size: 18px;\n            }\n\n            .notepad-body,\n            .notepad-meta {\n                font-size: 12px;\n            }\n\n            .notepad-meta span:first-child {\n                min-width: 96px;\n            }\n\n            .notepad-actions {\n                padding: 0 8px 8px;\n            }\n        }\n
+    </style>
 </head>
 
 <body id="win95-desktop">
@@ -2046,12 +2182,12 @@
     </div>
 
     <!-- SNAP メインウィンドウ -->
-    <div class="window" id="win-snap" style="width: 860px; z-index: 106;">
-        <div class="title-bar draggable-cursor" id="handle-snap">
-            <span>SNAP_Plugin.exe</span><div class="close-button">×</div>
+    <div class="window" id="win-sample" style="width: 860px; z-index: 107;">
+        <div class="title-bar draggable-cursor" id="handle-sample">
+            <span>SAMPLE_PLAYER.exe</span><div class="close-button">×</div>
         </div>
-
         <div class="window-contents">
+
 
             <!--
                 SAMPLE PLAYER
@@ -2106,6 +2242,16 @@
                        preload="auto"
                        loop></audio>
             </div>
+        </div>
+    </div>
+
+    <div class="window" id="win-snap" style="width: 860px; z-index: 106;">
+        <div class="title-bar draggable-cursor" id="handle-snap">
+            <span>SNAP_Plugin.exe</span><div class="close-button">×</div>
+        </div>
+
+        <div class="window-contents">
+
 
             <div class="snap-vst-shell">
                 <span class="snap-vst-shell-title">SNAP WEB PLUGIN</span>
@@ -2290,7 +2436,7 @@
                             <span id="web-preset-dirty"></span>
                         </div>
 
-                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r8.2</span>
+                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r8.5</span>
                     </div>
 
                     <!-- SETTINGS -->
@@ -2473,81 +2619,52 @@
                 </div>
             </div>
 
-            <div class="plugin-copy" style="margin-top:16px;">
+                    </div>
+    </div>
+
+    <div class="window notepad-window" id="win-install" style="width: 760px; z-index: 104;">
+        <div class="title-bar draggable-cursor" id="handle-install">
+            <span>SNAP_README.txt - Notepad</span><div class="close-button">×</div>
+        </div>
+        <div class="window-contents notepad-contents">
+            <div class="notepad-menu" aria-hidden="true">
+                <span>File</span>
+                <span>Edit</span>
+                <span>Format</span>
+                <span>View</span>
+                <span>Help</span>
+            </div>
+
+            <div class="notepad-sheet">
                 <h2>SNAP</h2>
-                <div>Guitar Effect Plugin by Kaichi Naito</div>
-                <div class="lead">
+                <div class="notepad-subtitle">Guitar Effect Plugin by Kaichi Naito</div>
+
+                <div class="notepad-body">
                     <p><strong>SNAP</strong> は、タイトで輪郭のある<strong>モダンクランチサウンド</strong>を作ることに特化して開発した、ギタリスト向けのエフェクタープラグインです。</p>
-
                     <p>コンプレッサーとオーバードライブをひとつにまとめ、音作りの中心となる独自の <strong>「SNAP」コントロール</strong>を搭載。</p>
-
                     <p>SNAPノブでは、ピッキングの立ち上がりやアタック感をコントロールできます。軽いタッチでもピッキングニュアンスや粒立ちを出しやすく、モダンなギターサウンドに必要な、タイトでレスポンスの良い弾き心地を作ることができます。</p>
-
                     <p>基本的には、アンプやアンプシミュレーターの前段に置くドライブ／ブースターとして使用可能。</p>
-
                     <p>一方で、<strong>ノイズゲート、9バンドEQ、CABセクション</strong>も内蔵しているため、CABをONにすれば<strong>SNAP単体でギターサウンドを完結させる</strong>こともできます。</p>
-
                     <p>クリーン寄りの軽いクランチから、BOOSTを使ったよりアグレッシブなサウンドまで対応。</p>
-
-                    <p>ただ歪ませるのではなく、<br>
-                    <strong>モダンなクランチサウンドと、気持ちよく弾けるピッキングレスポンスをひとつのプラグインで。</strong></p>
-
+                    <p><strong>モダンなクランチサウンドと、気持ちよく弾けるピッキングレスポンスをひとつのプラグインで。</strong></p>
                     <p>それが <strong>SNAP</strong> です。</p>
                 </div>
 
-                <table class="spec-table">
-                    <tr><th>Latest Version</th><td>v0.4.80</td></tr>
-                    <tr><th>Format</th><td>VST3</td></tr>
-                    <tr><th>OS</th><td>Windows 64-bit</td></tr>
-                    <tr><th>Browser Demo</th><td><span class="status-dev" id="browser-demo-status">Loading Web DSP...</span></td></tr>
-                </table>
-
-                <div style="margin-top:12px;">
-                    <a href="#" id="download-vst3" class="win95-btn primary is-disabled">Download VST3</a>
-                    <button type="button" class="win95-btn" id="focus-sample-btn">Try in Browser</button>
-                </div>
-
-                <div class="small-note">
-                    ※ Web試奏版はSNAP v0.4.80のDSPをブラウザ向けに移植したものです。
-                    VST3バイナリそのものを読み込んでいるわけではありません。
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- インストール -->
-    <div class="window" id="win-install" style="width: 430px; z-index: 103;">
-        <div class="title-bar draggable-cursor" id="handle-install">
-            <span>README_SNAP.txt</span><div class="close-button">×</div>
-        </div>
-        <div class="window-contents">
-            <div class="group-box">
-                <span class="group-box-title">INSTALL</span>
-                <ol class="install-list">
-                    <li>SNAPのZIPファイルをダウンロード</li>
-                    <li>ZIPを展開</li>
-                    <li>SNAP.vst3 をVST3フォルダへコピー</li>
-                    <li>DAW側でVST3を再スキャン</li>
-                    <li>エフェクト一覧からSNAPを読み込む</li>
-                </ol>
-
-                <div class="small-note">
-                    Windows標準VST3フォルダ:<br>
-                    C:\Program Files\Common Files\VST3
+                <div class="notepad-meta">
+                    <div><span>Latest Version:</span> v0.4.80</div>
+                    <div><span>Format:</span> VST3</div>
+                    <div><span>OS:</span> Windows 64-bit</div>
+                    <div><span>Browser Demo:</span> <span class="status-dev" id="browser-demo-status">Loading Web DSP...</span></div>
                 </div>
             </div>
 
-            <div class="group-box">
-                <span class="group-box-title">CONTENTS</span>
-                <div style="line-height:1.8;">
-                    ・COMP<br>
-                    ・DRIVE / BOOST<br>
-                    ・SNAP transient control<br>
-                    ・CAB selection<br>
-                    ・9-band EQ<br>
-                    ・GATE<br>
-                    ・Preset
-                </div>
+            <div class="notepad-actions">
+                <a href="#" id="download-vst3" class="win95-btn primary is-disabled">Download VST3</a>
+                <button type="button" class="win95-btn" id="focus-sample-btn">Open Sample Player</button>
+            </div>
+
+            <div class="small-note">
+                ※ Web試奏版はSNAP v0.4.80のDSPをブラウザ向けに移植したものです。VST3バイナリそのものを読み込んでいるわけではありません。
             </div>
         </div>
     </div>
@@ -2639,40 +2756,52 @@
         function setInitialPositions() {
             var isMobile = window.matchMedia("(max-width: 800px)").matches;
 
+            var sample = document.getElementById('win-sample');
             var snap = document.getElementById('win-snap');
             var install = document.getElementById('win-install');
             var changelog = document.getElementById('win-changelog');
 
+            var windows = [sample, snap, install, changelog];
+            for (var w = 0; w < windows.length; w++) {
+                if (!windows[w]) continue;
+                if (isMobile) {
+                    windows[w].style.transform = '';
+                } else {
+                    windows[w].style.left = '50%';
+                    windows[w].style.transform = 'translateX(-50%)';
+                }
+            }
+
             if (isMobile) {
-                snap.style.left = '3%';
-                snap.style.top = '190px';
+                var left = '6px';
+                var top = 190;
+                var gap = 24;
 
-                install.style.left = '3%';
-                install.style.top = '1380px';
+                [sample, snap, install, changelog].forEach(function(win) {
+                    if (!win) return;
+                    win.style.left = left;
+                    win.style.top = top + 'px';
+                    top += (win.offsetHeight || 300) + gap;
+                });
 
-                changelog.style.left = '3%';
-                changelog.style.top = '1660px';
-
-                document.body.style.minHeight = '1940px';
+                document.body.style.minHeight = (top + 100) + 'px';
             } else {
-                snap.style.left = '50%';
-                snap.style.top = '185px';
-                snap.style.transform = 'translateX(-50%)';
+                var topDesktop = 185;
+                var gapDesktop = 24;
 
-                install.style.left = '18%';
-                install.style.top = '1120px';
-                install.style.transform = '';
+                [sample, snap, install, changelog].forEach(function(win) {
+                    if (!win) return;
+                    win.style.top = topDesktop + 'px';
+                    topDesktop += (win.offsetHeight || 300) + gapDesktop;
+                });
 
-                changelog.style.left = '57%';
-                changelog.style.top = '1120px';
-                changelog.style.transform = '';
-
-                document.body.style.minHeight = '1450px';
+                document.body.style.minHeight = (topDesktop + 90) + 'px';
             }
         }
 
         window.addEventListener('load', function() {
             setTimeout(setInitialPositions, 80);
+            setTimeout(setInitialPositions, 450);
         });
 
         window.addEventListener('resize', function() {
@@ -2740,6 +2869,7 @@
             }
         }
 
+        initDrag('win-sample', 'handle-sample');
         initDrag('win-snap', 'handle-snap');
         initDrag('win-install', 'handle-install');
         initDrag('win-changelog', 'handle-changelog');
@@ -3122,10 +3252,14 @@
 
         if (focusSampleBtn) {
             focusSampleBtn.addEventListener('click', function() {
-                var player = document.querySelector('.sample-player');
-                if (!player) return;
+                var sampleWindow = document.getElementById('win-sample');
+                if (!sampleWindow) return;
 
-                player.scrollIntoView({
+                sampleWindow.style.display = '';
+                highestZIndex++;
+                sampleWindow.style.zIndex = highestZIndex;
+
+                sampleWindow.scrollIntoView({
                     behavior: 'smooth',
                     block: 'center'
                 });

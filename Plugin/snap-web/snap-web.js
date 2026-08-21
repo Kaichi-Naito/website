@@ -207,8 +207,16 @@
         }
 
         updateMeter(db) {
+            // Web demo only: visual meter calibration.
+            // This does NOT change the audio signal, gate threshold, DSP gain,
+            // sample playback level, or the site's click / UI sound effects.
+            // Keeping this as a simple display offset avoids adding any extra
+            // animation / frame-rate work to the Web version.
+            const DISPLAY_METER_OFFSET_DB = 6.0;
             const raw = Number(db);
-            const v = Number.isFinite(raw) ? Math.max(-60, Math.min(0, raw)) : -60;
+            const displayDb = Number.isFinite(raw) ? raw + DISPLAY_METER_OFFSET_DB : -60;
+            const v = Math.max(-60, Math.min(0, displayDb));
+
             if (this.meterFill) {
                 this.meterFill.style.width = (((v + 60) / 60) * 100).toFixed(1) + '%';
             }
