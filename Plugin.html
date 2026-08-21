@@ -1563,7 +1563,7 @@
         }
     
         /* =========================================================
-           SNAP WEB UI r9.1 — matched against SNAP v0.4.80 editor
+           SNAP WEB UI r9.2 — matched against SNAP v0.4.95 editor
            ========================================================= */
         .snap-vst-ui { container-type: inline-size; }
 
@@ -2374,6 +2374,54 @@
             }
         }
 
+    
+        /* =========================================================
+           v0.92 sync with SNAP VST3 v0.4.95
+           Web-only MONO/LOW, separate windows and demo gain remain unchanged.
+        ========================================================= */
+        .snap-vst-gear {
+            left: 95.08cqw !important;
+            top: 1.53cqw !important;
+            width: 3.71cqw !important;
+            height: 3.71cqw !important;
+        }
+
+        #snap-settings-open .snap-gear-svg {
+            transform-origin: 50% 50%;
+        }
+
+        #snap-settings-open:hover .snap-gear-svg {
+            animation: snap-web-gear-hover-spin .82s linear infinite;
+        }
+
+        @keyframes snap-web-gear-hover-spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .snap-eq-area { overflow: visible; }
+        .snap-eq-response {
+            position: absolute;
+            left: 4.7cqw;
+            right: 1.5cqw;
+            top: 1.40cqw;
+            height: 18.5cqw;
+            width: calc(100% - 6.2cqw);
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .12s ease;
+        }
+        .snap-eq-response.is-visible { opacity: .45; }
+        .snap-eq-zero-line { z-index: 1; }
+        .snap-eq-sliders { position: relative; z-index: 2; }
+
+        /* v0.4.83 preset control sizing, adapted to the Web-only no-SAVE strip. */
+        .snap-main-preset select {
+            width: 15.97cqw !important;
+            height: 2.42cqw !important;
+        }
+        .snap-main-preset label { font-size: .82cqw !important; }
+
     </style>
 </head>
 
@@ -2653,16 +2701,18 @@
                             <label for="web-preset-select">PRESET</label>
                             <select id="web-preset-select" aria-label="Preset">
                                 <option value="default">-- default --</option>
-                                <option value="Chime">Chime</option>
                                 <option value="Clean">Clean</option>
+                                <option value="Clean + CAB">Clean + CAB</option>
                                 <option value="CleanShred">CleanShred</option>
-                                <option value="CleanShredAmp">CleanShredAmp</option>
                                 <option value="Dist">Dist</option>
+                                <option value="Dist + CAB">Dist + CAB</option>
+                                <option value="Snap">Snap</option>
+                                <option value="Snap + CAB">Snap + CAB</option>
                             </select>
                             <span id="web-preset-dirty"></span>
                         </div>
 
-                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r9.1</span>
+                        <span class="snap-vst-bottom-version">v0.4.95 WEB · UI r9.2</span>
                     </div>
 
                     <!-- SETTINGS -->
@@ -2720,6 +2770,18 @@
                                 <div class="snap-eq-scale" aria-hidden="true">
                                     <span class="plus">+12</span><span class="zero">0</span><span class="minus">-12</span>
                                 </div>
+<svg class="snap-eq-response" id="snap-eq-response-svg" viewBox="0 0 1000 240" preserveAspectRatio="none" aria-hidden="true">
+                                    <defs>
+                                        <linearGradient id="snap-eq-response-gradient" x1="0" y1="0" x2="1" y2="0">
+                                            <stop offset="0%" stop-color="#F54949"/><stop offset="11.1%" stop-color="#F5A849"/>
+                                            <stop offset="22.2%" stop-color="#E3F549"/><stop offset="33.3%" stop-color="#84F549"/>
+                                            <stop offset="44.4%" stop-color="#49F56D"/><stop offset="55.6%" stop-color="#49F5CC"/>
+                                            <stop offset="66.7%" stop-color="#49BFF5"/><stop offset="77.8%" stop-color="#4961F5"/>
+                                            <stop offset="88.9%" stop-color="#9149F5"/><stop offset="100%" stop-color="#EF49F5"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <path id="snap-eq-response-path" d="" fill="none" stroke="url(#snap-eq-response-gradient)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
                                 <div class="snap-eq-zero-line"></div>
                                 <div class="snap-eq-sliders is-off" id="snap-eq-sliders">
                                 <div class="snap-eq-band" style="--eq-color:#F54949;">
@@ -2870,14 +2932,14 @@
                     <p>コンプレッサーとオーバードライブをひとつにまとめ、音作りの中心となる独自の <strong>「SNAP」コントロール</strong>を搭載。</p>
                     <p>SNAPノブでは、ピッキングの立ち上がりやアタック感をコントロールできます。軽いタッチでもピッキングニュアンスや粒立ちを出しやすく、モダンなギターサウンドに必要な、タイトでレスポンスの良い弾き心地を作ることができます。</p>
                     <p>基本的には、アンプやアンプシミュレーターの前段に置くドライブ／ブースターとして使用可能。</p>
-                    <p>一方で、<strong>ノイズゲート、9バンドEQ、CABセクション</strong>も内蔵しているため、CABをONにすれば<strong>SNAP単体でギターサウンドを完結させる</strong>こともできます。</p>
+                    <p>一方で、<strong>ノイズゲート、10バンドEQ、CABセクション</strong>も内蔵しているため、CABをONにすれば<strong>SNAP単体でギターサウンドを完結させる</strong>こともできます。</p>
                     <p>クリーン寄りの軽いクランチから、BOOSTを使ったよりアグレッシブなサウンドまで対応。</p>
                     <p><strong>モダンなクランチサウンドと、気持ちよく弾けるピッキングレスポンスをひとつのプラグインで。</strong></p>
                     <p>それが <strong>SNAP</strong> です。</p>
                 </div>
 
                 <div class="notepad-meta">
-                    <div><span>Latest Version:</span> v0.4.80</div>
+                    <div><span>Latest Version:</span> v0.4.95</div>
                     <div><span>Format:</span> VST3</div>
                     <div><span>OS:</span> Windows 64-bit</div>
                     <div><span>Browser Demo:</span> <span class="status-dev" id="browser-demo-status">Loading Web DSP...</span></div>
@@ -2885,7 +2947,7 @@
             </div>
 
             <div class="small-note">
-                ※ Web試奏版はSNAP v0.4.80のDSPをブラウザ向けに移植したものです。VST3バイナリそのものを読み込んでいるわけではありません。
+                ※ Web試奏版はSNAP v0.4.95のDSPをブラウザ向けに移植したものです。VST3バイナリそのものを読み込んでいるわけではありません。
             </div>
         </div>
     </div>
@@ -2902,7 +2964,7 @@
                 <div class="download-info">
                     <div><strong>SNAP</strong> VST3</div>
                     <div>Windows 64-bit</div>
-                    <div>Latest Version: v0.4.80</div>
+                    <div>Latest Version: v0.4.95</div>
                 </div>
 
                 <a href="#" id="download-vst3" class="win95-btn primary is-disabled download-main-btn">
@@ -2919,15 +2981,15 @@
         </div>
         <div class="window-contents">
             <div class="changelog">
-                SNAP v0.4.80<br>
+                SNAP v0.4.95<br>
                 ------------------------------<br>
-                ・VST3 development build<br>
-                ・COMP / DRIVE pedal UI<br>
-                ・SNAP control 0 - 10<br>
-                ・CAB / EQ / GATE<br>
-                ・Preset system<br>
-                ・DRIVE CPU LOW / HIGH<br>
-                ・Browser demo: preparing...<br>
+                ・COMP RMS + Peak detector / NaturalComp<br>
+                ・Updated COMP TONE voicing<br>
+                ・Updated DRIVE / SNAP / TONE / VOL voicing<br>
+                ・DRIVE body contour + developer voicing defaults<br>
+                ・Updated factory presets<br>
+                ・EQ response curve<br>
+                ・Browser DSP synced to v0.4.95<br>
                 <br>
                 この欄は今後、公開版の更新履歴に使用します。
             </div>

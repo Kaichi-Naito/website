@@ -20,7 +20,8 @@ class SnapWebProcessor extends AudioWorkletProcessor {
                         tanh: Math.tanh,
                         asinh: Math.asinh,
                         sinh: Math.sinh,
-                        cosh: Math.cosh
+                        cosh: Math.cosh,
+                        sqrt: Math.sqrt
                     };
                     const result = await WebAssembly.instantiate(data.wasmBytes, { env });
                     this.exports = result.instance.exports;
