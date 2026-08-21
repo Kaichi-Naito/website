@@ -1563,7 +1563,7 @@
         }
     
         /* =========================================================
-           SNAP WEB UI r8.1 — matched against SNAP v0.4.80 editor
+           SNAP WEB UI r8.2 — matched against SNAP v0.4.80 editor
            ========================================================= */
         .snap-vst-ui { container-type: inline-size; }
 
@@ -1861,7 +1861,158 @@
             transform: rotate(var(--knob-angle, 0deg)) !important;
         }
 
-    </style>
+    
+
+        /* v0.82: marker sits near the rim and rotates around the true knob centre. */
+        .snap-knob-marker,
+        .snap-gate-marker {
+            left: 50% !important;
+            top: 12% !important;
+            bottom: auto !important;
+            margin-left: -2px !important;
+            width: 4px !important;
+            height: 21% !important;
+
+            /*
+               Element top = 12%, height = 21%.
+               181% of its own height puts the transform origin almost exactly
+               at the knob centre (12 + 21 * 1.81 ≈ 50%).
+               This keeps the black line near the outer rim instead of pulling it
+               toward the centre.
+            */
+            transform-origin: 50% 181% !important;
+            transform: rotate(var(--knob-angle, 0deg)) !important;
+        }
+
+        .snap-gate-marker {
+            width: 3px !important;
+            margin-left: -1.5px !important;
+            height: 20% !important;
+            top: 13% !important;
+            transform-origin: 50% 185% !important;
+        }
+
+
+        /* v0.82: Settings text and controls share the same vertical centre. */
+        .snap-settings-header {
+            align-items: center !important;
+            line-height: 1 !important;
+        }
+
+        .snap-settings-header > span,
+        .snap-settings-header .gear-mini {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+        }
+
+        .snap-settings-row {
+            align-items: center !important;
+            min-height: 2.10cqw !important;
+        }
+
+        .snap-settings-row > label {
+            display: flex !important;
+            align-items: center !important;
+            height: 2.10cqw !important;
+            line-height: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .snap-segment,
+        .snap-cpu-fixed,
+        .snap-eq-header,
+        .snap-web-fixed-row {
+            align-items: center !important;
+        }
+
+        .snap-segment label,
+        .snap-cpu-choice,
+        .snap-eq-toggle,
+        .snap-eq-reset {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin: 0 !important;
+        }
+
+        .snap-web-only-note,
+        .snap-fixed-note {
+            display: inline-flex !important;
+            align-items: center !important;
+            height: 2.10cqw !important;
+            line-height: 1 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
+
+        /* v0.82: taller EQ, approximately 2x the previous fader travel. */
+        .snap-eq-area {
+            margin-top: 1.15cqw !important;
+            padding-left: 3.25cqw !important;
+        }
+
+        .snap-eq-sliders {
+            height: 22.1cqw !important;
+            align-items: start !important;
+        }
+
+        .snap-eq-band {
+            height: 22.1cqw !important;
+        }
+
+        .snap-eq-band .freq {
+            height: 1.40cqw !important;
+            line-height: 1.20cqw !important;
+        }
+
+        .snap-eq-fader {
+            width: 2.65cqw !important;
+            height: 18.5cqw !important;
+        }
+
+        .snap-eq-native {
+            width: 18.5cqw !important;
+            height: 2.3cqw !important;
+        }
+
+        .snap-eq-scale {
+            top: 1.40cqw !important;
+            height: 18.5cqw !important;
+        }
+
+        /* frequency title (1.40) + half of fader travel (9.25) */
+        .snap-eq-zero-line {
+            top: 10.65cqw !important;
+        }
+
+        .snap-eq-off-label {
+            top: 8.45cqw !important;
+        }
+
+        .snap-eq-band .eq-value {
+            bottom: 0.05cqw !important;
+        }
+
+        /*
+           Keep CLOSE and QR safely below / beside the taller faders.
+           The panel itself already has enough vertical room.
+        */
+        .snap-settings-close {
+            bottom: 2.0% !important;
+        }
+
+        .snap-settings-qr {
+            bottom: 2.0% !important;
+        }
+
+</style>
 </head>
 
 <body id="win95-desktop">
@@ -2139,7 +2290,7 @@
                             <span id="web-preset-dirty"></span>
                         </div>
 
-                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r8.1</span>
+                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r8.2</span>
                     </div>
 
                     <!-- SETTINGS -->
