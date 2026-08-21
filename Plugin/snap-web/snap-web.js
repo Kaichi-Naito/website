@@ -13,7 +13,7 @@
         drive:5, snap:5, tone:5, level:5, driveOn:1, boost:0,
         eqOn:0, eq31:0, eq62:0, eq125:0, eq250:0, eq500:0, eq1k:0,
         eq2k:0, eq4k:0, eq8k:0, eq16k:0, eqOut:0,
-        signalMode:0, driveCpuHigh:1,
+        signalMode:0, driveCpuHigh:0,
         devDirectOff:100, devTransientOff:100, devDirectOn:0, devTransientOn:50,
         cabMode:0
     };
@@ -364,6 +364,9 @@
             engine.setParam(name, value);
             updateControlUi(name, value);
         });
+
+        // Web version is intentionally fixed to DRIVE CPU LOW (4x oversampling).
+        engine.setParam('driveCpuHigh', 0);
 
         const dirty = document.getElementById('web-preset-dirty');
         if (dirty) dirty.textContent = '';

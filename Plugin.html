@@ -407,10 +407,24 @@
             line-height: 1;
         }
 
+        .snap-vst-brand-row {
+            display: flex;
+            align-items: baseline;
+            gap: 9px;
+            white-space: nowrap;
+        }
+
         .snap-vst-brand-main {
             font-size: clamp(20px, 2.75vw, 35px);
             font-weight: 900;
             letter-spacing: .2px;
+        }
+
+        .snap-vst-dev {
+            font-size: clamp(7px, .82vw, 11px);
+            font-weight: 800;
+            letter-spacing: .2px;
+            color: rgba(36,39,43,.52);
         }
 
         .snap-vst-brand-sub {
@@ -623,8 +637,8 @@
 
         .snap-pedal {
             position: absolute;
-            top: 22.5%;
-            width: 27.42%;
+            top: 23.0%;
+            width: 27.0%;
             height: 65.57%;
             border-radius: 22px;
             overflow: visible;
@@ -633,8 +647,8 @@
             font-family: Arial, Helvetica, sans-serif;
         }
 
-        .snap-pedal.comp { left: 19.11%; }
-        .snap-pedal.drive { left: 53.55%; }
+        .snap-pedal.comp { left: 19.35%; }
+        .snap-pedal.drive { left: 53.65%; }
 
         .snap-pedal-art {
             position: absolute;
@@ -660,7 +674,7 @@
             position: absolute;
             left: 7%;
             right: 7%;
-            top: 55.7%;
+            top: 56.1%;
             text-align: center;
             color: rgba(255,255,255,.96);
             font-size: clamp(21px, 3.1vw, 42px);
@@ -889,16 +903,56 @@
 
         .snap-vst-bottom {
             position: absolute;
-            bottom: 2%;
+            bottom: 1.8%;
             left: 3.2%;
             right: 2.7%;
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
             align-items: center;
             color: rgba(36,39,43,.58);
             font-size: clamp(7px, .9vw, 12px);
             font-weight: 700;
             z-index: 10;
+        }
+
+        .snap-vst-bottom-chain {
+            justify-self: start;
+        }
+
+        .snap-vst-bottom-version {
+            justify-self: end;
+        }
+
+        .snap-main-preset {
+            justify-self: center;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: rgba(36,39,43,.58);
+        }
+
+        .snap-main-preset label {
+            font-size: clamp(7px, .72vw, 10px);
+            font-weight: 800;
+        }
+
+        .snap-main-preset select {
+            width: clamp(130px, 15vw, 190px);
+            height: 25px;
+            border-radius: 12px;
+            border: 1px solid #c3c5c6;
+            background: #fbfaf7;
+            padding: 0 24px 0 12px;
+            color: #2a2d31;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: clamp(7px, .78vw, 10px);
+            font-weight: 700;
+            text-align: center;
+        }
+
+        #web-preset-dirty {
+            min-width: 8px;
+            color: rgba(36,39,43,.72);
         }
 
         .snap-vst-settings {
@@ -987,6 +1041,28 @@
         .snap-segment label.is-selected {
             background: #56bfd0;
             color: white;
+        }
+
+        .snap-fixed-setting {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 92px;
+            height: 28px;
+            padding: 5px 14px;
+            border: 1px solid #88929b;
+            border-radius: 7px;
+            background: #56bfd0;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .snap-fixed-note {
+            margin-left: 8px;
+            color: rgba(255,255,255,.46);
+            font-size: 10px;
+            font-weight: 700;
         }
 
         .snap-eq-header {
@@ -1515,7 +1591,10 @@
 
                 <div class="snap-vst-ui" id="snap-vst-ui">
                     <div class="snap-vst-brand">
-                        <div class="snap-vst-brand-main">SNAP</div>
+                        <div class="snap-vst-brand-row">
+                            <div class="snap-vst-brand-main">SNAP</div>
+                            <div class="snap-vst-dev">Dev Ver.</div>
+                        </div>
                         <div class="snap-vst-brand-sub">Kaichi Naito</div>
                     </div>
 
@@ -1662,8 +1741,22 @@
                     </div>
 
                     <div class="snap-vst-bottom">
-                        <span>GATE → COMP → DRIVE → EQ → CAB</span>
-                        <span>v0.4.80 WEB · UI r4</span>
+                        <span class="snap-vst-bottom-chain">GATE → COMP → DRIVE → EQ → CAB</span>
+
+                        <div class="snap-main-preset">
+                            <label for="web-preset-select">PRESET</label>
+                            <select id="web-preset-select" aria-label="Preset">
+                                <option value="default">-- default --</option>
+                                <option value="Chime">Chime</option>
+                                <option value="Clean">Clean</option>
+                                <option value="CleanShred">CleanShred</option>
+                                <option value="CleanShredAmp">CleanShredAmp</option>
+                                <option value="Dist">Dist</option>
+                            </select>
+                            <span id="web-preset-dirty"></span>
+                        </div>
+
+                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r5</span>
                     </div>
 
                     <!-- SETTINGS -->
@@ -1671,21 +1764,6 @@
                         <div class="snap-settings-header">
                             <span class="gear-mini">⚙</span>
                             <span>SETTINGS</span>
-                        </div>
-
-                        <div class="snap-settings-row">
-                            <label for="web-preset-select">PRESET</label>
-                            <div style="display:flex;gap:8px;align-items:center;">
-                                <select id="web-preset-select" style="flex:1;">
-                                    <option value="default">-- default --</option>
-                                    <option value="Chime">Chime</option>
-                                    <option value="Clean">Clean</option>
-                                    <option value="CleanShred">CleanShred</option>
-                                    <option value="CleanShredAmp">CleanShredAmp</option>
-                                    <option value="Dist">Dist</option>
-                                </select>
-                                <span id="web-preset-dirty"></span>
-                            </div>
                         </div>
 
                         <div class="snap-settings-row">
@@ -1701,12 +1779,9 @@
 
                         <div class="snap-settings-row">
                             <label>DRIVE CPU</label>
-                            <div class="snap-segment" data-segment-param="driveCpuHigh">
-                                <label><input type="radio" name="driveCpuUi" value="0">LOW</label>
-                                <label class="is-selected"><input type="radio" name="driveCpuUi" value="1">HIGH</label>
-                                <select data-snap-param="driveCpuHigh" style="display:none;">
-                                    <option value="0">LOW</option><option value="1" selected>HIGH</option>
-                                </select>
+                            <div>
+                                <span class="snap-fixed-setting">LOW</span>
+                                <span class="snap-fixed-note">Web fixed / 4×</span>
                             </div>
                         </div>
 
@@ -1750,12 +1825,24 @@
             <div class="plugin-copy" style="margin-top:16px;">
                 <h2>SNAP</h2>
                 <div>Guitar Effect Plugin by Kaichi Naito</div>
-                <p class="lead">
-                    自分がギターを弾く中で欲しかった機能をまとめて作っている、
-                    ギター向けのVST3プラグインです。
-                    上のWeb版ではサンプルフレーズを再生しながら、
-                    実際のSNAPに近いUIでパラメータを操作できます。
-                </p>
+                <div class="lead" style="line-height:1.9;">
+                    <p><strong>SNAP</strong> は、タイトで輪郭のある<strong>モダンクランチサウンド</strong>を作ることに特化して開発した、ギタリスト向けのエフェクタープラグインです。</p>
+
+                    <p>コンプレッサーとオーバードライブをひとつにまとめ、音作りの中心となる独自の <strong>「SNAP」コントロール</strong>を搭載。</p>
+
+                    <p>SNAPノブでは、ピッキングの立ち上がりやアタック感をコントロールできます。軽いタッチでもピッキングニュアンスや粒立ちを出しやすく、モダンなギターサウンドに必要な、タイトでレスポンスの良い弾き心地を作ることができます。</p>
+
+                    <p>基本的には、アンプやアンプシミュレーターの前段に置くドライブ／ブースターとして使用可能。</p>
+
+                    <p>一方で、<strong>ノイズゲート、9バンドEQ、CABセクション</strong>も内蔵しているため、CABをONにすれば<strong>SNAP単体でギターサウンドを完結させる</strong>こともできます。</p>
+
+                    <p>クリーン寄りの軽いクランチから、BOOSTを使ったよりアグレッシブなサウンドまで対応。</p>
+
+                    <p>ただ歪ませるのではなく、<br>
+                    <strong>モダンなクランチサウンドと、気持ちよく弾けるピッキングレスポンスをひとつのプラグインで。</strong></p>
+
+                    <p>それが <strong>SNAP</strong> です。</p>
+                </div>
 
                 <table class="spec-table">
                     <tr><th>Latest Version</th><td>v0.4.80</td></tr>
@@ -2120,7 +2207,11 @@
                            /\.wav$/i.test(file.name);
                 })
                 .sort(function(a, b) {
-                    return a.name.localeCompare(b.name, 'ja');
+                    return getSampleDisplayName(a.name).localeCompare(
+                        getSampleDisplayName(b.name),
+                        'ja',
+                        { numeric: true, sensitivity: 'base' }
+                    );
                 });
 
             sampleSelect.innerHTML = '';
@@ -2143,15 +2234,9 @@
                 sampleSelect.appendChild(option);
             });
 
-            /*
-                arpeggioがあれば初期選択。
-                なければアルファベット順の先頭を使います。
-            */
-            var preferred = sampleFiles.find(function(file) {
-                return file.name === 'SNAP_sample_arpeggio.wav';
-            });
-
-            sampleSelect.value = preferred ? preferred.name : sampleFiles[0].name;
+            // Always select the first file that actually exists in the folder
+            // after sorting by the displayed file name.
+            sampleSelect.value = sampleFiles[0].name;
 
             if (samplePlayBtn) samplePlayBtn.disabled = false;
             setAudioSourceFromFileName(sampleSelect.value, false);
@@ -2182,25 +2267,20 @@
             .catch(function(error) {
                 console.error('Could not load sample list:', error);
 
-                /*
-                    GitHub APIが一時的に使えない場合のフォールバック。
-                    既存のarpeggioだけは直接再生できるようにします。
-                */
+                // Do not guess a filename. If the folder listing cannot be read,
+                // keep playback disabled rather than selecting a nonexistent sample.
                 if (sampleSelect) {
                     sampleSelect.innerHTML = '';
-
-                    var fallbackOption = document.createElement('option');
-                    fallbackOption.value = 'SNAP_sample_arpeggio.wav';
-                    fallbackOption.textContent = 'arpeggio.wav';
-                    sampleSelect.appendChild(fallbackOption);
+                    var errorOption = document.createElement('option');
+                    errorOption.value = '';
+                    errorOption.textContent = 'Sample list unavailable';
+                    sampleSelect.appendChild(errorOption);
                 }
 
-                if (samplePlayBtn) samplePlayBtn.disabled = false;
-                setAudioSourceFromFileName('SNAP_sample_arpeggio.wav', false);
+                if (samplePlayBtn) samplePlayBtn.disabled = true;
 
                 if (sampleEngineStatus) {
-                    sampleEngineStatus.textContent =
-                        'LOOP ON / SNAP WEB DSP: PREPARING';
+                    sampleEngineStatus.textContent = 'SAMPLE LIST LOAD FAILED';
                 }
             });
         }

@@ -240,7 +240,7 @@ static void init_params(void){
     p.inputTrim=0; p.gate=1; p.comp=5; p.compVol=5; p.compTone=5; p.compOn=1;
     p.drive=5; p.snap=5; p.tone=5; p.level=5; p.driveOn=1; p.boost=0;
     p.eqOn=0; int i; for(i=0;i<NUM_EQ;++i)p.eq[i]=0; p.eqOut=0;
-    p.signalMode=0; p.driveCpuHigh=1;
+    p.signalMode=0; p.driveCpuHigh=0;
     p.devDirectOff=100; p.devTransientOff=100; p.devDirectOn=0; p.devTransientOn=50;
     sInputTrim=p.inputTrim; sGate=p.gate; sComp=p.comp; sCompVol=p.compVol; sCompTone=p.compTone;
     sDrive=p.drive; sSnap=p.snap; sTone=p.tone; sLevel=p.level; sBoost=p.boost;
