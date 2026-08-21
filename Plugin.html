@@ -1563,7 +1563,7 @@
         }
     
         /* =========================================================
-           SNAP WEB UI r7 — matched against SNAP v0.4.80 editor
+           SNAP WEB UI r8 — matched against SNAP v0.4.80 editor
            ========================================================= */
         .snap-vst-ui { container-type: inline-size; }
 
@@ -1722,6 +1722,126 @@
             .snap-eq-sliders { gap:.35cqw; }
         }
 
+    
+        /* r8: knob shadow stays fixed while only the face/marker rotates */
+        .snap-knob::before,
+        .snap-gate-knob::before {
+            content: "";
+            position: absolute;
+            left: 3%;
+            top: 7%;
+            width: 94%;
+            height: 94%;
+            border-radius: 50%;
+            background: rgba(65, 67, 70, .17);
+            transform: translateY(7%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .snap-knob-face,
+        .snap-gate-face {
+            z-index: 1;
+            box-shadow:
+                inset 0 -3px 5px rgba(0,0,0,.08),
+                inset 0 2px 3px rgba(255,255,255,.85) !important;
+        }
+
+        .snap-gate-knob.gate-closed::before {
+            background: rgba(64, 183, 218, .19);
+            box-shadow: 0 0 .65cqw rgba(73,188,221,.28);
+        }
+
+        .snap-gate-knob.gate-closed .snap-gate-face {
+            box-shadow:
+                inset 0 -.14cqw .22cqw rgba(0,0,0,.08),
+                inset 0 .10cqw .18cqw rgba(255,255,255,.88) !important;
+        }
+
+    
+        /* r8: Settings EQ geometry closer to desktop SNAP */
+        .snap-eq-area {
+            position: relative !important;
+            left: auto !important;
+            right: auto !important;
+            top: auto !important;
+            bottom: auto !important;
+            margin-top: 1.75cqw !important;
+            padding-left: 3.25cqw !important;
+            width: 100%;
+        }
+
+        .snap-eq-sliders {
+            gap: 1.05cqw !important;
+            height: 14.0cqw !important;
+        }
+
+        .snap-eq-band {
+            height: 14.0cqw !important;
+        }
+
+        .snap-eq-band .freq {
+            height: 1.35cqw !important;
+            line-height: 1.15cqw !important;
+            font-size: .73cqw !important;
+        }
+
+        .snap-eq-fader {
+            width: 2.65cqw !important;
+            height: 9.85cqw !important;
+        }
+
+        .snap-eq-track,
+        .snap-eq-fill {
+            width: .56cqw !important;
+            border-radius: .28cqw !important;
+        }
+
+        .snap-eq-track {
+            background: rgba(255,255,255,.085) !important;
+        }
+
+        .snap-eq-thumb {
+            width: 1.16cqw !important;
+            height: 1.16cqw !important;
+            box-shadow:
+                0 0 0 .055cqw rgba(255,255,255,.18),
+                0 .06cqw .10cqw rgba(0,0,0,.25) !important;
+        }
+
+        .snap-eq-native {
+            width: 9.85cqw !important;
+            height: 2.3cqw !important;
+        }
+
+        .snap-eq-band .eq-value {
+            bottom: .02cqw !important;
+            font-size: .62cqw !important;
+        }
+
+        .snap-eq-scale {
+            top: 1.35cqw !important;
+            height: 9.85cqw !important;
+            font-size: .62cqw !important;
+        }
+
+        .snap-eq-zero-line {
+            left: 3.05cqw !important;
+            top: 6.275cqw !important;
+        }
+
+        .snap-eq-off-label {
+            top: 4.65cqw !important;
+        }
+
+    
+        @media (max-width: 800px) {
+            #win-nyan-special {
+                width: 90% !important;
+                max-width: 360px !important;
+            }
+        }
+
     </style>
 </head>
 
@@ -1742,7 +1862,7 @@
             <img src="images/gif/Disc.gif" alt="Discography"><span>Discography</span>
         </a>
         <a href="Plugin.html" class="desktop-icon current">
-            <img src="images/gif/Computer.gif" alt="Plugin"><span>Plugin</span>
+            <img src="images/plugin-images/gif/plugin.png" alt="Plugin"><span>Plugin</span>
         </a>
         <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" class="desktop-icon">
             <img src="images/gif/Earth.gif" alt="Works"><span>Works</span>
@@ -2000,7 +2120,7 @@
                             <span id="web-preset-dirty"></span>
                         </div>
 
-                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r7</span>
+                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r8</span>
                     </div>
 
                     <!-- SETTINGS -->
@@ -2030,7 +2150,7 @@
                                         <option value="0" selected>MONO</option>
                                     </select>
                                 </div>
-                                <span class="snap-web-only-note">Web版は MONO のみ</span>
+                                <span class="snap-web-only-note">Web version: MONO only</span>
                             </div>
                         </div>
 
@@ -2039,7 +2159,7 @@
                             <div class="snap-cpu-fixed" aria-label="Drive CPU: LOW fixed on Web">
                                 <span class="snap-cpu-choice low">LOW</span>
                                 <span class="snap-cpu-choice high" title="Web versionでは選択できません">HIGH</span>
-                                <span class="snap-web-only-note">Web版は LOW のみ</span>
+                                <span class="snap-web-only-note">Web version: LOW only</span>
                             </div>
                         </div>
 
@@ -2284,6 +2404,20 @@
         </div>
     </div>
 
+
+    <div class="window" id="win-nyan-special" style="width: 480px; z-index: 20000; display: none;">
+        <div class="title-bar draggable-cursor" id="handle-nyan-special">
+            <span>Nyan_Cat.txt</span><div class="close-button">×</div>
+        </div>
+        <div class="window-contents" style="background-color: #fff; padding: 10px; text-align: center;">
+            <img src="images/NyanCatAA.png" alt="Nyan Cat Art" style="width: 100%; height: auto; display: block; margin: 0 auto;">
+            <p style="color: #000; font-size: 10px; text-align: center; margin-top: 10px;">NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! </p>
+        </div>
+    </div>
+
+    <img id="nyan-cat" src="images/gif/Nyancat.gif" alt="Nyan Cat"
+         style="position: fixed; width: 80px; height: auto; z-index: 10001; cursor: pointer; display: block; image-rendering: pixelated; top: 50%; left: 50%;">
+
     <div id="win95-taskbar">
         <button id="taskbar-start-btn" class="click-target">
             <img src="images/start.png" alt="Start">
@@ -2439,6 +2573,7 @@
         initDrag('win-snap', 'handle-snap');
         initDrag('win-install', 'handle-install');
         initDrag('win-changelog', 'handle-changelog');
+        initDrag('win-nyan-special', 'handle-nyan-special');
 
         var closeBtns = document.querySelectorAll('.close-button');
 
@@ -2460,6 +2595,119 @@
             closeBtns[j].addEventListener('click', closeAction);
             closeBtns[j].addEventListener('touchend', closeAction);
         }
+
+        // --- Nyan Cat増殖 ＆ 10匹イベント（index.htmlと同じ仕組み） ---
+        var catSound;
+        try {
+            catSound = new Audio('Sound/CatMeow.mp3');
+            catSound.preload = 'auto';
+        } catch(e) {}
+
+        var cats = [];
+
+        function setupCat(catElement, startX, startY, startVx, startVy) {
+            var catObj = {
+                element: catElement,
+                x: startX,
+                y: startY,
+                vx: startVx,
+                vy: startVy
+            };
+            cats.push(catObj);
+
+            if (cats.length === 10) {
+                var specialWin = document.getElementById('win-nyan-special');
+                if (specialWin) {
+                    specialWin.style.display = 'inline-block';
+                    specialWin.style.left = '50%';
+                    specialWin.style.top = '50%';
+                    specialWin.style.transform = 'translate(-50%, -50%)';
+                    highestZIndex++;
+                    specialWin.style.zIndex = highestZIndex;
+                }
+            }
+
+            function catchCat(e) {
+                e.preventDefault();
+
+                if (catSound) {
+                    catSound.currentTime = 0;
+                    catSound.play().catch(function(){});
+                }
+
+                catObj.vx = (Math.random() * 4 + 2) * (Math.random() < 0.5 ? 1 : -1);
+                catObj.vy = (Math.random() * 3 + 1) * (Math.random() < 0.5 ? 1 : -1);
+
+                var newCat = document.createElement('img');
+                newCat.src = 'images/gif/Nyancat.gif';
+                newCat.style.position = 'fixed';
+                newCat.style.width = '80px';
+                newCat.style.zIndex = '10001';
+                newCat.style.cursor = 'pointer';
+                newCat.style.imageRendering = 'pixelated';
+                newCat.style.left = catObj.x + 'px';
+                newCat.style.top = catObj.y + 'px';
+                document.body.appendChild(newCat);
+
+                setupCat(
+                    newCat,
+                    catObj.x,
+                    catObj.y,
+                    (Math.random() * 4 + 2) * (Math.random() < 0.5 ? 1 : -1),
+                    (Math.random() * 3 + 1) * (Math.random() < 0.5 ? 1 : -1)
+                );
+            }
+
+            catElement.addEventListener('mousedown', catchCat);
+            catElement.addEventListener('touchstart', catchCat, { passive: false });
+        }
+
+        var originalCat = document.getElementById('nyan-cat');
+        if (originalCat) {
+            setupCat(
+                originalCat,
+                window.innerWidth / 2,
+                window.innerHeight / 2,
+                3,
+                2
+            );
+        }
+
+        function animateCats() {
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+
+            for (var i = 0; i < cats.length; i++) {
+                var cat = cats[i];
+                cat.x += cat.vx;
+                cat.y += cat.vy;
+
+                if (cat.x + 80 > w) {
+                    cat.x = w - 80;
+                    cat.vx *= -1;
+                    cat.element.style.transform = 'scaleX(-1)';
+                } else if (cat.x < 0) {
+                    cat.x = 0;
+                    cat.vx *= -1;
+                    cat.element.style.transform = 'scaleX(1)';
+                }
+
+                if (cat.y + 50 > h) {
+                    cat.y = h - 50;
+                    cat.vy *= -1;
+                } else if (cat.y < 0) {
+                    cat.y = 0;
+                    cat.vy *= -1;
+                }
+
+                cat.element.style.left = cat.x + 'px';
+                cat.element.style.top = cat.y + 'px';
+            }
+
+            requestAnimationFrame(animateCats);
+        }
+
+        requestAnimationFrame(animateCats);
 
         /* 配布開始まではDownloadを無効化 */
         var downloadBtn = document.getElementById('download-vst3');
