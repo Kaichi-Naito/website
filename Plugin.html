@@ -1563,7 +1563,7 @@
         }
     
         /* =========================================================
-           SNAP WEB UI r9.0 — matched against SNAP v0.4.80 editor
+           SNAP WEB UI r9.1 — matched against SNAP v0.4.80 editor
            ========================================================= */
         .snap-vst-ui { container-type: inline-size; }
 
@@ -2336,6 +2336,44 @@
             font-size: 1.04cqw !important;
         }
 
+    
+        /* =========================================================
+           v0.91 separate DOWNLOAD window
+        ========================================================= */
+        .download-window .window-contents {
+            padding: 8px;
+        }
+
+        .download-group {
+            min-height: 118px;
+            padding: 16px 14px 14px;
+            text-align: center;
+        }
+
+        .download-info {
+            margin: 2px 0 14px;
+            line-height: 1.65;
+            font-size: 12px;
+        }
+
+        .download-main-btn {
+            display: inline-flex;
+            min-width: 150px;
+            height: 34px;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        @media (max-width: 800px) {
+            #win-download {
+                width: calc(100vw - 12px) !important;
+                max-width: none !important;
+                box-sizing: border-box !important;
+            }
+        }
+
     </style>
 </head>
 
@@ -2355,7 +2393,7 @@
         <a href="Discography.html" class="desktop-icon">
             <img src="images/gif/Disc.gif" alt="Discography"><span>Discography</span>
         </a>
-        <a href="Plugin.html" class="desktop-icon current">
+        <a href="Plugin.html" class="desktop-icon">
             <img src="images/gif/Plugin.png" alt="Plugin"><span>Plugin</span>
         </a>
         <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" class="desktop-icon">
@@ -2624,7 +2662,7 @@
                             <span id="web-preset-dirty"></span>
                         </div>
 
-                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r9.0</span>
+                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r9.1</span>
                     </div>
 
                     <!-- SETTINGS -->
@@ -2846,13 +2884,30 @@
                 </div>
             </div>
 
-            <div class="notepad-actions">
-                <a href="#" id="download-vst3" class="win95-btn primary is-disabled">Download VST3</a>
-                <button type="button" class="win95-btn" id="focus-sample-btn">Open Sample Player</button>
-            </div>
-
             <div class="small-note">
                 ※ Web試奏版はSNAP v0.4.80のDSPをブラウザ向けに移植したものです。VST3バイナリそのものを読み込んでいるわけではありません。
+            </div>
+        </div>
+    </div>
+
+
+    <div class="window download-window" id="win-download" style="width: 360px; z-index: 114;">
+        <div class="title-bar draggable-cursor" id="handle-download">
+            <span>SNAP_DOWNLOAD.exe</span><div class="close-button">×</div>
+        </div>
+        <div class="window-contents">
+            <div class="group-box download-group">
+                <span class="group-box-title">DOWNLOAD</span>
+
+                <div class="download-info">
+                    <div><strong>SNAP</strong> VST3</div>
+                    <div>Windows 64-bit</div>
+                    <div>Latest Version: v0.4.80</div>
+                </div>
+
+                <a href="#" id="download-vst3" class="win95-btn primary is-disabled download-main-btn">
+                    DOWNLOAD
+                </a>
             </div>
         </div>
     </div>
@@ -2947,8 +3002,9 @@
             var sample = document.getElementById('win-sample');
             var snap = document.getElementById('win-snap');
             var install = document.getElementById('win-install');
+            var download = document.getElementById('win-download');
             var changelog = document.getElementById('win-changelog');
-            var windows = [sample, snap, install, changelog];
+            var windows = [sample, snap, install, download, changelog];
 
             for (var w = 0; w < windows.length; w++) {
                 if (!windows[w]) continue;
@@ -2960,7 +3016,7 @@
                 var mobileTop = 190;
                 var mobileGap = 24;
 
-                [sample, snap, install, changelog].forEach(function(win) {
+                [sample, snap, install, download, changelog].forEach(function(win) {
                     if (!win) return;
                     win.style.left = mobileLeft;
                     win.style.top = mobileTop + 'px';
@@ -2969,6 +3025,7 @@
 
                 if (sample) sample.style.zIndex = '118';
                 if (install) install.style.zIndex = '116';
+                if (download) download.style.zIndex = '114';
                 if (changelog) changelog.style.zIndex = '110';
                 if (snap) snap.style.zIndex = '120';
 
@@ -2982,10 +3039,12 @@
             var sampleWidth = sample ? (sample.offsetWidth || 860) : 860;
             var snapWidth = snap ? (snap.offsetWidth || 860) : 860;
             var installWidth = install ? (install.offsetWidth || 760) : 760;
+            var downloadWidth = download ? (download.offsetWidth || 360) : 360;
 
             var sampleHeight = sample ? (sample.offsetHeight || 190) : 190;
             var snapHeight = snap ? (snap.offsetHeight || 620) : 620;
             var installHeight = install ? (install.offsetHeight || 520) : 520;
+            var downloadHeight = download ? (download.offsetHeight || 170) : 170;
 
             /*
                Reference layout proportions from the supplied screenshot:
@@ -3025,8 +3084,14 @@
             var snapTop = sampleTop + sampleHeight - 25;
             var installTop = snapTop + snapHeight - 55;
 
+            var downloadLeft = snapLeft + snapWidth - downloadWidth - 18;
+            var downloadTop = installTop + 82;
+
             var changelogLeft = installLeft + 28;
-            var changelogTop = installTop + installHeight + 24;
+            var changelogTop = Math.max(
+                installTop + installHeight + 24,
+                downloadTop + downloadHeight + 24
+            );
 
             if (sample) {
                 sample.style.left = sampleLeft + 'px';
@@ -3044,6 +3109,12 @@
                 snap.style.left = snapLeft + 'px';
                 snap.style.top = snapTop + 'px';
                 snap.style.zIndex = '120';
+            }
+
+            if (download) {
+                download.style.left = downloadLeft + 'px';
+                download.style.top = downloadTop + 'px';
+                download.style.zIndex = '114';
             }
 
             if (changelog) {
@@ -3134,6 +3205,7 @@
         initDrag('win-sample', 'handle-sample');
         initDrag('win-snap', 'handle-snap');
         initDrag('win-install', 'handle-install');
+        initDrag('win-download', 'handle-download');
         initDrag('win-changelog', 'handle-changelog');
         initDrag('win-nyan-special', 'handle-nyan-special');
 
@@ -3297,7 +3369,6 @@
         var samplePlayBtn = document.getElementById('sample-play-btn');
         var sampleSelect = document.getElementById('sample-select');
         var sampleEngineStatus = document.getElementById('sample-engine-status');
-        var focusSampleBtn = document.getElementById('focus-sample-btn');
 
         var SAMPLE_PREFIX = 'SNAP_sample_';
         var SAMPLE_FOLDER = 'Plugin/samplesound/';
@@ -3508,28 +3579,6 @@
                 } else {
                     sampleAudio.pause();
                     sampleAudio.currentTime = 0;
-                }
-            });
-        }
-
-        if (focusSampleBtn) {
-            focusSampleBtn.addEventListener('click', function() {
-                var sampleWindow = document.getElementById('win-sample');
-                if (!sampleWindow) return;
-
-                sampleWindow.style.display = '';
-                highestZIndex++;
-                sampleWindow.style.zIndex = highestZIndex;
-
-                sampleWindow.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-
-                if (samplePlayBtn) {
-                    setTimeout(function() {
-                        samplePlayBtn.focus();
-                    }, 350);
                 }
             });
         }
