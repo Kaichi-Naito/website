@@ -1563,7 +1563,7 @@
         }
     
         /* =========================================================
-           SNAP WEB UI r8.7 — matched against SNAP v0.4.80 editor
+           SNAP WEB UI r9.0 — matched against SNAP v0.4.80 editor
            ========================================================= */
         .snap-vst-ui { container-type: inline-size; }
 
@@ -2289,6 +2289,53 @@
             font-family: 'PixelMplus', sans-serif !important;
         }
 
+    
+        /* =========================================================
+           v0.90 SETTINGS TYPE SCALE
+           Slightly larger text while preserving the current layout.
+        ========================================================= */
+        .snap-settings-header {
+            font-size: 1.55cqw !important;
+        }
+
+        .snap-settings-row {
+            font-size: 1.02cqw !important;
+        }
+
+        .snap-settings-row > label {
+            font-size: .92cqw !important;
+        }
+
+        .snap-segment label,
+        .snap-cpu-choice,
+        .snap-eq-toggle,
+        .snap-eq-reset {
+            font-size: .95cqw !important;
+        }
+
+        .snap-web-only-note,
+        .snap-fixed-note {
+            font-size: .82cqw !important;
+        }
+
+        .snap-eq-band,
+        .snap-eq-band .freq {
+            font-size: .90cqw !important;
+        }
+
+        .snap-eq-band .eq-value,
+        .snap-eq-scale {
+            font-size: .78cqw !important;
+        }
+
+        .snap-eq-off-label {
+            font-size: 3.28cqw !important;
+        }
+
+        .snap-settings-close {
+            font-size: 1.04cqw !important;
+        }
+
     </style>
 </head>
 
@@ -2577,7 +2624,7 @@
                             <span id="web-preset-dirty"></span>
                         </div>
 
-                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r8.7</span>
+                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r9.0</span>
                     </div>
 
                     <!-- SETTINGS -->
@@ -2973,7 +3020,8 @@
                SAMPLE overlaps SNAP by about 25 px.
                README begins about 55 px before SNAP ends.
             */
-            var sampleTop = 55;
+            var desktopGroupYOffset = 120;
+            var sampleTop = 55 + desktopGroupYOffset;
             var snapTop = sampleTop + sampleHeight - 25;
             var installTop = snapTop + snapHeight - 55;
 
