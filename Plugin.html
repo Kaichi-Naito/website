@@ -2274,6 +2274,21 @@
             }
         }
 
+    
+        /* v0.89: Notepad content uses the same standard font as this page. */
+        .notepad-window,
+        .notepad-window .title-bar,
+        .notepad-menu,
+        .notepad-sheet,
+        .notepad-sheet h2,
+        .notepad-subtitle,
+        .notepad-body,
+        .notepad-meta,
+        .notepad-actions,
+        .notepad-window .small-note {
+            font-family: 'PixelMplus', sans-serif !important;
+        }
+
     </style>
 </head>
 
@@ -2905,39 +2920,65 @@
                     mobileTop += (win.offsetHeight || 300) + mobileGap;
                 });
 
+                if (sample) sample.style.zIndex = '118';
+                if (install) install.style.zIndex = '116';
+                if (changelog) changelog.style.zIndex = '110';
+                if (snap) snap.style.zIndex = '120';
+
+                highestZIndex = 120;
                 document.body.style.minHeight = (mobileTop + 100) + 'px';
                 return;
             }
 
             var viewportW = window.innerWidth || 1600;
-            var viewportH = window.innerHeight || 900;
 
             var sampleWidth = sample ? (sample.offsetWidth || 860) : 860;
             var snapWidth = snap ? (snap.offsetWidth || 860) : 860;
             var installWidth = install ? (install.offsetWidth || 760) : 760;
 
             var sampleHeight = sample ? (sample.offsetHeight || 190) : 190;
-            var snapHeight = snap ? (snap.offsetHeight || 660) : 660;
+            var snapHeight = snap ? (snap.offsetHeight || 620) : 620;
             var installHeight = install ? (install.offsetHeight || 520) : 520;
-            var changelogHeight = changelog ? (changelog.offsetHeight || 280) : 280;
 
-            function clamp(value, min, max) {
-                return Math.min(Math.max(value, min), max);
-            }
+            /*
+               Reference layout proportions from the supplied screenshot:
 
-            /* Match the reference layout from the provided screenshot as closely as possible. */
-            var sampleLeft = clamp(Math.round(viewportW * 0.064), 40, Math.max(40, viewportW - sampleWidth - 20));
-            var sampleTop = clamp(Math.round(viewportH * 0.058), 32, 140);
+               SAMPLE  x = 0
+               SNAP    x = +215 px
+               README  x = +10 px
 
-            var snapLeft = clamp(Math.round(viewportW * 0.337), sampleLeft + 220, Math.max(sampleLeft + 220, viewportW - snapWidth - 20));
-            var snapTop = clamp(Math.round(viewportH * 0.200), sampleTop + 95, 260);
+               This preserves the same overlap relationship, but the complete
+               three-window composition is centred as one group.
+            */
+            var snapOffsetX = 215;
+            var readmeOffsetX = 10;
 
-            var installLeft = clamp(Math.round(viewportW * 0.067), 42, Math.max(42, viewportW - installWidth - 20));
-            var installTop = snapTop + snapHeight - 82;
-            installTop = clamp(installTop, snapTop + 340, Math.max(snapTop + 340, viewportH - 180));
+            var compositionWidth = Math.max(
+                sampleWidth,
+                snapOffsetX + snapWidth,
+                readmeOffsetX + installWidth
+            );
 
-            var changelogLeft = installLeft + 26;
-            var changelogTop = installTop + installHeight + 22;
+            var stageLeft = Math.max(
+                20,
+                Math.round((viewportW - compositionWidth) / 2)
+            );
+
+            var sampleLeft = stageLeft;
+            var snapLeft = stageLeft + snapOffsetX;
+            var installLeft = stageLeft + readmeOffsetX;
+
+            /*
+               Same vertical overlap feel as the reference image.
+               SAMPLE overlaps SNAP by about 25 px.
+               README begins about 55 px before SNAP ends.
+            */
+            var sampleTop = 55;
+            var snapTop = sampleTop + sampleHeight - 25;
+            var installTop = snapTop + snapHeight - 55;
+
+            var changelogLeft = installLeft + 28;
+            var changelogTop = installTop + installHeight + 24;
 
             if (sample) {
                 sample.style.left = sampleLeft + 'px';
