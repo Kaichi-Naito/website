@@ -1563,7 +1563,7 @@
         }
     
         /* =========================================================
-           SNAP WEB UI r8 — matched against SNAP v0.4.80 editor
+           SNAP WEB UI r8.1 — matched against SNAP v0.4.80 editor
            ========================================================= */
         .snap-vst-ui { container-type: inline-size; }
 
@@ -1842,6 +1842,25 @@
             }
         }
 
+    
+        /* v0.81: keep ALL knob shading fixed; rotate only the black marker. */
+        .snap-knob-face,
+        .snap-gate-face {
+            transform: none !important;
+        }
+
+        .snap-knob-marker,
+        .snap-gate-marker {
+            left: 50% !important;
+            top: auto !important;
+            bottom: 50% !important;
+            margin-left: -2px;
+            width: 4px;
+            height: 23%;
+            transform-origin: 50% 100% !important;
+            transform: rotate(var(--knob-angle, 0deg)) !important;
+        }
+
     </style>
 </head>
 
@@ -1862,7 +1881,7 @@
             <img src="images/gif/Disc.gif" alt="Discography"><span>Discography</span>
         </a>
         <a href="Plugin.html" class="desktop-icon current">
-            <img src="images/plugin-images/gif/plugin.png" alt="Plugin"><span>Plugin</span>
+            <img src="images/gif/Plugin.png" alt="Plugin"><span>Plugin</span>
         </a>
         <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" class="desktop-icon">
             <img src="images/gif/Earth.gif" alt="Works"><span>Works</span>
@@ -2120,7 +2139,7 @@
                             <span id="web-preset-dirty"></span>
                         </div>
 
-                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r8</span>
+                        <span class="snap-vst-bottom-version">v0.4.80 WEB · UI r8.1</span>
                     </div>
 
                     <!-- SETTINGS -->
