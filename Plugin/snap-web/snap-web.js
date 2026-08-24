@@ -67,9 +67,13 @@
                 });
 
                 this.master = this.context.createGain();
-                // Web-demo-only final output lift. This AudioContext contains only the SNAP
-                // sample player, so the Windows95 click/GUI sounds are intentionally untouched.
-                this.master.gain.value = Math.pow(10, 6.0 / 20.0); // +6 dB
+                // Web-demo output calibration:
+                // - Both COMP and DRIVE bypassed: keep the existing +6 dB raw-sample lift.
+                // - Either effect enabled: no extra Web lift, because the current VST DSP
+                //   already produces the intended processed level.
+                // This affects only the SNAP sample-player AudioContext; Windows UI sounds
+                // remain completely untouched.
+                this.master.gain.value = 1.0;
 
                 this.limiter = this.context.createDynamicsCompressor();
                 this.limiter.threshold.value = -1.0;
@@ -97,6 +101,7 @@
                     if (data.type === 'ready') {
                         this.ready = true;
                         this.applyAllParams();
+                        this.updateWebOutputGain(true);
                         this.applyCabMode(this.params.cabMode, true);
                         this.setStatus('LOOP ON / SNAP WEB DSP: READY');
                         if (this.browserStatus) {
@@ -156,6 +161,7 @@
         setParam(name, value) {
             if (name === 'signalMode' || name === 'driveCpuHigh') value = 0;
             this.params[name] = Number(value);
+            if (name === 'compOn' || name === 'driveOn') this.updateWebOutputGain(false);
             const map = {
                 inputTrim:P.INPUT_TRIM, gate:P.GATE, comp:P.COMP, compVol:P.COMP_VOL,
                 compTone:P.COMP_TONE, compOn:P.COMP_ON, drive:P.DRIVE, snap:P.SNAP,
@@ -173,6 +179,21 @@
             };
             if (name === 'cabMode') return this.applyCabMode(Number(value));
             if (map[name] !== undefined) this.send(map[name], value);
+        }
+
+        updateWebOutputGain(immediate=false) {
+            if (!this.master || !this.context) return;
+            const processed = Number(this.params.compOn) >= 0.5 || Number(this.params.driveOn) >= 0.5;
+            const gainDb = processed ? 0.0 : 6.0;
+            const target = Math.pow(10, gainDb / 20.0);
+            const t = this.context.currentTime;
+            this.master.gain.cancelScheduledValues(t);
+            if (immediate) {
+                this.master.gain.setValueAtTime(target, t);
+            } else {
+                this.master.gain.setValueAtTime(this.master.gain.value, t);
+                this.master.gain.linearRampToValueAtTime(target, t + 0.020);
+            }
         }
 
         applyAllParams() {
@@ -413,6 +434,19 @@
                 }
             });
         }
+
+        const displayWidths = { 50:500, 75:640, 100:800, 125:960, 150:1120 };
+        document.querySelectorAll('[data-web-display-size]').forEach(button => {
+            button.addEventListener('click', () => {
+                if (window.matchMedia('(max-width: 800px)').matches) return;
+                const size = Number(button.dataset.webDisplaySize);
+                const win = document.getElementById('win-snap');
+                if (!win || !displayWidths[size]) return;
+                win.style.width = displayWidths[size] + 'px';
+                document.querySelectorAll('[data-web-display-size]').forEach(b =>
+                    b.classList.toggle('is-selected', b === button));
+            });
+        });
 
         const reset = document.getElementById('snap-eq-reset');
         if (reset) {

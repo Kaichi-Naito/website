@@ -1563,7 +1563,7 @@
         }
     
         /* =========================================================
-           SNAP WEB UI r9.4 — matched against SNAP v0.4.109 editor
+           SNAP WEB UI r9.5 — matched against SNAP v0.4.109 editor
            ========================================================= */
         .snap-vst-ui { container-type: inline-size; }
 
@@ -2424,7 +2424,7 @@
 
     
         /* =========================================================
-           SNAP WEB UI r9.4
+           SNAP WEB UI r9.5
            - remove the inner SNAP WEB PLUGIN frame
            - slightly enlarge desktop plugin view
            - enlarge upper-left branding
@@ -2550,6 +2550,149 @@
             margin-top: 2.55cqw !important;
         }
 
+    
+        /* =========================================================
+           v0.95 SETTINGS — matched to SNAP v0.4.109
+        ========================================================= */
+        .snap-vst-settings {
+            left: 2.5% !important;
+            top: 2.8% !important;
+            width: 95% !important;
+            height: 94.4% !important;
+            padding: 0 !important;
+            border-radius: 1.05cqw !important;
+            background: linear-gradient(180deg, rgba(41,45,51,.985), rgba(20,24,30,.99)) !important;
+            overflow: hidden !important;
+            font-family: Arial, Helvetica, sans-serif !important;
+        }
+
+        .snap-settings-header {
+            position: absolute !important;
+            left: 0 !important;
+            top: 1.85cqw !important;
+            right: 0 !important;
+            height: 2.25cqw !important;
+            margin: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 1.2cqw !important;
+            font-size: 1.52cqw !important;
+            line-height: 1 !important;
+            z-index: 4;
+        }
+        .snap-settings-header .gear-mini { width:2.25cqw !important; height:2.25cqw !important; }
+        .snap-settings-top-divider {
+            position:absolute; left:3.0cqw; right:3.0cqw; top:6.05cqw; height:1px;
+            background:rgba(255,255,255,.18); z-index:4;
+        }
+
+        .snap-settings-scroll {
+            position:absolute; left:0; right:.55cqw; top:6.35cqw; bottom:4.75cqw;
+            overflow-y:auto; overflow-x:hidden;
+            padding:1.45cqw 3.0cqw 2.2cqw 3.0cqw;
+            scrollbar-width:thin; scrollbar-color:rgba(220,220,220,.65) transparent;
+        }
+        .snap-settings-scroll::-webkit-scrollbar { width:.58cqw; min-width:6px; }
+        .snap-settings-scroll::-webkit-scrollbar-track { background:transparent; }
+        .snap-settings-scroll::-webkit-scrollbar-thumb { background:rgba(220,220,220,.62); border-radius:.4cqw; }
+
+        .snap-settings-controls { width:100%; }
+        .snap-settings-row {
+            display:grid !important;
+            grid-template-columns:11.6cqw minmax(0,1fr) !important;
+            gap:0 !important; align-items:center !important;
+            min-height:3.85cqw !important; margin:0 !important;
+        }
+        .snap-settings-row > label {
+            display:flex !important; align-items:center !important;
+            height:100% !important; padding:0 !important; margin:0 !important;
+            color:rgba(255,255,255,.65) !important;
+            font-size:.95cqw !important; font-weight:800 !important;
+        }
+        .snap-preset-folder-field {
+            width:66.5cqw; max-width:76%; height:2.7cqw;
+            display:flex; align-items:center; padding:0 .8cqw;
+            border:1px solid rgba(255,255,255,.18);
+            background:rgba(255,255,255,.075); color:rgba(255,255,255,.9);
+            font-size:.90cqw; font-weight:700; overflow:hidden; white-space:nowrap;
+        }
+        .snap-display-size-row { display:flex; gap:.75cqw; align-items:center; }
+        .snap-display-size-row button,
+        .snap-segment label,
+        .snap-cpu-choice,
+        .snap-eq-toggle,
+        .snap-eq-reset {
+            height:2.45cqw !important; min-height:24px !important;
+            border:1px solid rgba(196,208,218,.72) !important;
+            border-radius:.65cqw !important;
+            background:#323a43 !important; color:#fff !important;
+            display:inline-flex !important; align-items:center !important; justify-content:center !important;
+            padding:0 1.15cqw !important; margin:0 !important;
+            font-size:.96cqw !important; line-height:1 !important; font-weight:800 !important;
+        }
+        .snap-display-size-row button { min-width:5.7cqw; cursor:pointer; }
+        .snap-display-size-row button.is-selected,
+        .snap-segment label.is-selected,
+        .snap-cpu-choice.low { background:#56bfd0 !important; }
+        .snap-segment label { min-width:8.4cqw !important; cursor:pointer; }
+        .snap-segment label.is-disabled,
+        .snap-cpu-choice.high { opacity:.42 !important; cursor:not-allowed !important; }
+        .snap-web-fixed-row,.snap-cpu-fixed { display:flex !important; gap:.8cqw !important; align-items:center !important; }
+        .snap-web-only-note { font-size:.72cqw !important; color:rgba(255,255,255,.48) !important; margin-left:.4cqw !important; }
+        .snap-eq-header { display:flex !important; gap:.9cqw !important; align-items:center !important; }
+        .snap-eq-toggle { min-width:9.4cqw !important; cursor:pointer !important; }
+        .snap-eq-toggle.is-on { background:#5da2d2 !important; }
+        .snap-eq-reset { min-width:8.3cqw !important; cursor:pointer !important; }
+
+        .snap-eq-area {
+            position:relative !important; left:auto !important; right:auto !important; top:auto !important; bottom:auto !important;
+            width:84.0cqw !important; height:20.2cqw !important;
+            margin:2.15cqw 0 0 4.0cqw !important; padding:0 !important;
+        }
+        .snap-eq-sliders { height:100% !important; gap:1.08cqw !important; display:grid !important; grid-template-columns:repeat(11,1fr) !important; }
+        .snap-eq-band { height:100% !important; min-height:0 !important; overflow:visible !important; }
+        .snap-eq-band .freq { font-size:.92cqw !important; height:1.55cqw !important; line-height:1.2cqw !important; }
+        .snap-eq-fader { height:14.6cqw !important; width:3.0cqw !important; }
+        .snap-eq-track,.snap-eq-fill { width:.62cqw !important; }
+        .snap-eq-thumb { width:1.30cqw !important; height:1.30cqw !important; }
+        .snap-eq-native { width:14.6cqw !important; height:2.5cqw !important; }
+        .snap-eq-band .eq-value { font-size:.88cqw !important; bottom:-.1cqw !important; color:rgba(255,255,255,.96) !important; font-weight:800; }
+        .snap-eq-scale { left:-4.2cqw !important; top:1.55cqw !important; height:14.6cqw !important; font-size:.78cqw !important; }
+        .snap-eq-zero-line { left:-.7cqw !important; right:-.7cqw !important; top:8.85cqw !important; }
+        .snap-eq-response { left:1.5cqw !important; right:8.0cqw !important; top:2.1cqw !important; height:13.5cqw !important; }
+        .snap-eq-off-label { top:7.0cqw !important; font-size:3.0cqw !important; }
+
+        .snap-settings-info-section {
+            position:relative; margin-top:4.3cqw; padding:2.0cqw 0 2.5cqw;
+            border-top:1px solid rgba(255,255,255,.17);
+            display:grid; grid-template-columns:30.7cqw 1fr; column-gap:4.0cqw;
+            min-height:36.5cqw;
+        }
+        .snap-settings-info-image-wrap { width:30.7cqw; }
+        .snap-settings-profile { width:30.7cqw; height:30.7cqw; object-fit:cover; display:block; }
+        .snap-settings-profile-caption { margin-top:1.0cqw; font-size:1.25cqw; font-weight:800; color:#fff; }
+        .snap-settings-info-copy { padding-right:1.3cqw; color:rgba(255,255,255,.97); }
+        .snap-settings-info-copy h3 { margin:.25cqw 0 1.55cqw; font-size:2.15cqw; line-height:1; }
+        .snap-settings-info-copy p { margin:0 0 1.15cqw; font-size:1.05cqw; line-height:1.55; font-weight:700; }
+        .snap-settings-info-section .snap-settings-qr {
+            position:absolute !important; right:1.0cqw !important; bottom:2.0cqw !important;
+            width:7.4cqw !important; height:7.4cqw !important; min-width:0 !important; max-width:none !important;
+        }
+        .snap-settings-close {
+            position:absolute !important; left:50% !important; bottom:1.25cqw !important; transform:translateX(-50%) !important;
+            width:12.0cqw !important; min-width:104px !important; height:3.0cqw !important; min-height:30px !important;
+            font-size:1.0cqw !important; z-index:6;
+        }
+
+        @media (max-width:800px) {
+            .snap-settings-scroll { padding-left:2.2cqw; padding-right:2.2cqw; }
+            .snap-settings-row { grid-template-columns:12.5cqw minmax(0,1fr) !important; }
+            .snap-web-only-note { display:none !important; }
+            .snap-preset-folder-field { max-width:95%; }
+            .snap-settings-info-section { grid-template-columns:30.7cqw 1fr; column-gap:3cqw; }
+        }
+
     </style>
 </head>
 
@@ -2633,11 +2776,6 @@
                             <path d="M9 25 L5 21 L9 17" />
                         </svg>
                     </div>
-                </div>
-
-                <div class="sample-help">
-                    プルダウンからサンプルフレーズを選び、ループ再生しながらSNAPを試せるようにする予定です。
-                    「SNAP_sample_」より後ろのファイル名だけを表示します。
                 </div>
 
                 <audio id="snap-sample-audio"
@@ -2840,13 +2978,13 @@
                             <span id="web-preset-dirty"></span>
                         </div>
 
-                        <span class="snap-vst-bottom-version">v0.4.109 WEB · UI r9.4</span>
+                        <span class="snap-vst-bottom-version">v0.4.109 WEB · UI r9.5</span>
                     </div>
 
                     <!-- SETTINGS -->
                     <div class="snap-vst-settings" id="snap-vst-settings">
-                        <div class="snap-settings-header">
-                            <span class="gear-mini"><svg class="snap-gear-svg" viewBox="0 0 100 100" aria-hidden="true">
+    <div class="snap-settings-header">
+        <span class="gear-mini"><svg class="snap-gear-svg" viewBox="0 0 100 100" aria-hidden="true">
     <circle class="snap-gear-ring" cx="50" cy="50" r="27"></circle>
     <rect class="snap-gear-tooth" x="43" y="3" width="14" height="22" rx="3" transform="rotate(0 50 50)"></rect>
     <rect class="snap-gear-tooth" x="43" y="3" width="14" height="22" rx="3" transform="rotate(45 50 50)"></rect>
@@ -2857,181 +2995,213 @@
     <rect class="snap-gear-tooth" x="43" y="3" width="14" height="22" rx="3" transform="rotate(270 50 50)"></rect>
     <rect class="snap-gear-tooth" x="43" y="3" width="14" height="22" rx="3" transform="rotate(315 50 50)"></rect>
 </svg></span>
-                            <span>SETTINGS</span>
-                        </div>
+        <span>SETTINGS</span>
+    </div>
+    <div class="snap-settings-top-divider"></div>
 
-                        <div class="snap-settings-row">
-                            <label>SIGNAL</label>
-                            <div class="snap-web-fixed-row" aria-label="Signal: MONO only on Web">
-                                <div class="snap-segment" data-segment-param="signalMode">
-                                    <label class="is-selected"><input type="radio" name="signalModeUi" value="0">MONO</label>
-                                    <label class="is-disabled" title="Web版では選択できません"><input type="radio" name="signalModeUi" value="1" disabled>STEREO</label>
-                                    <select data-snap-param="signalMode" style="display:none;">
-                                        <option value="0" selected>MONO</option>
-                                    </select>
-                                </div>
-                                <span class="snap-web-only-note">Web version: MONO only</span>
-                            </div>
-                        </div>
+    <div class="snap-settings-scroll">
+        <div class="snap-settings-controls">
+            <div class="snap-settings-row snap-settings-folder-row">
+                <label>PRESET FOLDER</label>
+                <div class="snap-preset-folder-field">Built-in Web Presets</div>
+            </div>
 
-                        <div class="snap-settings-row">
-                            <label>DRIVE CPU</label>
-                            <div class="snap-cpu-fixed" aria-label="Drive CPU: LOW fixed on Web">
-                                <span class="snap-cpu-choice low">LOW</span>
-                                <span class="snap-cpu-choice high" title="Web versionでは選択できません">HIGH</span>
-                                <span class="snap-web-only-note">Web version: LOW only</span>
-                            </div>
-                        </div>
+            <div class="snap-settings-row">
+                <label>DISPLAY SIZE</label>
+                <div class="snap-display-size-row">
+                    <button type="button" data-web-display-size="50">50%</button>
+                    <button type="button" data-web-display-size="75">75%</button>
+                    <button type="button" data-web-display-size="100">100%</button>
+                    <button type="button" data-web-display-size="125" class="is-selected">125%</button>
+                    <button type="button" data-web-display-size="150">150%</button>
+                </div>
+            </div>
 
-                        <div class="snap-settings-row">
-                            <label>EQ</label>
-                            <div class="snap-eq-header">
-                                <label class="snap-eq-toggle" data-switch-visual="eqOn">
-                                    <span>EQ ON/OFF</span>
-                                    <input type="checkbox" data-snap-param="eqOn" aria-label="EQ ON/OFF">
-                                </label>
-                                <button type="button" class="snap-eq-reset" id="snap-eq-reset">RESET</button>
-                            </div>
-                        </div>
-
-                            <div class="snap-eq-area">
-                                <div class="snap-eq-scale" aria-hidden="true">
-                                    <span class="plus">+12</span><span class="zero">0</span><span class="minus">-12</span>
-                                </div>
-<svg class="snap-eq-response" id="snap-eq-response-svg" viewBox="0 0 1000 240" preserveAspectRatio="none" aria-hidden="true">
-                                    <defs>
-                                        <linearGradient id="snap-eq-response-gradient" x1="0" y1="0" x2="1" y2="0">
-                                            <stop offset="0%" stop-color="#F54949"/><stop offset="11.1%" stop-color="#F5A849"/>
-                                            <stop offset="22.2%" stop-color="#E3F549"/><stop offset="33.3%" stop-color="#84F549"/>
-                                            <stop offset="44.4%" stop-color="#49F56D"/><stop offset="55.6%" stop-color="#49F5CC"/>
-                                            <stop offset="66.7%" stop-color="#49BFF5"/><stop offset="77.8%" stop-color="#4961F5"/>
-                                            <stop offset="88.9%" stop-color="#9149F5"/><stop offset="100%" stop-color="#EF49F5"/>
-                                        </linearGradient>
-                                    </defs>
-                                    <path id="snap-eq-response-path" d="" fill="none" stroke="url(#snap-eq-response-gradient)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <div class="snap-eq-zero-line"></div>
-                                <div class="snap-eq-sliders is-off" id="snap-eq-sliders">
-                                <div class="snap-eq-band" style="--eq-color:#F54949;">
-                                    <span class="freq">31</span>
-                                    <div class="snap-eq-fader">
-                                        <div class="snap-eq-track"></div>
-                                        <div class="snap-eq-fill"></div>
-                                        <div class="snap-eq-thumb"></div>
-                                        <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq31" aria-label="31">
-                                    </div>
-                                    <span class="eq-value" data-snap-value="eq31">0</span>
-                                </div>
-                                <div class="snap-eq-band" style="--eq-color:#F5A849;">
-                                    <span class="freq">62</span>
-                                    <div class="snap-eq-fader">
-                                        <div class="snap-eq-track"></div>
-                                        <div class="snap-eq-fill"></div>
-                                        <div class="snap-eq-thumb"></div>
-                                        <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq62" aria-label="62">
-                                    </div>
-                                    <span class="eq-value" data-snap-value="eq62">0</span>
-                                </div>
-                                <div class="snap-eq-band" style="--eq-color:#E3F549;">
-                                    <span class="freq">125</span>
-                                    <div class="snap-eq-fader">
-                                        <div class="snap-eq-track"></div>
-                                        <div class="snap-eq-fill"></div>
-                                        <div class="snap-eq-thumb"></div>
-                                        <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq125" aria-label="125">
-                                    </div>
-                                    <span class="eq-value" data-snap-value="eq125">0</span>
-                                </div>
-                                <div class="snap-eq-band" style="--eq-color:#84F549;">
-                                    <span class="freq">250</span>
-                                    <div class="snap-eq-fader">
-                                        <div class="snap-eq-track"></div>
-                                        <div class="snap-eq-fill"></div>
-                                        <div class="snap-eq-thumb"></div>
-                                        <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq250" aria-label="250">
-                                    </div>
-                                    <span class="eq-value" data-snap-value="eq250">0</span>
-                                </div>
-                                <div class="snap-eq-band" style="--eq-color:#49F56D;">
-                                    <span class="freq">500</span>
-                                    <div class="snap-eq-fader">
-                                        <div class="snap-eq-track"></div>
-                                        <div class="snap-eq-fill"></div>
-                                        <div class="snap-eq-thumb"></div>
-                                        <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq500" aria-label="500">
-                                    </div>
-                                    <span class="eq-value" data-snap-value="eq500">0</span>
-                                </div>
-                                <div class="snap-eq-band" style="--eq-color:#49F5CC;">
-                                    <span class="freq">1k</span>
-                                    <div class="snap-eq-fader">
-                                        <div class="snap-eq-track"></div>
-                                        <div class="snap-eq-fill"></div>
-                                        <div class="snap-eq-thumb"></div>
-                                        <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq1k" aria-label="1k">
-                                    </div>
-                                    <span class="eq-value" data-snap-value="eq1k">0</span>
-                                </div>
-                                <div class="snap-eq-band" style="--eq-color:#49BFF5;">
-                                    <span class="freq">2k</span>
-                                    <div class="snap-eq-fader">
-                                        <div class="snap-eq-track"></div>
-                                        <div class="snap-eq-fill"></div>
-                                        <div class="snap-eq-thumb"></div>
-                                        <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq2k" aria-label="2k">
-                                    </div>
-                                    <span class="eq-value" data-snap-value="eq2k">0</span>
-                                </div>
-                                <div class="snap-eq-band" style="--eq-color:#4961F5;">
-                                    <span class="freq">4k</span>
-                                    <div class="snap-eq-fader">
-                                        <div class="snap-eq-track"></div>
-                                        <div class="snap-eq-fill"></div>
-                                        <div class="snap-eq-thumb"></div>
-                                        <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq4k" aria-label="4k">
-                                    </div>
-                                    <span class="eq-value" data-snap-value="eq4k">0</span>
-                                </div>
-                                <div class="snap-eq-band" style="--eq-color:#9149F5;">
-                                    <span class="freq">8k</span>
-                                    <div class="snap-eq-fader">
-                                        <div class="snap-eq-track"></div>
-                                        <div class="snap-eq-fill"></div>
-                                        <div class="snap-eq-thumb"></div>
-                                        <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq8k" aria-label="8k">
-                                    </div>
-                                    <span class="eq-value" data-snap-value="eq8k">0</span>
-                                </div>
-                                <div class="snap-eq-band" style="--eq-color:#EF49F5;">
-                                    <span class="freq">16k</span>
-                                    <div class="snap-eq-fader">
-                                        <div class="snap-eq-track"></div>
-                                        <div class="snap-eq-fill"></div>
-                                        <div class="snap-eq-thumb"></div>
-                                        <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq16k" aria-label="16k">
-                                    </div>
-                                    <span class="eq-value" data-snap-value="eq16k">0</span>
-                                </div>
-                                <div class="snap-eq-band" style="--eq-color:#F5499C;">
-                                    <span class="freq">VOL</span>
-                                    <div class="snap-eq-fader">
-                                        <div class="snap-eq-track"></div>
-                                        <div class="snap-eq-fill"></div>
-                                        <div class="snap-eq-thumb"></div>
-                                        <input class="snap-eq-native" type="range" min="-18" max="18" step="0.1" value="0" data-snap-param="eqOut" aria-label="VOL">
-                                    </div>
-                                    <span class="eq-value" data-snap-value="eqOut">0</span>
-                                </div>
-                                </div>
-                                <div class="snap-eq-off-label">OFF</div>
-                            </div>
-
-                        <img class="snap-settings-qr"
-                             src="Plugin/snap-web/ui/Kaichi_web_QR.png"
-                             alt="Kaichi website QR">
-
-                        <button type="button" class="snap-settings-close" id="snap-settings-close">CLOSE</button>
+            <div class="snap-settings-row">
+                <label>SIGNAL</label>
+                <div class="snap-web-fixed-row">
+                    <div class="snap-segment" data-segment-param="signalMode">
+                        <label class="is-selected"><input type="radio" name="signalModeUi" value="0">MONO</label>
+                        <label class="is-disabled" title="Web version: MONO only"><input type="radio" name="signalModeUi" value="1" disabled>STEREO</label>
+                        <select data-snap-param="signalMode" style="display:none;"><option value="0" selected>MONO</option></select>
                     </div>
+                    <span class="snap-web-only-note">Web version: MONO only</span>
+                </div>
+            </div>
+
+            <div class="snap-settings-row">
+                <label>DRIVE CPU</label>
+                <div class="snap-cpu-fixed">
+                    <span class="snap-cpu-choice low">LOW</span>
+                    <span class="snap-cpu-choice high" title="Web version: LOW only">HIGH</span>
+                    <span class="snap-web-only-note">Web version: LOW only</span>
+                </div>
+            </div>
+
+            <div class="snap-settings-row">
+                <label>EQ</label>
+                <div class="snap-eq-header">
+                    <label class="snap-eq-toggle" data-switch-visual="eqOn">
+                        <span>ON / OFF</span>
+                        <input type="checkbox" data-snap-param="eqOn" aria-label="EQ ON / OFF">
+                    </label>
+                    <button type="button" class="snap-eq-reset" id="snap-eq-reset">RESET</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="snap-eq-area">
+            <div class="snap-eq-scale" aria-hidden="true"><span class="plus">+12</span><span class="zero">0</span><span class="minus">-12</span></div>
+            <svg class="snap-eq-response" id="snap-eq-response-svg" viewBox="0 0 1000 240" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                    <linearGradient id="snap-eq-response-gradient" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#F54949"/><stop offset="11.1%" stop-color="#F5A849"/>
+                        <stop offset="22.2%" stop-color="#E3F549"/><stop offset="33.3%" stop-color="#84F549"/>
+                        <stop offset="44.4%" stop-color="#49F56D"/><stop offset="55.6%" stop-color="#49F5CC"/>
+                        <stop offset="66.7%" stop-color="#49BFF5"/><stop offset="77.8%" stop-color="#4961F5"/>
+                        <stop offset="88.9%" stop-color="#9149F5"/><stop offset="100%" stop-color="#EF49F5"/>
+                    </linearGradient>
+                </defs>
+                <path id="snap-eq-response-path" d="" fill="none" stroke="url(#snap-eq-response-gradient)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div class="snap-eq-zero-line"></div>
+            <div class="snap-eq-sliders is-off" id="snap-eq-sliders">
+                <div class="snap-eq-band" style="--eq-color:#F54949;">
+        <span class="freq">31</span>
+        <div class="snap-eq-fader">
+            <div class="snap-eq-track"></div>
+            <div class="snap-eq-fill"></div>
+            <div class="snap-eq-thumb"></div>
+            <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq31" aria-label="31">
+        </div>
+        <span class="eq-value" data-snap-value="eq31">0</span>
+    </div>
+<div class="snap-eq-band" style="--eq-color:#F5A849;">
+        <span class="freq">62</span>
+        <div class="snap-eq-fader">
+            <div class="snap-eq-track"></div>
+            <div class="snap-eq-fill"></div>
+            <div class="snap-eq-thumb"></div>
+            <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq62" aria-label="62">
+        </div>
+        <span class="eq-value" data-snap-value="eq62">0</span>
+    </div>
+<div class="snap-eq-band" style="--eq-color:#E3F549;">
+        <span class="freq">125</span>
+        <div class="snap-eq-fader">
+            <div class="snap-eq-track"></div>
+            <div class="snap-eq-fill"></div>
+            <div class="snap-eq-thumb"></div>
+            <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq125" aria-label="125">
+        </div>
+        <span class="eq-value" data-snap-value="eq125">0</span>
+    </div>
+<div class="snap-eq-band" style="--eq-color:#84F549;">
+        <span class="freq">250</span>
+        <div class="snap-eq-fader">
+            <div class="snap-eq-track"></div>
+            <div class="snap-eq-fill"></div>
+            <div class="snap-eq-thumb"></div>
+            <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq250" aria-label="250">
+        </div>
+        <span class="eq-value" data-snap-value="eq250">0</span>
+    </div>
+<div class="snap-eq-band" style="--eq-color:#49F56D;">
+        <span class="freq">500</span>
+        <div class="snap-eq-fader">
+            <div class="snap-eq-track"></div>
+            <div class="snap-eq-fill"></div>
+            <div class="snap-eq-thumb"></div>
+            <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq500" aria-label="500">
+        </div>
+        <span class="eq-value" data-snap-value="eq500">0</span>
+    </div>
+<div class="snap-eq-band" style="--eq-color:#49F5CC;">
+        <span class="freq">1k</span>
+        <div class="snap-eq-fader">
+            <div class="snap-eq-track"></div>
+            <div class="snap-eq-fill"></div>
+            <div class="snap-eq-thumb"></div>
+            <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq1k" aria-label="1k">
+        </div>
+        <span class="eq-value" data-snap-value="eq1k">0</span>
+    </div>
+<div class="snap-eq-band" style="--eq-color:#49BFF5;">
+        <span class="freq">2k</span>
+        <div class="snap-eq-fader">
+            <div class="snap-eq-track"></div>
+            <div class="snap-eq-fill"></div>
+            <div class="snap-eq-thumb"></div>
+            <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq2k" aria-label="2k">
+        </div>
+        <span class="eq-value" data-snap-value="eq2k">0</span>
+    </div>
+<div class="snap-eq-band" style="--eq-color:#4961F5;">
+        <span class="freq">4k</span>
+        <div class="snap-eq-fader">
+            <div class="snap-eq-track"></div>
+            <div class="snap-eq-fill"></div>
+            <div class="snap-eq-thumb"></div>
+            <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq4k" aria-label="4k">
+        </div>
+        <span class="eq-value" data-snap-value="eq4k">0</span>
+    </div>
+<div class="snap-eq-band" style="--eq-color:#9149F5;">
+        <span class="freq">8k</span>
+        <div class="snap-eq-fader">
+            <div class="snap-eq-track"></div>
+            <div class="snap-eq-fill"></div>
+            <div class="snap-eq-thumb"></div>
+            <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq8k" aria-label="8k">
+        </div>
+        <span class="eq-value" data-snap-value="eq8k">0</span>
+    </div>
+<div class="snap-eq-band" style="--eq-color:#EF49F5;">
+        <span class="freq">16k</span>
+        <div class="snap-eq-fader">
+            <div class="snap-eq-track"></div>
+            <div class="snap-eq-fill"></div>
+            <div class="snap-eq-thumb"></div>
+            <input class="snap-eq-native" type="range" min="-12" max="12" step="0.1" value="0" data-snap-param="eq16k" aria-label="16k">
+        </div>
+        <span class="eq-value" data-snap-value="eq16k">0</span>
+    </div>
+<div class="snap-eq-band" style="--eq-color:#F5499C;">
+        <span class="freq">VOL</span>
+        <div class="snap-eq-fader">
+            <div class="snap-eq-track"></div>
+            <div class="snap-eq-fill"></div>
+            <div class="snap-eq-thumb"></div>
+            <input class="snap-eq-native" type="range" min="-18" max="18" step="0.1" value="0" data-snap-param="eqOut" aria-label="VOL">
+        </div>
+        <span class="eq-value" data-snap-value="eqOut">0</span>
+    </div>
+            </div>
+            <div class="snap-eq-off-label">OFF</div>
+        </div>
+
+        <div class="snap-settings-info-section">
+            <div class="snap-settings-info-image-wrap">
+                <img class="snap-settings-profile" src="Plugin/snap-web/ui/Kaichi_profile.jpg" alt="Kaichi Naito">
+                <div class="snap-settings-profile-caption">Guitar Effect Plugin by Kaichi Naito</div>
+            </div>
+            <div class="snap-settings-info-copy">
+                <h3>SNAP</h3>
+                <p>SNAP は、タイトで輪郭のあるモダンクランチサウンドを作ることに特化して開発した、ギタリスト向けのエフェクタープラグインです。</p>
+                <p>コンプレッサーとオーバードライブをひとつにまとめ、音作りの中心となる独自の「SNAP」コントロールを搭載。</p>
+                <p>SNAPノブでは、ピッキングの立ち上がりやアタック感をコントロールできます。軽いタッチでもピッキングニュアンスや粒立ちを出しやすく、モダンなギターサウンドに必要な、タイトでレスポンスの良い弾き心地を作ることができます。</p>
+                <p>基本的には、アンプやアンプシミュレーターの前段に置くドライブ／ブースターとして使用可能。</p>
+                <p>一方で、ノイズゲート、10バンドEQ、CABセクションも内蔵しているため、CABをONにすればSNAP単体でギターサウンドを完結させることもできます。</p>
+                <p>クリーン寄りの軽いクランチから、BOOSTを使ったよりアグレッシブなサウンドまで対応。</p>
+                <p>モダンなクランチサウンドと、気持ちよく弾けるピッキングレスポンスをひとつのプラグインで。</p>
+                <p>それが SNAP です。</p>
+            </div>
+            <img class="snap-settings-qr" src="Plugin/snap-web/ui/Kaichi_web_QR.png" alt="Kaichi website QR">
+        </div>
+    </div>
+
+    <button type="button" class="snap-settings-close" id="snap-settings-close">CLOSE</button>
+</div>
                 </div>
             </div>
 
