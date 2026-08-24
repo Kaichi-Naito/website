@@ -1563,7 +1563,7 @@
         }
     
         /* =========================================================
-           SNAP WEB UI r9.2 — matched against SNAP v0.4.95 editor
+           SNAP WEB UI r9.4 — matched against SNAP v0.4.109 editor
            ========================================================= */
         .snap-vst-ui { container-type: inline-size; }
 
@@ -2376,7 +2376,7 @@
 
     
         /* =========================================================
-           v0.92 sync with SNAP VST3 v0.4.95
+           v0.92 sync with SNAP VST3 v0.4.109
            Web-only MONO/LOW, separate windows and demo gain remain unchanged.
         ========================================================= */
         .snap-vst-gear {
@@ -2421,6 +2421,134 @@
             height: 2.42cqw !important;
         }
         .snap-main-preset label { font-size: .82cqw !important; }
+
+    
+        /* =========================================================
+           SNAP WEB UI r9.4
+           - remove the inner SNAP WEB PLUGIN frame
+           - slightly enlarge desktop plugin view
+           - enlarge upper-left branding
+        ========================================================= */
+        .snap-vst-shell {
+            margin: 0 !important;
+            border: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+            position: relative;
+            overflow: hidden !important;
+        }
+
+        .snap-vst-shell-title {
+            display: none !important;
+        }
+
+        .snap-vst-ui {
+            border: 0 !important;
+        }
+
+        .snap-vst-brand-main {
+            font-size: 2.82cqw !important;
+        }
+
+        .snap-vst-dev {
+            font-size: .78cqw !important;
+            margin-left: .20cqw !important;
+        }
+
+        .snap-vst-brand-sub {
+            font-size: 1.06cqw !important;
+            margin-top: .38cqw !important;
+        }
+
+        @media (max-width: 800px) {
+            /* Keep mobile sizing from the existing responsive implementation. */
+            #win-snap {
+                width: calc(100vw - 12px) !important;
+            }
+
+            .snap-vst-shell {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+        }
+
+    
+        /* =========================================================
+           Web v0.94 / SNAP VST3 v0.4.109 sync
+           Web-only MONO + DRIVE CPU LOW, separate windows, fixed knob shadows,
+           Web output calibration and mobile behaviour remain unchanged.
+        ========================================================= */
+        /* Main branding: v0.4.106+ slightly larger SNAP / creator credit. */
+        .snap-vst-brand-main { font-size: 3.06cqw !important; }
+        .snap-vst-brand-sub { font-size: 1.13cqw !important; }
+        .snap-vst-dev { font-size: .80cqw !important; }
+
+        /* v0.4.96+: main gear rotates at idle and pauses while hovered. */
+        .snap-vst-gear {
+            left: 94.84cqw !important;
+            top: 1.29cqw !important;
+            width: 4.19cqw !important;
+            height: 4.19cqw !important;
+        }
+        #snap-settings-open .snap-gear-svg {
+            animation: snap-web-gear-idle-spin 3.0s linear infinite !important;
+            transform-origin: 50% 50%;
+        }
+        #snap-settings-open:hover .snap-gear-svg {
+            animation-play-state: paused !important;
+        }
+        @keyframes snap-web-gear-idle-spin { to { transform: rotate(360deg); } }
+
+        /* v0.4.106-109: GATE and CAB share the lower utility-control line. */
+        .snap-vst-gate {
+            left: 5.806cqw !important;
+            top: 21.69cqw !important;
+            width: 6.452cqw !important;
+        }
+        .snap-vst-gate-label {
+            font-size: .81cqw !important;
+            margin-bottom: .16cqw !important;
+        }
+        .snap-gate-knob {
+            width: 3.55cqw !important;
+            height: 3.87cqw !important;
+        }
+        .snap-vst-cab {
+            left: 87.10cqw !important;
+            right: auto !important;
+            top: 21.85cqw !important;
+            width: 4.84cqw !important;
+        }
+        .snap-vst-cab-label {
+            font-size: .77cqw !important;
+            margin-bottom: .16cqw !important;
+        }
+        .snap-vst-cab select {
+            width: 4.84cqw !important;
+            height: 2.26cqw !important;
+        }
+
+        /* v0.4.106/108: Good target lives inside the cyan target region in white. */
+        .snap-vst-meter-good {
+            left: 60% !important;
+            width: 30% !important;
+            top: 9px !important;
+            height: 17px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: rgba(255,255,255,.96) !important;
+            font-size: .72cqw !important;
+            line-height: 1 !important;
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        /* v0.4.109: clearer vertical gap below EQ ON/OFF / RESET.
+           Keep the taller Web faders requested earlier. */
+        .snap-eq-area {
+            margin-top: 2.55cqw !important;
+        }
 
     </style>
 </head>
@@ -2519,7 +2647,7 @@
         </div>
     </div>
 
-    <div class="window" id="win-snap" style="width: 860px; z-index: 120;">
+    <div class="window" id="win-snap" style="width: 960px; z-index: 120;">
         <div class="title-bar draggable-cursor" id="handle-snap">
             <span>SNAP_Plugin.exe</span><div class="close-button">×</div>
         </div>
@@ -2553,7 +2681,7 @@
                             <span style="left:90%">-6</span>
                             <span style="left:100%">0</span>
                         </div>
-                        <div class="snap-vst-meter-good">Good target: -24 to -6 dBFS</div>
+                        <div class="snap-vst-meter-good">Good target</div>
                         <div class="snap-vst-meter-value" id="web-meter-value">-inf</div>
 
                         <div class="snap-vst-trim-label">TRIM</div>
@@ -2701,18 +2829,18 @@
                             <label for="web-preset-select">PRESET</label>
                             <select id="web-preset-select" aria-label="Preset">
                                 <option value="default">-- default --</option>
+                                <option value="Snap">Snap</option>
+                                <option value="Snap + CAB">Snap + CAB</option>
                                 <option value="Clean">Clean</option>
                                 <option value="Clean + CAB">Clean + CAB</option>
                                 <option value="CleanShred">CleanShred</option>
                                 <option value="Dist">Dist</option>
                                 <option value="Dist + CAB">Dist + CAB</option>
-                                <option value="Snap">Snap</option>
-                                <option value="Snap + CAB">Snap + CAB</option>
                             </select>
                             <span id="web-preset-dirty"></span>
                         </div>
 
-                        <span class="snap-vst-bottom-version">v0.4.95 WEB · UI r9.2</span>
+                        <span class="snap-vst-bottom-version">v0.4.109 WEB · UI r9.4</span>
                     </div>
 
                     <!-- SETTINGS -->
@@ -2939,7 +3067,7 @@
                 </div>
 
                 <div class="notepad-meta">
-                    <div><span>Latest Version:</span> v0.4.95</div>
+                    <div><span>Latest Version:</span> v0.4.109</div>
                     <div><span>Format:</span> VST3</div>
                     <div><span>OS:</span> Windows 64-bit</div>
                     <div><span>Browser Demo:</span> <span class="status-dev" id="browser-demo-status">Loading Web DSP...</span></div>
@@ -2947,7 +3075,7 @@
             </div>
 
             <div class="small-note">
-                ※ Web試奏版はSNAP v0.4.95のDSPをブラウザ向けに移植したものです。VST3バイナリそのものを読み込んでいるわけではありません。
+                ※ Web試奏版はSNAP v0.4.109のDSPをブラウザ向けに移植したものです。VST3バイナリそのものを読み込んでいるわけではありません。
             </div>
         </div>
     </div>
@@ -2964,7 +3092,7 @@
                 <div class="download-info">
                     <div><strong>SNAP</strong> VST3</div>
                     <div>Windows 64-bit</div>
-                    <div>Latest Version: v0.4.95</div>
+                    <div>Latest Version: v0.4.109</div>
                 </div>
 
                 <a href="#" id="download-vst3" class="win95-btn primary is-disabled download-main-btn">
@@ -2981,7 +3109,7 @@
         </div>
         <div class="window-contents">
             <div class="changelog">
-                SNAP v0.4.95<br>
+                SNAP v0.4.109<br>
                 ------------------------------<br>
                 ・COMP RMS + Peak detector / NaturalComp<br>
                 ・Updated COMP TONE voicing<br>
@@ -2989,7 +3117,7 @@
                 ・DRIVE body contour + developer voicing defaults<br>
                 ・Updated factory presets<br>
                 ・EQ response curve<br>
-                ・Browser DSP synced to v0.4.95<br>
+                ・Browser DSP synced to v0.4.109<br>
                 <br>
                 この欄は今後、公開版の更新履歴に使用します。
             </div>
