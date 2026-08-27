@@ -1,0 +1,589 @@
+:root {
+            color-scheme: light;
+        }
+        html {
+            overflow-x: hidden;
+            width: 100%;
+            scrollbar-width: none;
+            background: #008080;
+        }
+        html::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+        /* --- index.html ベースCSS --- */
+        @font-face {
+            font-family: 'PixelMplus';
+            src: url('https://kaichi-naito.github.io/website/fonts/PixelMplus10-Regular.ttf') format('truetype');
+            font-display: swap; 
+        }
+        body {
+            font-family: 'PixelMplus', sans-serif;
+            color: black;
+            text-align: center;
+            margin: 0;
+            padding: 20px 0 calc(50px + env(safe-area-inset-bottom)) 0;
+            background-color: transparent;
+            background-image: none;
+            overflow-x: hidden;
+            width: 100%;
+            z-index: 1;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(rgba(0,0,0,0.10), rgba(0,0,0,0.10)),
+                url('https://kaichi-naito.github.io/website/images/windows-95-background.jpg')
+                center center / cover no-repeat;
+            z-index: -1;
+            pointer-events: none;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .window {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            box-shadow: 1px 1px 0 0 #000000;
+            padding: 2px;
+            margin: 0; 
+            max-width: 95vw;
+            display: inline-block;
+            text-align: left;
+            position: absolute;
+            animation: fadeIn 0.4s ease-in forwards; 
+            transition: transform 0.2s;
+        }
+        .draggable-cursor { cursor: grab; }
+        .title-bar {
+            background: linear-gradient(90deg, #000080, #1084d0);
+            padding: 3px 5px 3px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .title-bar-controls {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+        .window-control-button {
+            width: 16px;
+            height: 14px;
+            padding: 0;
+            line-height: 11px;
+            text-align: center;
+            font-family: 'PixelMplus', sans-serif;
+            font-size: 12px;
+            color: #000;
+            background-color: #c0c0c0;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+        .window-control-button:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding-top: 1px;
+            padding-left: 1px;
+        }
+        .minimize-button {
+            padding-bottom: 4px;
+            font-weight: bold;
+        }
+        .maximize-button {
+            font-size: 10px;
+            line-height: 10px;
+        }
+
+        .close-button {
+            width: 16px; height: 14px;
+            font-size: 13px;
+            background-color: #c0c0c0;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            /* --- 画像の設定 --- */
+            background-image: url('images/×.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 20px; /* ★ここで×の大きさを調整できます */
+            
+            /* 文字を隠す */
+            color: transparent;
+            padding: 0;
+            line-height: 1;
+            font-family: inherit;
+            box-sizing: border-box;
+            /* ボタンらしさ */
+            cursor: pointer;
+        }
+        .close-button:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding-top: 1px; padding-left: 1px;
+        }
+        .window-contents {
+            padding: 15px;
+            border: 1px solid #808080;
+            background-color: #c0c0c0;
+        }
+        .win95-btn {
+            background-color: #c0c0c0; border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 6px 12px; color: black !important;
+            text-decoration: none !important; display: inline-block;
+            font-size: 16px; margin: 5px; cursor: pointer;
+        }
+        .win95-btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding: 7px 11px 5px 13px;
+        }
+        .nav { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 40px; }
+        .desktop-icon {
+            display: flex; flex-direction: column; align-items: center;
+            text-decoration: none; color: white !important; width: 80px; cursor: pointer;
+        }
+        .desktop-icon img { width: 48px; height: 48px; object-fit: contain; image-rendering: pixelated; margin-bottom: 5px; }
+        .desktop-icon span { font-size: 14px; text-align: center; padding: 2px 4px; border: 1px dotted transparent; text-shadow: 1px 1px 0 #000; }
+        .desktop-icon:hover span, .desktop-icon:active span { background-color: #000080; color: white; border: 1px dotted #fff; }
+        .header-title { color: white; text-shadow: 2px 2px #000; font-size: 2.5em; margin-bottom: 20px; }
+        .profile-section { display: flex; align-items: center; gap: 30px; }
+        .profile-img { width: 120px; height: auto; border: none; }
+        .social-icons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center; }
+        .social-item img { width: 40px; height: 40px; display: block; margin: 0 auto 5px; }
+        iframe { border: 2px solid #808080; background: #000; display: block; }
+        .footer { margin-top: 50px; color: white; font-size: 12px; position: absolute; bottom: 60px; width: 100%; text-shadow: 1px 1px 2px #000; }
+        
+
+        /* --- Visitor Counter --- */
+        #win-counter {
+            width: 300px;
+        }
+        #win-counter .window-contents {
+            text-align: center;
+            padding: 12px 16px 14px;
+        }
+        .visitor-counter-line {
+            margin: 2px 0 8px;
+            font-size: 15px;
+        }
+        .visitor-counter-display {
+            display: inline-block;
+            min-width: 170px;
+            padding: 5px 9px 6px;
+            background: #000;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            color: #00ff00;
+            font-family: 'PixelMplus', monospace;
+            font-size: 25px;
+            font-weight: normal;
+            letter-spacing: 3px;
+            line-height: 1;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .visitor-counter-suffix {
+            margin: 8px 0 0;
+            font-size: 14px;
+        }
+
+        /* --- タスクバーデザイン --- */
+        #win95-taskbar {
+            position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: 32px;
+            padding: 0 4px env(safe-area-inset-bottom) 4px;
+            box-sizing: border-box;
+            background-color: #c0c0c0; border-top: 2px solid #ffffff;
+            box-shadow: 0 -1px 0 0 #000000; z-index: 50000; display: flex; align-items: center;
+        }
+
+        #taskbar-start-btn {
+            background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff;
+            height: 24px; padding: 0 2px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-sizing: border-box;
+        }
+        #taskbar-start-btn:active { border-color: #808080 #ffffff #ffffff #808080; padding: 1px 1px 0 3px; }
+        #taskbar-start-btn img { image-rendering: pixelated; height: 18px; width: auto; }
+        #taskbar-tasks { display: flex; gap: 4px; margin-left: 6px; overflow: hidden; height: 24px; flex: 1; min-width: 0; }
+        .win95-taskbar-tab {
+            background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff;
+            height: 24px; width: min(150px, 16vw); min-width: 82px; padding: 0 4px; font-size: 12px; color: black; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; box-sizing: border-box;
+        }
+        #taskbar-tray {
+            margin-left: auto; border-top: 1px solid #808080; border-left: 1px solid #808080;
+            border-right: 1px solid #ffffff; border-bottom: 1px solid #ffffff;
+            background-color: #c0c0c0; height: 24px; display: flex; align-items: center; gap: 6px; padding: 0 8px; box-sizing: border-box;
+        }
+        #taskbar-tray img { width: 30px; height: 30px; image-rendering: pixelated; }
+        #tray-clock { font-size: 14px; color: black; width: 46px; text-align: right; }
+
+
+        .win95-taskbar-tab {
+            cursor: pointer;
+            font-family: 'PixelMplus', sans-serif;
+        }
+        .win95-taskbar-tab.active {
+            border-color: #808080 #ffffff #ffffff #808080;
+            background-color: #d4d4d4;
+            font-weight: bold;
+        }
+
+        /* --- 最大化 --- */
+        .window.maximized-window {
+            position: fixed !important;
+            left: 4px !important;
+            top: 4px !important;
+            width: calc(100vw - 8px) !important;
+            max-width: none !important;
+            height: calc(100vh - 42px) !important;
+            transform: none !important;
+            box-sizing: border-box;
+        }
+        .window.maximized-window .window-contents {
+            height: calc(100% - 24px);
+            overflow: auto;
+            box-sizing: border-box;
+        }
+
+        /* --- Start menu --- */
+        #start-menu {
+            position: fixed;
+            left: 4px;
+            bottom: 33px;
+            width: 220px;
+            display: none;
+            z-index: 60000;
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            box-shadow: 1px 1px 0 #000;
+            text-align: left;
+            padding: 2px;
+            box-sizing: border-box;
+        }
+        #start-menu.open {
+            display: flex;
+        }
+        .start-menu-rail {
+            width: 28px;
+            background: linear-gradient(#808080, #3f3f3f);
+            color: #fff;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 8px 0;
+            box-sizing: border-box;
+        }
+        .start-menu-rail span {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        .start-menu-items {
+            flex: 1;
+            padding: 4px;
+        }
+        .start-menu-item {
+            width: 100%;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 0;
+            background: transparent;
+            color: #000;
+            font-family: 'PixelMplus', sans-serif;
+            font-size: 14px;
+            text-align: left;
+            padding: 5px 8px;
+            cursor: pointer;
+        }
+        .start-menu-item:hover,
+        .start-menu-item:focus {
+            background: #000080;
+            color: #fff;
+            outline: none;
+        }
+        .start-menu-item img {
+            width: 28px;
+            height: 28px;
+            image-rendering: pixelated;
+            object-fit: contain;
+        }
+        #taskbar-start-btn.start-open {
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding: 1px 1px 0 3px;
+        }
+
+        /* --- Cat warning --- */
+        #win-cat-warning {
+            width: 360px;
+            max-width: 92vw;
+            display: none;
+        }
+        #win-cat-warning .window-contents {
+            padding: 16px;
+        }
+        .warning-content {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .warning-error-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #d00000;
+            color: #fff;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 1px #800000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: sans-serif;
+            font-size: 25px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .warning-message {
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+        }
+        .warning-actions {
+            text-align: center;
+            margin-top: 14px;
+        }
+        .warning-ok-button {
+            min-width: 80px;
+            padding: 4px 14px;
+            font-family: 'PixelMplus', sans-serif;
+            font-size: 13px;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            cursor: pointer;
+        }
+        .warning-ok-button:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        /* --- Shut Down / blue screen --- */
+        #shutdown-screen {
+            position: fixed;
+            inset: 0;
+            display: none;
+            z-index: 1000000;
+            background: #0000aa;
+            color: #fff;
+            text-align: left;
+            font-family: 'PixelMplus', monospace;
+            padding: 6vh 7vw;
+            box-sizing: border-box;
+            overflow: hidden;
+            cursor: none;
+        }
+        #shutdown-screen.active {
+            display: block;
+        }
+        #shutdown-screen .shutdown-title {
+            display: inline-block;
+            background: #c0c0c0;
+            color: #0000aa;
+            padding: 2px 8px;
+            margin-bottom: 20px;
+            font-family: 'PixelMplus', sans-serif;
+            font-size: 16px;
+        }
+        #shutdown-output {
+            white-space: pre-wrap;
+            font-family: 'PixelMplus', sans-serif;
+            font-size: clamp(12px, 1.25vw, 17px);
+            line-height: 1.35;
+            margin: 0;
+        }
+/* --- Very subtle random CRT glitch noise --- */
+        #crt-glitch-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 2147483645;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .crt-glitch-strip {
+            position: absolute;
+            left: -2%;
+            width: 104%;
+            height: 2px;
+            opacity: 0;
+            background:
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.08) 0px,
+                    rgba(255,255,255,0.08) 1px,
+                    rgba(0,0,0,0.05) 1px,
+                    rgba(0,0,0,0.05) 3px,
+                    transparent 3px,
+                    transparent 8px
+                );
+            -webkit-backdrop-filter: contrast(1.08) brightness(1.055) saturate(1.03);
+            backdrop-filter: contrast(1.08) brightness(1.055) saturate(1.03);
+            will-change: top, height, transform, opacity;
+        }
+        .crt-glitch-strip.visible {
+            opacity: 0.080;
+        }
+
+
+
+
+        /* --- CRT front layer: flat debug version --- */
+        /*
+           Debug build:
+           - No page curvature
+           - No curved scanline grid
+           - Original v12 UI/layout behavior is preserved
+        */
+        #crt-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2147483646;
+            pointer-events: none;
+            overflow: hidden;
+            background:
+                repeating-linear-gradient(
+                    to bottom,
+                    rgba(0,0,0,0.00) 0px,
+                    rgba(0,0,0,0.00) 2px,
+                    rgba(0,0,0,0.050) 3px,
+                    rgba(0,0,0,0.050) 4px
+                );
+            box-shadow:
+                inset 0 0 38px rgba(255,255,255,0.035),
+                inset 0 0 92px rgba(0,0,0,0.16);
+            -webkit-backdrop-filter: contrast(1.022) saturate(0.97);
+            backdrop-filter: contrast(1.022) saturate(0.97);
+        }
+
+        #crt-overlay::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 0% 0%,
+                    rgba(0,0,0,0.36) 0%,
+                    rgba(0,0,0,0.18) 8%,
+                    rgba(0,0,0,0.06) 16%,
+                    transparent 25%),
+                radial-gradient(circle at 100% 0%,
+                    rgba(0,0,0,0.36) 0%,
+                    rgba(0,0,0,0.18) 8%,
+                    rgba(0,0,0,0.06) 16%,
+                    transparent 25%),
+                radial-gradient(circle at 0% 100%,
+                    rgba(0,0,0,0.36) 0%,
+                    rgba(0,0,0,0.18) 8%,
+                    rgba(0,0,0,0.06) 16%,
+                    transparent 25%),
+                radial-gradient(circle at 100% 100%,
+                    rgba(0,0,0,0.36) 0%,
+                    rgba(0,0,0,0.18) 8%,
+                    rgba(0,0,0,0.06) 16%,
+                    transparent 25%);
+        }
+
+        #crt-overlay::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(
+                    ellipse at 25% 12%,
+                    rgba(255,255,255,0.15) 0%,
+                    rgba(255,255,255,0.065) 10%,
+                    rgba(255,255,255,0.025) 22%,
+                    transparent 40%
+                ),
+                linear-gradient(
+                    115deg,
+                    rgba(255,255,255,0.07) 0%,
+                    rgba(255,255,255,0.03) 18%,
+                    transparent 38%
+                );
+            mix-blend-mode: screen;
+            opacity: 0.88;
+        }
+
+        @media (max-width: 800px) {
+            body { font-size: 14px; background-attachment: scroll; }
+            .header-title { font-size: 1.6em; margin-bottom: 15px; }
+            .window { box-sizing: border-box; }
+            
+            #win-profile { width: 200px !important; }
+            #win-counter { width: 250px !important; max-width: 88vw !important; }
+            #win-phalux { width: 45% !important; max-width: 160px !important; }
+            #win-social { width: 90% !important; max-width: 350px !important; }
+            #win-spotify { width: 92% !important; max-width: 360px !important; }
+            #win-youtube { width: 96% !important; max-width: 380px !important; }
+            #win-nyan-special { width: 90% !important; max-width: 360px !important; }
+            
+            #win-phalux .window-contents { padding: 5px !important; }
+            #win-phalux .window-contents img { max-width: 100px !important; }
+
+            .title-bar { font-size: 12px; padding: 2px 4px 2px 6px; }
+            .close-button { width: 14px; height: 12px; font-size: 11px; }
+            .window-control-button { width: 14px; height: 12px; font-size: 10px; line-height: 9px; }
+            .title-bar-controls { gap: 1px; margin-left: 4px; }
+            #win-cat-warning { width: 90% !important; max-width: 340px !important; }
+            .window-contents { padding: 8px; }
+            
+            /* --- バグの原因だった「消えていた箇所」を復元 --- */
+            .profile-section { flex-direction: column; text-align: center; gap: 8px; }
+            .profile-text h2 { font-size: 1.2em; margin: 0 0 4px 0 !important; }
+            .profile-text p { font-size: 0.9em; margin: 0 0 8px 0 !important; }
+            .profile-text a { font-size: 12px !important; }
+            .profile-img { width: 84px !important; }
+            
+            .social-icons-grid { gap: 4px !important; }
+            .social-item { padding: 3px 6px !important; font-size: 12px !important; }
+            .social-item img { width: 28px !important; height: 28px !important; margin-bottom: 2px !important; }
+            /* ----------------------------------------------- */
+
+            .nav { gap: 8px; margin-bottom: 25px; }
+            .desktop-icon { width: 60px; }
+            .desktop-icon img { width: 34px !important; height: 34px !important; }
+            .desktop-icon span { font-size: 11px; padding: 1px 2px; }
+
+            /* スマホ用タスクバー */
+            #win95-taskbar { height: 28px; }
+    
+        /* Bottom overscan is handled separately:
+           extend taskbar-colored pixels below and sideways beyond the visible screen. */
+        #win95-taskbar::after {
+            content: "";
+            position: absolute;
+            left: -20vw;
+            right: -20vw;
+            top: 100%;
+            height: 120px;
+            background: #c0c0c0;
+            pointer-events: none;
+        }
+
+        #taskbar-start-btn { height: 22px; }
+            #taskbar-start-btn img { height: 16px !important; }
+            .win95-taskbar-tab { width: 90px; font-size: 10px; height: 22px; }
+            #taskbar-tray img { width: 28px; height: 28px; }
+            #tray-clock { font-size: 12px; width: 36px; }
+        }
