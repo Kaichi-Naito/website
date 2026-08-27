@@ -29,6 +29,7 @@
     var startupSound = createAudio('Sound/windows.mp3');
     var catSound = createAudio('Sound/CatMeow.mp3');
     var catErrorSound = createAudio('Sound/Error_2.mp3');
+    var catCrashSound = createAudio('Sound/Nyancat_x30.mp3');
 
     function play(audio) {
         if (!audio) return;
@@ -551,6 +552,31 @@
     function triggerCatCrashShutdown() {
         if (catCrashTriggered) return;
         catCrashTriggered = true;
+
+        // Play the dedicated x30 SE at the exact start of the rush.
+        // This is called synchronously from the user's 30th cat click.
+        if (catCrashSound) {
+            try {
+                catCrashSound.currentTime = 0;
+                var crashPlay = catCrashSound.play();
+                if (crashPlay && typeof crashPlay.catch === 'function') {
+                    crashPlay.catch(function () {
+                        // Fallback: create a fresh audio element if the preloaded instance was blocked/stale.
+                        try {
+                            var fallbackCrashSound = new Audio(asset('Sound/Nyancat_x30.mp3'));
+                            fallbackCrashSound.volume = 1;
+                            fallbackCrashSound.play().catch(function(){});
+                        } catch (e) {}
+                    });
+                }
+            } catch (e) {
+                try {
+                    var fallbackCrashSound2 = new Audio(asset('Sound/Nyancat_x30.mp3'));
+                    fallbackCrashSound2.volume = 1;
+                    fallbackCrashSound2.play().catch(function(){});
+                } catch (e2) {}
+            }
+        }
 
         var crashCat = document.createElement('img');
         crashCat.id = 'nyan-cat-crash';
