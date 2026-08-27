@@ -79,6 +79,43 @@
             font-size: 14px;
             margin-bottom: 2px;
         }
+
+        .title-bar-controls {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+        .window-control-button {
+            width: 16px;
+            height: 14px;
+            padding: 0;
+            line-height: 11px;
+            text-align: center;
+            font-family: 'PixelMplus', sans-serif;
+            font-size: 12px;
+            color: #000;
+            background-color: #c0c0c0;
+            border: 1px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+        .window-control-button:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding-top: 1px;
+            padding-left: 1px;
+        }
+        .minimize-button {
+            padding-bottom: 4px;
+            font-weight: bold;
+        }
+        .maximize-button {
+            font-size: 10px;
+            line-height: 10px;
+        }
+
         .close-button {
             width: 16px; height: 14px;
             font-size: 13px;
@@ -176,7 +213,7 @@
             padding: 0 4px env(safe-area-inset-bottom) 4px;
             box-sizing: border-box;
             background-color: #c0c0c0; border-top: 2px solid #ffffff;
-            box-shadow: 0 -1px 0 0 #000000; z-index: 10000; display: flex; align-items: center;
+            box-shadow: 0 -1px 0 0 #000000; z-index: 50000; display: flex; align-items: center;
         }
         #taskbar-start-btn {
             background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff;
@@ -184,10 +221,10 @@
         }
         #taskbar-start-btn:active { border-color: #808080 #ffffff #ffffff #808080; padding: 1px 1px 0 3px; }
         #taskbar-start-btn img { image-rendering: pixelated; height: 18px; width: auto; }
-        #taskbar-tasks { display: flex; gap: 4px; margin-left: 6px; overflow: hidden; height: 24px; }
+        #taskbar-tasks { display: flex; gap: 4px; margin-left: 6px; overflow: hidden; height: 24px; flex: 1; min-width: 0; }
         .win95-taskbar-tab {
             background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff;
-            height: 24px; width: 120px; padding: 0 4px; font-size: 12px; color: black; white-space: nowrap;
+            height: 24px; width: min(150px, 16vw); min-width: 82px; padding: 0 4px; font-size: 12px; color: black; white-space: nowrap;
             overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; box-sizing: border-box;
         }
         #taskbar-tray {
@@ -197,6 +234,241 @@
         }
         #taskbar-tray img { width: 30px; height: 30px; image-rendering: pixelated; }
         #tray-clock { font-size: 14px; color: black; width: 46px; text-align: right; }
+
+
+        .win95-taskbar-tab {
+            cursor: pointer;
+            font-family: 'PixelMplus', sans-serif;
+        }
+        .win95-taskbar-tab.active {
+            border-color: #808080 #ffffff #ffffff #808080;
+            background-color: #d4d4d4;
+            font-weight: bold;
+        }
+
+        /* --- 最大化 --- */
+        .window.maximized-window {
+            position: fixed !important;
+            left: 4px !important;
+            top: 4px !important;
+            width: calc(100vw - 8px) !important;
+            max-width: none !important;
+            height: calc(100vh - 42px) !important;
+            transform: none !important;
+            box-sizing: border-box;
+        }
+        .window.maximized-window .window-contents {
+            height: calc(100% - 24px);
+            overflow: auto;
+            box-sizing: border-box;
+        }
+
+        /* --- Start menu --- */
+        #start-menu {
+            position: fixed;
+            left: 4px;
+            bottom: 33px;
+            width: 220px;
+            display: none;
+            z-index: 60000;
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            box-shadow: 1px 1px 0 #000;
+            text-align: left;
+            padding: 2px;
+            box-sizing: border-box;
+        }
+        #start-menu.open {
+            display: flex;
+        }
+        .start-menu-rail {
+            width: 28px;
+            background: linear-gradient(#808080, #3f3f3f);
+            color: #fff;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 8px 0;
+            box-sizing: border-box;
+        }
+        .start-menu-rail span {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        .start-menu-items {
+            flex: 1;
+            padding: 4px;
+        }
+        .start-menu-item {
+            width: 100%;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 0;
+            background: transparent;
+            color: #000;
+            font-family: 'PixelMplus', sans-serif;
+            font-size: 14px;
+            text-align: left;
+            padding: 5px 8px;
+            cursor: pointer;
+        }
+        .start-menu-item:hover,
+        .start-menu-item:focus {
+            background: #000080;
+            color: #fff;
+            outline: none;
+        }
+        .start-menu-item img {
+            width: 28px;
+            height: 28px;
+            image-rendering: pixelated;
+            object-fit: contain;
+        }
+        #taskbar-start-btn.start-open {
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding: 1px 1px 0 3px;
+        }
+
+        /* --- Cat warning --- */
+        #win-cat-warning {
+            width: 360px;
+            max-width: 92vw;
+            display: none;
+        }
+        #win-cat-warning .window-contents {
+            padding: 16px;
+        }
+        .warning-content {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .warning-error-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #d00000;
+            color: #fff;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 1px #800000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: sans-serif;
+            font-size: 25px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .warning-message {
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+        }
+        .warning-actions {
+            text-align: center;
+            margin-top: 14px;
+        }
+        .warning-ok-button {
+            min-width: 80px;
+            padding: 4px 14px;
+            font-family: 'PixelMplus', sans-serif;
+            font-size: 13px;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            cursor: pointer;
+        }
+        .warning-ok-button:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        /* --- Shut Down / blue screen --- */
+        #shutdown-screen {
+            position: fixed;
+            inset: 0;
+            display: none;
+            z-index: 1000000;
+            background: #0000aa;
+            color: #fff;
+            text-align: left;
+            font-family: 'PixelMplus', monospace;
+            padding: 6vh 7vw;
+            box-sizing: border-box;
+            overflow: hidden;
+            cursor: none;
+        }
+        #shutdown-screen.active {
+            display: block;
+        }
+        #shutdown-screen .shutdown-title {
+            display: inline-block;
+            background: #c0c0c0;
+            color: #0000aa;
+            padding: 2px 8px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        #shutdown-output {
+            white-space: pre-wrap;
+            font-size: clamp(12px, 1.25vw, 17px);
+            line-height: 1.35;
+            margin: 0;
+        }
+
+        /* --- CRT front layer --- */
+        #crt-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2147483646;
+            pointer-events: none;
+            border-radius: 3.6% / 2.6%;
+            background:
+                radial-gradient(ellipse at center,
+                    rgba(255,255,255,0.035) 0%,
+                    rgba(255,255,255,0.015) 45%,
+                    rgba(0,0,0,0.06) 73%,
+                    rgba(0,0,0,0.28) 100%),
+                repeating-linear-gradient(
+                    to bottom,
+                    rgba(0,0,0,0.00) 0px,
+                    rgba(0,0,0,0.00) 2px,
+                    rgba(0,0,0,0.055) 3px,
+                    rgba(0,0,0,0.055) 4px
+                );
+            box-shadow:
+                inset 0 0 26px rgba(255,255,255,0.07),
+                inset 0 0 85px rgba(0,0,0,0.38),
+                inset 0 0 150px rgba(0,0,0,0.16);
+            -webkit-backdrop-filter: contrast(1.035) saturate(0.94) blur(0.12px);
+            backdrop-filter: contrast(1.035) saturate(0.94) blur(0.12px);
+        }
+        #crt-overlay::before {
+            content: "";
+            position: absolute;
+            inset: -1.2%;
+            border-radius: 7% / 5%;
+            box-shadow:
+                inset 0 0 45px rgba(0,0,0,0.34),
+                inset 0 0 8px rgba(255,255,255,0.10);
+        }
+        #crt-overlay::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background:
+                linear-gradient(90deg,
+                    rgba(255,0,0,0.012),
+                    transparent 33%,
+                    rgba(0,255,255,0.010) 66%,
+                    transparent);
+            opacity: 0.7;
+        }
 
         @media (max-width: 800px) {
             body { font-size: 14px; background-attachment: scroll; }
@@ -216,6 +488,9 @@
 
             .title-bar { font-size: 12px; padding: 2px 4px 2px 6px; }
             .close-button { width: 14px; height: 12px; font-size: 11px; }
+            .window-control-button { width: 14px; height: 12px; font-size: 10px; line-height: 9px; }
+            .title-bar-controls { gap: 1px; margin-left: 4px; }
+            #win-cat-warning { width: 90% !important; max-width: 340px !important; }
             .window-contents { padding: 8px; }
             
             /* --- バグの原因だった「消えていた箇所」を復元 --- */
@@ -270,7 +545,7 @@
 
     <div class="window" id="win-profile" style="width: 380px; z-index: 104;">
         <div class="title-bar draggable-cursor" id="handle-profile">
-            <span>Profile.exe</span><button type="button" class="close-button" aria-label="Close">×</button>
+            <span>Profile.exe</span><div class="title-bar-controls"><button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button><button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button><button type="button" class="close-button" aria-label="Close">×</button></div>
         </div>
         <div class="window-contents profile-section">
             <img src="images/DotGuitar.png" alt="Kaichi" class="profile-img">
@@ -285,7 +560,7 @@
 
     <div class="window" id="win-counter" style="z-index: 106;">
         <div class="title-bar draggable-cursor" id="handle-counter">
-            <span>Visitor_Counter.exe</span><button type="button" class="close-button" aria-label="Close">×</button>
+            <span>Visitor_Counter.exe</span><div class="title-bar-controls"><button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button><button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button><button type="button" class="close-button" aria-label="Close">×</button></div>
         </div>
         <div class="window-contents">
             <p class="visitor-counter-line">You are the</p>
@@ -296,7 +571,7 @@
 
     <div class="window" id="win-phalux" style="width: 175px; z-index: 105;"> 
         <div class="title-bar draggable-cursor" id="handle-phalux">
-            <span>PHALUX.band</span><button type="button" class="close-button" aria-label="Close">×</button>
+            <span>PHALUX.band</span><div class="title-bar-controls"><button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button><button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button><button type="button" class="close-button" aria-label="Close">×</button></div>
         </div>
         <div class="window-contents" style="text-align: center; padding: 10px;"> 
             <a href="https://phalux.bitfan.id/" target="_blank" rel="noopener noreferrer" class="phalux-link"> 
@@ -307,7 +582,7 @@
 
     <div class="window" id="win-social" style="width: 450px; z-index: 103;">
         <div class="title-bar draggable-cursor" id="handle-social">
-            <span>Social_Media.lnk</span><button type="button" class="close-button" aria-label="Close">×</button>
+            <span>Social_Media.lnk</span><div class="title-bar-controls"><button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button><button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button><button type="button" class="close-button" aria-label="Close">×</button></div>
         </div>
         <div class="window-contents">
             <div class="social-icons-grid">
@@ -323,7 +598,7 @@
 
     <div class="window" id="win-spotify" style="width: 600px; z-index: 102;">
         <div class="title-bar draggable-cursor" id="handle-spotify">
-            <span>CD_Player.exe</span><button type="button" class="close-button" aria-label="Close">×</button>
+            <span>CD_Player.exe</span><div class="title-bar-controls"><button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button><button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button><button type="button" class="close-button" aria-label="Close">×</button></div>
         </div>
         <div class="window-contents">
             <iframe title="Kaichi Spotify album player" src="https://open.spotify.com/embed/album/414HJT5311vIKZHsxh56S2?utm_source=generator" width="100%" height="152" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
@@ -332,7 +607,7 @@
 
     <div class="window" id="win-youtube" style="width: 800px; z-index: 101;">
         <div class="title-bar draggable-cursor" id="handle-youtube">
-            <span>Media_Player.avi</span><button type="button" class="close-button" aria-label="Close">×</button>
+            <span>Media_Player.avi</span><div class="title-bar-controls"><button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button><button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button><button type="button" class="close-button" aria-label="Close">×</button></div>
         </div>
         <div class="window-contents">
             <h3 style="margin-top:0;">Original songs🎸</h3>
@@ -343,9 +618,28 @@
         </div>
     </div>
 
+
+    <div class="window" id="win-cat-warning" style="z-index: 40000;">
+        <div class="title-bar draggable-cursor" id="handle-cat-warning">
+            <span>Warning</span>
+            <div class="title-bar-controls">
+                <button type="button" class="close-button" aria-label="Close">×</button>
+            </div>
+        </div>
+        <div class="window-contents">
+            <div class="warning-content">
+                <div class="warning-error-icon" aria-hidden="true">×</div>
+                <p class="warning-message">Warning: Too many cats detected.</p>
+            </div>
+            <div class="warning-actions">
+                <button type="button" id="cat-warning-ok" class="warning-ok-button">OK</button>
+            </div>
+        </div>
+    </div>
+
     <div class="window" id="win-nyan-special" style="width: 480px; z-index: 20000; display: none;">
         <div class="title-bar draggable-cursor" id="handle-nyan-special">
-            <span>Nyan_Cat.txt</span><button type="button" class="close-button" aria-label="Close">×</button>
+            <span>Nyan_Cat.txt</span><div class="title-bar-controls"><button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button><button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button><button type="button" class="close-button" aria-label="Close">×</button></div>
         </div>
         <div class="window-contents" style="background-color: #fff; padding: 10px; text-align: center;">
             <img src="images/NyanCatAA.png" alt="Nyan Cat Art" style="width: 100%; height: auto; display: block; margin: 0 auto;">
@@ -353,21 +647,37 @@
         </div>
     </div>
 
-    <img id="nyan-cat" src="images/gif/Nyancat.gif" alt="Nyan Cat" style="position: fixed; width: 80px; height: auto; z-index: 10001; cursor: pointer; display: block; image-rendering: pixelated; top: 50%; left: 50%;">
+    <img id="nyan-cat" src="images/gif/Nyancat.gif" alt="Nyan Cat" style="position: fixed; width: 80px; height: auto; z-index: 25000; cursor: pointer; display: block; image-rendering: pixelated; top: 50%; left: 50%;">
+
+
+    <div id="start-menu" aria-hidden="true">
+        <div class="start-menu-rail"><span>Kaichi 95</span></div>
+        <div class="start-menu-items">
+            <button type="button" id="shutdown-menu-item" class="start-menu-item">
+                <img src="images/gif/Computer.gif" alt="">
+                <span>Shut Down...</span>
+            </button>
+        </div>
+    </div>
 
     <div id="win95-taskbar">
         <button id="taskbar-start-btn" class="win95-taskbar-btn click-target">
             <img src="images/start.png" alt="Start">
         </button>
-        <div id="taskbar-tasks">
-            <div class="win95-taskbar-tab">Tap NyanCat!!</div>
-            <div class="win95-taskbar-tab">ฅ^•ω•^ฅ</div>
-        </div>
+        <div id="taskbar-tasks" aria-label="Open windows"></div>
         <div id="taskbar-tray">
             <img src="images/volume-icon.png" alt="Volume" width="15" height="15">
             <div id="tray-clock">00:00</div>
         </div>
     </div>
+
+
+    <div id="shutdown-screen" aria-hidden="true">
+        <div class="shutdown-title">Kaichi OS</div>
+        <pre id="shutdown-output"></pre>
+    </div>
+
+    <div id="crt-overlay" aria-hidden="true"></div>
 
     <div class="footer">
         このサイトは本人によって頑張って作成されました
@@ -386,13 +696,13 @@
             }
         }
 
-        var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .close-button, .title-bar, .phalux-link, .click-target');
+        var clickTargets = document.querySelectorAll('.desktop-icon, .win95-btn, .window-control-button, .close-button, .title-bar, .phalux-link, .click-target, .warning-ok-button');
         for (var i = 0; i < clickTargets.length; i++) {
             clickTargets[i].addEventListener('mousedown', playClickSound);
             clickTargets[i].addEventListener('touchstart', playClickSound, { passive: true });
         }
 
-        var highestZIndex = 110;
+        var highestZIndex = 30000;
 
         function setInitialPositions() {
             var width = window.innerWidth;
@@ -462,7 +772,8 @@
             handle.addEventListener('touchstart', startDragging, { passive: false });
 
             function startDragging(e) {
-                if(e.target.classList.contains('close-button')) return;
+                if(e.target.closest('.title-bar-controls')) return;
+                if(target.classList.contains('maximized-window')) return;
                 isDragging = true;
                 highestZIndex++;
                 target.style.zIndex = highestZIndex;
@@ -500,18 +811,331 @@
         initDrag('win-spotify', 'handle-spotify');
         initDrag('win-youtube', 'handle-youtube');
         initDrag('win-nyan-special', 'handle-nyan-special');
+        initDrag('win-cat-warning', 'handle-cat-warning');
+
+
+        // --- Window manager / real taskbar ---
+        var taskbarTasks = document.getElementById('taskbar-tasks');
+        var activeWindowId = null;
+
+        function getWindowTitle(win) {
+            var title = win.querySelector('.title-bar > span');
+            return title ? title.textContent.trim() : win.id;
+        }
+
+        function ensureTaskbarTab(win) {
+            if (!taskbarTasks || !win || win.dataset.closed === 'true') return null;
+
+            var existing = taskbarTasks.querySelector('[data-window-id="' + win.id + '"]');
+            if (existing) return existing;
+
+            var tab = document.createElement('button');
+            tab.type = 'button';
+            tab.className = 'win95-taskbar-tab';
+            tab.dataset.windowId = win.id;
+            tab.textContent = getWindowTitle(win);
+            tab.title = getWindowTitle(win);
+
+            tab.addEventListener('click', function() {
+                playClickSound();
+                var target = document.getElementById(this.dataset.windowId);
+                if (!target) return;
+
+                var isVisible = target.style.display !== 'none' && target.dataset.minimized !== 'true';
+                if (isVisible && activeWindowId === target.id) {
+                    minimizeWindow(target);
+                } else {
+                    restoreWindow(target);
+                    focusWindow(target);
+                }
+            });
+
+            taskbarTasks.appendChild(tab);
+            return tab;
+        }
+
+        function removeTaskbarTab(win) {
+            if (!taskbarTasks || !win) return;
+            var tab = taskbarTasks.querySelector('[data-window-id="' + win.id + '"]');
+            if (tab) tab.remove();
+            if (activeWindowId === win.id) activeWindowId = null;
+            refreshTaskbarActiveState();
+        }
+
+        function refreshTaskbarActiveState() {
+            if (!taskbarTasks) return;
+            var tabs = taskbarTasks.querySelectorAll('.win95-taskbar-tab');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.toggle('active', tabs[i].dataset.windowId === activeWindowId);
+            }
+        }
+
+        function focusWindow(win) {
+            if (!win || win.dataset.closed === 'true') return;
+            if (win.dataset.minimized === 'true') restoreWindow(win);
+
+            highestZIndex++;
+            if (win.id === 'win-cat-warning') {
+                win.style.zIndex = '40000';
+            } else {
+                win.style.zIndex = highestZIndex;
+            }
+
+            activeWindowId = win.id;
+            ensureTaskbarTab(win);
+            refreshTaskbarActiveState();
+        }
+
+        function minimizeWindow(win) {
+            if (!win || win.dataset.closed === 'true') return;
+            ensureTaskbarTab(win);
+            win.dataset.minimized = 'true';
+            win.style.display = 'none';
+
+            if (activeWindowId === win.id) activeWindowId = null;
+            refreshTaskbarActiveState();
+        }
+
+        function restoreWindow(win) {
+            if (!win || win.dataset.closed === 'true') return;
+            win.dataset.minimized = 'false';
+            win.style.display = win.dataset.windowDisplay || 'inline-block';
+            ensureTaskbarTab(win);
+        }
+
+        function showWindow(win) {
+            if (!win) return;
+            win.dataset.closed = 'false';
+            win.dataset.minimized = 'false';
+            win.style.display = win.dataset.windowDisplay || 'inline-block';
+            ensureTaskbarTab(win);
+            focusWindow(win);
+        }
+
+        function closeWindow(win) {
+            if (!win) return;
+            win.dataset.closed = 'true';
+            win.dataset.minimized = 'false';
+            win.style.display = 'none';
+            removeTaskbarTab(win);
+        }
+
+        function centerWindow(win) {
+            if (!win) return;
+            win.style.transform = 'none';
+
+            requestAnimationFrame(function() {
+                var left = Math.max(6, (window.innerWidth - win.offsetWidth) / 2);
+                var top = Math.max(12, (window.innerHeight - win.offsetHeight - 36) / 2);
+                win.style.left = left + 'px';
+                win.style.top = top + 'px';
+            });
+        }
+
+        function toggleMaximizeWindow(win) {
+            if (!win || win.dataset.closed === 'true') return;
+
+            if (win.classList.contains('maximized-window')) {
+                var restore = win._restoreState || {};
+                win.classList.remove('maximized-window');
+                win.style.position = restore.position || 'absolute';
+                win.style.left = restore.left || '';
+                win.style.top = restore.top || '';
+                win.style.width = restore.width || '';
+                win.style.height = restore.height || '';
+                win.style.maxWidth = restore.maxWidth || '';
+                win.style.transform = restore.transform || '';
+            } else {
+                win._restoreState = {
+                    position: win.style.position,
+                    left: win.style.left,
+                    top: win.style.top,
+                    width: win.style.width,
+                    height: win.style.height,
+                    maxWidth: win.style.maxWidth,
+                    transform: win.style.transform
+                };
+                win.classList.add('maximized-window');
+            }
+
+            focusWindow(win);
+        }
+
+        var managedWindows = document.querySelectorAll('.window');
+        for (var mw = 0; mw < managedWindows.length; mw++) {
+            (function(win) {
+                win.dataset.windowDisplay = 'inline-block';
+                win.dataset.minimized = 'false';
+                win.dataset.closed = 'false';
+
+                if (getComputedStyle(win).display !== 'none') {
+                    ensureTaskbarTab(win);
+                }
+
+                win.addEventListener('mousedown', function(e) {
+                    if (!e.target.closest('.title-bar-controls')) focusWindow(win);
+                });
+                win.addEventListener('touchstart', function(e) {
+                    if (!e.target.closest('.title-bar-controls')) focusWindow(win);
+                }, { passive: true });
+            })(managedWindows[mw]);
+        }
+
+        var minimizeBtns = document.querySelectorAll('.minimize-button');
+        for (var mb = 0; mb < minimizeBtns.length; mb++) {
+            minimizeBtns[mb].addEventListener('click', function(e) {
+                e.stopPropagation();
+                playClickSound();
+                minimizeWindow(this.closest('.window'));
+            });
+        }
+
+        var maximizeBtns = document.querySelectorAll('.maximize-button');
+        for (var xb = 0; xb < maximizeBtns.length; xb++) {
+            maximizeBtns[xb].addEventListener('click', function(e) {
+                e.stopPropagation();
+                playClickSound();
+                toggleMaximizeWindow(this.closest('.window'));
+            });
+        }
+
+        // Initial active window = highest visible z-index.
+        var topWindow = null;
+        var topZ = -Infinity;
+        for (var tw = 0; tw < managedWindows.length; tw++) {
+            if (getComputedStyle(managedWindows[tw]).display === 'none') continue;
+            var z = parseInt(managedWindows[tw].style.zIndex || '0', 10);
+            if (z > topZ) {
+                topZ = z;
+                topWindow = managedWindows[tw];
+            }
+        }
+        if (topWindow) {
+            activeWindowId = topWindow.id;
+            refreshTaskbarActiveState();
+        }
+
+        // --- Start menu ---
+        var startButton = document.getElementById('taskbar-start-btn');
+        var startMenu = document.getElementById('start-menu');
+        var shutdownMenuItem = document.getElementById('shutdown-menu-item');
+
+        function setStartMenuOpen(open) {
+            if (!startMenu || !startButton) return;
+            startMenu.classList.toggle('open', open);
+            startMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
+            startButton.classList.toggle('start-open', open);
+        }
+
+        if (startButton) {
+            startButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                setStartMenuOpen(!startMenu.classList.contains('open'));
+            });
+        }
+
+        document.addEventListener('mousedown', function(e) {
+            if (!startMenu || !startMenu.classList.contains('open')) return;
+            if (!startMenu.contains(e.target) && !startButton.contains(e.target)) {
+                setStartMenuOpen(false);
+            }
+        });
+
+        // --- Shut Down... / 7 sec fake blue screen ---
+        function randomHex(length) {
+            var chars = '0123456789ABCDEF';
+            var out = '';
+            for (var i = 0; i < length; i++) out += chars.charAt(Math.floor(Math.random() * chars.length));
+            return out;
+        }
+
+        function beginFakeShutdown() {
+            var screen = document.getElementById('shutdown-screen');
+            var output = document.getElementById('shutdown-output');
+            if (!screen || !output) return;
+
+            setStartMenuOpen(false);
+            screen.classList.add('active');
+            screen.setAttribute('aria-hidden', 'false');
+            output.textContent = '';
+            document.body.style.overflow = 'hidden';
+
+            var fixedLines = [
+                'A problem has been detected and Kaichi OS is shutting down.',
+                '',
+                'Preparing system restart...',
+                'Saving desktop state... OK',
+                'Stopping Media_Player.avi... OK',
+                'Stopping CD_Player.exe... OK',
+                'Closing Social_Media.lnk... OK',
+                'Terminating cat.exe processes...',
+                ''
+            ];
+
+            var lineIndex = 0;
+            var dumpIndex = 0;
+
+            function appendLine(line) {
+                output.textContent += line + '\n';
+                screen.scrollTop = screen.scrollHeight;
+            }
+
+            var lineTimer = setInterval(function() {
+                if (lineIndex < fixedLines.length) {
+                    appendLine(fixedLines[lineIndex++]);
+                    return;
+                }
+
+                dumpIndex++;
+                appendLine(
+                    '[' + String(dumpIndex).padStart(3, '0') + '] ' +
+                    '0x' + randomHex(8) + '  ' +
+                    randomHex(16) + '  ' +
+                    (dumpIndex % 4 === 0 ? 'OK' : 'FLUSH')
+                );
+
+                if (dumpIndex >= 42) {
+                    clearInterval(lineTimer);
+                    appendLine('');
+                    appendLine('System restart initialized.');
+                    appendLine('Returning to Kaichi Guitar Music...');
+                }
+            }, 75);
+
+            setTimeout(function() {
+                window.location.href = 'index.html';
+            }, 7000);
+        }
+
+        if (shutdownMenuItem) {
+            shutdownMenuItem.addEventListener('click', function() {
+                playClickSound();
+                beginFakeShutdown();
+            });
+        }
+
+        // Warning OK
+        var catWarningOk = document.getElementById('cat-warning-ok');
+        if (catWarningOk) {
+            catWarningOk.addEventListener('click', function() {
+                playClickSound();
+                closeWindow(document.getElementById('win-cat-warning'));
+            });
+        }
 
         var closeBtns = document.querySelectorAll('.close-button');
         for(var j = 0; j < closeBtns.length; j++) {
             closeBtns[j].addEventListener('mousedown', function(e) { e.stopPropagation(); });
             closeBtns[j].addEventListener('touchstart', function(e) { e.stopPropagation(); }, { passive: false });
-            var closeAction = function(e) { e.preventDefault(); this.closest('.window').style.display = 'none'; };
+            var closeAction = function(e) { e.preventDefault(); closeWindow(this.closest('.window')); };
             closeBtns[j].addEventListener('click', closeAction);
             closeBtns[j].addEventListener('touchend', closeAction);
         }
 
         // --- Nyan Cat増殖 ＆ 10匹イベント ---
         var catSound; try { catSound = new Audio('Sound/CatMeow.mp3'); catSound.preload = 'auto'; } catch(e) {}
+        var catErrorSound; try { catErrorSound = new Audio('Sound/Error_2.mp3'); catErrorSound.preload = 'auto'; } catch(e) {}
+        var catWarningTriggered = false;
         var cats = [];
         function setupCat(catElement, startX, startY, startVx, startVy) {
             var catObj = { element: catElement, x: startX, y: startY, vx: startVx, vy: startVy };
@@ -519,10 +1143,21 @@
 
             if (cats.length === 10) {
                 var specialWin = document.getElementById('win-nyan-special');
-                specialWin.style.display = 'inline-block';
-                specialWin.style.left = '50%'; specialWin.style.top = '50%';
-                specialWin.style.transform = 'translate(-50%, -50%)';
-                highestZIndex++; specialWin.style.zIndex = highestZIndex;
+                showWindow(specialWin);
+                centerWindow(specialWin);
+            }
+
+            if (cats.length === 20 && !catWarningTriggered) {
+                catWarningTriggered = true;
+                var warningWin = document.getElementById('win-cat-warning');
+                showWindow(warningWin);
+                centerWindow(warningWin);
+                warningWin.style.zIndex = '40000';
+
+                if (catErrorSound) {
+                    catErrorSound.currentTime = 0;
+                    catErrorSound.play().catch(function(){});
+                }
             }
 
             function catchCat(e) {
@@ -532,7 +1167,7 @@
                 catObj.vy = (Math.random() * 3 + 1) * (Math.random() < 0.5 ? 1 : -1);
                 var newCat = document.createElement('img');
                 newCat.src = 'images/gif/Nyancat.gif';
-                newCat.style.position = 'fixed'; newCat.style.width = '80px'; newCat.style.zIndex = '10001';
+                newCat.style.position = 'fixed'; newCat.style.width = '80px'; newCat.style.zIndex = '25000';
                 newCat.style.cursor = 'pointer'; newCat.style.imageRendering = 'pixelated';
                 newCat.style.left = catObj.x + 'px'; newCat.style.top = catObj.y + 'px';
                 document.body.appendChild(newCat);
