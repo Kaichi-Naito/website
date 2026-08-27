@@ -619,22 +619,21 @@
             opacity: 1;
         }
 
-
 /* =========================================================
-   FINAL FIX: x30 Nyan Cat mobile clockwise spin
-   Keep this at the very end so it wins the CSS cascade.
+   FINAL FIX: x30 Nyan Cat mobile clockwise slow zoom
    ========================================================= */
 @media (max-width: 800px) {
     #nyan-cat-crash {
-        transform: translate(-50%, -50%) rotate(0deg) scale(0.18) !important;
+        /* Start much smaller so the approach feels more gradual. */
+        transform: translate(-50%, -50%) rotate(0deg) scale(0.035) !important;
         transition:
-            transform 1.55s cubic-bezier(0.20, 0.82, 0.16, 1),
+            transform 2.60s cubic-bezier(0.16, 0.60, 0.18, 1),
             filter 0.12s linear,
             opacity 0.12s linear !important;
     }
 
     #nyan-cat-crash.nyan-cat-crash-go {
-        /* Positive degrees = clockwise rotation on screen. */
+        /* Positive degrees = clockwise rotation. */
         transform: translate(-50%, -50%) rotate(1440deg) scale(80) !important;
     }
 }
