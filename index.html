@@ -136,6 +136,40 @@
         iframe { border: 2px solid #808080; background: #000; display: block; }
         .footer { margin-top: 50px; color: white; font-size: 12px; position: absolute; bottom: 60px; width: 100%; text-shadow: 1px 1px 2px #000; }
         
+
+        /* --- Visitor Counter --- */
+        #win-counter {
+            width: 300px;
+        }
+        #win-counter .window-contents {
+            text-align: center;
+            padding: 12px 16px 14px;
+        }
+        .visitor-counter-line {
+            margin: 2px 0 8px;
+            font-size: 15px;
+        }
+        .visitor-counter-display {
+            display: inline-block;
+            min-width: 170px;
+            padding: 5px 9px 6px;
+            background: #000;
+            border: 2px solid;
+            border-color: #808080 #ffffff #ffffff #808080;
+            color: #00ff00;
+            font-family: "Courier New", monospace;
+            font-size: 25px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            line-height: 1;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .visitor-counter-suffix {
+            margin: 8px 0 0;
+            font-size: 14px;
+        }
+
         /* --- タスクバーデザイン --- */
         #win95-taskbar {
             position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: 32px;
@@ -170,6 +204,7 @@
             .window { box-sizing: border-box; }
             
             #win-profile { width: 200px !important; }
+            #win-counter { width: 250px !important; max-width: 88vw !important; }
             #win-phalux { width: 45% !important; max-width: 160px !important; }
             #win-social { width: 90% !important; max-width: 350px !important; }
             #win-spotify { width: 92% !important; max-width: 360px !important; }
@@ -244,6 +279,18 @@
                 <p style="margin:0 0 15px 0;">Guitar, write music.</p>
                 <a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank" rel="noopener noreferrer" style="font-size: 14px; color: blue;">Hotone Official Artist</a>
             </div>
+        </div>
+    </div>
+
+
+    <div class="window" id="win-counter" style="z-index: 106;">
+        <div class="title-bar draggable-cursor" id="handle-counter">
+            <span>Visitor_Counter.exe</span><button type="button" class="close-button" aria-label="Close">×</button>
+        </div>
+        <div class="window-contents">
+            <p class="visitor-counter-line">You are the</p>
+            <div id="visitor-counter-number" class="visitor-counter-display" aria-live="polite">------</div>
+            <p id="visitor-counter-suffix" class="visitor-counter-suffix">visitor!</p>
         </div>
     </div>
 
@@ -351,6 +398,7 @@
             var width = window.innerWidth;
             var isMobile = window.matchMedia("(max-width: 800px)").matches;
             var profile = document.getElementById('win-profile');
+            var counter = document.getElementById('win-counter');
             var phalux = document.getElementById('win-phalux');
             var social = document.getElementById('win-social');
             var spotify = document.getElementById('win-spotify');
@@ -385,6 +433,7 @@
                     maxBottom = 900;
                 }
             } else {
+                if(counter.style.display !== 'none') { counter.style.left = '3%'; counter.style.top = '190px'; }
                 if(profile.style.display !== 'none') { profile.style.left = '28%'; profile.style.top = '200px'; }
                 if(phalux.style.display !== 'none') { phalux.style.left = '75%'; phalux.style.top = '170px'; }
                 if(social.style.display !== 'none') { social.style.left = '57%'; social.style.top = '350px'; }
@@ -444,6 +493,7 @@
             }
         }
 
+        initDrag('win-counter', 'handle-counter');
         initDrag('win-profile', 'handle-profile');
         initDrag('win-phalux', 'handle-phalux'); 
         initDrag('win-social', 'handle-social');
@@ -508,6 +558,56 @@
             requestAnimationFrame(animateCats);
         }
         requestAnimationFrame(animateCats);
+
+
+        // --- Visitor Counter ---
+        // GoatCounterの実測値に1200を加算して表示します。
+        var VISITOR_COUNT_OFFSET = 1200;
+        var VISITOR_COUNT_PATH = '/website';
+
+        function ordinalSuffix(number) {
+            var mod100 = number % 100;
+            if (mod100 >= 11 && mod100 <= 13) return 'th';
+
+            switch (number % 10) {
+                case 1: return 'st';
+                case 2: return 'nd';
+                case 3: return 'rd';
+                default: return 'th';
+            }
+        }
+
+        function updateVisitorCounter() {
+            var numberEl = document.getElementById('visitor-counter-number');
+            var suffixEl = document.getElementById('visitor-counter-suffix');
+            if (!numberEl || !suffixEl) return;
+
+            var counterUrl =
+                'https://kaichi.goatcounter.com/counter/' +
+                encodeURIComponent(VISITOR_COUNT_PATH) +
+                '.json';
+
+            fetch(counterUrl)
+                .then(function(response) {
+                    if (!response.ok) throw new Error('Counter request failed: ' + response.status);
+                    return response.json();
+                })
+                .then(function(data) {
+                    var rawCount = parseInt(String(data.count).replace(/,/g, ''), 10);
+                    if (!Number.isFinite(rawCount)) throw new Error('Invalid counter value');
+
+                    var displayCount = rawCount + VISITOR_COUNT_OFFSET;
+                    numberEl.textContent = String(displayCount).padStart(6, '0') + ordinalSuffix(displayCount);
+                    suffixEl.textContent = 'visitor!';
+                })
+                .catch(function(error) {
+                    numberEl.textContent = '------';
+                    suffixEl.textContent = 'visitor!';
+                    console.warn('Visitor counter could not be loaded.', error);
+                });
+        }
+
+        updateVisitorCounter();
 
         // --- 時計更新 ---
         function updateTrayClock() {
