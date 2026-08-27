@@ -644,13 +644,15 @@
         }
 
         @keyframes nyan-cat-crash-desktop {
-            from {
-                transform: translate(-50%, -50%) rotate(0deg) scale(0.18);
-            }
-            to {
-                transform: translate(-50%, -50%) rotate(1440deg) scale(80);
-            }
-        }
+    from {
+        width: 4px;
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to {
+        width: 140vw;
+        transform: translate(-50%, -50%) rotate(1440deg);
+    }
+}
 
         /*
            Mobile uses width instead of a fixed scale value.
