@@ -16,176 +16,28 @@
     <link rel="preload" href="Plugin/snap-web/ui/DRIVE_FluidArt.webp" as="image" type="image/webp" fetchpriority="high">
     <link rel="preload" href="Plugin/snap-web/snap_dsp.wasm" as="fetch" type="application/wasm" crossorigin>
 
+        <link rel="canonical" href="https://kaichi-naito.github.io/website/Plugin.html">
+    <link rel="stylesheet" href="css/common-ui.css">
+
     <style>
-        :root { color-scheme: light; }
 
-        html {
-            overflow-x: hidden;
-            width: 100vw;
+        * {
+            box-sizing: border-box;
         }
 
-        @font-face {
-            font-family: 'PixelMplus';
-            src: url('https://kaichi-naito.github.io/website/fonts/PixelMplus10-Regular.ttf') format('truetype');
-            font-display: swap;
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            font-family: 'PixelMplus', sans-serif;
-            color: black;
-            text-align: center;
-            margin: 0;
-            padding: 20px 0 calc(60px + env(safe-area-inset-bottom)) 0;
-            background-color: #008080;
-            background-image: url('images/windows-95-background.jpg');
-            background-size: cover;
-            background-attachment: fixed;
-            overflow-x: hidden;
-            width: 100%;
-            min-height: 1180px;
-            z-index: 1;
-            position: relative;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.1);
-            z-index: -1;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .header-title {
-            color: white;
-            text-shadow: 2px 2px #000;
-            font-size: 2.5em;
-            margin: 0 0 20px 0;
-        }
-
-        .nav {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 35px;
-            padding: 0 12px;
-        }
-
-        .desktop-icon {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: white !important;
-            width: 80px;
-            cursor: pointer;
-        }
-
-        .desktop-icon img {
-            width: 48px;
-            height: 48px;
-            object-fit: contain;
-            image-rendering: pixelated;
-            margin-bottom: 5px;
-        }
-
-        .desktop-icon span {
-            font-size: 14px;
-            text-align: center;
-            padding: 2px 4px;
-            border: 1px dotted transparent;
-            text-shadow: 1px 1px 0 #000;
-        }
-
-        .desktop-icon:hover span,
-        .desktop-icon:active span,
-        .desktop-icon.current span {
-            background-color: #000080;
-            color: white;
-            border: 1px dotted #fff;
-        }
-
-        .window {
+        /* Coming Soon は Plugin ページ固有のゲートなので、
+           共通ウィンドウマネージャーの管理対象にはしません。 */
+        .coming-soon-window {
             background-color: #c0c0c0;
             border: 2px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
             box-shadow: 1px 1px 0 0 #000000;
             padding: 2px;
-            max-width: 95vw;
             display: inline-block;
             text-align: left;
-            position: absolute;
-            animation: fadeIn 0.4s ease-in forwards;
         }
 
-        .draggable-cursor { cursor: grab; }
-
-        .title-bar {
-            background: linear-gradient(90deg, #000080, #1084d0);
-            padding: 3px 5px 3px 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
-            font-size: 14px;
-            margin-bottom: 2px;
-            user-select: none;
-        }
-
-        .close-button {
-            width: 16px;
-            height: 14px;
-            font-size: 13px;
-            background-color: #c0c0c0;
-            border: 1px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            background-image: url('images/×.png');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 20px;
-            color: transparent;
-            cursor: pointer;
-            flex: 0 0 auto;
-        }
-
-        .close-button:active {
-            border-color: #808080 #ffffff #ffffff #808080;
-            padding-top: 1px;
-            padding-left: 1px;
-        }
-
-        .window-contents {
-            padding: 15px;
-            border: 1px solid #808080;
-            background-color: #c0c0c0;
-        }
-
-        .win95-btn {
-            background-color: #c0c0c0;
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            padding: 7px 14px;
-            color: black !important;
-            text-decoration: none !important;
-            display: inline-block;
-            font-family: 'PixelMplus', sans-serif;
-            font-size: 15px;
-            margin: 5px 4px;
-            cursor: pointer;
-        }
-
-        .win95-btn:active {
-            border-color: #808080 #ffffff #ffffff #808080;
-        }
-
-        .win95-btn.primary {
+.win95-btn.primary {
             font-weight: bold;
             outline: 1px dotted #000;
             outline-offset: -5px;
@@ -1364,141 +1216,7 @@
             overflow: auto;
         }
 
-        .footer {
-            color: white;
-            font-size: 12px;
-            position: absolute;
-            bottom: 52px;
-            width: 100%;
-            text-shadow: 1px 1px 2px #000;
-        }
-
-        #win95-taskbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            height: 32px;
-            padding-bottom: env(safe-area-inset-bottom);
-            box-sizing: content-box;
-            background-color: #c0c0c0;
-            border-top: 2px solid #ffffff;
-            box-shadow: 0 -1px 0 0 #000000;
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            padding-left: 4px;
-            padding-right: 4px;
-        }
-
-        #taskbar-start-btn {
-            background-color: #c0c0c0;
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            height: 24px;
-            padding: 0 2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        #taskbar-start-btn img {
-            image-rendering: pixelated;
-            height: 18px;
-            width: auto;
-        }
-
-        #taskbar-tasks {
-            display: flex;
-            gap: 4px;
-            margin-left: 6px;
-            overflow: hidden;
-            height: 24px;
-        }
-
-        .win95-taskbar-tab {
-            background-color: #c0c0c0;
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            height: 24px;
-            min-width: 130px;
-            max-width: 190px;
-            padding: 0 7px;
-            font-size: 12px;
-            color: black;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: flex;
-            align-items: center;
-        }
-
-        #taskbar-tray {
-            margin-left: auto;
-            border-top: 1px solid #808080;
-            border-left: 1px solid #808080;
-            border-right: 1px solid #ffffff;
-            border-bottom: 1px solid #ffffff;
-            background-color: #c0c0c0;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 0 8px;
-        }
-
-        #taskbar-tray img {
-            width: 30px;
-            height: 30px;
-            image-rendering: pixelated;
-        }
-
-        #tray-clock {
-            font-size: 14px;
-            color: black;
-            width: 46px;
-            text-align: right;
-        }
-
         @media (max-width: 800px) {
-            body {
-                font-size: 14px;
-                min-height: 1470px;
-            }
-
-            .header-title {
-                font-size: 1.6em;
-                margin-bottom: 15px;
-            }
-
-            .nav {
-                gap: 8px;
-                margin-bottom: 25px;
-            }
-
-            .desktop-icon { width: 54px; }
-            .desktop-icon img {
-                width: 34px !important;
-                height: 34px !important;
-            }
-            .desktop-icon span {
-                font-size: 10px;
-                padding: 1px 2px;
-            }
-
-            .title-bar {
-                font-size: 12px;
-                padding: 2px 4px 2px 6px;
-            }
-
-            .close-button {
-                width: 14px;
-                height: 12px;
-            }
-
-            .window-contents { padding: 9px; }
 
             #win-snap,
             #win-install,
@@ -1543,23 +1261,6 @@
 
             .spec-table th { width: 105px; }
 
-            #win95-taskbar { height: 28px; }
-            #taskbar-start-btn { height: 22px; }
-            #taskbar-start-btn img { height: 16px !important; }
-            .win95-taskbar-tab {
-                min-width: 80px;
-                max-width: 120px;
-                font-size: 10px;
-                height: 22px;
-            }
-            #taskbar-tray img {
-                width: 28px;
-                height: 28px;
-            }
-            #tray-clock {
-                font-size: 12px;
-                width: 36px;
-            }
         }
     
         /* =========================================================
@@ -2147,7 +1848,124 @@
             }
         }
 
-    \n        /* =========================================================\n           v0.85 separate windows / XP Notepad-style README\n        ========================================================= */\n        .notepad-window .window-contents {\n            padding: 0;\n            background: #ece9d8;\n        }\n\n        .notepad-contents {\n            padding: 0 !important;\n            background: #ece9d8;\n        }\n\n        .notepad-menu {\n            display: flex;\n            gap: 18px;\n            padding: 5px 10px 4px;\n            font-size: 14px;\n            line-height: 1.2;\n            color: #000;\n            border-bottom: 1px solid #b6b6b6;\n            background: #f4f4f4;\n            user-select: none;\n        }\n\n        .notepad-sheet {\n            margin: 10px;\n            padding: 14px 16px;\n            background: #ffffff;\n            border: 1px solid #7f9db9;\n            box-shadow: inset 1px 1px 0 #ffffff;\n            color: #111;\n            font-family: 'MS UI Gothic', 'Tahoma', sans-serif;\n            line-height: 1.55;\n        }\n\n        .notepad-sheet h2 {\n            margin: 0 0 6px;\n            font-size: 22px;\n            font-weight: 700;\n            letter-spacing: 0.3px;\n        }\n\n        .notepad-subtitle {\n            font-size: 13px;\n            margin-bottom: 12px;\n        }\n\n        .notepad-body {\n            font-size: 13px;\n        }\n\n        .notepad-body p {\n            margin: 0 0 12px;\n        }\n\n        .notepad-meta {\n            margin-top: 16px;\n            padding-top: 12px;\n            border-top: 1px solid #d9d9d9;\n            font-size: 13px;\n            line-height: 1.8;\n        }\n\n        .notepad-meta span:first-child {\n            display: inline-block;\n            min-width: 120px;\n            font-weight: 700;\n        }\n\n        .notepad-actions {\n            display: flex;\n            gap: 10px;\n            flex-wrap: wrap;\n            padding: 0 10px 10px;\n        }\n\n        @media (max-width: 800px) {\n            #win-sample,\n            #win-snap,\n            #win-install,\n            #win-changelog {\n                width: calc(100vw - 12px) !important;\n                max-width: none !important;\n                box-sizing: border-box !important;\n            }\n\n            .notepad-menu {\n                gap: 12px;\n                font-size: 12px;\n                padding-left: 8px;\n                padding-right: 8px;\n            }\n\n            .notepad-sheet {\n                margin: 8px;\n                padding: 10px 12px;\n            }\n\n            .notepad-sheet h2 {\n                font-size: 18px;\n            }\n\n            .notepad-body,\n            .notepad-meta {\n                font-size: 12px;\n            }\n\n            .notepad-meta span:first-child {\n                min-width: 96px;\n            }\n\n            .notepad-actions {\n                padding: 0 8px 8px;\n            }\n        }\n
+    
+        /* =========================================================
+           v0.85 separate windows / XP Notepad-style README
+        ========================================================= */
+        .notepad-window .window-contents {
+            padding: 0;
+            background: #ece9d8;
+        }
+
+        .notepad-contents {
+            padding: 0 !important;
+            background: #ece9d8;
+        }
+
+        .notepad-menu {
+            display: flex;
+            gap: 18px;
+            padding: 5px 10px 4px;
+            font-size: 14px;
+            line-height: 1.2;
+            color: #000;
+            border-bottom: 1px solid #b6b6b6;
+            background: #f4f4f4;
+            user-select: none;
+        }
+
+        .notepad-sheet {
+            margin: 10px;
+            padding: 14px 16px;
+            background: #ffffff;
+            border: 1px solid #7f9db9;
+            box-shadow: inset 1px 1px 0 #ffffff;
+            color: #111;
+            font-family: 'MS UI Gothic', 'Tahoma', sans-serif;
+            line-height: 1.55;
+        }
+
+        .notepad-sheet h2 {
+            margin: 0 0 6px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .notepad-subtitle {
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .notepad-body {
+            font-size: 13px;
+        }
+
+        .notepad-body p {
+            margin: 0 0 12px;
+        }
+
+        .notepad-meta {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #d9d9d9;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .notepad-meta span:first-child {
+            display: inline-block;
+            min-width: 120px;
+            font-weight: 700;
+        }
+
+        .notepad-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 0 10px 10px;
+        }
+
+        @media (max-width: 800px) {
+            #win-sample,
+            #win-snap,
+            #win-install,
+            #win-changelog {
+                width: calc(100vw - 12px) !important;
+                max-width: none !important;
+                box-sizing: border-box !important;
+            }
+
+            .notepad-menu {
+                gap: 12px;
+                font-size: 12px;
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            .notepad-sheet {
+                margin: 8px;
+                padding: 10px 12px;
+            }
+
+            .notepad-sheet h2 {
+                font-size: 18px;
+            }
+
+            .notepad-body,
+            .notepad-meta {
+                font-size: 12px;
+            }
+
+            .notepad-meta span:first-child {
+                min-width: 96px;
+            }
+
+            .notepad-actions {
+                padding: 0 8px 8px;
+            }
+        }
+
     
         /* =========================================================
            v0.86 scattered desktop windows + closer XP Notepad styling
@@ -2797,8 +2615,8 @@
                 padding-top: 70px;
             }
         }
-
     </style>
+
 
     <script>
         (function () {
@@ -2823,7 +2641,7 @@
 <body id="win95-desktop">
 
     <div id="coming-soon-gate" aria-label="Coming Soon">
-        <div class="window coming-soon-window">
+        <div class="coming-soon-window">
             <div class="title-bar">
                 <span>Coming Soon</span>
             </div>
@@ -2833,39 +2651,19 @@
         </div>
     </div>
 
-    <script src="//accaii.com/kaichi/script.js" async></script>
+        <h1 class="header-title">Kaichi Guitar Music</h1>
 
-    <h1 class="header-title">Kaichi Guitar Music</h1>
-
-    <!--
-        このページ完成後、index.html側にも同じPluginリンクを追加する想定です。
-        アイコンは既存サイト内に必ず存在する Computer.gif を一旦使用しています。
-    -->
-    <div class="nav">
-        <a href="index.html" class="desktop-icon">
-            <img src="images/gif/Computer.gif" alt="Home"><span>Home</span>
-        </a>
-        <a href="Discography.html" class="desktop-icon">
-            <img src="images/gif/Disc.gif" alt="Discography"><span>Discography</span>
-        </a>
-        <a href="Plugin.html" class="desktop-icon">
-            <img src="images/gif/Plugin.png" alt="Plugin"><span>Plugin</span>
-        </a>
-        <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" class="desktop-icon">
-            <img src="images/gif/Earth.gif" alt="Works"><span>Works</span>
-        </a>
-        <a href="Contact.html" class="desktop-icon">
-            <img src="images/gif/window.gif" alt="Contact"><span>Contact</span>
-        </a>
-        <a href="freebgm.html" class="desktop-icon">
-            <img src="images/gif/Sound.gif" alt="FREEBGM"><span>FREEBGM</span>
-        </a>
-    </div>
+    <div id="common-nav"></div>
 
     <!-- SNAP メインウィンドウ -->
     <div class="window" id="win-sample" style="width: 860px; z-index: 118;">
         <div class="title-bar draggable-cursor" id="handle-sample">
-            <span>SAMPLE_PLAYER.exe</span><div class="close-button">×</div>
+            <span>SAMPLE_PLAYER.exe</span>
+            <div class="title-bar-controls">
+                <button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button>
+                <button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button>
+                <button type="button" class="close-button" aria-label="Close">×</button>
+            </div>
         </div>
         <div class="window-contents">
 
@@ -2923,7 +2721,12 @@
 
     <div class="window" id="win-snap" style="width: 960px; z-index: 120;">
         <div class="title-bar draggable-cursor" id="handle-snap">
-            <span>SNAP_Plugin.exe</span><div class="close-button">×</div>
+            <span>SNAP_Plugin.exe</span>
+            <div class="title-bar-controls">
+                <button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button>
+                <button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button>
+                <button type="button" class="close-button" aria-label="Close">×</button>
+            </div>
         </div>
 
         <div class="window-contents">
@@ -3345,7 +3148,12 @@
 
     <div class="window notepad-window" id="win-install" style="width: 760px; z-index: 116;">
         <div class="title-bar draggable-cursor" id="handle-install">
-            <span>SNAP_README.txt - Notepad</span><div class="close-button">×</div>
+            <span>SNAP_README.txt - Notepad</span>
+            <div class="title-bar-controls">
+                <button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button>
+                <button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button>
+                <button type="button" class="close-button" aria-label="Close">×</button>
+            </div>
         </div>
         <div class="window-contents notepad-contents">
             <div class="notepad-menu" aria-hidden="true">
@@ -3388,7 +3196,12 @@
 
     <div class="window download-window" id="win-download" style="width: 360px; z-index: 114;">
         <div class="title-bar draggable-cursor" id="handle-download">
-            <span>SNAP_DOWNLOAD.exe</span><div class="close-button">×</div>
+            <span>SNAP_DOWNLOAD.exe</span>
+            <div class="title-bar-controls">
+                <button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button>
+                <button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button>
+                <button type="button" class="close-button" aria-label="Close">×</button>
+            </div>
         </div>
         <div class="window-contents">
             <div class="group-box download-group">
@@ -3410,7 +3223,12 @@
     <!-- Changelog -->
     <div class="window" id="win-changelog" style="width: 430px; z-index: 102;">
         <div class="title-bar draggable-cursor" id="handle-changelog">
-            <span>CHANGELOG.log</span><div class="close-button">×</div>
+            <span>CHANGELOG.log</span>
+            <div class="title-bar-controls">
+                <button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button>
+                <button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button>
+                <button type="button" class="close-button" aria-label="Close">×</button>
+            </div>
         </div>
         <div class="window-contents">
             <div class="changelog">
@@ -3430,67 +3248,10 @@
     </div>
 
 
-    <div class="window" id="win-nyan-special" style="width: 480px; z-index: 20000; display: none;">
-        <div class="title-bar draggable-cursor" id="handle-nyan-special">
-            <span>Nyan_Cat.txt</span><div class="close-button">×</div>
-        </div>
-        <div class="window-contents" style="background-color: #fff; padding: 10px; text-align: center;">
-            <img src="images/NyanCatAA.png" alt="Nyan Cat Art" style="width: 100%; height: auto; display: block; margin: 0 auto;">
-            <p style="color: #000; font-size: 10px; text-align: center; margin-top: 10px;">NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! NYAN !! </p>
-        </div>
-    </div>
-
-    <img id="nyan-cat" src="images/gif/Nyancat.gif" alt="Nyan Cat"
-         style="position: fixed; width: 80px; height: auto; z-index: 10001; cursor: pointer; display: block; image-rendering: pixelated; top: 50%; left: 50%;">
-
-    <div id="win95-taskbar">
-        <button id="taskbar-start-btn" class="click-target">
-            <img src="images/start.png" alt="Start">
-        </button>
-
-        <div id="taskbar-tasks">
-            <div class="win95-taskbar-tab">SNAP_Plugin.exe</div>
-            <div class="win95-taskbar-tab">SAMPLE PLAYER</div>
-        </div>
-
-        <div id="taskbar-tray">
-            <img src="images/volume-icon.png" alt="Volume">
-            <div id="tray-clock">00:00</div>
-        </div>
-    </div>
-
-    <div class="footer">
-        このサイトは本人によって頑張って作成されました
-    </div>
 
     <script src="Plugin/snap-web/snap-web.js"></script>
 
     <script>
-        var mouseClickSound;
-
-        try {
-            mouseClickSound = new Audio('Sound/MouseClick.mp3');
-            mouseClickSound.preload = 'auto';
-            mouseClickSound.load();
-        } catch(e) {}
-
-        function playClickSound() {
-            if (!mouseClickSound) return;
-            mouseClickSound.currentTime = 0;
-            mouseClickSound.play().catch(function() {});
-        }
-
-        var clickTargets = document.querySelectorAll(
-            '.desktop-icon, .win95-btn, .close-button, .title-bar, .click-target'
-        );
-
-        for (var i = 0; i < clickTargets.length; i++) {
-            clickTargets[i].addEventListener('mousedown', playClickSound);
-            clickTargets[i].addEventListener('touchstart', playClickSound, { passive: true });
-        }
-
-        var highestZIndex = 120;
-
         function setInitialPositions() {
             var isMobile = window.matchMedia("(max-width: 800px)").matches;
 
@@ -3523,8 +3284,6 @@
                 if (download) download.style.zIndex = '114';
                 if (changelog) changelog.style.zIndex = '110';
                 if (snap) snap.style.zIndex = '120';
-
-                highestZIndex = 120;
                 document.body.style.minHeight = (mobileTop + 100) + 'px';
                 return;
             }
@@ -3618,225 +3377,12 @@
                 changelog.style.zIndex = '110';
             }
 
-            highestZIndex = 120;
-
             var bottoms = windows.filter(Boolean).map(function(win) {
                 return (parseInt(win.style.top, 10) || 0) + (win.offsetHeight || 300);
             });
             var maxBottom = bottoms.length ? Math.max.apply(null, bottoms) : 1200;
             document.body.style.minHeight = (maxBottom + 80) + 'px';
         }
-
-        window.addEventListener('load', function() {
-            setTimeout(setInitialPositions, 80);
-            setTimeout(setInitialPositions, 450);
-        });
-
-        window.addEventListener('resize', function() {
-            setTimeout(setInitialPositions, 80);
-        });
-
-        function initDrag(targetId, handleId) {
-            var target = document.getElementById(targetId);
-            var handle = document.getElementById(handleId);
-
-            if (!target || !handle) return;
-
-            var isDragging = false;
-            var initialX = 0;
-            var initialY = 0;
-
-            handle.addEventListener('mousedown', startDragging);
-            handle.addEventListener('touchstart', startDragging, { passive: false });
-
-            function startDragging(e) {
-                if (e.target.classList.contains('close-button')) return;
-
-                isDragging = true;
-                highestZIndex++;
-                target.style.zIndex = highestZIndex;
-
-                /* ドラッグ開始時は中央寄せ用transformを解除 */
-                if (target.style.transform) {
-                    var rect = target.getBoundingClientRect();
-                    target.style.transform = '';
-                    target.style.left = rect.left + 'px';
-                    target.style.top = rect.top + 'px';
-                }
-
-                var clientX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX;
-                var clientY = (e.type === 'touchstart') ? e.touches[0].clientY : e.clientY;
-
-                initialX = clientX - target.offsetLeft;
-                initialY = clientY - target.offsetTop;
-
-                if (e.type === 'touchstart') e.preventDefault();
-
-                document.addEventListener('mousemove', dragging);
-                document.addEventListener('touchmove', dragging, { passive: false });
-                document.addEventListener('mouseup', endDrag);
-                document.addEventListener('touchend', endDrag);
-            }
-
-            function dragging(e) {
-                if (!isDragging) return;
-
-                var clientX = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
-                var clientY = (e.type === 'touchmove') ? e.touches[0].clientY : e.clientY;
-
-                target.style.left = (clientX - initialX) + 'px';
-                target.style.top = (clientY - initialY) + 'px';
-
-                if (e.type === 'touchmove') e.preventDefault();
-            }
-
-            function endDrag() {
-                isDragging = false;
-                document.removeEventListener('mousemove', dragging);
-                document.removeEventListener('touchmove', dragging);
-            }
-        }
-
-        initDrag('win-sample', 'handle-sample');
-        initDrag('win-snap', 'handle-snap');
-        initDrag('win-install', 'handle-install');
-        initDrag('win-download', 'handle-download');
-        initDrag('win-changelog', 'handle-changelog');
-        initDrag('win-nyan-special', 'handle-nyan-special');
-
-        var closeBtns = document.querySelectorAll('.close-button');
-
-        for (var j = 0; j < closeBtns.length; j++) {
-            closeBtns[j].addEventListener('mousedown', function(e) {
-                e.stopPropagation();
-            });
-
-            closeBtns[j].addEventListener('touchstart', function(e) {
-                e.stopPropagation();
-            }, { passive: false });
-
-            var closeAction = function(e) {
-                e.preventDefault();
-                var windowElement = this.closest('.window');
-                if (windowElement) windowElement.style.display = 'none';
-            };
-
-            closeBtns[j].addEventListener('click', closeAction);
-            closeBtns[j].addEventListener('touchend', closeAction);
-        }
-
-        // --- Nyan Cat増殖 ＆ 10匹イベント（index.htmlと同じ仕組み） ---
-        var catSound;
-        try {
-            catSound = new Audio('Sound/CatMeow.mp3');
-            catSound.preload = 'auto';
-        } catch(e) {}
-
-        var cats = [];
-
-        function setupCat(catElement, startX, startY, startVx, startVy) {
-            var catObj = {
-                element: catElement,
-                x: startX,
-                y: startY,
-                vx: startVx,
-                vy: startVy
-            };
-            cats.push(catObj);
-
-            if (cats.length === 10) {
-                var specialWin = document.getElementById('win-nyan-special');
-                if (specialWin) {
-                    specialWin.style.display = 'inline-block';
-                    specialWin.style.left = '50%';
-                    specialWin.style.top = '50%';
-                    specialWin.style.transform = 'translate(-50%, -50%)';
-                    highestZIndex++;
-                    specialWin.style.zIndex = highestZIndex;
-                }
-            }
-
-            function catchCat(e) {
-                e.preventDefault();
-
-                if (catSound) {
-                    catSound.currentTime = 0;
-                    catSound.play().catch(function(){});
-                }
-
-                catObj.vx = (Math.random() * 4 + 2) * (Math.random() < 0.5 ? 1 : -1);
-                catObj.vy = (Math.random() * 3 + 1) * (Math.random() < 0.5 ? 1 : -1);
-
-                var newCat = document.createElement('img');
-                newCat.src = 'images/gif/Nyancat.gif';
-                newCat.style.position = 'fixed';
-                newCat.style.width = '80px';
-                newCat.style.zIndex = '10001';
-                newCat.style.cursor = 'pointer';
-                newCat.style.imageRendering = 'pixelated';
-                newCat.style.left = catObj.x + 'px';
-                newCat.style.top = catObj.y + 'px';
-                document.body.appendChild(newCat);
-
-                setupCat(
-                    newCat,
-                    catObj.x,
-                    catObj.y,
-                    (Math.random() * 4 + 2) * (Math.random() < 0.5 ? 1 : -1),
-                    (Math.random() * 3 + 1) * (Math.random() < 0.5 ? 1 : -1)
-                );
-            }
-
-            catElement.addEventListener('mousedown', catchCat);
-            catElement.addEventListener('touchstart', catchCat, { passive: false });
-        }
-
-        var originalCat = document.getElementById('nyan-cat');
-        if (originalCat) {
-            setupCat(
-                originalCat,
-                window.innerWidth / 2,
-                window.innerHeight / 2,
-                3,
-                2
-            );
-        }
-
-        function animateCats() {
-            var w = window.innerWidth;
-            var h = window.innerHeight;
-
-            for (var i = 0; i < cats.length; i++) {
-                var cat = cats[i];
-                cat.x += cat.vx;
-                cat.y += cat.vy;
-
-                if (cat.x + 80 > w) {
-                    cat.x = w - 80;
-                    cat.vx *= -1;
-                    cat.element.style.transform = 'scaleX(-1)';
-                } else if (cat.x < 0) {
-                    cat.x = 0;
-                    cat.vx *= -1;
-                    cat.element.style.transform = 'scaleX(1)';
-                }
-
-                if (cat.y + 50 > h) {
-                    cat.y = h - 50;
-                    cat.vy *= -1;
-                } else if (cat.y < 0) {
-                    cat.y = 0;
-                    cat.vy *= -1;
-                }
-
-                cat.element.style.left = cat.x + 'px';
-                cat.element.style.top = cat.y + 'px';
-            }
-
-            requestAnimationFrame(animateCats);
-        }
-
-        requestAnimationFrame(animateCats);
 
         /* 配布開始まではDownloadを無効化 */
         var downloadBtn = document.getElementById('download-vst3');
@@ -3848,6 +3394,7 @@
                 }
             });
         }
+
 
         /* ---------------------------------------------------------
            SAMPLE PLAYER
@@ -4081,24 +3628,10 @@
         loadSampleList();
 
 
-        function updateTrayClock() {
-            var clock = document.getElementById('tray-clock');
-            if (!clock) return;
 
-            var now = new Date();
-            var h = now.getHours();
-            var m = now.getMinutes();
-
-            clock.textContent =
-                (h < 10 ? '0' + h : h) + ':' +
-                (m < 10 ? '0' + m : m);
-        }
-
-        updateTrayClock();
-        setInterval(updateTrayClock, 60000);
     </script>
 
-    <script>
+<script>
         (function () {
             var secret = document.getElementById('coming-soon-secret');
             if (!secret) return;
@@ -4125,7 +3658,11 @@
                 document.documentElement.classList.remove('coming-soon-locked');
                 document.documentElement.classList.add('coming-soon-unlocked');
 
-                // Re-run current window placement after revealing the test page.
+                // 解除後に共通window managerへウィンドウを登録し直す。
+                if (window.KaichiUI && typeof window.KaichiUI.refreshWindows === 'function') {
+                    window.KaichiUI.refreshWindows();
+                }
+
                 if (typeof setInitialPositions === 'function') {
                     setTimeout(setInitialPositions, 0);
                     setTimeout(setInitialPositions, 120);
@@ -4134,5 +3671,6 @@
         })();
     </script>
 
+    <script src="js/common-ui.js"></script>
 </body>
 </html>
