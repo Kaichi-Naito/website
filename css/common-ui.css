@@ -620,20 +620,35 @@
         }
 
 /* =========================================================
-   FINAL FIX: x30 Nyan Cat mobile clockwise slow zoom
+   x30 Nyan Cat — MOBILE slow clockwise approach
+   A single 0.02 -> 80 transition still looks very fast because
+   CSS interpolates the scale numerically. These staged values
+   approximate perceptually even / exponential growth.
    ========================================================= */
+@keyframes nyan-cat-mobile-rush {
+    0%   { transform: translate(-50%, -50%) rotate(0deg)    scale(0.020); }
+    10%  { transform: translate(-50%, -50%) rotate(144deg)  scale(0.046); }
+    20%  { transform: translate(-50%, -50%) rotate(288deg)  scale(0.105); }
+    30%  { transform: translate(-50%, -50%) rotate(432deg)  scale(0.240); }
+    40%  { transform: translate(-50%, -50%) rotate(576deg)  scale(0.550); }
+    50%  { transform: translate(-50%, -50%) rotate(720deg)  scale(1.260); }
+    60%  { transform: translate(-50%, -50%) rotate(864deg)  scale(2.900); }
+    70%  { transform: translate(-50%, -50%) rotate(1008deg) scale(6.650); }
+    80%  { transform: translate(-50%, -50%) rotate(1152deg) scale(15.200); }
+    90%  { transform: translate(-50%, -50%) rotate(1296deg) scale(34.900); }
+    100% { transform: translate(-50%, -50%) rotate(1440deg) scale(80); }
+}
+
 @media (max-width: 800px) {
     #nyan-cat-crash {
-        /* Start much smaller so the approach feels more gradual. */
-        transform: translate(-50%, -50%) rotate(0deg) scale(0.035) !important;
+        transform: translate(-50%, -50%) rotate(0deg) scale(0.020) !important;
         transition:
-            transform 2.60s cubic-bezier(0.16, 0.60, 0.18, 1),
             filter 0.12s linear,
             opacity 0.12s linear !important;
     }
 
     #nyan-cat-crash.nyan-cat-crash-go {
-        /* Positive degrees = clockwise rotation. */
-        transform: translate(-50%, -50%) rotate(1440deg) scale(80) !important;
+        /* 4 clockwise rotations over 4.8 sec. */
+        animation: nyan-cat-mobile-rush 4.8s linear forwards !important;
     }
 }
