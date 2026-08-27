@@ -8,7 +8,8 @@
     <meta property="og:title" content="Kaichi Guitar Music">
     <meta property="og:description" content="Kaichiのオリジナル楽曲・ギター演奏動画を公開中。">
     <meta property="og:image" content="https://kaichi-naito.github.io/website/images/card-image.jpg">
-    <meta property="og:url" content="https://kaichi-naito.github.io/website/index.html">
+    <meta property="og:url" content="https://kaichi-naito.github.io/website/">
+    <link rel="canonical" href="https://kaichi-naito.github.io/website/">
     <meta property="og:type" content="website">
     <meta http-equiv="Cache-Control" content="max-age=31536000">
     <title>Kaichi Guitar Music</title>
@@ -19,7 +20,7 @@
         }
         html {
             overflow-x: hidden;
-            width: 100vw;
+            width: 100%;
         }
         /* --- index.html ベースCSS --- */
         @font-face {
@@ -90,8 +91,12 @@
             background-position: center;
             background-size: 20px; /* ★ここで×の大きさを調整できます */
             
-            /* 文字を隠す（これだけでOK） */
-            color: transparent; 
+            /* 文字を隠す */
+            color: transparent;
+            padding: 0;
+            line-height: 1;
+            font-family: inherit;
+            box-sizing: border-box;
             /* ボタンらしさ */
             cursor: pointer;
         }
@@ -134,9 +139,10 @@
         /* --- タスクバーデザイン --- */
         #win95-taskbar {
             position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: 32px;
-            padding-bottom: env(safe-area-inset-bottom); box-sizing: content-box; 
+            padding: 0 4px env(safe-area-inset-bottom) 4px;
+            box-sizing: border-box;
             background-color: #c0c0c0; border-top: 2px solid #ffffff;
-            box-shadow: 0 -1px 0 0 #000000; z-index: 10000; display: flex; align-items: center; padding: 0 4px;
+            box-shadow: 0 -1px 0 0 #000000; z-index: 10000; display: flex; align-items: center;
         }
         #taskbar-start-btn {
             background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff;
@@ -159,7 +165,7 @@
         #tray-clock { font-size: 14px; color: black; width: 46px; text-align: right; }
 
         @media (max-width: 800px) {
-            body { font-size: 14px; }
+            body { font-size: 14px; background-attachment: scroll; }
             .header-title { font-size: 1.6em; margin-bottom: 15px; }
             .window { box-sizing: border-box; }
             
@@ -205,7 +211,7 @@
     </style>
 </head>
 <body id="win95-desktop">
-    <script src="//accaii.com/kaichi/script.js" async></script>
+    <!-- Access analytics: GoatCounter is loaded near </body>. -->
 
     <h1 class="header-title">Kaichi Guitar Music</h1>
 
@@ -216,7 +222,7 @@
         <a href="Discography.html" class="desktop-icon">
             <img src="images/gif/Disc.gif" alt="Discography"><span>Discography</span>
         </a>
-        <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" class="desktop-icon">
+        <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" rel="noopener noreferrer" class="desktop-icon">
             <img src="images/gif/Earth.gif" alt="Works"><span>Works</span>
         </a>
         <a href="Contact.html" class="desktop-icon">
@@ -229,24 +235,24 @@
 
     <div class="window" id="win-profile" style="width: 380px; z-index: 104;">
         <div class="title-bar draggable-cursor" id="handle-profile">
-            <span>Profile.exe</span><div class="close-button">×</div>
+            <span>Profile.exe</span><button type="button" class="close-button" aria-label="Close">×</button>
         </div>
         <div class="window-contents profile-section">
             <img src="images/DotGuitar.png" alt="Kaichi" class="profile-img">
             <div class="profile-text">
                 <h2 style="margin:0 0 10px 0;">Kaichi</h2>
                 <p style="margin:0 0 15px 0;">Guitar, write music.</p>
-                <a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank" style="font-size: 14px; color: blue;">Hotone Official Artist</a>
+                <a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank" rel="noopener noreferrer" style="font-size: 14px; color: blue;">Hotone Official Artist</a>
             </div>
         </div>
     </div>
 
     <div class="window" id="win-phalux" style="width: 175px; z-index: 105;"> 
         <div class="title-bar draggable-cursor" id="handle-phalux">
-            <span>PHALUX.band</span><div class="close-button">×</div>
+            <span>PHALUX.band</span><button type="button" class="close-button" aria-label="Close">×</button>
         </div>
         <div class="window-contents" style="text-align: center; padding: 10px;"> 
-            <a href="https://phalux.bitfan.id/" target="_blank" class="phalux-link"> 
+            <a href="https://phalux.bitfan.id/" target="_blank" rel="noopener noreferrer" class="phalux-link"> 
                 <img src="images/PHALUX_logo.png" alt="PHALUX" style="width: 100%; max-width: 150px; height: auto; border: 2px solid #808080; display: block; margin: 0 auto;"> 
             </a>
         </div>
@@ -254,37 +260,37 @@
 
     <div class="window" id="win-social" style="width: 450px; z-index: 103;">
         <div class="title-bar draggable-cursor" id="handle-social">
-            <span>Social_Media.lnk</span><div class="close-button">×</div>
+            <span>Social_Media.lnk</span><button type="button" class="close-button" aria-label="Close">×</button>
         </div>
         <div class="window-contents">
             <div class="social-icons-grid">
-                <a href="https://x.com/Kaichi_zZ" target="_blank" class="win95-btn social-item"><img src="images/X_dot_logo.png">X</a>
-                <a href="https://www.instagram.com/kaichi_zz/" target="_blank" class="win95-btn social-item"><img src="images/instagram_dot_logo.png">Insta</a>
-                <a href="https://www.youtube.com/KaichizZ" target="_blank" class="win95-btn social-item"><img src="images/Youtube_dot_logo.png">YouTube</a>
-                <a href="https://www.tiktok.com/@kaichi_zz" target="_blank" class="win95-btn social-item"><img src="images/Tiktok_icon.png">TikTok</a>
-                <a href="https://open.spotify.com/artist/0zok75wIWAb9qQ0hofCT1h?si=QrD4CGKXSyGttC7-3nM-XA" target="_blank" class="win95-btn social-item"><img src="images/spotify-icon.png">Spotify</a>
-                <a href="https://music.apple.com/jp/artist/kaichi-naito/1542151566" target="_blank" class="win95-btn social-item"><img src="images/applemusic_dot_logo.png">Music</a>
+                <a href="https://x.com/Kaichi_zZ" target="_blank" rel="noopener noreferrer" class="win95-btn social-item"><img src="images/X_dot_logo.png" alt="">X</a>
+                <a href="https://www.instagram.com/kaichi_zz/" target="_blank" rel="noopener noreferrer" class="win95-btn social-item"><img src="images/instagram_dot_logo.png" alt="">Insta</a>
+                <a href="https://www.youtube.com/KaichizZ" target="_blank" rel="noopener noreferrer" class="win95-btn social-item"><img src="images/Youtube_dot_logo.png" alt="">YouTube</a>
+                <a href="https://www.tiktok.com/@kaichi_zz" target="_blank" rel="noopener noreferrer" class="win95-btn social-item"><img src="images/Tiktok_icon.png" alt="">TikTok</a>
+                <a href="https://open.spotify.com/artist/0zok75wIWAb9qQ0hofCT1h?si=QrD4CGKXSyGttC7-3nM-XA" target="_blank" rel="noopener noreferrer" class="win95-btn social-item"><img src="images/spotify-icon.png" alt="">Spotify</a>
+                <a href="https://music.apple.com/jp/artist/kaichi-naito/1542151566" target="_blank" rel="noopener noreferrer" class="win95-btn social-item"><img src="images/applemusic_dot_logo.png" alt="">Music</a>
             </div>
         </div>
     </div>
 
     <div class="window" id="win-spotify" style="width: 600px; z-index: 102;">
         <div class="title-bar draggable-cursor" id="handle-spotify">
-            <span>CD_Player.exe</span><div class="close-button">×</div>
+            <span>CD_Player.exe</span><button type="button" class="close-button" aria-label="Close">×</button>
         </div>
         <div class="window-contents">
-            <iframe src="https://open.spotify.com/embed/album/414HJT5311vIKZHsxh56S2?utm_source=generator" width="100%" height="152" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            <iframe title="Kaichi Spotify album player" src="https://open.spotify.com/embed/album/414HJT5311vIKZHsxh56S2?utm_source=generator" width="100%" height="152" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         </div>
     </div>
 
     <div class="window" id="win-youtube" style="width: 800px; z-index: 101;">
         <div class="title-bar draggable-cursor" id="handle-youtube">
-            <span>Media_Player.avi</span><div class="close-button">×</div>
+            <span>Media_Player.avi</span><button type="button" class="close-button" aria-label="Close">×</button>
         </div>
         <div class="window-contents">
             <h3 style="margin-top:0;">Original songs🎸</h3>
             <div style="position:relative; padding-top: 56.25%;">
-                <iframe src="https://www.youtube.com/embed/videoseries?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" 
+                <iframe title="Kaichi original songs playlist" src="https://www.youtube.com/embed/videoseries?list=PLaOBQu1YWaAJwvtVQX4xxTIkby7Bj1YF2" 
                         style="position:absolute; top:0; left:0; width:100%; height:100%;" frameborder="0" allowfullscreen loading="lazy"></iframe>
             </div>
         </div>
@@ -292,7 +298,7 @@
 
     <div class="window" id="win-nyan-special" style="width: 480px; z-index: 20000; display: none;">
         <div class="title-bar draggable-cursor" id="handle-nyan-special">
-            <span>Nyan_Cat.txt</span><div class="close-button">×</div>
+            <span>Nyan_Cat.txt</span><button type="button" class="close-button" aria-label="Close">×</button>
         </div>
         <div class="window-contents" style="background-color: #fff; padding: 10px; text-align: center;">
             <img src="images/NyanCatAA.png" alt="Nyan Cat Art" style="width: 100%; height: auto; display: block; margin: 0 auto;">
@@ -367,7 +373,7 @@
                 }
                 
                 if(spotify.style.display !== 'none') {
-                    social.style.left = '20%';
+                    spotify.style.left = '20%';
                     spotify.style.top = '620px';
                 }
 
@@ -391,8 +397,12 @@
             if(maxBottom > 0) document.body.style.minHeight = maxBottom + 'px';
         }
 
-        window.onload = function() { setTimeout(setInitialPositions, 100); };
-        window.onresize = function() { setTimeout(setInitialPositions, 100); };
+        window.addEventListener('load', function() {
+            setTimeout(setInitialPositions, 100);
+        });
+        window.addEventListener('resize', function() {
+            setTimeout(setInitialPositions, 100);
+        });
 
         function initDrag(targetId, handleId) {
             var target = document.getElementById(targetId);
@@ -425,7 +435,13 @@
                 target.style.top = (cy - initialY) + 'px';
                 if(e.type === 'touchmove') e.preventDefault();
             }
-            function endDrag() { isDragging = false; document.removeEventListener('mousemove', dragging); document.removeEventListener('touchmove', dragging); }
+            function endDrag() {
+                isDragging = false;
+                document.removeEventListener('mousemove', dragging);
+                document.removeEventListener('touchmove', dragging);
+                document.removeEventListener('mouseup', endDrag);
+                document.removeEventListener('touchend', endDrag);
+            }
         }
 
         initDrag('win-profile', 'handle-profile');
@@ -504,5 +520,12 @@
         }
         updateTrayClock(); setInterval(updateTrayClock, 60000);
     </script>
+    <!-- GoatCounter -->
+    <script
+        data-goatcounter="https://kaichi.goatcounter.com/count"
+        async
+        src="https://gc.zgo.at/count.js">
+    </script>
+
 </body>
 </html>
