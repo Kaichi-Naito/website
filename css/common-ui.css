@@ -608,8 +608,16 @@
 
         /* =========================================================
            30 Nyan Cats: screen crash event
-           PC     = clockwise 4 rotations / scale 80 / 1.55 sec
-           Mobile = clockwise 4 rotations / scale 20 / 1.55 sec
+           PC:
+             - 1.55 sec
+             - clockwise 4 rotations
+             - max scale 80
+
+           Mobile:
+             - same 1.55 sec timing/easing
+             - clockwise 4 rotations
+             - final width = 108vw (slightly wider than the screen)
+             - original GIF aspect ratio is preserved
            ========================================================= */
 
         #nyan-cat-crash {
@@ -617,7 +625,12 @@
             left: 50%;
             top: 50%;
             width: 22px;
-            height: auto;
+            height: auto !important;
+            max-width: none !important;
+            max-height: none !important;
+            object-fit: contain;
+            display: block;
+
             z-index: 999999;
             pointer-events: none;
             image-rendering: pixelated;
@@ -627,7 +640,7 @@
 
             opacity: 0.98;
             filter: brightness(1);
-            will-change: transform, filter, opacity;
+            will-change: transform, width, filter, opacity;
         }
 
         @keyframes nyan-cat-crash-desktop {
@@ -639,12 +652,19 @@
             }
         }
 
+        /*
+           Mobile uses width instead of a fixed scale value.
+           108vw means the final cat is about 8% wider than the phone screen,
+           regardless of the phone's actual width.
+        */
         @keyframes nyan-cat-crash-mobile {
             from {
-                transform: translate(-50%, -50%) rotate(0deg) scale(0.18);
+                width: 4px;
+                transform: translate(-50%, -50%) rotate(0deg);
             }
             to {
-                transform: translate(-50%, -50%) rotate(1440deg) scale(10);
+                width: 108vw;
+                transform: translate(-50%, -50%) rotate(1440deg);
             }
         }
 
@@ -662,8 +682,18 @@
         }
 
         @media (max-width: 800px) {
+            #nyan-cat-crash {
+                width: 4px;
+                height: auto !important;
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
             #nyan-cat-crash.nyan-cat-crash-go {
-                animation-name: nyan-cat-crash-mobile;
+                animation:
+                    nyan-cat-crash-mobile
+                    1.55s
+                    cubic-bezier(0.20, 0.82, 0.16, 1)
+                    forwards;
             }
         }
 
