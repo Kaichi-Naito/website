@@ -592,10 +592,11 @@
             });
         });
 
-        // Mobile uses a slower approach so the zoom is easier to perceive.
+        // Mobile uses a much slower staged approach.
+        // CSS keyframes finish at 4.8 sec; keep impact / shutdown in sync.
         var isMobileCrash = window.matchMedia('(max-width: 800px)').matches;
-        var impactDelay = isMobileCrash ? 2350 : 1350;
-        var shutdownDelay = isMobileCrash ? 2600 : 1550;
+        var impactDelay = isMobileCrash ? 4550 : 1350;
+        var shutdownDelay = isMobileCrash ? 4800 : 1550;
 
         // "Impact" just before the blue screen.
         setTimeout(function () {
