@@ -611,7 +611,7 @@
         }
 
         #nyan-cat-crash.nyan-cat-crash-go {
-            transform: translate(-50%, -50%) scale(80);
+            transform: translate(-50%, -50%) scale(40);
         }
 
         #nyan-cat-crash.nyan-cat-crash-impact {
@@ -633,10 +633,10 @@
     40%  { transform: translate(-50%, -50%) rotate(576deg)  scale(0.550); }
     50%  { transform: translate(-50%, -50%) rotate(720deg)  scale(1.260); }
     60%  { transform: translate(-50%, -50%) rotate(864deg)  scale(2.900); }
-    70%  { transform: translate(-50%, -50%) rotate(1008deg) scale(6.650); }
-    80%  { transform: translate(-50%, -50%) rotate(1152deg) scale(15.200); }
-    90%  { transform: translate(-50%, -50%) rotate(1296deg) scale(34.900); }
-    100% { transform: translate(-50%, -50%) rotate(1440deg) scale(80); }
+    70%  { transform: translate(-50%, -50%) rotate(1008deg) scale(3.325); }
+    80%  { transform: translate(-50%, -50%) rotate(1152deg) scale(7.600); }
+    90%  { transform: translate(-50%, -50%) rotate(1296deg) scale(17.450); }
+    100% { transform: translate(-50%, -50%) rotate(1440deg) scale(40); }
 }
 
 @media (max-width: 800px) {
