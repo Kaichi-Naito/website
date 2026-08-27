@@ -583,6 +583,20 @@
         crashCat.src = asset('images/gif/Nyancat.gif');
         crashCat.alt = '';
         crashCat.setAttribute('aria-hidden', 'true');
+
+        // Critical x30 visuals are also set inline so page-specific CSS
+        // cannot accidentally hide the crash cat.
+        crashCat.style.position = 'fixed';
+        crashCat.style.left = '50%';
+        crashCat.style.top = '50%';
+        crashCat.style.width = '22px';
+        crashCat.style.height = '14px';
+        crashCat.style.zIndex = '2147483647';
+        crashCat.style.pointerEvents = 'none';
+        crashCat.style.visibility = 'visible';
+        crashCat.style.opacity = '1';
+        crashCat.style.imageRendering = 'pixelated';
+
         document.body.appendChild(crashCat);
 
         // Force initial style to render before starting the animation.
@@ -601,8 +615,12 @@
             crashCat.classList.add('nyan-cat-crash-impact');
         }, impactDelay);
 
-        // Cat hits the screen -> immediate shutdown sequence.
+        // Cat hits the screen -> remove the foreground cat first,
+        // then show the blue screen.
         setTimeout(function () {
+            if (crashCat && crashCat.parentNode) {
+                crashCat.parentNode.removeChild(crashCat);
+            }
             beginFakeShutdown();
         }, shutdownDelay);
     }
