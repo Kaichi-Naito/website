@@ -7,6 +7,7 @@
     var activeWindowId = null;
     var cats = [];
     var catWarningTriggered = false;
+    var catCrashTriggered = false;
 
     function asset(path) {
         return ASSET_BASE + path.replace(/^\/+/, '');
@@ -517,7 +518,7 @@
                 sessionStorage.setItem('kaichi-play-startup-sound', '1');
             } catch (e) {}
             window.location.href = 'index.html';
-        }, 7000);
+        }, 6000);
     }
 
     function playStartupSoundAfterReboot() {
@@ -546,6 +547,36 @@
         } catch (e) {}
     }
 
+
+    function triggerCatCrashShutdown() {
+        if (catCrashTriggered) return;
+        catCrashTriggered = true;
+
+        var crashCat = document.createElement('img');
+        crashCat.id = 'nyan-cat-crash';
+        crashCat.src = asset('images/gif/Nyancat.gif');
+        crashCat.alt = '';
+        crashCat.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(crashCat);
+
+        // Force initial style to render before starting the animation.
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                crashCat.classList.add('nyan-cat-crash-go');
+            });
+        });
+
+        // "Impact" just before the blue screen.
+        setTimeout(function () {
+            crashCat.classList.add('nyan-cat-crash-impact');
+        }, 1350);
+
+        // Cat hits the screen -> immediate shutdown sequence.
+        setTimeout(function () {
+            beginFakeShutdown();
+        }, 1550);
+    }
+
     function setupCat(catElement, startX, startY, startVx, startVy) {
         var catObj = { element: catElement, x: startX, y: startY, vx: startVx, vy: startVy };
         cats.push(catObj);
@@ -563,6 +594,10 @@
             centerWindow(warning);
             warning.style.zIndex = '40000';
             play(catErrorSound);
+        }
+
+        if (cats.length === 30 && !catCrashTriggered) {
+            triggerCatCrashShutdown();
         }
 
         function catchCat(e) {
