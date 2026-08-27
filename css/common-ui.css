@@ -636,6 +636,6 @@
 
     #nyan-cat-crash.nyan-cat-crash-go {
         /* Mobile: same zoom timing/easing as PC, plus clockwise rotation. */
-        transform: translate(-50%, -50%) rotate(1440deg) scale(40) !important;
+        transform: translate(-50%, -50%) rotate(1440deg) scale(20) !important;
     }
 }
