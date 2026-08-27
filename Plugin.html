@@ -1563,7 +1563,7 @@
         }
     
         /* =========================================================
-           SNAP WEB UI r9.7 — matched against SNAP v0.4.109 editor
+           SNAP WEB UI r9.8 — matched against SNAP v0.4.109 editor
            ========================================================= */
         .snap-vst-ui { container-type: inline-size; }
 
@@ -2424,7 +2424,7 @@
 
     
         /* =========================================================
-           SNAP WEB UI r9.7
+           SNAP WEB UI r9.8
            - remove the inner SNAP WEB PLUGIN frame
            - slightly enlarge desktop plugin view
            - enlarge upper-left branding
@@ -2708,15 +2708,23 @@
            Only the gate window is visible until "Coming Soon"
            has been clicked 10 times.
         ========================================================= */
-        html.coming-soon-locked body > *:not(#coming-soon-gate) {
-            visibility: hidden !important;
-            pointer-events: none !important;
+        /* While locked, hide only the private plugin test windows. */
+        html.coming-soon-locked #win-sample,
+        html.coming-soon-locked #win-snap,
+        html.coming-soon-locked #win-install,
+        html.coming-soon-locked #win-download,
+        html.coming-soon-locked #win-changelog {
+            display: none !important;
         }
 
         #coming-soon-gate {
             display: none;
         }
 
+        /*
+           The gate itself is transparent and does not block the page.
+           Header, Nyan Cat and taskbar remain visible/clickable.
+        */
         html.coming-soon-locked #coming-soon-gate {
             position: fixed;
             inset: 0;
@@ -2725,12 +2733,12 @@
             align-items: center;
             justify-content: center;
             visibility: visible !important;
+            pointer-events: none !important;
+            background: transparent !important;
+        }
+
+        html.coming-soon-locked #coming-soon-gate .coming-soon-window {
             pointer-events: auto !important;
-            background-color: #008080;
-            background-image: url('images/windows-95-background.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
         }
 
         html.coming-soon-unlocked #coming-soon-gate {
@@ -2774,6 +2782,19 @@
 
             #coming-soon-secret {
                 font-size: 21px;
+            }
+        }
+
+    
+        /* v0.98: place Coming Soon below the six-item header area. */
+        html.coming-soon-locked #coming-soon-gate {
+            padding-top: 110px;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 800px) {
+            html.coming-soon-locked #coming-soon-gate {
+                padding-top: 70px;
             }
         }
 
@@ -3087,7 +3108,7 @@
                             </select>
                         </div>
 
-                        <span class="snap-vst-bottom-version">v0.4.109 WEB · UI r9.7</span>
+                        <span class="snap-vst-bottom-version">v0.4.109 WEB · UI r9.8</span>
                     </div>
 
                     <!-- SETTINGS -->
