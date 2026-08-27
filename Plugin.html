@@ -1563,7 +1563,7 @@
         }
     
         /* =========================================================
-           SNAP WEB UI r9.8 — matched against SNAP v0.4.109 editor
+           SNAP WEB UI r9.9 — matched against SNAP v0.4.109 editor
            ========================================================= */
         .snap-vst-ui { container-type: inline-size; }
 
@@ -2424,7 +2424,7 @@
 
     
         /* =========================================================
-           SNAP WEB UI r9.8
+           SNAP WEB UI r9.9
            - remove the inner SNAP WEB PLUGIN frame
            - slightly enlarge desktop plugin view
            - enlarge upper-left branding
@@ -2803,8 +2803,13 @@
     <script>
         (function () {
             var unlocked = false;
+
             try {
-                unlocked = sessionStorage.getItem('snapPluginComingSoonUnlocked') === '1';
+                sessionStorage.removeItem('snapPluginComingSoonUnlocked');
+                sessionStorage.removeItem('snapPluginComingSoonClicks');
+            } catch (e) {}
+            try {
+                unlocked = sessionStorage.getItem('snapPluginComingSoonUnlocked_v2') === '1';
             } catch (e) {}
 
             document.documentElement.classList.add(
@@ -3108,7 +3113,7 @@
                             </select>
                         </div>
 
-                        <span class="snap-vst-bottom-version">v0.4.109 WEB · UI r9.8</span>
+                        <span class="snap-vst-bottom-version">v0.4.109 WEB · UI r9.9</span>
                     </div>
 
                     <!-- SETTINGS -->
@@ -4100,21 +4105,21 @@
 
             var clickCount = 0;
             try {
-                clickCount = parseInt(sessionStorage.getItem('snapPluginComingSoonClicks') || '0', 10) || 0;
+                clickCount = parseInt(sessionStorage.getItem('snapPluginComingSoonClicks_v2') || '0', 10) || 0;
             } catch (e) {}
 
             secret.addEventListener('click', function () {
                 clickCount += 1;
 
                 try {
-                    sessionStorage.setItem('snapPluginComingSoonClicks', String(clickCount));
+                    sessionStorage.setItem('snapPluginComingSoonClicks_v2', String(clickCount));
                 } catch (e) {}
 
                 if (clickCount < 10) return;
 
                 try {
-                    sessionStorage.setItem('snapPluginComingSoonUnlocked', '1');
-                    sessionStorage.removeItem('snapPluginComingSoonClicks');
+                    sessionStorage.setItem('snapPluginComingSoonUnlocked_v2', '1');
+                    sessionStorage.removeItem('snapPluginComingSoonClicks_v2');
                 } catch (e) {}
 
                 document.documentElement.classList.remove('coming-soon-locked');
