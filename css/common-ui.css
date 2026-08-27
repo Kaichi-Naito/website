@@ -644,7 +644,7 @@
                 transform: translate(-50%, -50%) rotate(0deg) scale(0.18);
             }
             to {
-                transform: translate(-50%, -50%) rotate(1440deg) scale(20);
+                transform: translate(-50%, -50%) rotate(1440deg) scale(10);
             }
         }
 
