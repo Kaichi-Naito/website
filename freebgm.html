@@ -1,189 +1,500 @@
-<!DOCTYPE html>More actions
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaichi Guitar Music</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <meta name="keywords" content="Kaichi, Kaichi Naito, FREE BGM, フリーBGM, ギター, 音楽">
+    <meta name="description" content="Kaichi Naitoの楽曲をフリーBGMとして使用する際の利用条件・クレジット・ダウンロード案内です。">
+
+    <meta property="og:title" content="Kaichi FREE BGM">
+    <meta property="og:description" content="Kaichi NaitoのFREE BGM利用案内。">
+    <meta property="og:image" content="https://kaichi-naito.github.io/website/images/card-image.jpg">
+    <meta property="og:url" content="https://kaichi-naito.github.io/website/freebgm.html">
+    <meta property="og:type" content="website">
+
+    <title>FREE BGM | Kaichi Guitar Music</title>
+
+    <link rel="icon" href="images/card-image.jpg" type="image/jpg">
+    <link rel="canonical" href="https://kaichi-naito.github.io/website/freebgm.html">
+
+    <!-- Discography / Contact / Plugin と同じ共通UI -->
+    <link rel="stylesheet" href="css/common-ui.css">
+
     <style>
-        @font-face {
-            font-family: 'PixelMplus';
-            src: url('https://kaichi-naito.github.io/website/fonts/PixelMplus10-Regular.ttf') format('truetype');
-        }
-        body {
-            font-family: 'PixelMplus', sans-serif;
-            color: white;
-            text-align: center;
-            position: relative;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background: url('images/8bit_star.png') no-repeat center center fixed;
-            background-size: cover;
+        /* =========================================================
+           FREE BGM — page specific
+           共通ヘッダー / 背景 / タスクバー / Nyan Cat / CRT /
+           Start / Shutdown は common-ui.css / common-ui.js 側
+           ========================================================= */
+
+        * {
+            box-sizing: border-box;
         }
 
-        .background-video {
-            display: none; /* 背景を画像に変更するため、ビデオを非表示にします */
-            /*position: fixed;
-            right: 0;
-            bottom: 0;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: -2;
-            object-fit: cover;*/
+        body {
+            min-height: 1100px;
         }
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.2); /* 明るさを下げるための黒のオーバーレイ */
-            z-index: -1;
+
+        #win-freebgm {
+            width: 760px;
+            max-width: calc(100vw - 24px);
         }
-        .header {
-            padding: 0px;
+
+        #win-credit {
+            width: 430px;
+            max-width: calc(100vw - 24px);
         }
-        .header h1 {
-            font-size: 2em;
-            margin-bottom: 30px;
+
+        #win-download {
+            width: 430px;
+            max-width: calc(100vw - 24px);
         }
-        .nav {
+
+        .freebgm-notepad {
+            padding: 0 !important;
+            background: #d4d0c8 !important;
+        }
+
+        .notepad-menu {
             display: flex;
-            justify-content: center;
-            gap: 20px;
+            gap: 0;
+            padding: 4px 6px 3px;
+            font-size: 12px;
+            line-height: 1.2;
+            color: #000;
+            border-bottom: 1px solid #b7b7b7;
+            background: #d4d0c8;
+            user-select: none;
+        }
+
+        .notepad-menu span {
+            display: inline-block;
+            margin-right: 14px;
+        }
+
+        .notepad-sheet {
+            margin: 3px;
+            padding: 16px 18px 18px;
+            background: #fff;
+            border: 1px solid #7f9db9;
+            color: #000;
+            line-height: 1.7;
+            min-height: 540px;
+        }
+
+        .notepad-sheet h2 {
+            margin: 0 0 6px;
+            font-size: 24px;
+            line-height: 1.2;
+        }
+
+        .notepad-subtitle {
             margin-bottom: 20px;
+            font-size: 12px;
+            color: #444;
         }
-        .nav a, .nav a:visited {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
+
+        .freebgm-section {
+            margin: 0 0 22px;
         }
-        .nav a:hover {
-            text-decoration: underline;
+
+        .freebgm-section:last-child {
+            margin-bottom: 0;
         }
-        .content {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
+
+        .freebgm-section-title {
+            margin: 0 0 8px;
+            padding-bottom: 3px;
+            border-bottom: 1px solid #d7d7d7;
+            font-size: 14px;
+            font-weight: bold;
         }
-        .content h2 {
-            font-size: 1.5em;
-            margin-bottom: 20px;
+
+        .freebgm-section p {
+            margin: 0 0 10px;
+            font-size: 12px;
+            line-height: 1.75;
         }
-        .content p {
-            margin-bottom: 20px;
-            line-height: 1.5;
+
+        .rules-list {
+            margin: 7px 0 0 18px;
+            padding: 0;
+            font-size: 12px;
+            line-height: 1.85;
         }
-        .content a, .content a:visited {
-            color: white;
+
+        .rules-list li {
+            margin-bottom: 2px;
         }
-        .content a:hover {
-            text-decoration: underline;
+
+        .info-panel {
+            border: 2px groove #fff;
+            padding: 16px 14px 14px;
+            position: relative;
+            margin: 7px;
+            background: #c0c0c0;
         }
-        .credit-box {
-            border: 2px solid white;
-            padding: 10px;
-            margin-top: 20px;
-            background-color: black; /* 背景色を黒に設定 */
-            color: white; /* テキスト色を白に設定 */
+
+        .info-panel-title {
+            position: absolute;
+            top: -9px;
+            left: 10px;
+            padding: 0 6px;
+            background: #c0c0c0;
+            font-size: 13px;
         }
-        .footer {
-            text-align: center; /* 中央揃え */
-            font-size: 0.8em; /* 標準サイズより少し小さめ */
-            color: white; /* 白色に変更 */
-            margin: 20px 0; /* 上下に20pxのマージン */
-            padding: 10px 0; /* 上下に10pxのパディング */
+
+        .credit-copy {
+            margin: 4px 0 12px;
+            padding: 14px 12px;
+            border: 2px inset #fff;
+            background: #000;
+            color: #fff;
+            font-size: 12px;
+            line-height: 1.9;
+            text-align: center;
+            overflow-wrap: anywhere;
         }
-        @media (max-width: 600px) {
+
+        .credit-copy a,
+        .credit-copy a:visited {
+            color: #fff;
+        }
+
+        .credit-help {
+            margin: 10px 2px 2px;
+            font-size: 11px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .download-copy {
+            margin: 2px 0 12px;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .download-url {
+            display: block;
+            width: 100%;
+            margin: 9px 0;
+            padding: 8px 10px;
+            border: 2px inset #fff;
+            background: #fff;
+            color: #000 !important;
+            text-decoration: none !important;
+            font-size: 11px;
+            overflow-wrap: anywhere;
+        }
+
+        .download-actions {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .download-actions .win95-btn {
+            min-width: 150px;
+            text-align: center;
+        }
+
+        @media (max-width: 800px) {
             body {
-                font-size: 80%;
+                min-height: 1600px;
             }
-            .nav {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-                justify-items: center;
+
+            #win-freebgm,
+            #win-credit,
+            #win-download {
+                width: calc(100vw - 12px) !important;
+                max-width: none !important;
             }
-            .nav a {
-                font-size: 16px;
+
+            .notepad-menu {
+                font-size: 11px;
+                padding: 4px 6px 3px;
             }
-            .header h1 {
-                font-size: 1.5em;
+
+            .notepad-menu span {
+                margin-right: 10px;
             }
-            .content {
-                padding: 10px;
+
+            .notepad-sheet {
+                padding: 11px 12px 14px;
+                min-height: 0;
             }
-            .content h2 {
-                font-size: 1.2em;
+
+            .notepad-sheet h2 {
+                font-size: 20px;
+            }
+
+            .freebgm-section p,
+            .rules-list {
+                font-size: 11px;
+            }
+
+            .info-panel {
+                margin: 4px;
+                padding: 15px 10px 10px;
+            }
+
+            .credit-copy,
+            .download-copy {
+                font-size: 11px;
             }
         }
-    </style>   
+    </style>
 </head>
-<body>
-<!--アクセス解析研究所-->
-<script src="//accaii.com/kaichi/script.js" async></script><noscript><img src="//accaii.com/kaichi/script?guid=on"></noscript>
-<!--アクセス解析研究所END-->
-    <video autoplay muted loop playsinline class="background-video">
-        <source src="images/8bit_town.mp4" type="video/mp4">
-    </video>
-    <div class="header">
-        <h1>Kaichi Guitar Music</h1>
-        <div class="nav">
-            <a href="https://kaichi-naito.github.io/website/index.html">Home</a>
-            <a href="https://kaichi-naito.github.io/website/Discography.html">Discography</a>
-            <a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank">Works</a>
-            <a href="https://kaichi-naito.github.io/website/Contact.html" target="_blank">Contact</a>
-            <!-- <a href="https://twitter.com/messages/compose?recipient_id=261132037" target="_blank">Contact</a> -->
-            <a href="https://kaichi-naito.github.io/website/freebgm.html">FREEBGM</a>
+
+<body id="win95-desktop">
+
+    <h1 class="header-title">Kaichi Guitar Music</h1>
+
+    <!-- 共通6項目ナビ -->
+    <div id="common-nav"></div>
+
+    <!-- =====================================================
+         FREE BGM README
+         ===================================================== -->
+    <div class="window" id="win-freebgm" style="z-index: 118;">
+        <div class="title-bar draggable-cursor" id="handle-freebgm">
+            <span>FREE_BGM_README.txt - Notepad</span>
+            <div class="title-bar-controls">
+                <button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button>
+                <button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button>
+                <button type="button" class="close-button" aria-label="Close">×</button>
+            </div>
+        </div>
+
+        <div class="window-contents freebgm-notepad">
+            <div class="notepad-menu" aria-hidden="true">
+                <span>File</span>
+                <span>Edit</span>
+                <span>Format</span>
+                <span>View</span>
+                <span>Help</span>
+            </div>
+
+            <div class="notepad-sheet">
+                <h2>FREE BGM</h2>
+                <div class="notepad-subtitle">Kaichi Naito / Free Music Usage Guide</div>
+
+                <section class="freebgm-section">
+                    <div class="freebgm-section-title">ENGLISH</div>
+                    <p>
+                        You may use my music as free music. (Excluding songs by others who were involved in the work)
+                        When you use it, please write the credit contents in the summary column, etc.
+                        as shown in the example. (I don't obtain content IDs, so videos using background music can be monetized on YouTube.)
+                    </p>
+                </section>
+
+                <section class="freebgm-section">
+                    <div class="freebgm-section-title">日本語</div>
+                    <p>
+                        私の曲をフリーBGMとして動画や配信で使用することを許可します。(お仕事で携わった曲を除く)
+                        使用する際は概要欄等に記載例のようにクレジット内容を記載してください。
+                        (コンテンツIDを取得しておりませんので、BGM使用動画はYouTubeで収益化可能です。)
+                    </p>
+                </section>
+
+                <section class="freebgm-section">
+                    <div class="freebgm-section-title">✅ 以下の行為はご遠慮ください</div>
+                    <ul class="rules-list">
+                        <li>クレジット内容を記載しないでの使用。</li>
+                        <li>自作発言や不正なコンテンツIDの取得。</li>
+                        <li>本曲の販売行為。</li>
+                        <li>その他、こちらからの申し立てさせていただいた場合。</li>
+                    </ul>
+                </section>
+
+                <section class="freebgm-section">
+                    <div class="freebgm-section-title">✅ About using my music</div>
+                    <ul class="rules-list">
+                        <li>You must include the full credits in your description.</li>
+                        <li>You can not claim my music as your own.</li>
+                        <li>You can not sell my music anywhere.</li>
+                        <li>You can not use my music as background music for your own musical work without the my consent.</li>
+                        <li>You can not use my music without giving any credits in the video description.</li>
+                        <li>You can not remove or add parts from to the credit.</li>
+                    </ul>
+                </section>
+            </div>
         </div>
     </div>
-    <div class="content">
-        <h2>FREE BGM</h2>
-        <p>
-            You may use my music as free music. (Excluding songs by others who were involved in the work)When you use it, please write the credit contents in the summary column, etc.
-            as shown in the example below. (I don't obtain content IDs, so videos using background music can be monetized on YouTube.)
-        </p>
-        <p>
-            私の曲をフリーBGMとして動画や配信で使用することを許可します。(お仕事で携わった曲を除く)使用する際は概要欄等に以下記載例のようにクレジット内容を記載してください。
-            (コンテンツIDを取得しておりませんので、BGM使用動画はYouTubeで収益化可能です。)
-        </p>
-        <div class="credit-box">
-            －－－－－－－－credit－－－－－－－－<br>
-            BGM：Kaichi Naito<br>
-            <a href="https://www.youtube.com/@Kaichi_zZ" target="_blank">https://www.youtube.com/@Kaichi_zZ</a><br>
-            －－－－－－－－－－－－－－－－－－－
+
+    <!-- =====================================================
+         CREDIT
+         ===================================================== -->
+    <div class="window" id="win-credit" style="z-index: 120;">
+        <div class="title-bar draggable-cursor" id="handle-credit">
+            <span>CREDIT.txt</span>
+            <div class="title-bar-controls">
+                <button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button>
+                <button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button>
+                <button type="button" class="close-button" aria-label="Close">×</button>
+            </div>
         </div>
-        <p>
-            Download is available from soundcloud.<br>
-            ダウンロードはsoundcloudから可能です。<br>
-            <a href="https://soundcloud.com/olli78zzxkeg/" target="_blank">https://soundcloud.com/olli78zzxkeg/</a>
-        </p>
-        <p>
-            Please contact me if you have any other questions.<br>
-            その他不明点があればご連絡ください。
-        </p>
-        <p>
-            ✅ 以下の行為はご遠慮ください:<br>
-            - クレジット内容を記載しないでの使用。<br>
-            - 自作発言や不正なコンテンツIDの取得。<br>
-            - 本曲の販売行為。<br>
-            - その他、こちらからの申し立てさせていただいた場合。
-        </p>
-        <p>
-            ✅ About using my music:<br>
-            - You must include the full credits in your description.<br>
-            - You can not claim my music as your own.<br>
-            - You can not sell my music anywhere.<br>
-            - You can not use my music as background music for your own musical work without the my consent.<br>
-            - You can not use my music without giving any credits in the video description.<br>
-            - You can not remove or add parts from to the credit.
-        </p>
+
+        <div class="window-contents">
+            <div class="info-panel">
+                <span class="info-panel-title">CREDIT</span>
+
+                <div class="credit-copy">
+                    －－－－－－－－credit－－－－－－－－<br>
+                    BGM：Kaichi Naito<br>
+                    <a href="https://www.youtube.com/@Kaichi_zZ" target="_blank" rel="noopener noreferrer">
+                        https://www.youtube.com/@Kaichi_zZ
+                    </a><br>
+                    －－－－－－－－－－－－－－－－－－－
+                </div>
+
+                <div class="credit-help">
+                    使用する際は、上記のクレジット内容を概要欄等に記載してください。
+                </div>
+            </div>
+        </div>
     </div>
-        <div class="footer">
-        このサイトは本人によって頑張って作成されました
+
+    <!-- =====================================================
+         DOWNLOAD
+         ===================================================== -->
+    <div class="window" id="win-download" style="z-index: 116;">
+        <div class="title-bar draggable-cursor" id="handle-download">
+            <span>DOWNLOAD.url</span>
+            <div class="title-bar-controls">
+                <button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button>
+                <button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button>
+                <button type="button" class="close-button" aria-label="Close">×</button>
+            </div>
+        </div>
+
+        <div class="window-contents">
+            <div class="info-panel">
+                <span class="info-panel-title">SOUNDCLOUD</span>
+
+                <div class="download-copy">
+                    Download is available from soundcloud.<br>
+                    ダウンロードはsoundcloudから可能です。
+                </div>
+
+                <a class="download-url"
+                   href="https://soundcloud.com/olli78zzxkeg/"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    https://soundcloud.com/olli78zzxkeg/
+                </a>
+
+                <div class="download-copy">
+                    Please contact me if you have any other questions.<br>
+                    その他不明点があればご連絡ください。
+                </div>
+
+                <div class="download-actions">
+                    <a class="win95-btn"
+                       href="https://soundcloud.com/olli78zzxkeg/"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        Open SoundCloud
+                    </a>
+
+                    <a class="win95-btn" href="Contact.html">
+                        Contact
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        /*
+           Discography / Contact / Plugin と同様、
+           ウィンドウの配置だけこのページ側で管理します。
+           ドラッグ・最小化・最大化・閉じる・タスクバー等は common-ui.js 側。
+        */
+        function setInitialPositions() {
+            var isMobile = window.matchMedia('(max-width: 800px)').matches;
+
+            var readme = document.getElementById('win-freebgm');
+            var credit = document.getElementById('win-credit');
+            var download = document.getElementById('win-download');
+
+            var windows = [readme, credit, download];
+
+            windows.forEach(function (win) {
+                if (!win || win.dataset.closed === 'true' || win.dataset.minimized === 'true') return;
+                win.style.transform = '';
+            });
+
+            if (isMobile) {
+                var top = 175;
+                var gap = 22;
+
+                windows.forEach(function (win) {
+                    if (!win || win.dataset.closed === 'true') return;
+
+                    win.style.left = '6px';
+                    win.style.top = top + 'px';
+
+                    if (win.dataset.minimized !== 'true') {
+                        top += (win.offsetHeight || 300) + gap;
+                    }
+                });
+
+                document.body.style.minHeight = Math.max(1450, top + 100) + 'px';
+                return;
+            }
+
+            var vw = window.innerWidth || 1440;
+            var center = vw / 2;
+
+            if (readme && readme.dataset.closed !== 'true') {
+                readme.style.left = Math.max(20, center - 520) + 'px';
+                readme.style.top = '205px';
+            }
+
+            if (credit && credit.dataset.closed !== 'true') {
+                credit.style.left = Math.max(20, center + 160) + 'px';
+                credit.style.top = '270px';
+            }
+
+            if (download && download.dataset.closed !== 'true') {
+                download.style.left = Math.max(20, center + 205) + 'px';
+                download.style.top = '515px';
+            }
+
+            var bottoms = windows
+                .filter(function (win) {
+                    return win && win.dataset.closed !== 'true' && win.dataset.minimized !== 'true';
+                })
+                .map(function (win) {
+                    return (parseInt(win.style.top, 10) || 0) + (win.offsetHeight || 300);
+                });
+
+            var maxBottom = bottoms.length ? Math.max.apply(null, bottoms) : 1000;
+            document.body.style.minHeight = Math.max(1050, maxBottom + 100) + 'px';
+        }
+
+        window.onKaichiWindowClosed = function () {
+            setTimeout(setInitialPositions, 0);
+        };
+
+        window.addEventListener('load', function () {
+            setTimeout(setInitialPositions, 80);
+            setTimeout(setInitialPositions, 400);
+
+            /* FREEBGM のアイコンを現在ページとして表示 */
+            var freeBgmLink = document.querySelector('#common-nav a[href="freebgm.html"]');
+            if (freeBgmLink) freeBgmLink.classList.add('current');
+        });
+
+        window.addEventListener('resize', function () {
+            setTimeout(setInitialPositions, 80);
+        });
+    </script>
+
+    <!-- 共通UI:
+         Navigation / GoatCounter / Taskbar / Start / Shutdown /
+         CRT / Nyan Cat 10・20・30匹イベント -->
+    <script src="js/common-ui.js"></script>
 </body>
 </html>
