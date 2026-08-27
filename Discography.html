@@ -738,23 +738,7 @@
             <img src="images/gif/Sound.gif" alt="FREEBGM"><span>FREEBGM</span>
         </a>
     </div>
-
-    <div class="window" id="win-profile" style="width: 380px; z-index: 104;">
-        <div class="title-bar draggable-cursor" id="handle-profile">
-            <span>Profile.exe</span><div class="title-bar-controls"><button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button><button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button><button type="button" class="close-button" aria-label="Close">×</button></div>
-        </div>
-        <div class="window-contents profile-section">
-            <img src="images/DotGuitar.png" alt="Kaichi" class="profile-img">
-            <div class="profile-text">
-                <h2 style="margin:0 0 10px 0;">Kaichi</h2>
-                <p style="margin:0 0 15px 0;">Guitar, write music.</p>
-                <a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank" rel="noopener noreferrer" style="font-size: 14px; color: blue;">Hotone Official Artist</a>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- 新曲テンプレート
+<!-- 新曲テンプレート
     <div class="window song-window" id="win-曲名">
         <div class="title-bar draggable-cursor" id="handle-曲名">
             <span>曲名.exe</span><div class="title-bar-controls"><button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button><button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button><button type="button" class="close-button" aria-label="Close">×</button></div></div>
@@ -792,7 +776,8 @@
                 <div class="album-info">
                     <p>Single</p>
                     <p class="artist-tag">#PHALUX</p>　<h3>SCREAM</h3>
-                    <p>Release: 2026.mm.dd</p>
+                    <p>Release: 2026.7.19</p>
+                    <p>illust : いのうえさぶこ<a href="https://twitter.com/ayupi0718" target="_blank" rel="noopener noreferrer" class="click-target">@ayupi0718</a></p>
                     <div class="links">
                         <a href="https://open.spotify.com/intl-ja/track/7D25v5ATCQA9R20yqfwKE1?si=464a42eea19e4e38" target="_blank" rel="noopener noreferrer" class="click-target">
                             <img src="images/spotify-icon.png" alt="Spotify" loading="lazy">
@@ -1335,7 +1320,7 @@
         function setInitialPositions() {
             var isMobile = window.matchMedia("(max-width: 800px)").matches;
             var songWindows = getSongWindows();
-            var currentTop = isMobile ? 145 : 175;
+            var currentTop = isMobile ? 175 : 225;
 
             for (var i = 0; i < songWindows.length; i++) {
                 var el = songWindows[i];
