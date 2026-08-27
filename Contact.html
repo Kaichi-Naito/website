@@ -22,7 +22,7 @@
             overflow-x: hidden;
             width: 100%;
             scrollbar-width: none;
-            background: #000;
+            background: #008080;
         }
         html::-webkit-scrollbar {
             width: 0;
@@ -40,12 +40,8 @@
             text-align: center;
             margin: 0;
             padding: 20px 0 calc(50px + env(safe-area-inset-bottom)) 0;
-            background-color: #008080;
-            background-image: url('https://kaichi-naito.github.io/website/images/windows-95-background.jpg');
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            background-color: transparent;
+            background-image: none;
             overflow-x: hidden;
             width: 100%;
             z-index: 1;
@@ -55,8 +51,12 @@
             content: "";
             position: fixed;
             inset: 0;
-            background-color: rgba(0, 0, 0, 0.1);
+            background:
+                linear-gradient(rgba(0,0,0,0.10), rgba(0,0,0,0.10)),
+                url('https://kaichi-naito.github.io/website/images/windows-95-background.jpg')
+                center center / cover no-repeat;
             z-index: -1;
+            pointer-events: none;
         }
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -547,7 +547,6 @@
             .header-title { font-size: 1.6em; margin-bottom: 15px; }
             .window { box-sizing: border-box; }
             
-            #win-profile { width: 200px !important; }
             #win-counter { width: 250px !important; max-width: 88vw !important; }
             #win-phalux { width: 45% !important; max-width: 160px !important; }
             #win-social { width: 90% !important; max-width: 350px !important; }
@@ -725,24 +724,7 @@
             <img src="images/gif/Sound.gif" alt="FREEBGM"><span>FREEBGM</span>
         </a>
     </div>
-
-    <div class="window" id="win-profile" style="width: 380px; z-index: 104;">
-        <div class="title-bar draggable-cursor" id="handle-profile">
-            <span>Profile.exe</span><div class="title-bar-controls"><button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button><button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button><button type="button" class="close-button" aria-label="Close">×</button></div>
-        </div>
-        <div class="window-contents profile-section">
-            <img src="images/DotGuitar.png" alt="Kaichi" class="profile-img">
-            <div class="profile-text">
-                <h2 style="margin:0 0 10px 0;">Kaichi</h2>
-                <p style="margin:0 0 15px 0;">Guitar, write music.</p>
-                <a href="https://www.hotoneaudio.com/artists/Kaichi%20Naito" target="_blank" rel="noopener noreferrer" style="font-size: 14px; color: blue;">Hotone Official Artist</a>
-            </div>
-        </div>
-    </div>
-
-
-
-    <div class="window" id="win-message" style="z-index: 103;">
+<div class="window" id="win-message" style="z-index: 103;">
         <div class="title-bar draggable-cursor" id="handle-message">
             <span>Message</span>
             <div class="title-bar-controls">
