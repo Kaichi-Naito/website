@@ -592,15 +592,20 @@
             });
         });
 
+        // Mobile uses a slower approach so the zoom is easier to perceive.
+        var isMobileCrash = window.matchMedia('(max-width: 800px)').matches;
+        var impactDelay = isMobileCrash ? 2350 : 1350;
+        var shutdownDelay = isMobileCrash ? 2600 : 1550;
+
         // "Impact" just before the blue screen.
         setTimeout(function () {
             crashCat.classList.add('nyan-cat-crash-impact');
-        }, 1350);
+        }, impactDelay);
 
         // Cat hits the screen -> immediate shutdown sequence.
         setTimeout(function () {
             beginFakeShutdown();
-        }, 1550);
+        }, shutdownDelay);
     }
 
     function setupCat(catElement, startX, startY, startVx, startVy) {
