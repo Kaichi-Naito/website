@@ -2615,24 +2615,37 @@
                 padding-top: 70px;
             }
         }
-    </style>
+    
+        /* v0.99: hard-lock private plugin windows until the 10-click reveal. */
+        html:not(.coming-soon-unlocked) #win-sample,
+        html:not(.coming-soon-unlocked) #win-snap,
+        html:not(.coming-soon-unlocked) #win-install,
+        html:not(.coming-soon-unlocked) #win-download,
+        html:not(.coming-soon-unlocked) #win-changelog {
+            display: none !important;
+        }
+
+        html:not(.coming-soon-unlocked) #coming-soon-gate {
+            display: flex !important;
+        }
+</style>
 
 
     <script>
         (function () {
-            var unlocked = false;
-
+            /*
+               Pluginページはアクセスするたびに必ず Coming Soon から開始。
+               10回クリックした現在のページだけ、テスト画面を表示します。
+            */
             try {
                 sessionStorage.removeItem('snapPluginComingSoonUnlocked');
                 sessionStorage.removeItem('snapPluginComingSoonClicks');
-            } catch (e) {}
-            try {
-                unlocked = sessionStorage.getItem('snapPluginComingSoonUnlocked_v2') === '1';
+                sessionStorage.removeItem('snapPluginComingSoonUnlocked_v2');
+                sessionStorage.removeItem('snapPluginComingSoonClicks_v2');
             } catch (e) {}
 
-            document.documentElement.classList.add(
-                unlocked ? 'coming-soon-unlocked' : 'coming-soon-locked'
-            );
+            document.documentElement.classList.remove('coming-soon-unlocked');
+            document.documentElement.classList.add('coming-soon-locked');
         })();
     </script>
 
@@ -3637,28 +3650,15 @@
             if (!secret) return;
 
             var clickCount = 0;
-            try {
-                clickCount = parseInt(sessionStorage.getItem('snapPluginComingSoonClicks_v2') || '0', 10) || 0;
-            } catch (e) {}
 
             secret.addEventListener('click', function () {
                 clickCount += 1;
-
-                try {
-                    sessionStorage.setItem('snapPluginComingSoonClicks_v2', String(clickCount));
-                } catch (e) {}
-
                 if (clickCount < 10) return;
-
-                try {
-                    sessionStorage.setItem('snapPluginComingSoonUnlocked_v2', '1');
-                    sessionStorage.removeItem('snapPluginComingSoonClicks_v2');
-                } catch (e) {}
 
                 document.documentElement.classList.remove('coming-soon-locked');
                 document.documentElement.classList.add('coming-soon-unlocked');
 
-                // 解除後に共通window managerへウィンドウを登録し直す。
+                // 解除したこのページ内だけ、共通window managerへ登録。
                 if (window.KaichiUI && typeof window.KaichiUI.refreshWindows === 'function') {
                     window.KaichiUI.refreshWindows();
                 }
