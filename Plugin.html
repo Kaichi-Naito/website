@@ -2546,7 +2546,11 @@
         html.coming-soon-locked #coming-soon-gate {
             position: fixed;
             inset: 0;
-            z-index: 2147483647;
+            /*
+               Keep Coming Soon above the plugin content, but below
+               Nyan Cat / taskbar / Start menu / shutdown layers.
+            */
+            z-index: 15000;
             display: flex !important;
             align-items: center;
             justify-content: center;
