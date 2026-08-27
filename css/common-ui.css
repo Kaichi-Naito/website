@@ -620,9 +620,21 @@
         }
 
 
-        @media (max-width: 800px) {
-            /* Smartphone only: spin while the x30 Nyan Cat rushes toward the screen. */
-            #nyan-cat-crash.nyan-cat-crash-go {
-                transform: translate(-50%, -50%) rotate(1080deg) scale(80);
-            }
-        }
+/* =========================================================
+   FINAL FIX: x30 Nyan Cat mobile clockwise spin
+   Keep this at the very end so it wins the CSS cascade.
+   ========================================================= */
+@media (max-width: 800px) {
+    #nyan-cat-crash {
+        transform: translate(-50%, -50%) rotate(0deg) scale(0.18) !important;
+        transition:
+            transform 1.55s cubic-bezier(0.20, 0.82, 0.16, 1),
+            filter 0.12s linear,
+            opacity 0.12s linear !important;
+    }
+
+    #nyan-cat-crash.nyan-cat-crash-go {
+        /* Positive degrees = clockwise rotation on screen. */
+        transform: translate(-50%, -50%) rotate(1440deg) scale(80) !important;
+    }
+}
