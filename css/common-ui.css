@@ -595,8 +595,8 @@
             left: 50%;
             top: 50%;
             width: 22px;
-            height: 14px;
-            z-index: 2147483647;
+            height: auto;
+            z-index: 999999;
             pointer-events: none;
             image-rendering: pixelated;
             transform: translate(-50%, -50%) scale(0.18);
@@ -619,42 +619,22 @@
             opacity: 1;
         }
 
-/* =========================================================
-   x30 Nyan Cat — MOBILE
-   Same duration as PC, clockwise spin, half max scale.
-   The start is small but still visible (not sub-pixel).
-   ========================================================= */
-@keyframes nyan-cat-mobile-rush {
-    0%   { transform: translate(-50%, -50%) rotate(0deg)    scale(0.15); }
-    15%  { transform: translate(-50%, -50%) rotate(216deg)  scale(0.18); }
-    30%  { transform: translate(-50%, -50%) rotate(432deg)  scale(0.32); }
-    45%  { transform: translate(-50%, -50%) rotate(648deg)  scale(0.65); }
-    60%  { transform: translate(-50%, -50%) rotate(864deg)  scale(1.40); }
-    72%  { transform: translate(-50%, -50%) rotate(1037deg) scale(3.20); }
-    82%  { transform: translate(-50%, -50%) rotate(1181deg) scale(7.20); }
-    90%  { transform: translate(-50%, -50%) rotate(1296deg) scale(14.0); }
-    96%  { transform: translate(-50%, -50%) rotate(1382deg) scale(25.0); }
-    100% { transform: translate(-50%, -50%) rotate(1440deg) scale(40); }
-}
 
+/* =========================================================
+   FINAL FIX: x30 Nyan Cat mobile clockwise spin
+   Keep this at the very end so it wins the CSS cascade.
+   ========================================================= */
 @media (max-width: 800px) {
     #nyan-cat-crash {
-        visibility: visible !important;
-        opacity: 1 !important;
-
-        /*
-           IMPORTANT:
-           Do NOT use !important on transform here.
-           An !important transform declaration overrides CSS animations,
-           which was why the mobile x30 cat stayed tiny / effectively invisible.
-        */
-        transform: translate(-50%, -50%) rotate(0deg) scale(0.12);
+        transform: translate(-50%, -50%) rotate(0deg) scale(0.18) !important;
         transition:
+            transform 1.55s cubic-bezier(0.20, 0.82, 0.16, 1),
             filter 0.12s linear,
             opacity 0.12s linear !important;
     }
 
     #nyan-cat-crash.nyan-cat-crash-go {
-        animation: nyan-cat-mobile-rush 1.55s linear forwards !important;
+        /* Mobile: same zoom timing/easing as PC, plus clockwise rotation. */
+        transform: translate(-50%, -50%) rotate(1440deg) scale(40) !important;
     }
 }
