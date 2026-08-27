@@ -592,11 +592,9 @@
             });
         });
 
-        // Mobile uses a much slower staged approach.
-        // CSS keyframes finish at 4.8 sec; keep impact / shutdown in sync.
-        var isMobileCrash = window.matchMedia('(max-width: 800px)').matches;
-        var impactDelay = isMobileCrash ? 4550 : 1350;
-        var shutdownDelay = isMobileCrash ? 4800 : 1550;
+        // Same crash timing on desktop and mobile.
+        var impactDelay = 1350;
+        var shutdownDelay = 1550;
 
         // "Impact" just before the blue screen.
         setTimeout(function () {
