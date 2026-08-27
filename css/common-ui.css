@@ -649,7 +649,7 @@
         transform: translate(-50%, -50%) rotate(0deg);
     }
     to {
-        width: 140vw;
+        width: 128vw;
         transform: translate(-50%, -50%) rotate(1440deg);
     }
 }
