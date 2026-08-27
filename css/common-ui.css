@@ -611,7 +611,7 @@
         }
 
         #nyan-cat-crash.nyan-cat-crash-go {
-            transform: translate(-50%, -50%) scale(40);
+            transform: translate(-50%, -50%) scale(80);
         }
 
         #nyan-cat-crash.nyan-cat-crash-impact {
@@ -620,35 +620,34 @@
         }
 
 /* =========================================================
-   x30 Nyan Cat — MOBILE slow clockwise approach
-   A single 0.02 -> 80 transition still looks very fast because
-   CSS interpolates the scale numerically. These staged values
-   approximate perceptually even / exponential growth.
+   x30 Nyan Cat — MOBILE
+   Same duration as PC, clockwise spin, half max scale.
+   The start is small but still visible (not sub-pixel).
    ========================================================= */
 @keyframes nyan-cat-mobile-rush {
-    0%   { transform: translate(-50%, -50%) rotate(0deg)    scale(0.020); }
-    10%  { transform: translate(-50%, -50%) rotate(144deg)  scale(0.046); }
-    20%  { transform: translate(-50%, -50%) rotate(288deg)  scale(0.105); }
-    30%  { transform: translate(-50%, -50%) rotate(432deg)  scale(0.240); }
-    40%  { transform: translate(-50%, -50%) rotate(576deg)  scale(0.550); }
-    50%  { transform: translate(-50%, -50%) rotate(720deg)  scale(1.260); }
-    60%  { transform: translate(-50%, -50%) rotate(864deg)  scale(2.900); }
-    70%  { transform: translate(-50%, -50%) rotate(1008deg) scale(3.325); }
-    80%  { transform: translate(-50%, -50%) rotate(1152deg) scale(7.600); }
-    90%  { transform: translate(-50%, -50%) rotate(1296deg) scale(17.450); }
+    0%   { transform: translate(-50%, -50%) rotate(0deg)    scale(0.12); }
+    15%  { transform: translate(-50%, -50%) rotate(216deg)  scale(0.18); }
+    30%  { transform: translate(-50%, -50%) rotate(432deg)  scale(0.32); }
+    45%  { transform: translate(-50%, -50%) rotate(648deg)  scale(0.65); }
+    60%  { transform: translate(-50%, -50%) rotate(864deg)  scale(1.40); }
+    72%  { transform: translate(-50%, -50%) rotate(1037deg) scale(3.20); }
+    82%  { transform: translate(-50%, -50%) rotate(1181deg) scale(7.20); }
+    90%  { transform: translate(-50%, -50%) rotate(1296deg) scale(14.0); }
+    96%  { transform: translate(-50%, -50%) rotate(1382deg) scale(25.0); }
     100% { transform: translate(-50%, -50%) rotate(1440deg) scale(40); }
 }
 
 @media (max-width: 800px) {
     #nyan-cat-crash {
-        transform: translate(-50%, -50%) rotate(0deg) scale(0.020) !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: translate(-50%, -50%) rotate(0deg) scale(0.12) !important;
         transition:
             filter 0.12s linear,
             opacity 0.12s linear !important;
     }
 
     #nyan-cat-crash.nyan-cat-crash-go {
-        /* 4 clockwise rotations over 4.8 sec. */
-        animation: nyan-cat-mobile-rush 4.8s linear forwards !important;
+        animation: nyan-cat-mobile-rush 1.55s linear forwards !important;
     }
 }
