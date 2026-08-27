@@ -108,29 +108,47 @@
         }
 
         .close-button {
-            width: 16px; height: 14px;
-            font-size: 13px;
+            width: 16px;
+            height: 14px;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+
             background-color: #c0c0c0;
+            background-image: none !important;
+
             border: 1px solid;
             border-color: #ffffff #808080 #808080 #ffffff;
-            /* --- 画像の設定 --- */
-            background-image: url('images/×.png');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 20px; /* ★ここで×の大きさを調整できます */
-            
-            /* 文字を隠す */
-            color: transparent;
-            padding: 0;
-            line-height: 1;
-            font-family: inherit;
+
+            color: transparent !important;
             box-sizing: border-box;
-            /* ボタンらしさ */
             cursor: pointer;
+            flex: 0 0 auto;
         }
+
+        .close-button::before {
+            content: "×";
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: #000;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1;
+            transform: translateY(-1px);
+            pointer-events: none;
+        }
+
         .close-button:active {
             border-color: #808080 #ffffff #ffffff #808080;
-            padding-top: 1px; padding-left: 1px;
+        }
+
+        .close-button:active::before {
+            transform: translate(1px, 0);
         }
         .window-contents {
             padding: 15px;
@@ -588,8 +606,12 @@
             #tray-clock { font-size: 12px; width: 36px; }
         }
 
+        /* =========================================================
+           30 Nyan Cats: screen crash event
+           PC     = clockwise 4 rotations / scale 80 / 1.55 sec
+           Mobile = clockwise 4 rotations / scale 20 / 1.55 sec
+           ========================================================= */
 
-        /* --- 30 Nyan Cats: screen crash event --- */
         #nyan-cat-crash {
             position: fixed;
             left: 50%;
@@ -599,20 +621,39 @@
             z-index: 999999;
             pointer-events: none;
             image-rendering: pixelated;
-            transform: translate(-50%, -50%) scale(0.18);
+
+            transform: translate(-50%, -50%) rotate(0deg) scale(0.18);
             transform-origin: center center;
+
             opacity: 0.98;
             filter: brightness(1);
-            transition:
-                transform 1.55s cubic-bezier(0.20, 0.82, 0.16, 1),
-                filter 0.12s linear,
-                opacity 0.12s linear;
             will-change: transform, filter, opacity;
         }
 
+        @keyframes nyan-cat-crash-desktop {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg) scale(0.18);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(1440deg) scale(80);
+            }
+        }
+
+        @keyframes nyan-cat-crash-mobile {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg) scale(0.18);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(1440deg) scale(20);
+            }
+        }
+
         #nyan-cat-crash.nyan-cat-crash-go {
-            /* Desktop: clockwise spin while rushing toward the viewer. */
-            transform: translate(-50%, -50%) rotate(1440deg) scale(80);
+            animation:
+                nyan-cat-crash-desktop
+                1.55s
+                cubic-bezier(0.20, 0.82, 0.16, 1)
+                forwards;
         }
 
         #nyan-cat-crash.nyan-cat-crash-impact {
@@ -620,22 +661,9 @@
             opacity: 1;
         }
 
+        @media (max-width: 800px) {
+            #nyan-cat-crash.nyan-cat-crash-go {
+                animation-name: nyan-cat-crash-mobile;
+            }
+        }
 
-/* =========================================================
-   FINAL FIX: x30 Nyan Cat mobile clockwise spin
-   Keep this at the very end so it wins the CSS cascade.
-   ========================================================= */
-@media (max-width: 800px) {
-    #nyan-cat-crash {
-        transform: translate(-50%, -50%) rotate(0deg) scale(0.18) !important;
-        transition:
-            transform 1.55s cubic-bezier(0.20, 0.82, 0.16, 1),
-            filter 0.12s linear,
-            opacity 0.12s linear !important;
-    }
-
-    #nyan-cat-crash.nyan-cat-crash-go {
-        /* Mobile: same zoom timing/easing as PC, plus clockwise rotation. */
-        transform: translate(-50%, -50%) rotate(1440deg) scale(20) !important;
-    }
-}
