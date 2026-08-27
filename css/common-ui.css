@@ -618,3 +618,11 @@
             filter: brightness(2.2) contrast(1.15);
             opacity: 1;
         }
+
+
+        @media (max-width: 800px) {
+            /* Smartphone only: spin while the x30 Nyan Cat rushes toward the screen. */
+            #nyan-cat-crash.nyan-cat-crash-go {
+                transform: translate(-50%, -50%) rotate(1080deg) scale(80);
+            }
+        }
