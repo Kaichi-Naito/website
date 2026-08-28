@@ -163,6 +163,14 @@
            By reboot time it should normally already be available.
         */
         preloadSoftRebootHome().catch(function () {});
+
+        /*
+           Touch the decode promise now as well, so the 6-second blue screen
+           is used as preparation time rather than paying that cost at reboot.
+        */
+        if (startupAudioBufferPromise && typeof startupAudioBufferPromise.catch === 'function') {
+            startupAudioBufferPromise.catch(function () {});
+        }
     }
 
     function playStartupAudioSoftReboot() {
@@ -393,8 +401,30 @@
     function softRebootToHome() {
         preloadSoftRebootHome()
             .then(function (htmlText) {
-                installFetchedHomeDocument(htmlText);
-                return playStartupAudioSoftReboot();
+                /*
+                   IMPORTANT:
+                   Start windows.mp3 FIRST, while the current page / audio
+                   session is still completely untouched.
+
+                   The previous version rebuilt the Home DOM first and only
+                   then started the sound, which added a small but noticeable
+                   delay on some phones.
+                */
+                var startupPromise = playStartupAudioSoftReboot();
+
+                /*
+                   Give the browser one rendering frame to actually start the
+                   audio output, then swap in the real Home page.
+
+                   This keeps the blue-screen -> startup-sound -> Home timing
+                   feeling almost simultaneous, without destroying the audio
+                   session that made mobile playback reliable.
+                */
+                requestAnimationFrame(function () {
+                    installFetchedHomeDocument(htmlText);
+                });
+
+                return startupPromise;
             })
             .catch(function (error) {
                 /*
