@@ -37,6 +37,378 @@
     var catErrorSound = createAudio('Sound/Error_2.mp3');
     var catCrashSound = createAudio('Sound/Nyancat_x30.mp3');
 
+
+    /* =========================================================
+       SOFT REBOOT EXPERIMENT
+       Keep the current document alive through the blue screen,
+       swap the BODY to the real index.html contents, update the URL,
+       then play windows.mp3 from the already-unlocked audio context.
+
+       This avoids destroying the audio permission/state by doing a
+       full page navigation before the startup sound.
+       ========================================================= */
+    var softRebootHomePromise = null;
+    var startupAudioContext = null;
+    var startupAudioBufferPromise = null;
+    var startupHtmlAudioArmed = false;
+
+    function preloadSoftRebootHome() {
+        if (softRebootHomePromise) return softRebootHomePromise;
+
+        softRebootHomePromise = fetch(asset('index.html'), {
+            cache: 'no-cache'
+        }).then(function (response) {
+            if (!response.ok) {
+                throw new Error('Could not load index.html: HTTP ' + response.status);
+            }
+            return response.text();
+        });
+
+        return softRebootHomePromise;
+    }
+
+    function armStartupAudioForSoftReboot() {
+        /*
+           This function MUST be called directly from the user's click/touch
+           that starts the shutdown sequence.
+
+           Primary route: Web Audio.
+           Fallback route: arm the exact HTMLAudioElement silently.
+        */
+
+        try {
+            var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+            if (AudioContextClass) {
+                if (!startupAudioContext) {
+                    startupAudioContext = new AudioContextClass();
+                }
+
+                if (startupAudioContext.state === 'suspended') {
+                    startupAudioContext.resume().catch(function () {});
+                }
+
+                if (!startupAudioBufferPromise) {
+                    startupAudioBufferPromise = fetch(asset('Sound/windows.mp3'))
+                        .then(function (response) {
+                            if (!response.ok) {
+                                throw new Error('Could not load windows.mp3');
+                            }
+                            return response.arrayBuffer();
+                        })
+                        .then(function (arrayBuffer) {
+                            return new Promise(function (resolve, reject) {
+                                /*
+                                   Safari still supports the callback form reliably.
+                                */
+                                var decodeResult = startupAudioContext.decodeAudioData(
+                                    arrayBuffer.slice(0),
+                                    resolve,
+                                    reject
+                                );
+
+                                /*
+                                   Chromium returns a Promise. Safari may return void.
+                                */
+                                if (decodeResult && typeof decodeResult.then === 'function') {
+                                    decodeResult.then(resolve).catch(reject);
+                                }
+                            });
+                        })
+                        .catch(function () {
+                            return null;
+                        });
+                }
+            }
+        } catch (e) {}
+
+        /*
+           Also arm the exact <audio> element as a fallback.
+           It is muted while being started, so nothing is heard.
+        */
+        if (startupSound && !startupHtmlAudioArmed) {
+            startupHtmlAudioArmed = true;
+
+            try {
+                startupSound.pause();
+                startupSound.currentTime = 0;
+                startupSound.muted = true;
+
+                var armPromise = startupSound.play();
+
+                var finishArm = function () {
+                    setTimeout(function () {
+                        try {
+                            startupSound.pause();
+                            startupSound.currentTime = 0;
+                            startupSound.muted = false;
+                        } catch (e) {}
+                    }, 120);
+                };
+
+                if (armPromise && typeof armPromise.then === 'function') {
+                    armPromise.then(finishArm).catch(function () {
+                        try { startupSound.muted = false; } catch (e) {}
+                    });
+                } else {
+                    finishArm();
+                }
+            } catch (e) {
+                try { startupSound.muted = false; } catch (e2) {}
+            }
+        }
+
+        /*
+           Start fetching Home while the 6-second blue screen is running.
+           By reboot time it should normally already be available.
+        */
+        preloadSoftRebootHome().catch(function () {});
+    }
+
+    function playStartupAudioSoftReboot() {
+        /*
+           Prefer the AudioContext that was resumed by the shutdown gesture.
+           This keeps the sound inside the same document/audio session.
+        */
+        if (
+            startupAudioContext &&
+            startupAudioContext.state !== 'closed' &&
+            startupAudioBufferPromise
+        ) {
+            return startupAudioContext.resume()
+                .catch(function () {})
+                .then(function () {
+                    return startupAudioBufferPromise;
+                })
+                .then(function (buffer) {
+                    if (!buffer) throw new Error('No decoded startup buffer');
+
+                    var source = startupAudioContext.createBufferSource();
+                    source.buffer = buffer;
+                    source.connect(startupAudioContext.destination);
+                    source.start(0);
+                    return true;
+                })
+                .catch(function () {
+                    return playStartupAudioSoftRebootFallback();
+                });
+        }
+
+        return playStartupAudioSoftRebootFallback();
+    }
+
+    function playStartupAudioSoftRebootFallback() {
+        return new Promise(function (resolve) {
+            if (!startupSound) {
+                resolve(false);
+                return;
+            }
+
+            try {
+                startupSound.pause();
+                startupSound.currentTime = 0;
+                startupSound.muted = false;
+                startupSound.volume = 1;
+
+                var p = startupSound.play();
+
+                if (p && typeof p.then === 'function') {
+                    p.then(function () {
+                        resolve(true);
+                    }).catch(function () {
+                        resolve(false);
+                    });
+                } else {
+                    resolve(true);
+                }
+            } catch (e) {
+                resolve(false);
+            }
+        });
+    }
+
+    function resetSharedUiForHome() {
+        /*
+           Remove cats spawned directly under BODY during the previous page.
+           Keep the original cat in #common-ui-root.
+        */
+        var bodyChildren = Array.prototype.slice.call(document.body.children);
+
+        bodyChildren.forEach(function (child) {
+            if (
+                child.tagName === 'IMG' &&
+                child.id !== 'nyan-cat' &&
+                child.src &&
+                child.src.indexOf('Nyancat.gif') !== -1
+            ) {
+                child.remove();
+            }
+        });
+
+        cats = cats.filter(function (cat) {
+            return (
+                cat &&
+                cat.element &&
+                cat.element.id === 'nyan-cat' &&
+                document.documentElement.contains(cat.element)
+            );
+        });
+
+        catWarningTriggered = false;
+        catCrashTriggered = false;
+
+        var originalCat = document.getElementById('nyan-cat');
+        if (originalCat) {
+            originalCat.style.display = 'block';
+        }
+
+        var special = document.getElementById('win-nyan-special');
+        if (special) {
+            special.style.display = 'none';
+            special.dataset.closed = 'false';
+            special.dataset.minimized = 'false';
+        }
+
+        var warning = document.getElementById('win-cat-warning');
+        if (warning) {
+            warning.style.display = 'none';
+            warning.dataset.closed = 'false';
+            warning.dataset.minimized = 'false';
+        }
+
+        var taskbar = document.getElementById('taskbar-tasks');
+        if (taskbar) taskbar.innerHTML = '';
+
+        activeWindowId = null;
+    }
+
+    function installFetchedHomeDocument(htmlText) {
+        var parser = new DOMParser();
+        var parsed = parser.parseFromString(htmlText, 'text/html');
+
+        var commonRoot = document.getElementById('common-ui-root');
+        var parsedBody = parsed.body;
+
+        if (!parsedBody || !commonRoot) {
+            throw new Error('Home document could not be prepared');
+        }
+
+        /*
+           Capture the Home inline scripts. External common-ui.js is NOT
+           executed again because this current script instance stays alive.
+        */
+        var inlineScripts = [];
+
+        parsedBody.querySelectorAll('script').forEach(function (script) {
+            if (!script.src && script.textContent.trim()) {
+                inlineScripts.push(script.textContent);
+            }
+            script.remove();
+        });
+
+        /*
+           Old page-specific <style> blocks (Plugin / Discography / Contact /
+           FREEBGM) can affect Home after the body swap, so remove them.
+           index.html uses css/common-ui.css and does not need inline styles.
+        */
+        document.head.querySelectorAll('style').forEach(function (style) {
+            style.remove();
+        });
+
+        /*
+           Remove all current page-specific BODY content, but keep the shared
+           Windows UI root alive. That is what preserves the current document
+           and its audio state.
+        */
+        Array.prototype.slice.call(document.body.children).forEach(function (child) {
+            if (child !== commonRoot) {
+                child.remove();
+            }
+        });
+
+        /*
+           Insert the REAL body contents from index.html immediately before
+           the shared common UI root.
+        */
+        Array.prototype.slice.call(parsedBody.children).forEach(function (child) {
+            var imported = document.importNode(child, true);
+            document.body.insertBefore(imported, commonRoot);
+        });
+
+        document.body.id = parsedBody.id || 'win95-desktop';
+        document.body.removeAttribute('style');
+        document.body.style.overflow = '';
+
+        document.documentElement.classList.remove(
+            'coming-soon-locked',
+            'coming-soon-unlocked'
+        );
+
+        document.title = parsed.title || 'Kaichi Guitar Music';
+
+        /*
+           The address bar now says index.html without loading a new document.
+        */
+        try {
+            history.replaceState(
+                { kaichiSoftReboot: true },
+                '',
+                new URL('index.html', window.location.href).pathname
+            );
+        } catch (e) {}
+
+        /*
+           Execute Home's page-specific inline JS in global page scope.
+           This restores setInitialPositions() and the visitor counter logic.
+        */
+        inlineScripts.forEach(function (code) {
+            var script = document.createElement('script');
+            script.textContent = code;
+            document.body.insertBefore(script, commonRoot);
+            script.remove();
+        });
+
+        resetSharedUiForHome();
+
+        injectNavigation();
+        initWindows();
+
+        /*
+           Hide the shutdown screen only AFTER Home is in place.
+        */
+        var shutdownScreen = document.getElementById('shutdown-screen');
+        if (shutdownScreen) {
+            shutdownScreen.classList.remove('active');
+            shutdownScreen.setAttribute('aria-hidden', 'true');
+        }
+
+        runPageLayout();
+
+        /*
+           Home's visitor-counter script listens for this event.
+        */
+        document.dispatchEvent(new CustomEvent('kaichi-ui-ready'));
+    }
+
+    function softRebootToHome() {
+        preloadSoftRebootHome()
+            .then(function (htmlText) {
+                installFetchedHomeDocument(htmlText);
+                return playStartupAudioSoftReboot();
+            })
+            .catch(function (error) {
+                /*
+                   If the soft swap itself fails, always keep the site usable.
+                   Fall back to the original hard navigation.
+                */
+                console.warn('Soft reboot failed; using normal navigation.', error);
+                try {
+                    sessionStorage.setItem('kaichi-play-startup-sound', '1');
+                } catch (e) {}
+                window.location.href = 'index.html';
+            });
+    }
+
     function play(audio) {
         if (!audio) return;
         try {
@@ -450,6 +822,10 @@
 
         if (shutdownMenuItem) {
             shutdownMenuItem.addEventListener('click', function () {
+                /*
+                   Must happen inside this actual user click.
+                */
+                armStartupAudioForSoftReboot();
                 playClickSound();
                 beginFakeShutdown();
             });
@@ -521,10 +897,7 @@
         }, 75);
 
         setTimeout(function () {
-            try {
-                sessionStorage.setItem('kaichi-play-startup-sound', '1');
-            } catch (e) {}
-            window.location.href = 'index.html';
+            softRebootToHome();
         }, 6000);
     }
 
@@ -637,6 +1010,12 @@
     function triggerCatCrashShutdown() {
         if (catCrashTriggered) return;
         catCrashTriggered = true;
+
+        /*
+           triggerCatCrashShutdown() is reached synchronously from the
+           user's 30th cat click, so arm the startup audio RIGHT HERE.
+        */
+        armStartupAudioForSoftReboot();
 
         // Play the dedicated x30 SE at the exact start of the rush.
         // This is called synchronously from the user's 30th cat click.
