@@ -26,7 +26,13 @@
 
     var mouseClickSound = createAudio('Sound/MouseClick.mp3');
     var shutdownSound = createAudio('Sound/shutdown2.mp3');
+
+    // Startup sequence:
+    // silence.mp3 (0.1 sec / near-silent) -> windows.mp3
+    // The primer is intended to absorb devices that clip / mute the first playback.
+    var startupPrimerSound = createAudio('Sound/silence.mp3');
     var startupSound = createAudio('Sound/windows.mp3');
+
     var catSound = createAudio('Sound/CatMeow.mp3');
     var catErrorSound = createAudio('Sound/Error_2.mp3');
     var catCrashSound = createAudio('Sound/Nyancat_x30.mp3');
@@ -524,28 +530,107 @@
 
     function playStartupSoundAfterReboot() {
         var shouldPlay = false;
+
         try {
             shouldPlay = sessionStorage.getItem('kaichi-play-startup-sound') === '1';
-            if (shouldPlay) sessionStorage.removeItem('kaichi-play-startup-sound');
+            if (shouldPlay) {
+                sessionStorage.removeItem('kaichi-play-startup-sound');
+            }
         } catch (e) {}
 
         if (!shouldPlay || !startupSound) return;
 
-        try {
-            startupSound.currentTime = 0;
-            var p = startupSound.play();
-            if (p && typeof p.catch === 'function') {
-                p.catch(function () {
-                    var retry = function () {
-                        play(startupSound);
-                        document.removeEventListener('pointerdown', retry);
-                        document.removeEventListener('keydown', retry);
-                    };
-                    document.addEventListener('pointerdown', retry, { once: true });
-                    document.addEventListener('keydown', retry, { once: true });
-                });
+        var retryInstalled = false;
+
+        function removeRetryListeners() {
+            document.removeEventListener('pointerdown', retryFromGesture);
+            document.removeEventListener('keydown', retryFromGesture);
+        }
+
+        function installRetryListeners() {
+            if (retryInstalled) return;
+            retryInstalled = true;
+
+            document.addEventListener('pointerdown', retryFromGesture, { once: true });
+            document.addEventListener('keydown', retryFromGesture, { once: true });
+        }
+
+        function playWindowsSound() {
+            try {
+                startupSound.currentTime = 0;
+
+                var startupPromise = startupSound.play();
+
+                if (startupPromise && typeof startupPromise.then === 'function') {
+                    startupPromise
+                        .then(function () {
+                            removeRetryListeners();
+                        })
+                        .catch(function () {
+                            installRetryListeners();
+                        });
+                }
+            } catch (e) {
+                installRetryListeners();
             }
-        } catch (e) {}
+        }
+
+        function playStartupSequence() {
+            /*
+               First consume the device's "first playback" with the 0.1 sec
+               near-silent file. As soon as it finishes, play windows.mp3.
+            */
+            if (!startupPrimerSound) {
+                playWindowsSound();
+                return;
+            }
+
+            var sequenceFinished = false;
+
+            function continueToWindows() {
+                if (sequenceFinished) return;
+                sequenceFinished = true;
+
+                startupPrimerSound.removeEventListener('ended', continueToWindows);
+                startupPrimerSound.removeEventListener('error', continueToWindows);
+
+                playWindowsSound();
+            }
+
+            try {
+                startupPrimerSound.pause();
+                startupPrimerSound.currentTime = 0;
+                startupPrimerSound.loop = false;
+
+                startupPrimerSound.addEventListener('ended', continueToWindows, { once: true });
+                startupPrimerSound.addEventListener('error', continueToWindows, { once: true });
+
+                var primerPromise = startupPrimerSound.play();
+
+                if (primerPromise && typeof primerPromise.catch === 'function') {
+                    primerPromise.catch(function () {
+                        /*
+                           If autoplay itself is blocked, windows.mp3 would also
+                           be blocked. Retry the whole primer -> startup sequence
+                           on the user's next interaction.
+                        */
+                        startupPrimerSound.removeEventListener('ended', continueToWindows);
+                        startupPrimerSound.removeEventListener('error', continueToWindows);
+                        installRetryListeners();
+                    });
+                }
+            } catch (e) {
+                installRetryListeners();
+            }
+        }
+
+        function retryFromGesture() {
+            retryInstalled = false;
+            removeRetryListeners();
+            playStartupSequence();
+        }
+
+        playStartupSequence();
     }
 
 
