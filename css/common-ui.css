@@ -550,6 +550,26 @@
             
             #win-profile { width: 200px !important; }
             #win-counter { width: 250px !important; max-width: 88vw !important; }
+
+            /* Visitor Counter: smartphone sizing */
+            #win-counter .window-contents {
+                padding: 9px 12px 10px;
+            }
+            .visitor-counter-line {
+                margin: 1px 0 6px;
+                font-size: 12px;
+            }
+            .visitor-counter-display {
+                min-width: 145px;
+                padding: 4px 7px 5px;
+                font-size: 20px;
+                letter-spacing: 2px;
+            }
+            .visitor-counter-suffix {
+                margin-top: 6px;
+                font-size: 12px;
+            }
+
             #win-phalux { width: 45% !important; max-width: 160px !important; }
             #win-social { width: 90% !important; max-width: 350px !important; }
             #win-spotify { width: 92% !important; max-width: 360px !important; }
@@ -644,15 +664,13 @@
         }
 
         @keyframes nyan-cat-crash-desktop {
-    from {
-        width: 4px;
-        transform: translate(-50%, -50%) rotate(0deg);
-    }
-    to {
-        width: 128vw;
-        transform: translate(-50%, -50%) rotate(1440deg);
-    }
-}
+            from {
+                transform: translate(-50%, -50%) rotate(0deg) scale(0.18);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(1440deg) scale(80);
+            }
+        }
 
         /*
            Mobile uses width instead of a fixed scale value.
@@ -665,7 +683,7 @@
                 transform: translate(-50%, -50%) rotate(0deg);
             }
             to {
-                width: 128vw;
+                width: 108vw;
                 transform: translate(-50%, -50%) rotate(1440deg);
             }
         }
