@@ -665,9 +665,22 @@
         };
 
         /*
-         * common-ui.js fires this after its Windows UI is ready.
-         * Start the sheet request at that point so dynamically created
-         * windows can immediately join the common window/taskbar system.
+         * Start fetching the spreadsheet IMMEDIATELY.
+         *
+         * We no longer wait for common-ui.js to finish initializing.
+         * This lets the spreadsheet request run in parallel with the rest
+         * of the page load, so jacket-image URLs become available sooner.
+         *
+         * If the sheet finishes before common-ui.js, the generated windows
+         * are already present when common-ui initializes.
+         * If common-ui.js finishes first, refreshDiscographyWindows()
+         * registers the dynamically generated windows afterward.
+         */
+        loadDiscographyFromSheet();
+
+        /*
+         * Safety fallback only. Normally the request has already started,
+         * so loadDiscographyFromSheet() immediately returns here.
          */
         document.addEventListener('kaichi-ui-ready', function () {
             loadDiscographyFromSheet();
