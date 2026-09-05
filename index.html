@@ -15,8 +15,10 @@
     <title>Kaichi Guitar Music</title>
     <link rel="icon" href="images/card-image.jpg" type="image/jpg">
         <link rel="stylesheet" href="css/common-ui.css">
+    <link rel="stylesheet" href="css/room-view.css" id="room-view-styles">
 </head>
 <body id="win95-desktop">
+    <div id="desktop-surface">
     <h1 class="header-title">Kaichi Guitar Music</h1>
 
     <div id="common-nav"></div>
@@ -99,7 +101,28 @@
 
     
 
+    </div>
+    <button type="button" id="room-view-toggle" class="win95-btn" aria-haspopup="dialog">部屋を見渡す</button>
     <script>
+        // Also runs after the shared UI's soft reboot, which skips external scripts.
+        document.addEventListener('kaichi-ui-ready', function () {
+            if (!document.getElementById('room-view-styles')) {
+                var css = document.createElement('link');
+                css.id = 'room-view-styles';
+                css.rel = 'stylesheet';
+                css.href = 'css/room-view.css';
+                document.head.appendChild(css);
+            }
+            if (window.KaichiRoomView) {
+                window.KaichiRoomView.init();
+            } else if (!document.getElementById('room-view-script')) {
+                var js = document.createElement('script');
+                js.id = 'room-view-script';
+                js.src = 'js/room-view.js';
+                document.head.appendChild(js);
+            }
+        });
+
         function setInitialPositions() {
             var isMobile = window.matchMedia("(max-width: 800px)").matches;
             var profile = document.getElementById('win-profile');

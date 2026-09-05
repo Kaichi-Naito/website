@@ -1,0 +1,114 @@
+/* Home only: display:contents leaves the original desktop layout untouched. */
+#desktop-surface { display: contents; }
+#room-view-toggle {
+    position: fixed;
+    right: 12px;
+    bottom: calc(44px + env(safe-area-inset-bottom));
+    z-index: 60001;
+    font: 14px 'PixelMplus', sans-serif;
+    min-height: 40px;
+}
+#room-view-toggle:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+#room-view-dialog {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    padding: 0;
+    border: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    overflow: hidden;
+    background: transparent;
+    color: #eee;
+    touch-action: none;
+    overscroll-behavior: none;
+}
+#room-view-dialog::backdrop { background: transparent; }
+#room-view-scene {
+    position: fixed;
+    inset: 0;
+    z-index: 61000;
+    overflow: hidden;
+    background: #080908;
+    pointer-events: none;
+}
+#room-view-scene[hidden] { display: none; }
+#room-view-photo {
+    position: absolute;
+    left: 0;
+    top: 0;
+    max-width: none;
+    transform-origin: 0 0;
+    will-change: transform;
+}
+.room-view-open #desktop-surface,
+.room-view-open #common-ui-root {
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--room-desktop-width);
+    height: var(--room-desktop-height);
+    box-sizing: border-box;
+    transform-origin: 0 0;
+    transform: var(--room-screen-transform);
+    clip-path: inset(0 round 1.5% / 2%);
+    overflow: hidden;
+    pointer-events: none;
+    will-change: transform;
+}
+.room-view-open #desktop-surface {
+    z-index: 61001;
+    padding-top: 20px;
+    background: #008080 url('../images/windows-95-background.jpg') center / cover no-repeat;
+    filter: brightness(.9) saturate(.9);
+}
+.room-view-open #common-ui-root { z-index: 61002; }
+.room-view-open #common-ui-root .footer { display: none; }
+.room-view-open > #room-view-toggle,
+.room-view-open > img { visibility: hidden; }
+.room-view-controls {
+    position: absolute;
+    inset: max(18px, env(safe-area-inset-top)) 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font: 14px/1.5 sans-serif;
+    text-shadow: 0 1px 4px #000;
+}
+.room-view-controls p { margin: 0; }
+#room-view-return {
+    flex-shrink: 0;
+    min-height: 44px;
+    border: 1px solid #ffffff70;
+    border-radius: 3px;
+    background: #101210d9;
+    color: #fff;
+    padding: 10px 16px;
+    font: inherit;
+    cursor: pointer;
+}
+#room-view-return:focus-visible { outline: 2px solid white; outline-offset: 4px; }
+#room-view-screen-hit {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: 0 0;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    cursor: zoom-in;
+}
+#room-view-screen-hit:focus-visible { outline: 5px solid #b6d9ff; outline-offset: -5px; }
+@media (max-width: 600px) {
+    .room-view-controls { inset-inline: 14px; align-items: flex-start; }
+    .room-view-controls p { max-width: 13em; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #room-view-photo, .room-view-open #desktop-surface,
+    .room-view-open #common-ui-root { will-change: auto; }
+}
