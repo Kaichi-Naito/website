@@ -119,6 +119,7 @@
             await animateView(true);
         } catch (error) {
             if (active) restore();
+            photo.removeAttribute('src');
             toggle.textContent = '読み込めませんでした · 再試行';
             console.warn('Room view could not be opened.', error);
             return;
