@@ -43,10 +43,10 @@
         var mobile = isMobileRoom();
         var imageWidth = mobile ? 941 : 2014;
         var imageHeight = mobile ? 1672 : 1321;
-        var screenLeft = mobile ? 369 : 650;
-        var screenTop = mobile ? 571 : 400;
-        var screenRight = mobile ? 576 : 1333;
-        var screenBottom = mobile ? 855 : 878;
+        var screenLeft = mobile ? 374 : 650;
+        var screenTop = mobile ? 579 : 400;
+        var screenRight = mobile ? 574 : 1333;
+        var screenBottom = mobile ? 858 : 878;
         var scale;
 
         if (mobile) {
