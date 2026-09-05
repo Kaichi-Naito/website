@@ -4,7 +4,7 @@
     var active = false;
     var busy = false;
     var frame = 0;
-    var surface, shared, dialog, scene, photo, hit, toggle, back;
+    var surface, shared, dialog, scene, photo, hit, toggle;
     var savedScroll = 0;
     var savedOverflow = '';
     var desktopWidth = 0, desktopHeight = 0;
@@ -115,7 +115,6 @@
             updateSize();
             // Native modal provides focus trapping and makes the desktop inert.
             dialog.showModal();
-            back.focus({ preventScroll: true });
             await animateView(true);
         } catch (error) {
             if (active) restore();
@@ -205,13 +204,10 @@
         dialog.id = 'room-view-dialog';
         dialog.setAttribute('aria-label', '薄暗い部屋からPCを見る');
         dialog.innerHTML = '<button type="button" id="room-view-screen-hit" aria-label="PC画面に戻る"></button>' +
-            '<div class="room-view-controls"><p>マウス・ドラッグで見渡す<br>画面を押すとPCに戻ります</p>' +
-            '<button type="button" id="room-view-return">PC画面に戻る</button></div>';
+            '<div class="room-view-controls"><p>マウス・ドラッグで見渡す<br>画面を押すとPCに戻ります</p></div>';
         document.body.appendChild(dialog);
         hit = document.getElementById('room-view-screen-hit');
-        back = document.getElementById('room-view-return');
         toggle.addEventListener('click', enter);
-        back.addEventListener('click', leave);
         // Avoid treating a touch look-around gesture as a click on the monitor.
         var startX = 0, startY = 0, dragged = false;
         dialog.addEventListener('pointerdown', function (e) {
