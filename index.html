@@ -15,7 +15,7 @@
     <title>Kaichi Guitar Music</title>
     <link rel="icon" href="images/card-image.jpg" type="image/jpg">
         <link rel="stylesheet" href="css/common-ui.css">
-    <link rel="stylesheet" href="css/room-view.css" id="room-view-styles">
+    <link rel="stylesheet" href="css/room-view.css?v=20260906-0803" id="room-view-styles">
 </head>
 <body id="win95-desktop">
     <div id="desktop-surface">
@@ -102,7 +102,7 @@
     
 
     </div>
-    <button type="button" id="room-view-toggle" class="win95-btn" aria-haspopup="dialog">部屋を見渡す</button>
+    <button type="button" id="room-view-toggle" class="win95-btn" aria-haspopup="dialog" aria-label="部屋を見渡す" title="部屋を見渡す">部屋を見渡す</button>
     <script>
         // Also runs after the shared UI's soft reboot, which skips external scripts.
         document.addEventListener('kaichi-ui-ready', function () {
@@ -110,7 +110,7 @@
                 var css = document.createElement('link');
                 css.id = 'room-view-styles';
                 css.rel = 'stylesheet';
-                css.href = 'css/room-view.css';
+                css.href = 'css/room-view.css?v=20260906-0803';
                 document.head.appendChild(css);
             }
             if (window.KaichiRoomView) {
