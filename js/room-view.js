@@ -43,10 +43,10 @@
         var mobile = isMobileRoom();
         var imageWidth = mobile ? 941 : 2014;
         var imageHeight = mobile ? 1672 : 1321;
-        var screenLeft = mobile ? 374 : 650;
-        var screenTop = mobile ? 579 : 400;
-        var screenRight = mobile ? 574 : 1333;
-        var screenBottom = mobile ? 858 : 878;
+        var screenLeft = mobile ? 379 : 650;
+        var screenTop = mobile ? 578 : 400;
+        var screenRight = mobile ? 576 : 1333;
+        var screenBottom = mobile ? 859 : 878;
         var scale;
 
         if (mobile) {
@@ -237,8 +237,7 @@
         dialog = document.createElement('dialog');
         dialog.id = 'room-view-dialog';
         dialog.setAttribute('aria-label', '薄暗い部屋からPCを見る');
-        dialog.innerHTML = '<button type="button" id="room-view-screen-hit" aria-label="PC画面に戻る"></button>' +
-            '<div class="room-view-controls"><p>マウス・ドラッグで見渡す<br>画面を押すとPCに戻ります</p></div>';
+        dialog.innerHTML = '<button type="button" id="room-view-screen-hit" aria-label="PC画面に戻る"></button>';
         document.body.appendChild(dialog);
         hit = document.getElementById('room-view-screen-hit');
         toggle.addEventListener('click', enter);
