@@ -57,8 +57,8 @@
         var scale;
 
         if (mobile) {
-            // Fill the portrait viewport without stretching the supplied image.
-            scale = Math.max(w / imageWidth, h / imageHeight);
+            // Bring the phone closer while preserving the supplied image's aspect ratio.
+            scale = Math.max(w / imageWidth, h / imageHeight) * 1.2;
         } else {
             // Preserve the existing desktop behavior exactly.
             scale = Math.min(Math.max(w / imageWidth, h / imageHeight) * 1.04, w * .9 / 685);
