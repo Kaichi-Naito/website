@@ -105,6 +105,18 @@
 }
 #room-view-screen-hit:focus-visible { outline: 5px solid #b6d9ff; outline-offset: -5px; }
 @media (max-width: 600px) {
+    #room-view-toggle {
+        right: 6px;
+        bottom: calc(36px + env(safe-area-inset-bottom));
+        min-height: 30px;
+        margin: 2px;
+        padding: 3px 7px;
+        font-size: 11px;
+        line-height: 1.15;
+    }
+    #room-view-toggle:active {
+        padding: 4px 6px 2px 8px;
+    }
     .room-view-controls { inset-inline: 14px; align-items: flex-start; }
     .room-view-controls p { max-width: 13em; }
 }
