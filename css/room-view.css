@@ -1,14 +1,31 @@
 /* Home only: display:contents leaves the original desktop layout untouched. */
 #desktop-surface { display: contents; }
+
+/* A small Windows-era eye icon instead of a text button. */
 #room-view-toggle {
     position: fixed;
     right: 12px;
     bottom: calc(44px + env(safe-area-inset-bottom));
     z-index: 60001;
-    font: 14px 'PixelMplus', sans-serif;
-    min-height: 40px;
+    width: 44px;
+    height: 38px;
+    min-width: 44px;
+    min-height: 38px;
+    padding: 0;
+    overflow: hidden;
+    text-indent: -9999px;
+    white-space: nowrap;
+    background-color: #c0c0c0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='18' viewBox='0 0 24 18'%3E%3Cpath d='M2 9c2.8-4 6-6 10-6s7.2 2 10 6c-2.8 4-6 6-10 6S4.8 13 2 9Z' fill='none' stroke='%23111' stroke-width='2'/%3E%3Ccircle cx='12' cy='9' r='3' fill='%23111'/%3E%3C/svg%3E");
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
 }
+#room-view-toggle:hover { background-color: #d4d0c8; }
+#room-view-toggle:active { background-position: calc(50% + 1px) calc(50% + 1px); }
+#room-view-toggle:disabled { cursor: wait; opacity: .65; }
 #room-view-toggle:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
 #room-view-dialog {
     position: fixed;
     inset: 0;
@@ -25,8 +42,11 @@
     color: #eee;
     touch-action: none;
     overscroll-behavior: none;
+    cursor: grab;
 }
+#room-view-dialog.is-dragging { cursor: grabbing; }
 #room-view-dialog::backdrop { background: transparent; }
+
 #room-view-scene {
     position: fixed;
     inset: 0;
@@ -41,9 +61,14 @@
     left: 0;
     top: 0;
     max-width: none;
+    width: 1672px;
+    height: 941px;
     transform-origin: 0 0;
-    will-change: transform;
+    user-select: none;
+    -webkit-user-drag: none;
+    will-change: transform, opacity;
 }
+
 .room-view-open #desktop-surface,
 .room-view-open #common-ui-root {
     display: block;
@@ -55,10 +80,10 @@
     box-sizing: border-box;
     transform-origin: 0 0;
     transform: var(--room-screen-transform);
-    clip-path: inset(0 round 1.5% / 2%);
+    clip-path: var(--room-screen-clip);
     overflow: hidden;
     pointer-events: none;
-    will-change: transform;
+    will-change: transform, clip-path;
 }
 .room-view-open #desktop-surface {
     z-index: 61001;
@@ -70,29 +95,19 @@
 .room-view-open #common-ui-root .footer { display: none; }
 .room-view-open > #room-view-toggle,
 .room-view-open > img { visibility: hidden; }
-.room-view-controls {
+
+.room-view-hint {
     position: absolute;
-    inset: max(18px, env(safe-area-inset-top)) 20px auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    font: 14px/1.5 sans-serif;
-    text-shadow: 0 1px 4px #000;
+    left: max(18px, env(safe-area-inset-left));
+    top: max(16px, env(safe-area-inset-top));
+    margin: 0;
+    color: rgba(255,255,255,.72);
+    font: 12px/1.55 sans-serif;
+    letter-spacing: .02em;
+    text-shadow: 0 1px 4px #000, 0 0 12px #000;
+    pointer-events: none;
+    user-select: none;
 }
-.room-view-controls p { margin: 0; }
-#room-view-return {
-    flex-shrink: 0;
-    min-height: 44px;
-    border: 1px solid #ffffff70;
-    border-radius: 3px;
-    background: #101210d9;
-    color: #fff;
-    padding: 10px 16px;
-    font: inherit;
-    cursor: pointer;
-}
-#room-view-return:focus-visible { outline: 2px solid white; outline-offset: 4px; }
 #room-view-screen-hit {
     position: absolute;
     left: 0;
@@ -103,12 +118,21 @@
     padding: 0;
     cursor: zoom-in;
 }
-#room-view-screen-hit:focus-visible { outline: 5px solid #b6d9ff; outline-offset: -5px; }
+#room-view-screen-hit:focus-visible { outline: 4px solid rgba(182,217,255,.75); outline-offset: -5px; }
+#room-view-dialog.is-dragging #room-view-screen-hit { cursor: grabbing; }
+
 @media (max-width: 600px) {
-    .room-view-controls { inset-inline: 14px; align-items: flex-start; }
-    .room-view-controls p { max-width: 13em; }
+    #room-view-toggle {
+        right: 10px;
+        bottom: calc(42px + env(safe-area-inset-bottom));
+        width: 42px;
+        height: 36px;
+    }
+    .room-view-hint { font-size: 11px; }
 }
+
 @media (prefers-reduced-motion: reduce) {
-    #room-view-photo, .room-view-open #desktop-surface,
+    #room-view-photo,
+    .room-view-open #desktop-surface,
     .room-view-open #common-ui-root { will-change: auto; }
 }
