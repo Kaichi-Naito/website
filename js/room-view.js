@@ -43,10 +43,17 @@
         var mobile = isMobileRoom();
         var imageWidth = mobile ? 941 : 2014;
         var imageHeight = mobile ? 1672 : 1321;
-        var screenLeft = mobile ? 379 : 650;
-        var screenTop = mobile ? 578 : 400;
-        var screenRight = mobile ? 576 : 1333;
-        var screenBottom = mobile ? 859 : 878;
+        var screenPoints = mobile ? [
+            [379, 578],
+            [576, 582],
+            [572, 860],
+            [375, 856]
+        ] : [
+            [650, 400],
+            [1333, 400],
+            [1333, 878],
+            [650, 878]
+        ];
         var scale;
 
         if (mobile) {
@@ -59,17 +66,14 @@
 
         var x = (w - imageWidth * scale) / 2 + currentX;
         var y = (h - imageHeight * scale) / 2 + currentY;
-        var points = [
-            [screenLeft, screenTop],
-            [screenRight, screenTop],
-            [screenRight, screenBottom],
-            [screenLeft, screenBottom]
-        ].map(function (p) {
+        var points = screenPoints.map(function (p) {
             return [x + p[0] * scale, y + p[1] * scale];
         });
         var matrix = screenMatrix(points, desktopWidth, desktopHeight);
-        var screenWidth = screenRight - screenLeft;
-        var screenHeight = screenBottom - screenTop;
+        var screenLeft = screenPoints[0][0];
+        var screenTop = screenPoints[0][1];
+        var screenWidth = screenPoints[1][0] - screenPoints[0][0];
+        var screenHeight = screenPoints[3][1] - screenPoints[0][1];
 
         return {
             matrix: matrix,
