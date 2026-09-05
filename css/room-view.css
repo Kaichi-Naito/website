@@ -5,8 +5,33 @@
     right: 12px;
     bottom: calc(44px + env(safe-area-inset-bottom));
     z-index: 60001;
-    font: 14px 'PixelMplus', sans-serif;
-    min-height: 40px;
+    width: 36px;
+    min-width: 36px;
+    height: 32px;
+    min-height: 32px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-size: 0;
+    line-height: 0;
+    color: transparent;
+    text-indent: -9999px;
+    cursor: pointer;
+}
+#room-view-toggle::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 21px;
+    height: 14px;
+    transform: translate(-50%, -50%);
+    background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 16'%3E%3Cpath d='M1 8C4 4 7 2 12 2s8 2 11 6c-3 4-6 6-11 6S4 12 1 8Z' fill='none' stroke='%23111' stroke-width='2' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='8' r='3' fill='%23111'/%3E%3C/svg%3E");
+    image-rendering: pixelated;
+}
+#room-view-toggle:active { padding: 0; }
+#room-view-toggle:active::before {
+    transform: translate(calc(-50% + 1px), calc(-50% + 1px));
 }
 #room-view-toggle:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 #room-view-dialog {
@@ -85,16 +110,18 @@
     #room-view-toggle {
         right: 4px;
         bottom: calc(34px + env(safe-area-inset-bottom));
-        min-width: 0;
-        min-height: 22px;
+        width: 30px;
+        min-width: 30px;
+        height: 26px;
+        min-height: 26px;
         margin: 0;
-        padding: 1px 4px;
-        font-size: 9px;
-        line-height: 1;
+        padding: 0;
     }
-    #room-view-toggle:active {
-        padding: 2px 3px 0 5px;
+    #room-view-toggle::before {
+        width: 18px;
+        height: 12px;
     }
+    #room-view-toggle:active { padding: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
     #room-view-photo, .room-view-open #desktop-surface,
