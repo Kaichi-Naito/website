@@ -11,11 +11,15 @@
     var lookX = 0, lookY = 0, currentX = 0, currentY = 0;
     var animations = [];
     var motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    var imageURL = new URL('../images/liminal-room.png', document.currentScript.src).href;
+    var desktopImageURL = new URL('../images/liminal-room.png', document.currentScript.src).href;
+    var mobileImageURL = new URL('../images/liminal-room-mobile.png', document.currentScript.src).href;
     var identity = 'matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1)';
 
-    // Map the existing viewport to the four corners of the photographed CRT.
-    // A projective mapping keeps the desktop attached to its slightly tapered glass.
+    function isMobileRoom() {
+        return window.matchMedia('(max-width: 600px)').matches;
+    }
+
+    // Map the existing viewport to the four corners of the photographed screen.
     function screenMatrix(points, width, height) {
         var p0 = points[0], p1 = points[1], p2 = points[2], p3 = points[3];
         var dx1 = p1[0] - p2[0], dx2 = p3[0] - p2[0];
@@ -36,19 +40,45 @@
 
     function geometry() {
         var w = window.innerWidth, h = window.innerHeight;
-        // Keep the monitor entirely visible in portrait orientation, too.
-        var scale = Math.min(Math.max(w / 2014, h / 1321) * 1.04, w * .9 / 685);
-        var x = (w - 2014 * scale) / 2 + currentX;
-        var y = (h - 1321 * scale) / 2 + currentY;
-        var points = [[664, 400], [1330, 400], [1333, 878], [650, 878]].map(function (p) {
+        var mobile = isMobileRoom();
+        var imageWidth = mobile ? 941 : 2014;
+        var imageHeight = mobile ? 1672 : 1321;
+        var screenLeft = mobile ? 369 : 650;
+        var screenTop = mobile ? 571 : 400;
+        var screenRight = mobile ? 576 : 1333;
+        var screenBottom = mobile ? 855 : 878;
+        var scale;
+
+        if (mobile) {
+            // Fill the portrait viewport without stretching the supplied image.
+            scale = Math.max(w / imageWidth, h / imageHeight);
+        } else {
+            // Preserve the existing desktop behavior exactly.
+            scale = Math.min(Math.max(w / imageWidth, h / imageHeight) * 1.04, w * .9 / 685);
+        }
+
+        var x = (w - imageWidth * scale) / 2 + currentX;
+        var y = (h - imageHeight * scale) / 2 + currentY;
+        var points = [
+            [screenLeft, screenTop],
+            [screenRight, screenTop],
+            [screenRight, screenBottom],
+            [screenLeft, screenBottom]
+        ].map(function (p) {
             return [x + p[0] * scale, y + p[1] * scale];
         });
         var matrix = screenMatrix(points, desktopWidth, desktopHeight);
-        return { matrix: matrix,
+        var screenWidth = screenRight - screenLeft;
+        var screenHeight = screenBottom - screenTop;
+
+        return {
+            matrix: matrix,
             photo: 'matrix(' + [scale, 0, 0, scale, x, y].join(',') + ')',
-            // At the beginning of the pull-back the glass fills the viewport.
-            photoNear: 'matrix(' + [desktopWidth / 683, 0, 0, desktopHeight / 478,
-                -650 * desktopWidth / 683, -400 * desktopHeight / 478].join(',') + ')' };
+            // At the beginning of the pull-back the photographed screen fills the viewport.
+            photoNear: 'matrix(' + [desktopWidth / screenWidth, 0, 0, desktopHeight / screenHeight,
+                -screenLeft * desktopWidth / screenWidth,
+                -screenTop * desktopHeight / screenHeight].join(',') + ')'
+        };
     }
 
     function paint() {
@@ -88,6 +118,11 @@
     }
 
     function loadPhoto() {
+        var mobile = isMobileRoom();
+        var nextURL = mobile ? mobileImageURL : desktopImageURL;
+        photo.width = mobile ? 941 : 2014;
+        photo.height = mobile ? 1672 : 1321;
+        if (photo.getAttribute('src') !== nextURL) photo.src = nextURL;
         if (photo.complete && photo.naturalWidth) return Promise.resolve();
         if (photo.decode) return photo.decode();
         return new Promise(function (resolve, reject) {
@@ -102,7 +137,6 @@
         toggle.disabled = true;
         toggle.textContent = '部屋を読み込み中…';
         try {
-            if (!photo.getAttribute('src')) photo.src = imageURL;
             await loadPhoto();
             savedScroll = window.scrollY;
             savedOverflow = document.body.style.overflow;
