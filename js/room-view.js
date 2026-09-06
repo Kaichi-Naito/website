@@ -104,7 +104,7 @@
     }
 
     function animateView(entering) {
-        if (motion.matches || !surface.animate) return Promise.resolve();
+        if (!surface.animate) return Promise.resolve();
         var g = geometry();
         var options = { duration: 1050, easing: 'cubic-bezier(.22,.75,.2,1)', fill: 'forwards' };
         animations = [surface, shared].map(function (element) {
