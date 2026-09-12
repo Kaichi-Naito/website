@@ -1,5 +1,5 @@
 // Standard MIDI Files (type 0/1, PPQ timing); tempo changes from every track are merged.
-export const MIDI_LANES = Object.freeze([60, 62, 64, 65]);
+export const MIDI_LANES = Object.freeze([75, 74, 73, 72]);
 export const HOLD_BEATS = 1; // One quarter note or longer is a hold; shorter notes are taps.
 export function midiToChart(input, base) {
   const data = input instanceof Uint8Array ? input : new Uint8Array(input);
@@ -53,7 +53,7 @@ export function midiToChart(input, base) {
     }
     if(active.size)throw new Error('終わりのないMIDIノートがあります。音符の終端を設定して書き出してください。');
   }
-  if(!pairs.length)throw new Error('60・62・64・65番のMIDIノートが見つかりませんでした。');
+  if(!pairs.length)throw new Error('75・74・73・72番のMIDIノートが見つかりませんでした。');
   // A missing initial tempo uses this song's BPM, and is explicitly reported to the player.
   const hasInitialTempo=tempos.some(e=>e.tick===0);
   const events=[{tick:0,us:60000000/base.bpm,order:-1},...tempos].sort((a,b)=>a.tick-b.tick||a.order-b.order);
@@ -72,5 +72,5 @@ export function midiToChart(input, base) {
   const last=[-1,-1,-1,-1];
   for(const n of notes){if(n.t<last[n.lane]+.02)throw new Error('同じレーンのノーツが重なっているか、間隔が短すぎます（20 ms未満）。');last[n.lane]=n.end??n.t;}
   let hash=2166136261;for(const b of data)hash=Math.imul(hash^b,16777619)>>>0;
-  return {...base,id:`rolling-midi-v1-${hash.toString(16)}`,notes,midi:{ignored,clipped,tempoFallback:!hasInitialTempo},bpm:Math.round(60000000/segments.filter(s=>s.tick===0).at(-1).us*100)/100};
+  return {...base,id:`rolling-midi-v2-${hash.toString(16)}`,notes,midi:{ignored,clipped,tempoFallback:!hasInitialTempo},bpm:Math.round(60000000/segments.filter(s=>s.tick===0).at(-1).us*100)/100};
 }

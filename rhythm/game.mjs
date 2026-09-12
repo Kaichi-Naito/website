@@ -1,34 +1,40 @@
 import { RhythmEngine } from './engine.mjs?v=hold2';
-import { midiToChart } from './midi.mjs';
+import { midiToChart } from './midi.mjs?v=rank3';
+import { Leaderboard } from './leaderboard.mjs?v=rank3';
+import { approachSeconds, tapLevel, readSettings } from './settings.mjs';
 const $ = id => document.getElementById(id);
 const ui = Object.fromEntries(['canvas','stage','score','accuracy','combo','judgment','countdown','overlay','overlay-title','overlay-eyebrow','overlay-description','overlay-foot','start','restart','pause','result','status','progress','elapsed','settings','best-score'].map(id => [id, $(id)]));
 const g = ui.canvas.getContext('2d');
 const buttons = [...document.querySelectorAll('[data-lane]')];
 const colors = ['#7deaff','#7deaff','#ff8dda','#ff8dda'];
 const keyCodes = ['KeyQ','KeyW','KeyE','KeyR'];
-const publishedMidiPath = 'rhythm/charts/rolling.mid';
+const publishedMidiPath = 'rhythm/charts/Rolling_Game.mid';
 const inputSources = [new Set(), new Set(), new Set(), new Set()];
 const flashes = [0,0,0,0];
 let chart, defaultChart, engine, context, gain, buffer, source, tapBuffer, tapGain;
 let tapPromise;
 let mode = 'loading', startAt = 0, resumeAt = 0, frozenTime = -2.5, judgmentUntil = 0;
 let width = 800, height = 600, lastHud = 0, requestId = 0;
-let settings = { speed: 5, offset: 0, volume: 70, tapVolume: 70 };
-const settingsKey = 'kaichi-rhythm-settings-v1';
-const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const settingsKey = 'kaichi-rhythm-settings-v2';
+let savedSettings = {};
 try {
-  const saved = JSON.parse(localStorage.getItem(settingsKey) || '{}');
-  for (const [key,min,max] of [['speed',2,9],['offset',-250,250],['volume',0,100],['tapVolume',0,100]]) {
-    if (Number.isFinite(saved[key])) settings[key] = Math.max(min, Math.min(max, saved[key]));
+  const current = localStorage.getItem(settingsKey);
+  if (current) savedSettings = JSON.parse(current);
+  else {
+    const old = JSON.parse(localStorage.getItem('kaichi-rhythm-settings-v1') || '{}');
+    savedSettings = {offset:old.offset,volume:old.volume};
   }
-} catch { /* Storage may be disabled; gameplay does not depend on it. */ }
+} catch {}
+let settings = readSettings(savedSettings);
+const leaderboard = new Leaderboard();
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 for (const key of ['speed','offset','volume','tapVolume']) {
   $(key).value = settings[key];
   const update = () => {
     settings[key] = Number($(key).value);
     $(`${key}-value`).textContent = key === 'speed' ? settings[key].toFixed(1) : key === 'offset' ? `${settings[key] > 0 ? '+' : ''}${settings[key]} ms` : `${settings[key]}%`;
     if (gain) gain.gain.value = settings.volume / 100;
-    if (tapGain) tapGain.gain.value = settings.tapVolume / 100 * .4;
+    if (tapGain) tapGain.gain.value = tapLevel(settings.tapVolume);
     try { localStorage.setItem(settingsKey, JSON.stringify(settings)); } catch { /* optional */ }
   };
   $(key).addEventListener('input', update); update();
@@ -73,7 +79,7 @@ async function ensureAudioContext() {
     master.threshold.value=-1;master.knee.value=0;master.ratio.value=20;master.attack.value=.001;master.release.value=.06;
     master.connect(context.destination);
     gain = context.createGain(); gain.gain.value = settings.volume / 100; gain.connect(master);
-    tapGain = context.createGain(); tapGain.gain.value = settings.tapVolume / 100 * .4; tapGain.connect(master);
+    tapGain = context.createGain(); tapGain.gain.value = tapLevel(settings.tapVolume); tapGain.connect(master);
     context.addEventListener('statechange', () => { if (context.state !== 'running' && mode === 'playing') pause(); });
   }
   await context.resume();
@@ -108,7 +114,8 @@ function schedule(from, leadIn) {
   startAt = when - playFrom;
   resumeAt = context.currentTime + leadIn;
   source = context.createBufferSource(); source.buffer = buffer; source.connect(gain);
-  source.start(when, playFrom);
+  const remaining = Math.max(0, Math.min(chart.duration, buffer.duration) - playFrom);
+  source.start(when, playFrom, remaining);
   mode = 'playing'; ui.overlay.hidden = true; ui.pause.disabled = false;
   ui.settings.disabled = true; ui.status.textContent = 'PLAYING — Q / W / E / R';
   $('midi-controls').disabled = true;
@@ -123,6 +130,7 @@ async function startGame() {
     await loadAudio();
     if (token !== requestId) return;
     resetInputs(); engine = new RhythmEngine(chart, onJudge);
+    leaderboard.clearResult();
     frozenTime = -2.5; ui.result.hidden = true; ui.restart.hidden = true;
     ui.combo.textContent = ''; ui.judgment.style.opacity = 0; judgmentUntil = 0;
     schedule(-2.5, .10);
@@ -176,7 +184,9 @@ function finish() {
     const row = document.createElement('div'), name = document.createElement('span'), number = document.createElement('b');
     name.textContent = label; number.textContent = value; row.append(name, number); stats.append(row);
   }
-  ui.result.append(stats); ui.status.textContent = 'COMPLETE — おつかれさまでした';
+  ui.result.append(stats);
+  leaderboard.showResult({score:engine.score,accuracy:Number(engine.accuracy.toFixed(2)),maxCombo:engine.maxCombo,units:engine.units,counts:{...engine.counts}});
+  ui.status.textContent = 'COMPLETE — おつかれさまでした';
 }
 function onJudge({ label, lane, delta }) {
   const now = performance.now(); judgmentUntil = now + 550;
@@ -209,7 +219,9 @@ function inputUp(lane, sourceId) {
 window.addEventListener('keydown', event => {
   if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
   const lane = keyCodes.indexOf(event.code);
-  if (event.code === 'Escape') { event.preventDefault(); if (!event.repeat) { if (mode === 'playing') pause(); else if (mode === 'paused') resume(); } return; }
+  const typing = event.target instanceof HTMLElement && (event.target.isContentEditable || event.target.matches('input,textarea,select'));
+  if (typing) return;
+  if (event.code === 'Escape' || event.code === 'Space') { event.preventDefault(); if (!event.repeat) { if (mode === 'playing') pause(); else if (mode === 'paused') resume(); } return; }
   if (lane >= 0 && mode === 'playing') { event.preventDefault(); if (!event.repeat) inputDown(lane, 'keyboard'); }
 });
 window.addEventListener('keyup', event => { const lane = keyCodes.indexOf(event.code); if (lane >= 0) inputUp(lane, 'keyboard'); });
@@ -231,6 +243,7 @@ $('tap-preview').addEventListener('click', async () => {
 });
 function useChart(next, label) {
   ++requestId; stopSource(); resetInputs(); chart = next;
+  leaderboard.clearResult(); leaderboard.setChart(next, label);
   engine = new RhythmEngine(chart,onJudge); frozenTime = -2.5; mode = 'ready';
   ui.settings.disabled = false; ui.pause.disabled = true; $('midi-controls').disabled = false;
   ui.result.hidden = true; ui.restart.hidden = true; ui.countdown.textContent = '';
@@ -267,12 +280,12 @@ async function loadPublishedMidi() {
   $('midi-message').textContent='公開MIDIを確認しています…';
   try {
     const response=await fetch(`${publishedMidiPath}?updated=${Date.now()}`, {cache:'no-store'});
-    if(response.status===404)throw new Error('公開MIDIはまだありません。rhythm/charts/rolling.mid に配置してください。現在の譜面でプレイできます。');
+    if(response.status===404)throw new Error('公開MIDIはまだありません。rhythm/charts/Rolling_Game.mid に配置してください。現在の譜面でプレイできます。');
     if(!response.ok)throw new Error(`公開MIDIを読み込めませんでした（${response.status}）。現在の譜面を維持します。`);
     const bytes=await response.arrayBuffer();
     if(bytes.byteLength>2*1024*1024)throw new Error('MIDIは2 MB以下にしてください。');
     const next=midiToChart(bytes,defaultChart);
-    useChart(next,'rolling.mid（公開MIDI）');
+    useChart(next,'Rolling_Game.mid（公開MIDI）');
     $('midi-message').textContent=midiMessage(next);
   } catch(error) {
     mode=previousMode; ui.start.disabled=previousDisabled;
@@ -306,7 +319,7 @@ function draw(time, now) {
     if (engine?.held[lane]) laneQuad(lane,.1,1.02,lane<2?'#7deaff14':'#ff8dda14');
     if(!reduceMotion && now-flashes[lane]<240){g.globalAlpha=(1-(now-flashes[lane])/240)*.4;laneQuad(lane,.55,1.01,colors[lane]);g.globalAlpha=1;}
   }
-  const approach = 3.8 - settings.speed * .32;
+  const approach = approachSeconds(settings.speed);
   const beat = 60 / (chart?.bpm || 162);
   for (let k=Math.floor(time/beat);k<(time+approach)/beat+1;k++) {
     const d=1-(k*beat-time)/approach;if(d<0||d>1)continue;
@@ -334,7 +347,7 @@ function draw(time, now) {
     }
   }
   const a=point(0,1),b=point(4,1);g.lineWidth=3;g.strokeStyle='#ecf8ff';g.shadowBlur=15;g.shadowColor='#b0d5ff';g.beginPath();g.moveTo(a.x,a.y);g.lineTo(b.x,b.y);g.stroke();g.shadowBlur=0;g.lineWidth=1;
-  g.font='9px Arial';g.fillStyle='#96a3bf';g.textAlign='center';g.fillText('JUDGE LINE',width/2,height*.865);
+  g.font='10px PixelMplus';g.fillStyle='#96a3bf';g.textAlign='center';g.fillText('JUDGE LINE',width/2,height*.865);
 }
 function clockString(time) { time=Math.floor(Math.max(0,time));return `${Math.floor(time/60)}:${String(time%60).padStart(2,'0')}`; }
 function updateHud() {
@@ -354,7 +367,7 @@ function frame(now) {
     if(!resumeCountdown) engine.tick(time);
     const remain=resumeCountdown?resumeAt-context.currentTime:-songTime();
     ui.countdown.textContent=remain>0?String(Math.ceil(remain)):'';
-    if(songTime()>=Math.max(buffer.duration,chart.duration)+.2)finish();
+    if(songTime()>=Math.min(buffer.duration,chart.duration)+.2)finish();
   }
   draw(engine?time:-2.5,now);
   if(now>judgmentUntil)ui.judgment.style.opacity=0;

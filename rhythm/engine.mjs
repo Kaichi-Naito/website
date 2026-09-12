@@ -51,6 +51,7 @@ export class RhythmEngine {
     n.state = 'done';
     this.judge('MISS', n);
   }
-  get score() { return Math.round(this.earned / this.units * 1000000); }
-  get accuracy() { return this.resolved ? this.earned / this.resolved * 100 : 100; }
+  get weightedHits() { return this.counts.PERFECT + this.counts.GREAT * .8 + this.counts.GOOD * .5; }
+  get score() { return Math.round(this.weightedHits / this.units * 1000000); }
+  get accuracy() { return this.resolved ? this.weightedHits / this.resolved * 100 : 100; }
 }

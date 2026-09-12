@@ -1,14 +1,15 @@
 # Rolling — 4-key rhythm game, test version 01
 
 Entry point: `../RhythmGame.html`. The shared site navigation links to the game.
-No backend, build step, external game library, telemetry, or account is required.
+Gameplay needs no build step, external game library, or player account.
+Optional public rankings use the owner's Google Sheet and an Apps Script receiver.
 Serve the repository over HTTP (for example `python -m http.server`); ES modules and
 audio fetching are not supported by opening the HTML as a `file://` URL.
 
 ## Test song and chart
 
-- Source: user-supplied `Rolling_MV_ReMix_fix.wav`, PHALUX.
-- Scope: first 60 seconds. 192 kbps stereo MP3; last 0.4 seconds fade out.
+- Source: user-uploaded `rhythm/Rolling_Game.mp3`, PHALUX.
+- Scope: first 60 seconds. Playback stops at the test boundary even for a longer MP3.
 - Timing: 162 BPM, refined against spectral onset measurements of the source WAV.
 - Chart: `rolling-chart.json`, explicit time in seconds, lane 0–3 = Q/W/E/R.
   Optional `end` is a hold's end timestamp. Times are relative to the audio start.
@@ -34,9 +35,13 @@ audio fetching are not supported by opening the HTML as a `file://` URL.
   toward duration; late input must still sustain for the full 80% duration.
   Completion removes the note from the stage. Best scores use a new ruleset key.
 - Missing notes never ends a song early. Score is normalized to 1,000,000.
-- Escape/pause, tab hiding, and focus loss pause the audio and chart. Resume gives
+- Space/Escape/pause, tab hiding, and focus loss pause the audio and chart. Resume gives
   a countdown; a hold in progress can be re-gripped before the timeline resumes.
 - Speed, offset, volume, and personal best are stored locally when storage is available.
+- Speed defaults to 8, at the midpoint of the 2–14 slider. This matches old speed 8.
+  The range is exponential around that point to remain playable at both extremes.
+- Tap volume defaults to 70%, with gain .6 (150% of the old 100% gain .4).
+  The new settings version resets speed/tap defaults but preserves music volume and offset.
 
 ## User MIDI charts and tap sound
 
@@ -44,7 +49,7 @@ The page accepts `.mid`/`.midi` files locally through MY MIDI CHART. File conten
 are parsed in the browser; choosing a file does not upload it or replace the
 public chart. The same local file can be selected again after each REAPER export.
 
-The public chart has one fixed location: **`rhythm/charts/rolling.mid`**.
+The public chart has one fixed location: **`rhythm/charts/Rolling_Game.mid`**.
 The page automatically checks it at startup. Upload/replace this file on `main`
 and wait for GitHub Pages deployment, then use **公開MIDIを再読み込み**.
 Each request bypasses browser cache and uses a fresh URL. If the MIDI is absent,
@@ -52,8 +57,8 @@ the generated test chart is used. Reload failures preserve the selected chart
 and display the error. Local MIDI import remains available without deployment.
 See `charts/README.md` for the REAPER/update workflow in Japanese.
 
-- MIDI note numbers **60, 62, 64, 65** map to **Q, W, E, R** respectively.
-  These are C/D/E/F starting at middle C. Octave labels vary by DAW settings;
+- MIDI note numbers **75, 74, 73, 72** map to **Q, W, E, R** respectively.
+  These are D♯/D/C♯/C, one octave above middle C. Octave labels vary by DAW settings;
   the numbers are authoritative. Other pitches are ignored and reported.
 - Note-on sets the hit time. Notes shorter than one quarter note are taps.
   Notes at least one quarter note long are holds; note-off defines their visual
@@ -76,6 +81,16 @@ See `charts/README.md` for the REAPER/update workflow in Japanese.
   are separate from music volume. The output limiter controls overlapping peaks.
 
 Run `node --test rhythm/*.test.mjs` to include MIDI parsing and tempo-map tests.
+
+## Public rankings
+
+The separate ranking window appears to the right on desktop (1000px and wider),
+and below on narrow/mobile screens. It lists the selected chart's top 20 scores.
+Each completed play offers a name field and an explicit skip button. Submission
+is optional, confirmed by the server, and uses an idempotent play ID for retries.
+Chart contents are hashed with SHA-256 so different arrangements are not mixed.
+See `ranking/README.md` for the one-time Google Apps Script deployment and
+`設定!B2` endpoint configuration in the original ranking spreadsheet.
 
 ## Verification
 
