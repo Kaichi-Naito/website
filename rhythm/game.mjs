@@ -1,4 +1,4 @@
-import { RhythmEngine } from './engine.mjs?v=hold2';
+import { RhythmEngine } from './engine.mjs?v=rank3';
 import { midiToChart } from './midi.mjs?v=rank3';
 import { Leaderboard } from './leaderboard.mjs?v=rank3';
 import { approachSeconds, tapLevel, readSettings } from './settings.mjs';
@@ -102,7 +102,7 @@ async function loadAudio() {
   await ensureAudioContext();
   await loadTap();
   if (!buffer) {
-    const response = await fetch(chart.audio);
+    const response = await fetch(chart.audio, {cache:'no-cache'});
     if (!response.ok) throw new Error(`音源を読み込めませんでした（${response.status}）。`);
     buffer = await context.decodeAudioData(await response.arrayBuffer());
   }
@@ -377,7 +377,7 @@ function frame(now) {
 async function loadChart() {
   try {
     mode='loading';ui.start.disabled=true;
-    const response=await fetch('rhythm/rolling-chart.json');
+    const response=await fetch('rhythm/rolling-chart.json', {cache:'no-store'});
     if(!response.ok)throw new Error(`譜面を読み込めませんでした（${response.status}）。`);
     defaultChart=await response.json();
     useChart(defaultChart,'テスト譜面');
