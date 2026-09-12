@@ -624,7 +624,12 @@
                 'Apple Music'
             );
 
-            appendTextLink(links, item.youtube, 'YouTube', 'youtube-link');
+            appendPlatformLink(
+                links,
+                item.youtube,
+                'https://kaichi-naito.github.io/website/images/Youtube_dot_logo.png',
+                'YouTube'
+            );
 
             if (links.childNodes.length > 0) {
                 info.appendChild(links);
