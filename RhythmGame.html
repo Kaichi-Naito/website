@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="PHALUXのRollingで遊べる、Q・W・E・Rの4キー音楽ゲーム。">
+  <title>Rolling / Rhythm Game — Kaichi Guitar Music</title>
+  <link rel="icon" href="rhythm/game-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="rhythm/game.css">
+</head>
+<body>
+  <header class="desktop-header"><a href="index.html">← Kaichi Guitar Music</a><span>GAMES / 001</span></header>
+  <main class="app-window" id="app">
+    <div class="titlebar"><span><img src="rhythm/game-icon.svg" alt=""> Rhythm_Player.exe</span><a href="index.html" aria-label="ホームに戻る" class="close">×</a></div>
+    <div class="menubar"><span>PHALUX MUSIC ARCADE</span><span class="beta">TEST VERSION 01</span></div>
+    <div class="workspace">
+      <aside class="sidebar">
+        <div class="section-label">NOW PLAYING <span>01 / 01</span></div>
+        <div class="artwork"><img src="images/CDjacket/Rolling500x500.png" alt="Rolling ジャケット"><span class="artwork-tag">4 KEYS / 60 SEC DEMO</span></div>
+        <div class="song-heading"><p>PHALUX</p><h1>Rolling<span>♪</span></h1></div>
+        <div class="song-meta"><span>NORMAL</span><span id="bpm">— BPM</span><span>1:00</span></div>
+        <div class="rule"><span class="tiny-label">HOW TO PLAY</span><p>判定ラインに重なったらキーを押す。<br>長いノーツは、終わりまで長押し。</p><div class="mini-keys"><kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd></div></div>
+        <fieldset id="settings"><legend>PLAY SETTINGS</legend>
+          <label for="speed">ノーツ速度 <output id="speed-value">5.0</output></label>
+          <input type="range" id="speed" min="2" max="9" step=".5" value="5">
+          <label for="offset">タイミング調整 <output id="offset-value">0 ms</output></label>
+          <input type="range" id="offset" min="-250" max="250" step="5" value="0" aria-describedby="offset-help">
+          <p class="setting-help" id="offset-help">＋にすると、押すタイミングが遅くなります。</p>
+          <label for="volume">音量 <output id="volume-value">70%</output></label>
+          <input type="range" id="volume" min="0" max="100" step="5" value="70">
+        </fieldset>
+        <p class="best-score">PERSONAL BEST <strong id="best-score">—</strong></p>
+      </aside>
+      <section class="game-area" aria-label="4レーンの音楽ゲーム">
+        <div class="hud"><div><span>SCORE</span><strong id="score">0000000</strong></div><div class="accuracy"><span>ACCURACY</span><strong id="accuracy">100.00<small>%</small></strong></div><button id="pause" class="pause-button" aria-label="一時停止" disabled>Ⅱ</button></div>
+        <div class="stage" id="stage">
+          <canvas id="canvas" aria-label="上からノーツが落ちる4レーン。左からQ、W、E、R。"></canvas>
+          <div class="stage-heading"><span>ROLLING</span><span>PHALUX</span></div>
+          <div class="combo" id="combo"></div>
+          <div class="judgment" id="judgment"></div>
+          <div class="countdown" id="countdown"></div>
+          <div class="key-row" aria-label="タッチ操作用キー"><button data-lane="0" aria-label="Qレーン">Q</button><button data-lane="1" aria-label="Wレーン">W</button><button data-lane="2" aria-label="Eレーン">E</button><button data-lane="3" aria-label="Rレーン">R</button></div>
+          <div class="overlay" id="overlay">
+            <div class="overlay-card" id="overlay-card">
+              <p class="eyebrow" id="overlay-eyebrow">READY TO ROLL?</p>
+              <h2 id="overlay-title">音楽に、飛び込もう。</h2>
+              <p id="overlay-description">Q・W・E・Rに指を置いてスタート。<br>冒頭1分のテスト版。ミスしても続けられます。</p>
+              <div id="result" hidden></div>
+              <button id="start" class="primary-button" disabled>譜面を読み込み中…</button>
+              <button id="restart" class="secondary-button" hidden>最初からやり直す</button>
+              <p class="overlay-foot" id="overlay-foot">PCキーボード推奨 / ヘッドホン推奨</p>
+            </div>
+          </div>
+        </div>
+        <div class="progress-track"><div id="progress"></div></div>
+        <div class="playback-footer"><span id="elapsed">0:00 / 1:00</span><span>ESC 一時停止 <span class="footer-divider">/</span> Q W E R プレイ</span></div>
+      </section>
+    </div>
+    <footer class="statusbar"><span id="status" role="status">譜面を読み込んでいます</span><span>♪ KAICHI GUITAR MUSIC</span></footer>
+  </main>
+  <p class="page-note">譜面 v1：冒頭1分の完成音源からメロディーとリズムを解析したテスト譜面です。</p>
+  <noscript>このゲームを遊ぶにはJavaScriptを有効にしてください。</noscript>
+  <script type="module" src="rhythm/game.mjs"></script>
+</body>
+</html>
