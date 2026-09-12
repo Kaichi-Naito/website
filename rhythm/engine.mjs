@@ -1,5 +1,6 @@
 // All judgment times are seconds on the audio timeline. Rendering never scores notes.
-export const WINDOWS = Object.freeze({ perfect: .045, great: .09, good: .14, release: .10 });
+export const WINDOWS = Object.freeze({ perfect: .045, great: .09, good: .14 });
+export const HOLD_RATIO = .8;
 export class RhythmEngine {
   constructor(chart, onJudge = () => {}) {
     this.notes = chart.notes.map(n => ({ ...n, state: 'pending' }));
@@ -22,8 +23,13 @@ export class RhythmEngine {
       if (n.state === 'pending' && time - n.t > WINDOWS.good) {
         n.state = 'miss'; this.judge('MISS', n);
         if (n.end) this.judge('MISS', n);
-      } else if (n.state === 'holding' && time >= n.end) {
-        n.state = 'done'; this.judge(this.held[n.lane] ? 'PERFECT' : 'MISS', n);
+      } else if (n.state === 'holding') {
+        // Completion measures sustained input, never the timing of key-up.
+        if (!this.held[n.lane]) {
+          n.state = 'done'; this.judge('MISS', n);
+        } else if (time >= n.completeAt - 1e-9) {
+          n.state = 'done'; this.judge('PERFECT', n);
+        }
       }
     }
   }
@@ -34,14 +40,16 @@ export class RhythmEngine {
     if (!n || Math.abs(time - n.t) > WINDOWS.good) return;
     const delta = time - n.t;
     const label = Math.abs(delta) <= WINDOWS.perfect ? 'PERFECT' : Math.abs(delta) <= WINDOWS.great ? 'GREAT' : 'GOOD';
-    n.state = n.end ? 'holding' : 'done'; this.judge(label, n, delta);
+    n.state = n.end ? 'holding' : 'done';
+    if (n.end) n.completeAt = Math.max(time, n.t) + (n.end - n.t) * HOLD_RATIO;
+    this.judge(label, n, delta);
   }
   release(lane, time) {
     this.tick(time); this.held[lane] = false;
     const n = this.lanes[lane].find(n => n.state === 'holding');
     if (!n) return;
     n.state = 'done';
-    this.judge(time >= n.end - WINDOWS.release ? 'PERFECT' : 'MISS', n, time - n.end);
+    this.judge('MISS', n);
   }
   get score() { return Math.round(this.earned / this.units * 1000000); }
   get accuracy() { return this.resolved ? this.earned / this.resolved * 100 : 100; }

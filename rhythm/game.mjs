@@ -1,4 +1,4 @@
-import { RhythmEngine } from './engine.mjs';
+import { RhythmEngine } from './engine.mjs?v=hold2';
 import { midiToChart } from './midi.mjs';
 const $ = id => document.getElementById(id);
 const ui = Object.fromEntries(['canvas','stage','score','accuracy','combo','judgment','countdown','overlay','overlay-title','overlay-eyebrow','overlay-description','overlay-foot','start','restart','pause','result','status','progress','elapsed','settings','best-score'].map(id => [id, $(id)]));
@@ -6,6 +6,7 @@ const g = ui.canvas.getContext('2d');
 const buttons = [...document.querySelectorAll('[data-lane]')];
 const colors = ['#7deaff','#7deaff','#ff8dda','#ff8dda'];
 const keyCodes = ['KeyQ','KeyW','KeyE','KeyR'];
+const publishedMidiPath = 'rhythm/charts/rolling.mid';
 const inputSources = [new Set(), new Set(), new Set(), new Set()];
 const flashes = [0,0,0,0];
 let chart, defaultChart, engine, context, gain, buffer, source, tapBuffer, tapGain;
@@ -32,7 +33,7 @@ for (const key of ['speed','offset','volume','tapVolume']) {
   };
   $(key).addEventListener('input', update); update();
 }
-function bestKey() { return `kaichi-rhythm-best-${chart.id}`; }
+function bestKey() { return `kaichi-rhythm-best-hold80-${chart.id}`; }
 function readBest() { try { return Number(localStorage.getItem(bestKey())) || 0; } catch { return 0; } }
 function bestUI() { const n = readBest(); ui['best-score'].textContent = n ? n.toLocaleString() : '—'; }
 function resetInputs() {
@@ -136,6 +137,7 @@ async function startGame() {
 function pause() {
   if (mode !== 'playing') return;
   frozenTime = Math.max(-2.5, Math.min(songTime(), chart.duration));
+  if (context.currentTime >= resumeAt) engine.tick(frozenTime - settings.offset / 1000);
   mode = 'paused'; stopSource(); resetInputs();
   ui.pause.disabled = true; ui.settings.disabled = false; ui.countdown.textContent = '';
   $('midi-controls').disabled = false;
@@ -154,8 +156,9 @@ async function resume() {
 }
 function finish() {
   if (mode !== 'playing') return;
+  engine.tick(chart.duration + 1);
   frozenTime = chart.duration; mode = 'results'; stopSource(); resetInputs();
-  engine.tick(chart.duration + 1); updateHud();
+  updateHud();
   ui.pause.disabled = true; ui.settings.disabled = false; ui.restart.hidden = true;
   $('midi-controls').disabled = false;
   const best = readBest();
@@ -240,19 +243,43 @@ function useChart(next, label) {
 }
 $('midi-file').addEventListener('change', async event => {
   const file=event.target.files[0];if(!file||!defaultChart)return;
-  const previousDisabled=ui.start.disabled; ui.start.disabled=true; $('midi-controls').disabled=true;
+  const previousMode=mode; mode='loading';
+  const previousDisabled=ui.start.disabled; ui.start.disabled=true; ui.restart.disabled=true; $('midi-controls').disabled=true;
   try {
     if(file.size>2*1024*1024)throw new Error('MIDIは2 MB以下にしてください。');
     const next=midiToChart(await file.arrayBuffer(),defaultChart);
     useChart(next,file.name);
-    const messages=[`${next.notes.length}ノーツを読み込みました。`];
-    if(next.midi.tempoFallback)messages.push('冒頭のテンポ指定がないため162 BPMとして読み込みました。');
-    if(next.midi.ignored)messages.push(`割り当て外の${next.midi.ignored}音は除外しました。`);
-    if(next.midi.clipped)messages.push('1分以降の音符は省略・短縮しました。');
-    $('midi-message').textContent=messages.join(' ');
-  } catch(error) { $('midi-message').textContent=error.message;ui.start.disabled=previousDisabled; }
-  finally { $('midi-controls').disabled=false;event.target.value=''; }
+    $('midi-message').textContent=midiMessage(next);
+  } catch(error) { mode=previousMode; $('midi-message').textContent=error.message;ui.start.disabled=previousDisabled; }
+  finally { $('midi-controls').disabled=false;ui.restart.disabled=false;event.target.value=''; }
 });
+function midiMessage(next) {
+  const messages=[`${next.notes.length}ノーツを読み込みました。`];
+  if(next.midi.tempoFallback)messages.push('冒頭のテンポ指定がないため162 BPMとして読み込みました。');
+  if(next.midi.ignored)messages.push(`割り当て外の${next.midi.ignored}音は除外しました。`);
+  if(next.midi.clipped)messages.push('1分以降の音符は省略・短縮しました。');
+  return messages.join(' ');
+}
+async function loadPublishedMidi() {
+  if (!defaultChart || mode === 'playing') return;
+  const previousMode=mode, previousDisabled=ui.start.disabled;
+  mode='loading'; ui.start.disabled=true; ui.restart.disabled=true; $('midi-controls').disabled=true;
+  $('midi-message').textContent='公開MIDIを確認しています…';
+  try {
+    const response=await fetch(`${publishedMidiPath}?updated=${Date.now()}`, {cache:'no-store'});
+    if(response.status===404)throw new Error('公開MIDIはまだありません。rhythm/charts/rolling.mid に配置してください。現在の譜面でプレイできます。');
+    if(!response.ok)throw new Error(`公開MIDIを読み込めませんでした（${response.status}）。現在の譜面を維持します。`);
+    const bytes=await response.arrayBuffer();
+    if(bytes.byteLength>2*1024*1024)throw new Error('MIDIは2 MB以下にしてください。');
+    const next=midiToChart(bytes,defaultChart);
+    useChart(next,'rolling.mid（公開MIDI）');
+    $('midi-message').textContent=midiMessage(next);
+  } catch(error) {
+    mode=previousMode; ui.start.disabled=previousDisabled;
+    $('midi-message').textContent=error.message;
+  } finally { $('midi-controls').disabled=false; ui.restart.disabled=false; }
+}
+$('midi-reload').addEventListener('click',loadPublishedMidi);
 $('midi-reset').addEventListener('click',()=>{useChart(defaultChart,'テスト譜面');$('midi-message').textContent='';});
 function resize() {
   const r = ui.stage.getBoundingClientRect(); width = r.width; height = r.height;
@@ -339,11 +366,9 @@ async function loadChart() {
     mode='loading';ui.start.disabled=true;
     const response=await fetch('rhythm/rolling-chart.json');
     if(!response.ok)throw new Error(`譜面を読み込めませんでした（${response.status}）。`);
-    chart=await response.json();defaultChart=chart;engine=new RhythmEngine(chart,onJudge);mode='ready';
-    $('midi-controls').disabled=false;
-    $('bpm').textContent=`${chart.bpm} BPM`;bestUI();
-    ui.start.textContent='▶ START GAME';ui.start.disabled=false;
-    ui.status.textContent=`READY — ${chart.notes.length} NOTES / Q W E R`;
+    defaultChart=await response.json();
+    useChart(defaultChart,'テスト譜面');
+    await loadPublishedMidi();
   } catch(error) {mode='error';showOverlay('LOAD ERROR','譜面を読み込めませんでした',error.message,'再読み込み');ui.status.textContent='読み込みエラー';}
 }
 loadChart();resize();requestAnimationFrame(frame);

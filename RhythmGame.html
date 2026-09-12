@@ -19,7 +19,7 @@
         <div class="artwork"><img src="images/CDjacket/Rolling500x500.png" alt="Rolling ジャケット"><span class="artwork-tag">4 KEYS / 60 SEC DEMO</span></div>
         <div class="song-heading"><p>PHALUX</p><h1>Rolling<span>♪</span></h1></div>
         <div class="song-meta"><span>NORMAL</span><span id="bpm">— BPM</span><span>1:00</span></div>
-        <div class="rule"><span class="tiny-label">HOW TO PLAY</span><p>判定ラインに重なったらキーを押す。<br>長いノーツは、終わりまで長押し。</p><div class="mini-keys"><kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd></div></div>
+        <div class="rule"><span class="tiny-label">HOW TO PLAY</span><p>判定ラインに重なったらキーを押す。<br>長押しは長さの80％で成功。離すタイミングは判定しません。</p><div class="mini-keys"><kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd></div></div>
         <fieldset id="settings"><legend>PLAY SETTINGS</legend>
           <label for="speed">ノーツ速度 <output id="speed-value">5.0</output></label>
           <input type="range" id="speed" min="2" max="9" step=".5" value="5">
@@ -34,6 +34,8 @@
         </fieldset>
         <fieldset id="midi-controls" class="midi-controls" disabled><legend>MY MIDI CHART</legend>
           <p id="chart-name">テスト譜面</p>
+          <button id="midi-reload" type="button" class="secondary-button">公開MIDIを再読み込み</button>
+          <p class="setting-help">公開用：rhythm/charts/rolling.mid<br>差し替えて公開反映後、再読み込みできます。</p>
           <label for="midi-file" class="midi-label">MIDI譜面を読み込む</label>
           <input id="midi-file" type="file" accept=".mid,.midi,audio/midi,audio/x-midi">
           <p class="setting-help">Q=60 / W=62 / E=64 / R=65<br>4分音符以上は長押し。音源と0秒を揃えて書き出してください。</p>
@@ -71,6 +73,6 @@
   </main>
   <p class="page-note">譜面 v1：冒頭1分の完成音源からメロディーとリズムを解析したテスト譜面です。</p>
   <noscript>このゲームを遊ぶにはJavaScriptを有効にしてください。</noscript>
-  <script type="module" src="rhythm/game.mjs?v=midi1"></script>
+  <script type="module" src="rhythm/game.mjs?v=hold2"></script>
 </body>
 </html>

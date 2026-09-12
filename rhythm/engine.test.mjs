@@ -16,7 +16,7 @@ test('chart is a one-minute, playable four-lane arrangement with no overlapping 
     last[n.lane] = n.end || n.t;
   }
 });
-test('perfect full-chart play reaches 1,000,000 with every head and hold tail resolved', () => {
+test('perfect full-chart play reaches 1,000,000 with every head and sustained hold resolved', () => {
   const engine = new RhythmEngine(chart);
   const events = chart.notes.flatMap(n => [
     { t: n.t, lane: n.lane, down: true },
@@ -42,12 +42,37 @@ test('wrong keys, auto-repeat and presses outside the window cannot score', () =
   e.press(0,1.4); assert.equal(e.resolved,1);
   e.release(0,1.4); e.tick(2); assert.equal(e.counts.MISS,1);
 });
-test('early hold release misses the tail; a release inside tail grace succeeds', () => {
-  for (const [release, label] of [[1.5,'MISS'],[1.95,'PERFECT']]) {
+test('holds succeed at 80 percent, regardless of release timing afterward', () => {
+  for (const [release, label] of [[1.5,'MISS'],[1.799,'MISS'],[1.8,'PERFECT'],[1.9,'PERFECT'],[2,'PERFECT'],[10,'PERFECT']]) {
     const e = new RhythmEngine({ notes: [{ t: 1, end: 2, lane: 0 }] });
     e.press(0,1); e.release(0,release); e.tick(3);
     assert.equal(e.resolved,2); assert.equal(e.counts[label],label==='MISS'?1:2);
   }
+});
+test('hold completion is automatic and cannot score twice on release', () => {
+  const e = new RhythmEngine({ notes: [{ t: 1, end: 6, lane: 0 }] });
+  e.press(0,1); e.tick(4.999); assert.equal(e.resolved,1);
+  e.tick(5); assert.equal(e.score,1000000); assert.equal(e.resolved,2);
+  e.tick(8); e.release(0,9); assert.equal(e.resolved,2);
+});
+test('hold duration uses actual press time; early input does not shorten the hold', () => {
+  for (const press of [.9,1.1]) {
+    const e = new RhythmEngine({ notes: [{ t: 1, end: 3, lane: 0 }] });
+    e.press(0,press);
+    const completion=Math.max(press,1)+1.6;
+    e.tick(completion-.001); assert.equal(e.resolved,1);
+    e.tick(completion); assert.equal(e.resolved,2); assert.equal(e.counts.MISS,0);
+  }
+});
+test('releasing too soon cannot be repaired by tapping repeatedly', () => {
+  const e = new RhythmEngine({ notes: [{ t: 1, end: 3, lane: 0 }] });
+  e.press(0,1); e.release(0,1.1); e.press(0,1.2); e.tick(3);
+  assert.equal(e.counts.MISS,1); assert.equal(e.resolved,2);
+});
+test('a hold without a re-grip after pause cannot earn sustain credit', () => {
+  const e = new RhythmEngine({ notes: [{ t: 1, end: 3, lane: 0 }] });
+  e.press(0,1); e.tick(1.5); e.held.fill(false); e.tick(1.5);
+  assert.equal(e.counts.MISS,1); assert.equal(e.resolved,2);
 });
 test('simultaneous notes and pause/resume re-grip preserve independent holds', () => {
   const e = new RhythmEngine({ notes: [{ t: 1, end: 3, lane: 0 },{ t: 1,lane: 3 }] });
