@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="keywords" content="ギター, 作曲, 内藤海地, Kaichi, Kaichi Naito, PHALUX, Windows95">
-    <meta name="description" content="Kaichi Guitar Musicのディスコグラフィー。オリジナル楽曲のリリース情報や各ストリーミング配信へのリンクをまとめています。">  
+    <meta name="description" content="Kaichi Guitar Musicのディスコグラフィー。オリジナル楽曲・MVのリリース情報や各配信先へのリンクをまとめています。">
     <meta property="og:title" content="Discography - Kaichi Guitar Music">
-    <meta property="og:description" content="Kaichiのオリジナル楽曲・ディスコグラフィーまとめ">
+    <meta property="og:description" content="Kaichiのオリジナル楽曲・MV・ディスコグラフィーまとめ">
     <meta property="og:image" content="https://kaichi-naito.github.io/website/images/card-image.jpg">
     <meta property="og:url" content="https://kaichi-naito.github.io/website/Discography.html">
     <link rel="canonical" href="https://kaichi-naito.github.io/website/Discography.html">
@@ -14,9 +14,9 @@
     <meta http-equiv="Cache-Control" content="max-age=31536000">
     <title>Discography - Kaichi Guitar Music</title>
     <link rel="icon" href="images/card-image.jpg" type="image/jpg">
-        <link rel="stylesheet" href="css/common-ui.css">
+    <link rel="stylesheet" href="css/common-ui.css">
     <style>
-/* --- Discography page --- */
+        /* --- Discography page --- */
         .song-window {
             width: 550px;
             top: -9999px;
@@ -39,6 +39,17 @@
             border: 2px solid;
             border-color: #808080 #ffffff #ffffff #808080;
             object-fit: cover;
+            display: block;
+        }
+
+        .album.music-video-thumbnail img {
+            width: 240px;
+            height: 135px;
+        }
+
+        .album a {
+            display: block;
+            text-decoration: none;
         }
 
         .album-info {
@@ -89,6 +100,22 @@
             transform: scale(1.1);
         }
 
+        .links .youtube-link {
+            padding: 7px 10px;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            background: #c0c0c0;
+            color: #000000;
+            font-size: 13px;
+            line-height: 1;
+            text-decoration: none;
+            vertical-align: middle;
+        }
+
+        .links .youtube-link:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
         @media (max-width: 800px) {
             .song-window {
                 width: 88vw !important;
@@ -107,6 +134,11 @@
                 margin-right: 15px;
             }
 
+            .album.music-video-thumbnail img {
+                width: 150px;
+                height: 84px;
+            }
+
             .album-info h3 {
                 font-size: 1.2em;
                 margin-bottom: 5px;
@@ -119,6 +151,11 @@
             .links img {
                 width: 36px !important;
                 height: 36px !important;
+            }
+
+            .links .youtube-link {
+                padding: 6px 8px;
+                font-size: 12px;
             }
         }
 
@@ -299,6 +336,78 @@
             return '';
         }
 
+        function getYouTubeVideoId(value) {
+            var href = safeHttpUrl(value);
+            if (!href) return '';
+
+            try {
+                var url = new URL(href);
+                var host = url.hostname.toLowerCase();
+                var path = url.pathname.replace(/^\/+|\/+$/g, '');
+                var candidate = '';
+
+                if (host === 'youtu.be' || host === 'www.youtu.be') {
+                    candidate = path.split('/')[0] || '';
+                } else if (
+                    host === 'youtube.com' ||
+                    host === 'www.youtube.com' ||
+                    host === 'm.youtube.com' ||
+                    host === 'music.youtube.com'
+                ) {
+                    candidate = url.searchParams.get('v') || '';
+
+                    if (!candidate) {
+                        var segments = path.split('/');
+                        if (
+                            segments.length >= 2 &&
+                            (segments[0] === 'shorts' || segments[0] === 'embed' || segments[0] === 'live')
+                        ) {
+                            candidate = segments[1];
+                        }
+                    }
+                }
+
+                if (/^[A-Za-z0-9_-]{11}$/.test(candidate)) {
+                    return candidate;
+                }
+            } catch (e) {}
+
+            return '';
+        }
+
+        function safeMvThumbnail(value, youtubeValue) {
+            var text = String(value || '').trim();
+
+            if (text) {
+                try {
+                    var url = new URL(text, window.location.href);
+                    var host = url.hostname.toLowerCase();
+
+                    if (
+                        url.protocol === 'https:' &&
+                        (host === 'i.ytimg.com' ||
+                         host === 'img.youtube.com' ||
+                         host === 'kaichi-naito.github.io')
+                    ) {
+                        return url.href;
+                    }
+                } catch (e) {}
+            }
+
+            var videoId = getYouTubeVideoId(youtubeValue);
+            if (videoId) {
+                /* mqdefault is a stable 16:9 YouTube thumbnail. */
+                return 'https://i.ytimg.com/vi/' + videoId + '/mqdefault.jpg';
+            }
+
+            return '';
+        }
+
+        function isMusicVideoItem(item) {
+            var type = String((item && item.type) || '').trim().toLowerCase();
+            return type === 'music video' || type === 'mv';
+        }
+
         function linkLabelFromUrl(value) {
             var href = safeHttpUrl(value);
             if (!href) return '';
@@ -371,6 +480,19 @@
             parent.appendChild(a);
         }
 
+        function appendTextLink(parent, hrefValue, label, className) {
+            var href = safeHttpUrl(hrefValue);
+            if (!href) return;
+
+            var a = document.createElement('a');
+            a.href = href;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.className = 'click-target' + (className ? ' ' + className : '');
+            a.textContent = label;
+            parent.appendChild(a);
+        }
+
         function createReleaseWindow(item, index) {
             var win = document.createElement('div');
             win.className = 'window song-window';
@@ -405,25 +527,52 @@
             var section = document.createElement('div');
             section.className = 'discography-section';
 
-            var album = document.createElement('div');
-            album.className = 'album';
+            var isMusicVideo = isMusicVideoItem(item);
+            var artworkSrc = isMusicVideo
+                ? (safeMvThumbnail(item.mvThumbnail, item.youtube) || safeJacketPath(item.jacket))
+                : safeJacketPath(item.jacket);
 
-            var jacket = document.createElement('img');
-            jacket.src = safeJacketPath(item.jacket);
-            jacket.alt = item.title || 'Release artwork';
+            if (artworkSrc) {
+                var album = document.createElement('div');
+                album.className = 'album';
 
-            /*
-             * First 3 jackets are loaded immediately.
-             * Everything below that remains lazy-loaded.
-             */
-            if (index < 3) {
-                jacket.loading = 'eager';
-                jacket.fetchPriority = 'high';
-            } else {
-                jacket.loading = 'lazy';
+                if (isMusicVideo) {
+                    album.classList.add('music-video-thumbnail');
+                }
+
+                var jacket = document.createElement('img');
+                jacket.src = artworkSrc;
+                jacket.alt = isMusicVideo
+                    ? ((item.title || 'Music video') + ' thumbnail')
+                    : (item.title || 'Release artwork');
+
+                /*
+                 * First 3 artworks are loaded immediately.
+                 * Everything below that remains lazy-loaded.
+                 */
+                if (index < 3) {
+                    jacket.loading = 'eager';
+                    jacket.fetchPriority = 'high';
+                } else {
+                    jacket.loading = 'lazy';
+                }
+
+                var youtubeHref = isMusicVideo ? safeHttpUrl(item.youtube) : '';
+                if (youtubeHref) {
+                    var artworkLink = document.createElement('a');
+                    artworkLink.href = youtubeHref;
+                    artworkLink.target = '_blank';
+                    artworkLink.rel = 'noopener noreferrer';
+                    artworkLink.className = 'click-target';
+                    artworkLink.setAttribute('aria-label', (item.title || 'Music video') + ' on YouTube');
+                    artworkLink.appendChild(jacket);
+                    album.appendChild(artworkLink);
+                } else {
+                    album.appendChild(jacket);
+                }
+
+                section.appendChild(album);
             }
-
-            album.appendChild(jacket);
 
             var info = document.createElement('div');
             info.className = 'album-info';
@@ -475,8 +624,12 @@
                 'Apple Music'
             );
 
-            info.appendChild(links);
-            section.appendChild(album);
+            appendTextLink(links, item.youtube, 'YouTube', 'youtube-link');
+
+            if (links.childNodes.length > 0) {
+                info.appendChild(links);
+            }
+
             section.appendChild(info);
             contents.appendChild(section);
             win.appendChild(contents);
@@ -572,7 +725,9 @@
                     credit2: getCellValue(row, 11),
                     credit2Url: getCellValue(row, 12),
                     spotify: getCellValue(row, 13),
-                    appleMusic: getCellValue(row, 14)
+                    appleMusic: getCellValue(row, 14),
+                    youtube: getCellValue(row, 16),
+                    mvThumbnail: getCellValue(row, 17)
                 });
             }
 
@@ -669,7 +824,7 @@
          *
          * We no longer wait for common-ui.js to finish initializing.
          * This lets the spreadsheet request run in parallel with the rest
-         * of the page load, so jacket-image URLs become available sooner.
+         * of the page load, so artwork URLs become available sooner.
          *
          * If the sheet finishes before common-ui.js, the generated windows
          * are already present when common-ui initializes.
