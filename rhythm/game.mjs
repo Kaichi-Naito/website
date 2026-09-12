@@ -1,4 +1,5 @@
 import { RhythmEngine } from './engine.mjs';
+import { midiToChart } from './midi.mjs';
 const $ = id => document.getElementById(id);
 const ui = Object.fromEntries(['canvas','stage','score','accuracy','combo','judgment','countdown','overlay','overlay-title','overlay-eyebrow','overlay-description','overlay-foot','start','restart','pause','result','status','progress','elapsed','settings','best-score'].map(id => [id, $(id)]));
 const g = ui.canvas.getContext('2d');
@@ -7,24 +8,26 @@ const colors = ['#7deaff','#7deaff','#ff8dda','#ff8dda'];
 const keyCodes = ['KeyQ','KeyW','KeyE','KeyR'];
 const inputSources = [new Set(), new Set(), new Set(), new Set()];
 const flashes = [0,0,0,0];
-let chart, engine, context, gain, buffer, source;
+let chart, defaultChart, engine, context, gain, buffer, source, tapBuffer, tapGain;
+let tapPromise;
 let mode = 'loading', startAt = 0, resumeAt = 0, frozenTime = -2.5, judgmentUntil = 0;
 let width = 800, height = 600, lastHud = 0, requestId = 0;
-let settings = { speed: 5, offset: 0, volume: 70 };
+let settings = { speed: 5, offset: 0, volume: 70, tapVolume: 70 };
 const settingsKey = 'kaichi-rhythm-settings-v1';
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 try {
   const saved = JSON.parse(localStorage.getItem(settingsKey) || '{}');
-  for (const [key,min,max] of [['speed',2,9],['offset',-250,250],['volume',0,100]]) {
+  for (const [key,min,max] of [['speed',2,9],['offset',-250,250],['volume',0,100],['tapVolume',0,100]]) {
     if (Number.isFinite(saved[key])) settings[key] = Math.max(min, Math.min(max, saved[key]));
   }
 } catch { /* Storage may be disabled; gameplay does not depend on it. */ }
-for (const key of ['speed','offset','volume']) {
+for (const key of ['speed','offset','volume','tapVolume']) {
   $(key).value = settings[key];
   const update = () => {
     settings[key] = Number($(key).value);
     $(`${key}-value`).textContent = key === 'speed' ? settings[key].toFixed(1) : key === 'offset' ? `${settings[key] > 0 ? '+' : ''}${settings[key]} ms` : `${settings[key]}%`;
     if (gain) gain.gain.value = settings.volume / 100;
+    if (tapGain) tapGain.gain.value = settings.tapVolume / 100 * .4;
     try { localStorage.setItem(settingsKey, JSON.stringify(settings)); } catch { /* optional */ }
   };
   $(key).addEventListener('input', update); update();
@@ -60,15 +63,37 @@ function showOverlay(eyebrow, title, description, button) {
   ui['overlay-description'].textContent = description;
   ui.start.textContent = button; ui.start.disabled = false;
 }
-async function loadAudio() {
+async function ensureAudioContext() {
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   if (!AudioContextClass) throw new Error('このブラウザーは音声再生に対応していません。');
   if (!context) {
     context = new AudioContextClass({ latencyHint: 'interactive' });
-    gain = context.createGain(); gain.gain.value = settings.volume / 100; gain.connect(context.destination);
+    const master = context.createDynamicsCompressor();
+    master.threshold.value=-1;master.knee.value=0;master.ratio.value=20;master.attack.value=.001;master.release.value=.06;
+    master.connect(context.destination);
+    gain = context.createGain(); gain.gain.value = settings.volume / 100; gain.connect(master);
+    tapGain = context.createGain(); tapGain.gain.value = settings.tapVolume / 100 * .4; tapGain.connect(master);
     context.addEventListener('statechange', () => { if (context.state !== 'running' && mode === 'playing') pause(); });
   }
   await context.resume();
+}
+async function loadTap() {
+  if (tapBuffer) return;
+  if (!tapPromise) tapPromise = (async () => {
+    const r = await fetch('rhythm/tap.wav');
+    if (!r.ok) throw new Error(`タップ音を読み込めませんでした（${r.status}）。`);
+    tapBuffer = await context.decodeAudioData(await r.arrayBuffer());
+  })().catch(error => { tapPromise = null; throw error; });
+  await tapPromise;
+}
+function playTap() {
+  if (!tapBuffer || context?.state !== 'running' || !settings.tapVolume) return;
+  const tap = context.createBufferSource(); tap.buffer = tapBuffer; tap.connect(tapGain);
+  tap.onended = () => tap.disconnect(); tap.start();
+}
+async function loadAudio() {
+  await ensureAudioContext();
+  await loadTap();
   if (!buffer) {
     const response = await fetch(chart.audio);
     if (!response.ok) throw new Error(`音源を読み込めませんでした（${response.status}）。`);
@@ -85,11 +110,13 @@ function schedule(from, leadIn) {
   source.start(when, playFrom);
   mode = 'playing'; ui.overlay.hidden = true; ui.pause.disabled = false;
   ui.settings.disabled = true; ui.status.textContent = 'PLAYING — Q / W / E / R';
+  $('midi-controls').disabled = true;
 }
 async function startGame() {
   if (!chart || mode === 'playing' || (mode === 'loading' && !ui.start.disabled)) return;
   const token = ++requestId;
   mode = 'loading'; ui.start.disabled = true; ui.start.textContent = '音源を読み込み中…';
+  $('midi-controls').disabled = true;
   ui.status.textContent = '音源を準備しています';
   try {
     await loadAudio();
@@ -101,6 +128,7 @@ async function startGame() {
     ui.start.blur();
     if (document.hidden) pause();
   } catch (error) {
+    $('midi-controls').disabled = false;
     mode = 'error'; ui.status.textContent = '読み込みエラー';
     showOverlay('LOAD ERROR', '読み込みをやり直してください', error.message, '再読み込み');
   }
@@ -110,6 +138,7 @@ function pause() {
   frozenTime = Math.max(-2.5, Math.min(songTime(), chart.duration));
   mode = 'paused'; stopSource(); resetInputs();
   ui.pause.disabled = true; ui.settings.disabled = false; ui.countdown.textContent = '';
+  $('midi-controls').disabled = false;
   ui.restart.hidden = false; ui.result.hidden = true;
   ui.status.textContent = 'PAUSED — 再開まで譜面も音楽も止まります';
   showOverlay('PAUSED', 'ひとやすみ。', '再開すると2秒後に演奏が続きます。長押しの途中なら、再開前に同じキーを押してください。', 'プレイを再開');
@@ -128,6 +157,7 @@ function finish() {
   frozenTime = chart.duration; mode = 'results'; stopSource(); resetInputs();
   engine.tick(chart.duration + 1); updateHud();
   ui.pause.disabled = true; ui.settings.disabled = false; ui.restart.hidden = true;
+  $('midi-controls').disabled = false;
   const best = readBest();
   if (engine.score > best) { try { localStorage.setItem(bestKey(), String(engine.score)); } catch { /* optional */ } }
   bestUI();
@@ -158,6 +188,7 @@ function inputDown(lane, sourceId) {
   const s = inputSources[lane]; if (s.has(sourceId)) return;
   const wasHeld = s.size > 0; s.add(sourceId); buttons[lane].classList.add('active');
   if (!wasHeld) {
+    playTap();
     if (context.currentTime < resumeAt) engine.held[lane] = true;
     else engine.press(lane, judgeTime());
   }
@@ -189,6 +220,40 @@ window.addEventListener('pagehide', () => { ++requestId; pause(); stopSource(); 
 ui.start.addEventListener('click', () => { if (mode === 'paused') resume(); else if (!chart) loadChart(); else startGame(); });
 ui.restart.addEventListener('click', startGame);
 ui.pause.addEventListener('click', pause);
+$('tap-preview').addEventListener('click', async () => {
+  const button = $('tap-preview'); button.disabled = true;
+  try { await ensureAudioContext(); await loadTap(); playTap(); ui.status.textContent = 'タップ音を再生しました'; }
+  catch (error) { ui.status.textContent = error.message; }
+  finally { button.disabled = false; }
+});
+function useChart(next, label) {
+  ++requestId; stopSource(); resetInputs(); chart = next;
+  engine = new RhythmEngine(chart,onJudge); frozenTime = -2.5; mode = 'ready';
+  ui.settings.disabled = false; ui.pause.disabled = true; $('midi-controls').disabled = false;
+  ui.result.hidden = true; ui.restart.hidden = true; ui.countdown.textContent = '';
+  ui.combo.textContent = ''; delete ui.combo.dataset.value; ui.judgment.style.opacity = 0;
+  $('bpm').textContent = `${chart.bpm} BPM`; $('chart-name').textContent = label;
+  $('midi-reset').hidden = !chart.midi;
+  bestUI(); updateHud();
+  showOverlay('READY TO ROLL?', '音楽に、飛び込もう。', 'Q・W・E・Rに指を置いてスタート。冒頭1分のテスト版です。', '▶ START GAME');
+  ui.status.textContent = `READY — ${chart.notes.length} NOTES / Q W E R`;
+}
+$('midi-file').addEventListener('change', async event => {
+  const file=event.target.files[0];if(!file||!defaultChart)return;
+  const previousDisabled=ui.start.disabled; ui.start.disabled=true; $('midi-controls').disabled=true;
+  try {
+    if(file.size>2*1024*1024)throw new Error('MIDIは2 MB以下にしてください。');
+    const next=midiToChart(await file.arrayBuffer(),defaultChart);
+    useChart(next,file.name);
+    const messages=[`${next.notes.length}ノーツを読み込みました。`];
+    if(next.midi.tempoFallback)messages.push('冒頭のテンポ指定がないため162 BPMとして読み込みました。');
+    if(next.midi.ignored)messages.push(`割り当て外の${next.midi.ignored}音は除外しました。`);
+    if(next.midi.clipped)messages.push('1分以降の音符は省略・短縮しました。');
+    $('midi-message').textContent=messages.join(' ');
+  } catch(error) { $('midi-message').textContent=error.message;ui.start.disabled=previousDisabled; }
+  finally { $('midi-controls').disabled=false;event.target.value=''; }
+});
+$('midi-reset').addEventListener('click',()=>{useChart(defaultChart,'テスト譜面');$('midi-message').textContent='';});
 function resize() {
   const r = ui.stage.getBoundingClientRect(); width = r.width; height = r.height;
   const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -274,7 +339,8 @@ async function loadChart() {
     mode='loading';ui.start.disabled=true;
     const response=await fetch('rhythm/rolling-chart.json');
     if(!response.ok)throw new Error(`譜面を読み込めませんでした（${response.status}）。`);
-    chart=await response.json();engine=new RhythmEngine(chart,onJudge);mode='ready';
+    chart=await response.json();defaultChart=chart;engine=new RhythmEngine(chart,onJudge);mode='ready';
+    $('midi-controls').disabled=false;
     $('bpm').textContent=`${chart.bpm} BPM`;bestUI();
     ui.start.textContent='▶ START GAME';ui.start.disabled=false;
     ui.status.textContent=`READY — ${chart.notes.length} NOTES / Q W E R`;

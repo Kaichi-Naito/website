@@ -33,6 +33,36 @@ audio fetching are not supported by opening the HTML as a `file://` URL.
   a countdown; a hold in progress can be re-gripped before the timeline resumes.
 - Speed, offset, volume, and personal best are stored locally when storage is available.
 
+## User MIDI charts and tap sound
+
+The page accepts `.mid`/`.midi` files locally through MY MIDI CHART. File contents
+are parsed in the browser; choosing a file does not upload it or replace the
+public chart. The existing test chart remains the default on reload.
+
+- MIDI note numbers **60, 62, 64, 65** map to **Q, W, E, R** respectively.
+  These are C/D/E/F starting at middle C. Octave labels vary by DAW settings;
+  the numbers are authoritative. Other pitches are ignored and reported.
+- Note-on sets the hit time. Notes shorter than one quarter note are taps.
+  Notes at least one quarter note long are holds, ending at note-off. Use
+  1/16 notes for consistent tap entry. Velocity is ignored except that zero
+  velocity note-on is a note-off, as specified by MIDI.
+- Type 0/1 Standard MIDI Files with PPQ timing are supported. The parser merges
+  tempo maps across tracks and channels, handles running status, and rejects
+  missing note-offs and overlapping inputs on the same lane. SMPTE and type 2
+  are rejected with a user-visible explanation.
+- Align MIDI zero with the audio zero; do not trim the leading rest. Export the
+  tempo map from REAPER. Missing initial tempo is explicitly reported and uses
+  Rolling's 162 BPM fallback. MIDI duration need not equal the audio duration.
+- Playback remains the first **60 seconds**. Later notes are excluded and holds
+  crossing the end are shortened; these adjustments are reported after import.
+- Imported chart scores have separate IDs derived from MIDI contents.
+- The user-supplied tap WAV is converted to mono 44.1 kHz/16-bit PCM without
+  changing its speed. Each new gameplay key/pointer press triggers it, even
+  when no note is hit. Holding a key does not retrigger. Tap volume and preview
+  are separate from music volume. The output limiter controls overlapping peaks.
+
+Run `node --test rhythm/*.test.mjs` to include MIDI parsing and tempo-map tests.
+
 ## Verification
 
 `node --test rhythm/engine.test.mjs` from the repository root checks full-chart

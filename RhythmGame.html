@@ -6,7 +6,7 @@
   <meta name="description" content="PHALUXのRollingで遊べる、Q・W・E・Rの4キー音楽ゲーム。">
   <title>Rolling / Rhythm Game — Kaichi Guitar Music</title>
   <link rel="icon" href="rhythm/game-icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="rhythm/game.css">
+  <link rel="stylesheet" href="rhythm/game.css?v=midi1">
 </head>
 <body>
   <header class="desktop-header"><a href="index.html">← Kaichi Guitar Music</a><span>GAMES / 001</span></header>
@@ -28,6 +28,17 @@
           <p class="setting-help" id="offset-help">＋にすると、押すタイミングが遅くなります。</p>
           <label for="volume">音量 <output id="volume-value">70%</output></label>
           <input type="range" id="volume" min="0" max="100" step="5" value="70">
+          <label for="tapVolume">タップ音量 <output id="tapVolume-value">70%</output></label>
+          <input type="range" id="tapVolume" min="0" max="100" step="5" value="70">
+          <button id="tap-preview" type="button" class="secondary-button">タップ音を試聴</button>
+        </fieldset>
+        <fieldset id="midi-controls" class="midi-controls" disabled><legend>MY MIDI CHART</legend>
+          <p id="chart-name">テスト譜面</p>
+          <label for="midi-file" class="midi-label">MIDI譜面を読み込む</label>
+          <input id="midi-file" type="file" accept=".mid,.midi,audio/midi,audio/x-midi">
+          <p class="setting-help">Q=60 / W=62 / E=64 / R=65<br>4分音符以上は長押し。音源と0秒を揃えて書き出してください。</p>
+          <p id="midi-message" class="setting-help" role="status"></p>
+          <button id="midi-reset" type="button" class="secondary-button" hidden>テスト譜面に戻す</button>
         </fieldset>
         <p class="best-score">PERSONAL BEST <strong id="best-score">—</strong></p>
       </aside>
@@ -60,6 +71,6 @@
   </main>
   <p class="page-note">譜面 v1：冒頭1分の完成音源からメロディーとリズムを解析したテスト譜面です。</p>
   <noscript>このゲームを遊ぶにはJavaScriptを有効にしてください。</noscript>
-  <script type="module" src="rhythm/game.mjs"></script>
+  <script type="module" src="rhythm/game.mjs?v=midi1"></script>
 </body>
 </html>
