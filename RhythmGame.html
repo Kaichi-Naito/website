@@ -6,7 +6,7 @@
   <meta name="description" content="PHALUXのRollingで遊べる、Q・W・E・Rの4キー音楽ゲーム。">
   <title>Rolling / Rhythm Game — Kaichi Guitar Music</title>
   <link rel="icon" href="rhythm/game-icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="rhythm/game.css?v=rank3">
+  <link rel="stylesheet" href="rhythm/game.css?v=two-minute-v1">
 </head>
 <body>
   <header class="desktop-header"><a href="index.html">← Kaichi Guitar Music</a><span>GAMES / 001</span></header>
@@ -17,10 +17,10 @@
     <div class="workspace">
       <aside class="sidebar">
         <div class="section-label">NOW PLAYING <span>01 / 01</span></div>
-        <div class="artwork"><img src="images/CDjacket/Rolling500x500.png" alt="Rolling ジャケット"><span class="artwork-tag">4 KEYS / 60 SEC DEMO</span></div>
+        <div class="artwork"><img src="images/CDjacket/Rolling500x500.png" alt="Rolling ジャケット"><span class="artwork-tag">4 KEYS / 120 SEC DEMO</span></div>
         <div class="song-heading"><p>PHALUX</p><h1>Rolling<span>♪</span></h1></div>
-        <div class="song-meta"><span>NORMAL</span><span id="bpm">— BPM</span><span>1:00</span></div>
-        <div class="rule"><span class="tiny-label">HOW TO PLAY</span><p>判定ラインに重なったらキーを押す。<br>長押しは長さの80％で成功。離すタイミングは判定しません。</p><div class="mini-keys"><kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd></div></div>
+        <div class="song-meta"><span>NORMAL</span><span id="bpm">— BPM</span><span>2:00</span></div>
+        <div class="rule"><span class="tiny-label">HOW TO PLAY</span><p>判定ラインに重なったらキーを押す。<br>長押しは長さの80％で成功。離すタイミングは判定しません。<br>空押しは減点され、コンボが途切れます。</p><div class="mini-keys"><kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd></div></div>
         <fieldset id="settings"><legend>PLAY SETTINGS</legend>
           <label for="speed">ノーツ速度 <output id="speed-value">8.0</output></label>
           <input type="range" id="speed" min="2" max="14" step=".5" value="8">
@@ -33,32 +33,22 @@
           <input type="range" id="tapVolume" min="0" max="100" step="5" value="70">
           <button id="tap-preview" type="button" class="secondary-button">タップ音を試聴</button>
         </fieldset>
-        <fieldset id="midi-controls" class="midi-controls" disabled><legend>MY MIDI CHART</legend>
-          <p id="chart-name">テスト譜面</p>
-          <button id="midi-reload" type="button" class="secondary-button">公開MIDIを再読み込み</button>
-          <p class="setting-help">公開用：rhythm/charts/Rolling_Game.mid<br>差し替えて公開反映後、再読み込みできます。</p>
-          <label for="midi-file" class="midi-label">MIDI譜面を読み込む</label>
-          <input id="midi-file" type="file" accept=".mid,.midi,audio/midi,audio/x-midi">
-          <p class="setting-help">Q=75 / W=74 / E=73 / R=72<br>4分音符以上は長押し。音源と0秒を揃えて書き出してください。</p>
-          <p id="midi-message" class="setting-help" role="status"></p>
-          <button id="midi-reset" type="button" class="secondary-button" hidden>テスト譜面に戻す</button>
-        </fieldset>
         <p class="best-score">PERSONAL BEST <strong id="best-score">—</strong></p>
       </aside>
       <section class="game-area" aria-label="4レーンの音楽ゲーム">
-        <div class="hud"><div><span>SCORE</span><strong id="score">0000000</strong></div><div class="accuracy"><span>ACCURACY</span><strong id="accuracy">100.00<small>%</small></strong></div><button id="pause" class="pause-button" aria-label="一時停止" disabled>Ⅱ</button></div>
+        <div class="hud"><div><span>SCORE</span><strong id="score">0000000</strong></div><div class="accuracy"><span>ACCURACY</span><strong id="accuracy">100.00<small>%</small></strong><div id="accuracy-meter" class="accuracy-track" role="meter" aria-label="精度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="accuracy-fill"></div></div></div><button id="pause" class="pause-button" aria-label="一時停止" disabled>Ⅱ</button></div>
         <div class="stage" id="stage">
           <canvas id="canvas" aria-label="上からノーツが落ちる4レーン。左からQ、W、E、R。"></canvas>
           <div class="stage-heading"><span>ROLLING</span><span>PHALUX</span></div>
           <div class="combo" id="combo"></div>
           <div class="judgment" id="judgment"></div>
           <div class="countdown" id="countdown"></div>
-          <div class="key-row" aria-label="タッチ操作用キー"><button data-lane="0" aria-label="Qレーン">Q</button><button data-lane="1" aria-label="Wレーン">W</button><button data-lane="2" aria-label="Eレーン">E</button><button data-lane="3" aria-label="Rレーン">R</button></div>
+          <div class="key-row" aria-label="タッチ操作用キー"><button data-lane="0" aria-label="Qレーン"><span class="key-label" aria-hidden="true">Q</span></button><button data-lane="1" aria-label="Wレーン"><span class="key-label" aria-hidden="true">W</span></button><button data-lane="2" aria-label="Eレーン"><span class="key-label" aria-hidden="true">E</span></button><button data-lane="3" aria-label="Rレーン"><span class="key-label" aria-hidden="true">R</span></button></div>
           <div class="overlay" id="overlay">
             <div class="overlay-card" id="overlay-card">
               <p class="eyebrow" id="overlay-eyebrow">READY TO ROLL?</p>
               <h2 id="overlay-title">音楽に、飛び込もう。</h2>
-              <p id="overlay-description">Q・W・E・Rに指を置いてスタート。<br>冒頭1分のテスト版。ミスしても続けられます。</p>
+              <p id="overlay-description">Q・W・E・Rに指を置いてスタート。<br>冒頭2分のテスト版。ミスしても続けられます。</p>
               <div id="result" hidden></div>
               <form id="score-form" hidden>
                 <label for="player-name">名前を入れてランキングに登録</label>
@@ -74,7 +64,7 @@
           </div>
         </div>
         <div class="progress-track"><div id="progress"></div></div>
-        <div class="playback-footer"><span id="elapsed">0:00 / 1:00</span><span>SPACE / ESC 一時停止 <span class="footer-divider">/</span> Q W E R プレイ</span></div>
+        <div class="playback-footer"><span id="elapsed">0:00 / 2:00</span><span>SPACE / ESC 一時停止 <span class="footer-divider">/</span> Q W E R プレイ</span></div>
       </section>
     </div>
     <footer class="statusbar"><span id="status" role="status">譜面を読み込んでいます</span><span>♪ KAICHI GUITAR MUSIC</span></footer>
@@ -92,8 +82,8 @@
     </div>
   </aside>
   </div>
-  <p class="page-note">譜面 v1：冒頭1分の完成音源からメロディーとリズムを解析したテスト譜面です。</p>
+  <p class="page-note">冒頭2分のテスト版。空押しはPERFECT 1判定分の減点です。</p>
   <noscript>このゲームを遊ぶにはJavaScriptを有効にしてください。</noscript>
-  <script type="module" src="rhythm/game.mjs?v=rank3"></script>
+  <script type="module" src="rhythm/game.mjs?v=two-minute-v1"></script>
 </body>
 </html>

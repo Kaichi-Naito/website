@@ -54,7 +54,7 @@ export function midiToChart(input, base) {
     if(active.size)throw new Error('終わりのないMIDIノートがあります。音符の終端を設定して書き出してください。');
   }
   if(!pairs.length)throw new Error('75・74・73・72番のMIDIノートが見つかりませんでした。');
-  // A missing initial tempo uses this song's BPM, and is explicitly reported to the player.
+  // A missing initial tempo uses this song's BPM, and is retained in parser diagnostics.
   const hasInitialTempo=tempos.some(e=>e.tick===0);
   const events=[{tick:0,us:60000000/base.bpm,order:-1},...tempos].sort((a,b)=>a.tick-b.tick||a.order-b.order);
   const segments=[];let lastTick=0,seconds=0,us=events[0].us;
@@ -68,7 +68,7 @@ export function midiToChart(input, base) {
     const hold=n.stop-n.start>=ppq*HOLD_BEATS && stop-t>=.1;
     return [{t,lane:n.lane,...(hold?{end:stop}:{})}];
   }).sort((a,b)=>a.t-b.t||a.lane-b.lane);
-  if(!notes.length)throw new Error('冒頭1分にノーツがありません。MIDIの開始位置を確認してください。');
+  if(!notes.length)throw new Error(`冒頭${base.duration}秒にノーツがありません。MIDIの開始位置を確認してください。`);
   const last=[-1,-1,-1,-1];
   for(const n of notes){if(n.t<last[n.lane]+.02)throw new Error('同じレーンのノーツが重なっているか、間隔が短すぎます（20 ms未満）。');last[n.lane]=n.end??n.t;}
   let hash=2166136261;for(const b of data)hash=Math.imul(hash^b,16777619)>>>0;

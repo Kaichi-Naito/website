@@ -2,7 +2,7 @@
 // Only this spreadsheet is read/written. No Google credentials go into the website.
 const RANKING_SPREADSHEET_ID = '1l93jSWpBLkh6tLp6wZSS_Z8YHwxMCGFK8cYgJZ8wJmw';
 const RANKING_ORIGIN = 'https://kaichi-naito.github.io';
-const RANKING_RULESET = 'hold80-v2';
+const RANKING_RULESET = 'hold80-empty-v3';
 
 function validateScore_(input) {
   if(!input || input.song!=='Rolling' || input.ruleset!==RANKING_RULESET)throw new Error('対象外の曲または判定ルールです。');
@@ -14,7 +14,8 @@ function validateScore_(input) {
   for(const label of ['PERFECT','GREAT','GOOD','MISS'])if(!Number.isInteger(c[label])||c[label]<0||c[label]>20000)throw new Error('判定数が正しくありません。');
   const units=c.PERFECT+c.GREAT+c.GOOD+c.MISS;
   if(!units||units>20000||input.units!==units)throw new Error('完了したプレイのみ登録できます。');
-  const earned=c.PERFECT+c.GREAT*.8+c.GOOD*.5;
+  if(!Number.isInteger(input.emptyPresses)||input.emptyPresses<0||input.emptyPresses>20000)throw new Error('空押し数が正しくありません。');
+  const earned=Math.max(0,c.PERFECT+c.GREAT*.8+c.GOOD*.5-input.emptyPresses);
   const score=Math.round(earned/units*1000000),accuracy=Number((earned/units*100).toFixed(2));
   if(input.score!==score || input.accuracy!==accuracy)throw new Error('スコアと判定結果が一致しません。');
   if(!Number.isInteger(input.maxCombo)||input.maxCombo<0||input.maxCombo>units-c.MISS)throw new Error('コンボ数が正しくありません。');
@@ -45,7 +46,7 @@ function saveScore_(raw) {
       // Quote formula-like names so public submissions never become Sheets formulas.
       const safeName=/^[=+\-@']/.test(input.name)?"'"+input.name:input.name;
       sheet.getRange(row,2).setNumberFormat('@');
-      sheet.getRange(row,1,1,14).setValues([['Rolling',safeName,input.score,input.accuracy,input.maxCombo,input.chartKey,input.ruleset,Utilities.formatDate(new Date(),'Asia/Tokyo','yyyy-MM-dd HH:mm:ss'),input.playId,c.PERFECT,c.GREAT,c.GOOD,c.MISS,input.units]]);
+      sheet.getRange(row,1,1,15).setValues([['Rolling',safeName,input.score,input.accuracy,input.maxCombo,input.chartKey,input.ruleset,Utilities.formatDate(new Date(),'Asia/Tokyo','yyyy-MM-dd HH:mm:ss'),input.playId,c.PERFECT,c.GREAT,c.GOOD,c.MISS,input.units,input.emptyPresses]]);
       sheet.getRange(row,3).setNumberFormat('#,##0');sheet.getRange(row,4).setNumberFormat('0.00');
       SpreadsheetApp.flush();
     }

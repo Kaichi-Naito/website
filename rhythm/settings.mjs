@@ -6,8 +6,8 @@ export function readSettings(saved) {
   }
   return result;
 }
-// The old maximum tap gain was .4. New 70% equals 150% of that maximum.
-export function tapLevel(percent) { return percent / 70 * .6; }
+// Same slider value now gives 2.5 times the previous tap gain (.6 at 70%).
+export function tapLevel(percent) { return percent / 70 * 1.5; }
 // Old speed 8 gave 1.24 seconds of visibility. Center the extended scale there.
 // Exponential scaling stays positive even at the new high end.
 export function approachSeconds(speed) { return 1.24 * 2 ** ((8-speed)/6); }

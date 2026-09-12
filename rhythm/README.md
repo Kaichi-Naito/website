@@ -9,17 +9,12 @@ audio fetching are not supported by opening the HTML as a `file://` URL.
 ## Test song and chart
 
 - Source: user-uploaded `rhythm/Rolling_Game.mp3`, PHALUX.
-- Scope: first 60 seconds. Playback stops at the test boundary even for a longer MP3.
-- Timing: 162 BPM, refined against spectral onset measurements of the source WAV.
-- Chart: `rolling-chart.json`, explicit time in seconds, lane 0–3 = Q/W/E/R.
-  Optional `end` is a hold's end timestamp. Times are relative to the audio start.
-- This first chart is an estimate from the finished stereo mix, not a verified
-  transcription of isolated vocal or lead-guitar stems. Center-channel harmonic
-  attacks and predominant-pitch changes guide melody placement; strong band
-  accents add occasional chords. Sustained estimates become holds. It still
-  needs musician playtesting, particularly where vocals and guitars overlap.
-- Editing a chart does not require regenerating or replacing the audio. Increment
-  the chart `id` if score totals change so personal bests remain comparable.
+- Scope: first **120 seconds**. Playback stops at the boundary even for a longer MP3.
+- `rolling-chart.json` contains song metadata; `charts/Rolling_Game.mid` is the chart.
+- MIDI is parsed on every page load with cache bypass. Notes after 120 seconds
+  are excluded and crossing holds are shortened. A load error offers retry;
+  there is no fallback to an outdated generated chart.
+- The MIDI tempo map is used, with 162 BPM as the fallback if no initial tempo exists.
 
 ## Timing and controls
 
@@ -40,26 +35,27 @@ audio fetching are not supported by opening the HTML as a `file://` URL.
 - Speed, offset, volume, and personal best are stored locally when storage is available.
 - Speed defaults to 8, at the midpoint of the 2–14 slider. This matches old speed 8.
   The range is exponential around that point to remain playable at both extremes.
-- Tap volume defaults to 70%, with gain .6 (150% of the old 100% gain .4).
-  The new settings version resets speed/tap defaults but preserves music volume and offset.
+- Tap volume defaults to 70%, with gain 1.5 (2.5 times the previous .6).
+  Existing slider preferences are preserved; music volume is unchanged.
+- Each fresh press outside a note's ±140 ms window during the song deducts one
+  PERFECT scoring unit and breaks combo. Penalty debt persists even at zero;
+  displayed score and accuracy are clamped at zero. Countdown, held-key repeats,
+  and release after successful sustain are not penalized. Results include empty count.
+- Accuracy has a numeric percentage and a synchronized gauge. It uses weighted
+  resolved judgments minus empty penalties, divided by resolved judgments.
+- Touch buttons hide key letters on phone layouts. The page uses the homepage's
+  fixed Windows 95 wallpaper and 10% dark overlay.
 
 ## User MIDI charts and tap sound
 
-The page accepts `.mid`/`.midi` files locally through MY MIDI CHART. File contents
-are parsed in the browser; choosing a file does not upload it or replace the
-public chart. The same local file can be selected again after each REAPER export.
-
 The public chart has one fixed location: **`rhythm/charts/Rolling_Game.mid`**.
-The page automatically checks it at startup. Upload/replace this file on `main`
-and wait for GitHub Pages deployment, then use **公開MIDIを再読み込み**.
-Each request bypasses browser cache and uses a fresh URL. If the MIDI is absent,
-the generated test chart is used. Reload failures preserve the selected chart
-and display the error. Local MIDI import remains available without deployment.
-See `charts/README.md` for the REAPER/update workflow in Japanese.
+Upload/replace it on `main`, wait for GitHub Pages deployment, then reload the page.
+MIDI filenames, diagnostics, file import, and manual MIDI reload controls are absent
+from the game UI. See `charts/README.md` for the REAPER/update workflow.
 
 - MIDI note numbers **75, 74, 73, 72** map to **Q, W, E, R** respectively.
   These are D♯/D/C♯/C, one octave above middle C. Octave labels vary by DAW settings;
-  the numbers are authoritative. Other pitches are ignored and reported.
+  the numbers are authoritative. Other pitches are ignored.
 - Note-on sets the hit time. Notes shorter than one quarter note are taps.
   Notes at least one quarter note long are holds; note-off defines their visual
   length (not a release-timing judgment). Use
@@ -70,10 +66,10 @@ See `charts/README.md` for the REAPER/update workflow in Japanese.
   missing note-offs and overlapping inputs on the same lane. SMPTE and type 2
   are rejected with a user-visible explanation.
 - Align MIDI zero with the audio zero; do not trim the leading rest. Export the
-  tempo map from REAPER. Missing initial tempo is explicitly reported and uses
+  tempo map from REAPER. Missing initial tempo uses
   Rolling's 162 BPM fallback. MIDI duration need not equal the audio duration.
-- Playback remains the first **60 seconds**. Later notes are excluded and holds
-  crossing the end are shortened; these adjustments are reported after import.
+- Playback remains the first **120 seconds**. Later notes are excluded and holds
+  crossing the end are shortened; these adjustments are retained in parser diagnostics.
 - Imported chart scores have separate IDs derived from MIDI contents.
 - The user-supplied tap WAV is converted to mono 44.1 kHz/16-bit PCM without
   changing its speed. Each new gameplay key/pointer press triggers it, even
@@ -98,5 +94,5 @@ See `ranking/README.md` for the one-time Google Apps Script deployment and
 perfect/miss outcomes, lane overlap, held-key repeats, chords, sustain duration,
 automatic completion, release timing independence, and pause/re-grip behavior.
 Browser checks should cover start, keyboard input, pause/resume, retry, the
-one-minute result screen, and mobile layout. Subjective audio alignment should
+two-minute result screen, and mobile layout. Subjective audio alignment should
 also be checked on the player's actual output device.

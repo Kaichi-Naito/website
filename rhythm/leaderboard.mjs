@@ -1,8 +1,8 @@
 export const SHEET_ID = '1l93jSWpBLkh6tLp6wZSS_Z8YHwxMCGFK8cYgJZ8wJmw';
-export const RULESET = 'hold80-v2';
+export const RULESET = 'hold80-empty-v3';
 const $ = id => document.getElementById(id);
 export async function chartKey(chart) {
-  const normalized=JSON.stringify({song:'rolling-60',rules:RULESET,duration:chart.duration,notes:chart.notes.map(n=>[Math.round(n.t*1e6),n.lane,n.end?Math.round(n.end*1e6):null])});
+  const normalized=JSON.stringify({song:'rolling',rules:RULESET,duration:chart.duration,notes:chart.notes.map(n=>[Math.round(n.t*1e6),n.lane,n.end?Math.round(n.end*1e6):null])});
   const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(normalized));
   return Array.from(new Uint8Array(hash),b=>b.toString(16).padStart(2,'0')).join('');
 }

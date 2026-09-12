@@ -5,7 +5,7 @@ import vm from 'node:vm';
 import {chartKey,validName,validEndpoint} from './leaderboard.mjs';
 const code=readFileSync(new URL('./ranking/Code.gs',import.meta.url),'utf8');
 const sandbox=vm.createContext({});vm.runInContext(code,sandbox);
-const valid={song:'Rolling',ruleset:'hold80-v2',name:'かいち',chartKey:'a'.repeat(64),playId:'00000000-0000-4000-8000-000000000000',score:575000,accuracy:57.5,maxCombo:3,units:4,counts:{PERFECT:1,GREAT:1,GOOD:1,MISS:1}};
+const valid={song:'Rolling',ruleset:'hold80-empty-v3',name:'かいち',chartKey:'a'.repeat(64),playId:'00000000-0000-4000-8000-000000000000',score:575000,accuracy:57.5,maxCombo:3,emptyPresses:0,units:4,counts:{PERFECT:1,GREAT:1,GOOD:1,MISS:1}};
 test('ranking identity follows note content and rules, not MIDI filenames or metadata',async()=>{
   const chart={duration:60,notes:[{t:1,lane:0,end:2}]};
   assert.equal(await chartKey(chart),await chartKey({...chart,id:'another',title:'other'}));
@@ -38,4 +38,12 @@ test('retries only append once; formula-like names stay text; response is acknow
   assert(html.includes('"ok":true'));assert(html.includes('window.top.postMessage'));assert.equal(rows.length,2);
   const bad=sandbox.doPost({parameter:{requestId:valid.playId,payload:JSON.stringify({...entry,score:1})}});
   assert(bad.includes('"ok":false'));assert.equal(rows.length,2);
+});
+
+test('server derives the same empty-press penalty and rejects forged penalty counts',()=>{
+  const penalized={...valid,emptyPresses:1,score:325000,accuracy:32.5};
+  assert.equal(sandbox.validateScore_(penalized).score,325000);
+  assert.equal(sandbox.validateScore_({...penalized,emptyPresses:10,score:0,accuracy:0}).score,0);
+  for(const emptyPresses of [undefined,-1,1.5,Infinity,'1'])assert.throws(()=>sandbox.validateScore_({...penalized,emptyPresses}));
+  assert.throws(()=>sandbox.validateScore_({...valid,emptyPresses:1}));
 });
