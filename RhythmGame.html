@@ -25,6 +25,19 @@
     #settings-open{min-height:30px;padding:3px 9px;border:2px solid;border-color:#fff #808080 #808080 #fff;background:#c0c0c0;color:#202020}
     #settings-open:active{border-color:#808080 #fff #fff #808080;padding:4px 8px 2px 10px}
     .settings-gear{display:block;font-family:Arial,sans-serif;font-size:24px;line-height:1;color:#454b52;transform:none!important;animation:none!important}
+    .loading-progress-panel{margin:18px 0 6px;text-align:left}
+    .loading-progress-track{height:12px;padding:2px;background:#0b0f1a;border:1px solid;border-color:#060810 #68728a #68728a #060810;overflow:hidden}
+    .loading-progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--pink));transition:width .12s linear}
+    .loading-progress-panel.indeterminate .loading-progress-fill{width:34%!important;animation:rhythm-loading-slide .9s ease-in-out infinite alternate}
+    .loading-progress-label{margin-top:8px;font:10px var(--mono);letter-spacing:.5px;color:#aebbd1;text-align:center}
+    @keyframes rhythm-loading-slide{from{transform:translateX(-20%)}to{transform:translateX(190%)}}
+    .start-sequence{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;font:700 clamp(42px,9vw,86px) var(--mono);letter-spacing:5px;color:#fff;text-shadow:0 0 18px #7deaffaa,0 0 38px #ff8dda66}
+    .start-sequence.visible{opacity:1}
+    .start-sequence.pop{animation:rhythm-start-pop .34s ease-out}
+    .start-sequence.go{color:#b6ffb4;text-shadow:0 0 22px #b6ffb4bb,0 0 44px #7deaff88}
+    .stage.rhythm-starting .countdown{opacity:0!important}
+    @keyframes rhythm-start-pop{0%{transform:scale(.72);opacity:0}45%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:1}}
+    @media(prefers-reduced-motion:reduce){.start-sequence.pop{animation:none}.loading-progress-panel.indeterminate .loading-progress-fill{animation:none;width:100%!important;opacity:.45}}
     body{padding-bottom:calc(50px + env(safe-area-inset-bottom))}
     #rhythm-taskbar{position:fixed;left:0;right:0;bottom:0;width:100%;height:32px;padding:0 4px env(safe-area-inset-bottom) 4px;box-sizing:content-box;background:#c0c0c0;border-top:2px solid #fff;box-shadow:0 -1px 0 #000;z-index:50000;display:flex;align-items:center;color:#000;font-family:var(--mono)}
     #rhythm-start-btn{height:24px;padding:0 3px;background:#c0c0c0;border:2px solid;border-color:#fff #808080 #808080 #fff;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
@@ -75,12 +88,17 @@
           <div class="combo" id="combo"></div>
           <div class="judgment" id="judgment"></div>
           <div class="countdown" id="countdown"></div>
+          <div class="start-sequence" id="start-sequence" aria-hidden="true"></div>
           <div class="key-row" aria-label="タッチ操作用キー"><button data-lane="0" aria-label="Qレーン"><span class="key-label" aria-hidden="true">Q</span></button><button data-lane="1" aria-label="Wレーン"><span class="key-label" aria-hidden="true">W</span></button><button data-lane="2" aria-label="Eレーン"><span class="key-label" aria-hidden="true">E</span></button><button data-lane="3" aria-label="Rレーン"><span class="key-label" aria-hidden="true">R</span></button></div>
           <div class="overlay" id="overlay">
             <div class="overlay-card" id="overlay-card">
               <p class="eyebrow" id="overlay-eyebrow">PAUSED</p>
               <h2 id="overlay-title">ひとやすみ。</h2>
               <p id="overlay-description">再開ボタンでプレイを続けられます。</p>
+              <div id="loading-progress-panel" class="loading-progress-panel" hidden>
+                <div class="loading-progress-track" aria-hidden="true"><div id="loading-progress-fill" class="loading-progress-fill"></div></div>
+                <div id="loading-progress-label" class="loading-progress-label">音源を準備しています…</div>
+              </div>
               <div id="result" hidden></div>
               <form id="score-form" hidden>
                 <label for="player-name">名前を入れてランキングに登録</label>
@@ -168,6 +186,129 @@
       };
       patchAudioClock(window.AudioContext);
       patchAudioClock(window.webkitAudioContext);
+    })();
+  </script>
+  <script>
+    (() => {
+      const loadState = window.__rhythmLoadState = {latest:null,listeners:new Set()};
+      const notify = entry => {
+        loadState.latest = entry;
+        for (const listener of loadState.listeners) listener(entry);
+      };
+      const nativeFetch = window.fetch.bind(window);
+      window.fetch = async (input, init) => {
+        const url = typeof input === 'string' ? input : input?.url || String(input);
+        const response = await nativeFetch(input, init);
+        if (!/\.mp3(?:[?#]|$)/i.test(url) || !response.body || typeof ReadableStream === 'undefined') return response;
+        const total = Number(response.headers.get('content-length')) || 0;
+        const entry = {url,loaded:0,total,done:false};
+        notify(entry);
+        const reader = response.body.getReader();
+        const stream = new ReadableStream({
+          async pull(controller) {
+            try {
+              const {done,value} = await reader.read();
+              if (done) {
+                entry.done = true;
+                if (entry.total && entry.loaded < entry.total) entry.loaded = entry.total;
+                notify(entry);
+                controller.close();
+                return;
+              }
+              entry.loaded += value.byteLength;
+              notify(entry);
+              controller.enqueue(value);
+            } catch (error) {
+              controller.error(error);
+            }
+          },
+          cancel(reason) { return reader.cancel(reason); }
+        });
+        return new Response(stream,{status:response.status,statusText:response.statusText,headers:response.headers});
+      };
+
+      const overlay = document.getElementById('overlay');
+      const eyebrow = document.getElementById('overlay-eyebrow');
+      const panel = document.getElementById('loading-progress-panel');
+      const fill = document.getElementById('loading-progress-fill');
+      const label = document.getElementById('loading-progress-label');
+      const stage = document.getElementById('stage');
+      const sequence = document.getElementById('start-sequence');
+      let sequenceTimers = [];
+      let wasOverlayHidden = overlay.hidden;
+
+      const renderLoad = entry => {
+        if (panel.hidden) return;
+        panel.classList.remove('indeterminate');
+        if (!entry) {
+          fill.style.width = '0%';
+          panel.classList.add('indeterminate');
+          label.textContent = '音源を準備しています…';
+          return;
+        }
+        if (entry.done) {
+          fill.style.width = '100%';
+          label.textContent = '音源をデコード中…';
+          return;
+        }
+        if (entry.total > 0) {
+          const percent = Math.max(0,Math.min(100,Math.round(entry.loaded / entry.total * 100)));
+          fill.style.width = `${percent}%`;
+          label.textContent = `音源を読み込み中… ${percent}%`;
+        } else {
+          fill.style.width = '34%';
+          panel.classList.add('indeterminate');
+          label.textContent = '音源を読み込み中…';
+        }
+      };
+      loadState.listeners.add(renderLoad);
+
+      const syncLoadingPanel = () => {
+        const loading = !overlay.hidden && eyebrow.textContent.trim() === 'LOADING';
+        panel.hidden = !loading;
+        if (loading) renderLoad(loadState.latest);
+      };
+
+      const cancelSequence = () => {
+        sequenceTimers.forEach(clearTimeout);
+        sequenceTimers = [];
+        stage.classList.remove('rhythm-starting');
+        sequence.classList.remove('visible','pop','go');
+        sequence.textContent = '';
+        sequence.setAttribute('aria-hidden','true');
+      };
+      const showSequenceStep = (text, go=false) => {
+        sequence.textContent = text;
+        sequence.classList.remove('pop','go');
+        void sequence.offsetWidth;
+        sequence.classList.add('visible','pop');
+        if (go) sequence.classList.add('go');
+      };
+      const runSequence = () => {
+        cancelSequence();
+        stage.classList.add('rhythm-starting');
+        sequence.setAttribute('aria-hidden','false');
+        const steps = [
+          [0,'READY',false],
+          [450,'3',false],
+          [950,'2',false],
+          [1450,'1',false],
+          [1950,'GO!',true]
+        ];
+        for (const [delay,text,go] of steps) sequenceTimers.push(setTimeout(()=>showSequenceStep(text,go),delay));
+        sequenceTimers.push(setTimeout(cancelSequence,2600));
+      };
+
+      const overlayObserver = new MutationObserver(() => {
+        const hidden = overlay.hidden;
+        if (hidden && !wasOverlayHidden && eyebrow.textContent.trim() === 'LOADING') runSequence();
+        if (!hidden && eyebrow.textContent.trim() !== 'LOADING') cancelSequence();
+        wasOverlayHidden = hidden;
+        syncLoadingPanel();
+      });
+      overlayObserver.observe(overlay,{attributes:true,attributeFilter:['hidden']});
+      new MutationObserver(syncLoadingPanel).observe(eyebrow,{childList:true,subtree:true,characterData:true});
+      syncLoadingPanel();
     })();
   </script>
   <script type="module" src="rhythm/game.mjs?v=linear-motion-v1"></script>
