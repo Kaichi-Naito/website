@@ -94,6 +94,7 @@
   }
 
   #play-workspace .game-area {
+    height:100%;
     min-height:0;
   }
 
