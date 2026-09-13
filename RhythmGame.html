@@ -117,6 +117,59 @@
   </div>
   <p class="page-note">空押しはPERFECT 1判定分の減点です。長押しは1拍ごとに加点されます。</p>
   <noscript>このゲームを遊ぶにはJavaScriptを有効にしてください。</noscript>
+  <script>
+    (() => {
+      const debug = window.__rhythmDebug = {
+        frameErrors: 0,
+        timestampFallbacks: 0,
+        longFrames: 0,
+        lastFrameError: null,
+        lastLongFrameMs: 0
+      };
+
+      const nativeRaf = window.requestAnimationFrame.bind(window);
+      let lastFrameTime = 0;
+      window.requestAnimationFrame = callback => nativeRaf(time => {
+        if (lastFrameTime && time - lastFrameTime > 1000) {
+          debug.longFrames++;
+          debug.lastLongFrameMs = Math.round(time - lastFrameTime);
+          console.warn(`[RhythmGame] long animation frame: ${debug.lastLongFrameMs} ms`);
+        }
+        lastFrameTime = time;
+        try {
+          callback(time);
+        } catch (error) {
+          debug.frameErrors++;
+          debug.lastFrameError = {
+            message: String(error?.message || error),
+            at: new Date().toISOString()
+          };
+          console.error('[RhythmGame] animation frame failed; retrying on the next frame.', error);
+          window.requestAnimationFrame(callback);
+        }
+      });
+
+      const patchAudioClock = AudioContextClass => {
+        const proto = AudioContextClass?.prototype;
+        if (!proto || typeof proto.getOutputTimestamp !== 'function' || proto.getOutputTimestamp.__rhythmSafe) return;
+        const original = proto.getOutputTimestamp;
+        const safe = function() {
+          try {
+            const stamp = original.call(this);
+            if (stamp && Number.isFinite(stamp.contextTime) && Number.isFinite(stamp.performanceTime)) return stamp;
+          } catch (error) {
+            if (debug.timestampFallbacks === 0) console.warn('[RhythmGame] getOutputTimestamp failed; using AudioContext.currentTime.', error);
+          }
+          debug.timestampFallbacks++;
+          return {contextTime:this.currentTime,performanceTime:performance.now()};
+        };
+        safe.__rhythmSafe = true;
+        try { proto.getOutputTimestamp = safe; } catch {}
+      };
+      patchAudioClock(window.AudioContext);
+      patchAudioClock(window.webkitAudioContext);
+    })();
+  </script>
   <script type="module" src="rhythm/game.mjs?v=linear-motion-v1"></script>
   <dialog id="settings-dialog" aria-labelledby="settings-title">
     <form method="dialog" class="dialog-heading"><h2 id="settings-title">プレイ設定</h2><button aria-label="設定を閉じる" class="icon-button">×</button></form>
