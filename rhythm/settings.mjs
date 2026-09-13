@@ -1,4 +1,4 @@
-import './effects.mjs?v=arcade-effects-v1';
+import './effects.mjs?v=compact-hud-v1';
 
 export const DEFAULT_SETTINGS = Object.freeze({speed:8,offset:0,volume:75,tapVolume:75});
 export function readSettings(saved) {
