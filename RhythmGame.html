@@ -168,13 +168,10 @@
           const button = item.querySelector('.song-play-button');
           if (!button) return;
           const selected = item.getAttribute('aria-selected') === 'true';
-          if (selected) {
-            button.disabled = playSelected.disabled;
-            button.textContent = playSelected.disabled ? (playSelected.textContent.includes('できません') ? '×' : '…') : '▶ PLAY';
-          } else {
-            button.disabled = false;
-            button.textContent = '▶ PLAY';
-          }
+          const disabled = selected ? playSelected.disabled : false;
+          const text = selected && playSelected.disabled ? (playSelected.textContent.includes('できません') ? '×' : '…') : '▶ PLAY';
+          if (button.disabled !== disabled) button.disabled = disabled;
+          if (button.textContent !== text) button.textContent = text;
         });
       };
       const startSongFromCard = item => {
