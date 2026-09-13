@@ -1,6 +1,6 @@
 import { projectDepth } from './projection.mjs?v=song-select-v2';
 import { loadCatalog } from './catalog.mjs?v=song-select-v1';
-import { RhythmEngine } from './engine.mjs?v=song-select-v1';
+import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
 import { Leaderboard } from './leaderboard.mjs?v=song-select-v1';
 import { approachSeconds, tapLevel, readSettings } from './settings.mjs?v=song-select-v1';
@@ -18,6 +18,7 @@ const inputSources = [new Set(), new Set(), new Set(), new Set()];
 const flashes = [0,0,0,0];
 let chart, engine, context, gain, buffer, source, tapBuffer, tapGain;
 let tapPromise;
+const audioDataCache=new Map(),audioBufferCache=new Map(),audioFetchPromises=new Map(),audioDecodePromises=new Map();
 let mode = 'loading', startAt = 0, resumeAt = 0, frozenTime = -2.5, judgmentUntil = 0;
 let width = 800, height = 600, lastHud = 0, requestId = 0;
 const settingsKey = 'kaichi-rhythm-settings-v3';
@@ -89,6 +90,32 @@ async function ensureAudioContext() {
   }
   await context.resume();
 }
+function fetchAudioData(path) {
+  if(audioDataCache.has(path))return Promise.resolve(audioDataCache.get(path));
+  if(audioFetchPromises.has(path))return audioFetchPromises.get(path);
+  const promise=(async()=>{
+    const response=await fetch(path,{cache:'no-cache'});
+    if(!response.ok)throw new Error(`音源を読み込めませんでした（${response.status}）。`);
+    const data=await response.arrayBuffer();audioDataCache.set(path,data);return data;
+  })().finally(()=>audioFetchPromises.delete(path));
+  audioFetchPromises.set(path,promise);return promise;
+}
+function decodeSong(path) {
+  if(audioBufferCache.has(path))return Promise.resolve(audioBufferCache.get(path));
+  if(audioDecodePromises.has(path))return audioDecodePromises.get(path);
+  if(!context)return Promise.reject(new Error('音声再生を準備できませんでした。'));
+  const promise=(async()=>{
+    const data=await fetchAudioData(path);
+    // Some browsers detach the ArrayBuffer passed to decodeAudioData, so keep the cached bytes intact.
+    const decoded=await context.decodeAudioData(data.slice(0));audioBufferCache.set(path,decoded);return decoded;
+  })().finally(()=>audioDecodePromises.delete(path));
+  audioDecodePromises.set(path,promise);return promise;
+}
+function preloadAudio(path) {
+  const fetched=fetchAudioData(path);
+  if(context)fetched.then(()=>decodeSong(path)).catch(()=>{});
+  return fetched.catch(()=>null);
+}
 async function loadTap() {
   if (tapBuffer) return;
   if (!tapPromise) tapPromise = (async () => {
@@ -105,12 +132,8 @@ function playTap() {
 }
 async function loadAudio() {
   await ensureAudioContext();
-  await loadTap();
-  if (!buffer) {
-    const response = await fetch(chart.audio, {cache:'no-cache'});
-    if (!response.ok) throw new Error(`音源を読み込めませんでした（${response.status}）。`);
-    buffer = await context.decodeAudioData(await response.arrayBuffer());
-  }
+  const [songBuffer]=await Promise.all([decodeSong(chart.audio),loadTap()]);
+  buffer=songBuffer;
 }
 function schedule(from, leadIn) {
   stopSource();
@@ -274,7 +297,7 @@ function showSelection() {
   $('play-selected').focus();
 }
 function useChart(next) {
-  stopSource();resetInputs();chart=next;buffer=null;
+  stopSource();resetInputs();chart=next;buffer=audioBufferCache.get(next.audio)||null;preloadAudio(next.audio);
   leaderboard.clearResult();leaderboard.setChart(next,`${next.title} / ${next.difficulty}`);
   engine=new RhythmEngine(chart,onJudge);frozenTime=-2.5;mode='select';
   ui.settings.disabled=false;ui.pause.disabled=true;ui.result.hidden=true;ui.restart.hidden=true;
@@ -291,6 +314,7 @@ async function selectSong(index,scroll) {
   index=Math.max(0,Math.min(songs.length-1,index));
   if(index===selectedIndex&&chart)return;
   selectedIndex=index;const song=songs[index],token=++chartRequest;
+  preloadAudio(song.audio);
   chart=null;engine=null;mode='select';
   $('play-selected').disabled=true;$('play-selected').textContent='譜面を読み込み中…';
   $('selection-status').textContent='';$('catalog-retry').hidden=true;
