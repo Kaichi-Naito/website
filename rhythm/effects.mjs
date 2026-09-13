@@ -1,4 +1,11 @@
 // Visual-only rhythm game effects. This module must not affect timing, scoring, or input handling.
+if (typeof document !== 'undefined' && !document.querySelector('link[data-rhythm-compact-hud]')) {
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = new URL('./compact-hud.css?v=compact-hud-v1', import.meta.url).href;
+  link.dataset.rhythmCompactHud = 'true';
+  document.head.append(link);
+}
 if (typeof document !== 'undefined') initRhythmEffects();
 
 function initRhythmEffects() {
