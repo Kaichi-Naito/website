@@ -1,4 +1,6 @@
-export const DEFAULT_SETTINGS = Object.freeze({speed:8,offset:0,volume:100,tapVolume:100});
+import './effects.mjs?v=arcade-effects-v1';
+
+export const DEFAULT_SETTINGS = Object.freeze({speed:8,offset:0,volume:75,tapVolume:75});
 export function readSettings(saved) {
   const result={...DEFAULT_SETTINGS};
   for(const [key,min,max] of [['speed',2,14],['offset',-250,250],['volume',0,100],['tapVolume',0,100]]) {
