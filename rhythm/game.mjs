@@ -19,6 +19,7 @@ const flashes = [0,0,0,0];
 let chart, engine, context, gain, buffer, source, tapBuffer, tapGain;
 let tapPromise;
 const audioDataCache=new Map(),audioBufferCache=new Map(),audioFetchPromises=new Map(),audioDecodePromises=new Map();
+let scrollLockState=null;
 let mode = 'loading', startAt = 0, resumeAt = 0, frozenTime = -2.5, judgmentUntil = 0;
 let width = 800, height = 600, lastHud = 0, requestId = 0;
 const settingsKey = 'kaichi-rhythm-settings-v3';
@@ -54,6 +55,21 @@ function resetInputs() {
 }
 function stopSource() {
   if (source) { source.onended = null; try { source.stop(); } catch { /* already ended */ } source.disconnect(); source = null; }
+}
+function lockPageScroll() {
+  if(scrollLockState)return;
+  const app=$('app'),rect=app.getBoundingClientRect();
+  const target=Math.max(0,window.scrollY+rect.top-Math.max(0,(window.innerHeight-rect.height)/2));
+  window.scrollTo(0,target);
+  const body=document.body;
+  scrollLockState={y:window.scrollY,position:body.style.position,top:body.style.top,left:body.style.left,right:body.style.right,width:body.style.width};
+  body.style.position='fixed';body.style.top=`-${scrollLockState.y}px`;body.style.left='0';body.style.right='0';body.style.width='auto';
+}
+function unlockPageScroll() {
+  if(!scrollLockState)return;
+  const body=document.body,state=scrollLockState;scrollLockState=null;
+  body.style.position=state.position;body.style.top=state.top;body.style.left=state.left;body.style.right=state.right;body.style.width=state.width;
+  window.scrollTo(0,state.y);
 }
 // Use the hardware output timestamp when available so audio buffering does not shift judgment.
 function audibleTime() {
@@ -145,7 +161,7 @@ function schedule(from, leadIn) {
   const remaining = Math.max(0, Math.min(chart.duration, buffer.duration) - playFrom);
   source.start(when, playFrom, remaining);
   $('back-to-select').disabled=false;
-  mode = 'playing'; ui.overlay.hidden = true; ui.pause.disabled = false;
+  mode = 'playing';lockPageScroll();ui.overlay.hidden = true; ui.pause.disabled = false;
   ui.settings.disabled = true; ui.status.textContent = 'PLAYING — Q / W / E / R';
 }
 async function startGame() {
@@ -177,7 +193,7 @@ function pause() {
   if (mode !== 'playing') return;
   frozenTime = Math.max(-2.5, Math.min(songTime(), chart.duration));
   if (context.currentTime >= resumeAt) engine.tick(frozenTime - settings.offset / 1000);
-  mode = 'paused'; stopSource(); resetInputs();
+  mode = 'paused'; stopSource(); resetInputs();unlockPageScroll();
   ui.pause.disabled = true; ui.settings.disabled = false; ui.countdown.textContent = '';
   ui.restart.hidden = false; ui.result.hidden = true;
   ui.status.textContent = 'PAUSED — 再開まで譜面も音楽も止まります';
@@ -195,7 +211,7 @@ async function resume() {
 function finish() {
   if (mode !== 'playing') return;
   engine.tick(chart.duration + 1);
-  frozenTime = chart.duration; mode = 'results'; stopSource(); resetInputs();
+  frozenTime = chart.duration; mode = 'results'; stopSource(); resetInputs();unlockPageScroll();
   updateHud();
   ui.pause.disabled = true; ui.settings.disabled = false; ui.restart.hidden = true;
   const best = readBest();
@@ -263,7 +279,7 @@ buttons.forEach((button, lane) => {
 });
 window.addEventListener('blur', pause);
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
-window.addEventListener('pagehide', () => { ++requestId; pause(); stopSource(); });
+window.addEventListener('pagehide', () => { ++requestId; pause(); stopSource();unlockPageScroll(); });
 ui.start.addEventListener('click', () => { if (mode === 'paused') resume(); else startGame(); });
 ui.restart.addEventListener('click', startGame);
 ui.pause.addEventListener('click', pause);
@@ -290,7 +306,7 @@ wheel.addEventListener('scroll',()=>{
   },110);
 });
 function showSelection() {
-  ++requestId;stopSource();resetInputs();mode='select';frozenTime=-2.5;
+  ++requestId;stopSource();resetInputs();unlockPageScroll();mode='select';frozenTime=-2.5;
   $('selection-screen').hidden=false;$('play-workspace').hidden=true;ui.overlay.hidden=true;
   ui.pause.disabled=true;ui.settings.disabled=false;leaderboard.clearResult();
   ui.status.textContent='MUSIC SELECT';
