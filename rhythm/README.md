@@ -22,7 +22,8 @@ audio fetching are not supported by opening the HTML as a `file://` URL.
 - Q/W/E/R use physical `KeyboardEvent.code`; OS key repeat is ignored.
 - Touch/pointer lane buttons also work. Inputs are tracked per source.
 - Web Audio decodes the song before starting. One audio clock drives rendering
-  and scoring; `getOutputTimestamp()` compensates for device buffering where available.
+  and scoring; perspective projection accelerates visuals toward the judge line
+  while preserving arrival times. `getOutputTimestamp()` compensates for device buffering where available.
 - PERFECT ±45 ms, GREAT ±90 ms, GOOD ±140 ms; positive user offset delays the target.
 - Holds score the head plus one unit per complete MIDI quarter beat. The parser
   exports tempo-aware `ticks`; each beat succeeds after 80% held coverage.

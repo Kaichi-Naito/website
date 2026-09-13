@@ -1,3 +1,4 @@
+import { projectDepth } from './projection.mjs?v=song-select-v2';
 import { loadCatalog } from './catalog.mjs?v=song-select-v1';
 import { RhythmEngine } from './engine.mjs?v=song-select-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
@@ -341,6 +342,7 @@ function resize() {
 }
 new ResizeObserver(resize).observe(ui.stage);
 function point(lane, depth) {
+  depth=projectDepth(depth);
   const spread = width * (.24 + .60 * depth);
   return { x: width / 2 + (lane / 4 - .5) * spread, y: height * (.07 + .76 * depth) };
 }
@@ -380,7 +382,7 @@ function draw(time, now) {
       }
       const nd=n.state==='holding'?1:d;
       const left=point(n.lane+.06,nd),right=point(n.lane+.94,nd);
-      const noteHeight=4+nd*8;
+      const noteHeight=4+projectDepth(nd)*8;
       g.shadowBlur=reduceMotion?0:12;g.shadowColor=n.end?'#abffd5':colors[n.lane];
       g.fillStyle=n.end?'#b9ffbf':colors[n.lane];g.fillRect(left.x,left.y-noteHeight/2,right.x-left.x,noteHeight);
       g.shadowBlur=0;g.fillStyle='#f2ffff';g.fillRect(left.x+1,left.y-noteHeight/2,right.x-left.x-2,2);
