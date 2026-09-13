@@ -1,28 +1,32 @@
-import { RhythmEngine } from './engine.mjs?v=two-minute-v1';
-import { midiToChart } from './midi.mjs?v=two-minute-v1';
-import { Leaderboard } from './leaderboard.mjs?v=two-minute-v1';
-import { approachSeconds, tapLevel, readSettings } from './settings.mjs?v=two-minute-v1';
+import { loadCatalog } from './catalog.mjs?v=song-select-v1';
+import { RhythmEngine } from './engine.mjs?v=song-select-v1';
+import { midiToChart } from './midi.mjs?v=song-select-v1';
+import { Leaderboard } from './leaderboard.mjs?v=song-select-v1';
+import { approachSeconds, tapLevel, readSettings } from './settings.mjs?v=song-select-v1';
 const $ = id => document.getElementById(id);
 const ui = Object.fromEntries(['canvas','stage','score','accuracy','accuracy-meter','accuracy-fill','combo','judgment','countdown','overlay','overlay-title','overlay-eyebrow','overlay-description','overlay-foot','start','restart','pause','result','status','progress','elapsed','settings','best-score'].map(id => [id, $(id)]));
 const g = ui.canvas.getContext('2d');
 const buttons = [...document.querySelectorAll('[data-lane]')];
 const colors = ['#7deaff','#7deaff','#ff8dda','#ff8dda'];
 const keyCodes = ['KeyQ','KeyW','KeyE','KeyR'];
-const publishedMidiPath = 'rhythm/charts/Rolling_Game.mid';
+const judgmentColors = {PERFECT:'#ffe37a',GREAT:'#c4a2ff',GOOD:'#80e5b0',MISS:'#ff6f8a',EMPTY:'#ff6f8a'};
+const flashColors=[...colors], errors=[0,0,0,0], bursts=[];
+let songs=[], selectedIndex=-1, chartRequest=0, wheelTimer;
+const wheel=$('song-wheel');
 const inputSources = [new Set(), new Set(), new Set(), new Set()];
 const flashes = [0,0,0,0];
 let chart, engine, context, gain, buffer, source, tapBuffer, tapGain;
 let tapPromise;
 let mode = 'loading', startAt = 0, resumeAt = 0, frozenTime = -2.5, judgmentUntil = 0;
 let width = 800, height = 600, lastHud = 0, requestId = 0;
-const settingsKey = 'kaichi-rhythm-settings-v2';
+const settingsKey = 'kaichi-rhythm-settings-v3';
 let savedSettings = {};
 try {
   const current = localStorage.getItem(settingsKey);
   if (current) savedSettings = JSON.parse(current);
   else {
-    const old = JSON.parse(localStorage.getItem('kaichi-rhythm-settings-v1') || '{}');
-    savedSettings = {offset:old.offset,volume:old.volume};
+    const old = JSON.parse(localStorage.getItem('kaichi-rhythm-settings-v2') || '{}');
+    savedSettings = {offset:old.offset,speed:old.speed};
   }
 } catch {}
 let settings = readSettings(savedSettings);
@@ -39,7 +43,7 @@ for (const key of ['speed','offset','volume','tapVolume']) {
   };
   $(key).addEventListener('input', update); update();
 }
-function bestKey() { return `kaichi-rhythm-best-empty-v3-${chart.duration}-${chart.id}`; }
+function bestKey() { return `kaichi-rhythm-best-beat-v4-${chart.catalogId}-${chart.duration}-${chart.id}`; }
 function readBest() { try { return Number(localStorage.getItem(bestKey())) || 0; } catch { return 0; } }
 function bestUI() { const n = readBest(); ui['best-score'].textContent = n ? n.toLocaleString() : '—'; }
 function resetInputs() {
@@ -87,7 +91,7 @@ async function ensureAudioContext() {
 async function loadTap() {
   if (tapBuffer) return;
   if (!tapPromise) tapPromise = (async () => {
-    const r = await fetch('rhythm/tap.wav');
+    const r = await fetch('rhythm/tap.wav', {cache:'no-cache'});
     if (!r.ok) throw new Error(`タップ音を読み込めませんでした（${r.status}）。`);
     tapBuffer = await context.decodeAudioData(await r.arrayBuffer());
   })().catch(error => { tapPromise = null; throw error; });
@@ -116,18 +120,23 @@ function schedule(from, leadIn) {
   source = context.createBufferSource(); source.buffer = buffer; source.connect(gain);
   const remaining = Math.max(0, Math.min(chart.duration, buffer.duration) - playFrom);
   source.start(when, playFrom, remaining);
+  $('back-to-select').disabled=false;
   mode = 'playing'; ui.overlay.hidden = true; ui.pause.disabled = false;
   ui.settings.disabled = true; ui.status.textContent = 'PLAYING — Q / W / E / R';
 }
 async function startGame() {
-  if (!chart || mode === 'playing' || (mode === 'loading' && !ui.start.disabled)) return;
+  if (!chart || mode === 'playing' || mode === 'loading') return;
+  $('selection-screen').hidden=true; $('play-workspace').hidden=false; resize();
+  $('settings-dialog').close();
+  showOverlay('LOADING', chart.title, '音源を準備しています。', '音源を読み込み中…');
   const token = ++requestId;
   mode = 'loading'; ui.start.disabled = true; ui.start.textContent = '音源を読み込み中…';
+  $('back-to-select').disabled=true;
   ui.status.textContent = '音源を準備しています';
   try {
     await loadAudio();
     if (token !== requestId) return;
-    resetInputs(); engine = new RhythmEngine(chart, onJudge);
+    resetInputs(); bursts.length=0; flashes.fill(0); errors.fill(0); engine = new RhythmEngine(chart, onJudge);
     leaderboard.clearResult();
     frozenTime = -2.5; ui.result.hidden = true; ui.restart.hidden = true;
     ui.combo.textContent = ''; ui.judgment.style.opacity = 0; judgmentUntil = 0;
@@ -135,6 +144,7 @@ async function startGame() {
     ui.start.blur();
     if (document.hidden) pause();
   } catch (error) {
+    $('back-to-select').disabled=false;
     mode = 'error'; ui.status.textContent = '読み込みエラー';
     showOverlay('LOAD ERROR', '読み込みをやり直してください', error.message, '再読み込み');
   }
@@ -177,19 +187,22 @@ function finish() {
   const stats = document.createElement('div'); stats.className = 'result-stats';
   for (const [label, value] of [...Object.entries(engine.counts), ['空押し', engine.emptyPresses], ['MAX COMBO', engine.maxCombo], ['ACCURACY', `${engine.accuracy.toFixed(2)}%`]]) {
     const row = document.createElement('div'), name = document.createElement('span'), number = document.createElement('b');
-    name.textContent = label; number.textContent = value; row.append(name, number); stats.append(row);
+    row.dataset.judge=label; name.textContent = label; number.textContent = value; row.append(name, number); stats.append(row);
   }
   ui.result.append(stats);
   leaderboard.showResult({score:engine.score,accuracy:Number(engine.accuracy.toFixed(2)),maxCombo:engine.maxCombo,units:engine.units,emptyPresses:engine.emptyPresses,counts:{...engine.counts}});
   ui.status.textContent = 'COMPLETE — おつかれさまでした';
 }
-function onJudge({ label, lane, delta }) {
-  const now = performance.now(); judgmentUntil = now + 550;
-  ui.judgment.replaceChildren(document.createTextNode(label));
-  ui.judgment.style.color = label === 'EMPTY' ? '#ff889b' : label === 'MISS' ? '#a1afc8' : label === 'GOOD' ? '#ffc390' : label === 'GREAT' ? '#ffacf0' : '#b9ffff';
-  ui.judgment.style.opacity = 1;
-  if (label === 'GREAT' || label === 'GOOD') { const small = document.createElement('small'); small.textContent = delta < 0 ? 'FAST' : 'LATE'; ui.judgment.append(small); }
-  if (label !== 'MISS' && label !== 'EMPTY') flashes[lane] = now;
+function onJudge({label,lane,delta,sustain}) {
+  const now=performance.now(); judgmentUntil=now+550;
+  ui.judgment.replaceChildren(document.createTextNode(label==='EMPTY'?'空押し':label));
+  ui.judgment.style.color=judgmentColors[label];ui.judgment.style.opacity=1;
+  if(label==='GREAT'||label==='GOOD'){const small=document.createElement('small');small.textContent=delta<0?'FAST':'LATE';ui.judgment.append(small);}
+  if(label==='MISS'||label==='EMPTY')errors[lane]=now;
+  else {
+    flashes[lane]=now;flashColors[lane]=judgmentColors[label];
+    if(!reduceMotion){bursts.push({lane,at:now,color:judgmentColors[label],sustain});if(bursts.length>36)bursts.shift();}
+  }
 }
 function inputDown(lane, sourceId) {
   if (mode !== 'playing') return;
@@ -215,8 +228,8 @@ window.addEventListener('keydown', event => {
   if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
   const lane = keyCodes.indexOf(event.code);
   const typing = event.target instanceof HTMLElement && (event.target.isContentEditable || event.target.matches('input,textarea,select'));
-  if (typing) return;
-  if (event.code === 'Escape' || event.code === 'Space') { event.preventDefault(); if (!event.repeat) { if (mode === 'playing') pause(); else if (mode === 'paused') resume(); } return; }
+  if (typing || $('settings-dialog').open) return;
+  if ((event.code === 'Escape' || event.code === 'Space') && (mode === 'playing' || mode === 'paused')) { event.preventDefault(); if (!event.repeat) { if (mode === 'playing') pause(); else if (mode === 'paused') resume(); } return; }
   if (lane >= 0 && mode === 'playing') { event.preventDefault(); if (!event.repeat) inputDown(lane, 'keyboard'); }
 });
 window.addEventListener('keyup', event => { const lane = keyCodes.indexOf(event.code); if (lane >= 0) inputUp(lane, 'keyboard'); });
@@ -227,26 +240,99 @@ buttons.forEach((button, lane) => {
 window.addEventListener('blur', pause);
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
 window.addEventListener('pagehide', () => { ++requestId; pause(); stopSource(); });
-ui.start.addEventListener('click', () => { if (mode === 'paused') resume(); else if (!chart) loadChart(); else startGame(); });
+ui.start.addEventListener('click', () => { if (mode === 'paused') resume(); else startGame(); });
 ui.restart.addEventListener('click', startGame);
 ui.pause.addEventListener('click', pause);
-$('tap-preview').addEventListener('click', async () => {
-  const button = $('tap-preview'); button.disabled = true;
-  try { await ensureAudioContext(); await loadTap(); playTap(); ui.status.textContent = 'タップ音を再生しました'; }
-  catch (error) { ui.status.textContent = error.message; }
-  finally { button.disabled = false; }
+$('settings-open').addEventListener('click',()=>{
+  if(mode==='playing')pause();
+  if(mode==='loading')return;
+  $('settings-dialog').showModal();
 });
-function useChart(next, label) {
-  ++requestId; stopSource(); resetInputs(); chart = next;
-  leaderboard.clearResult(); leaderboard.setChart(next, label);
-  engine = new RhythmEngine(chart,onJudge); frozenTime = -2.5; mode = 'ready';
-  ui.settings.disabled = false; ui.pause.disabled = true;
-  ui.result.hidden = true; ui.restart.hidden = true; ui.countdown.textContent = '';
-  ui.combo.textContent = ''; delete ui.combo.dataset.value; ui.judgment.style.opacity = 0;
-  $('bpm').textContent = `${chart.bpm} BPM`;
-  bestUI(); updateHud();
-  showOverlay('READY TO ROLL?', '音楽に、飛び込もう。', '冒頭2分のテスト版。ノーツに合わせてキー、または下のボタンを押してください。', '▶ START GAME');
-  ui.status.textContent = `READY — ${chart.notes.length} NOTES / Q W E R`;
+$('back-to-select').addEventListener('click',showSelection);
+$('play-selected').addEventListener('click',startGame);
+$('catalog-retry').addEventListener('click',loadSongs);
+$('song-prev').addEventListener('click',()=>selectSong(selectedIndex-1,true));
+$('song-next').addEventListener('click',()=>selectSong(selectedIndex+1,true));
+wheel.addEventListener('keydown',event=>{
+  if(event.key==='ArrowDown'||event.key==='ArrowUp'){event.preventDefault();selectSong(selectedIndex+(event.key==='ArrowDown'?1:-1),true);}
+  if(event.key==='Enter'&&!$('play-selected').disabled){event.preventDefault();startGame();}
+});
+wheel.addEventListener('scroll',()=>{
+  clearTimeout(wheelTimer);wheelTimer=setTimeout(()=>{
+    const center=wheel.scrollTop+wheel.clientHeight/2;
+    let nearest=selectedIndex,distance=Infinity;
+    [...wheel.children].forEach((item,index)=>{const d=Math.abs(item.offsetTop-wheel.offsetTop+item.offsetHeight/2-center);if(d<distance){distance=d;nearest=index;}});
+    if(nearest!==selectedIndex)selectSong(nearest,false);
+  },110);
+});
+function showSelection() {
+  ++requestId;stopSource();resetInputs();mode='select';frozenTime=-2.5;
+  $('selection-screen').hidden=false;$('play-workspace').hidden=true;ui.overlay.hidden=true;
+  ui.pause.disabled=true;ui.settings.disabled=false;leaderboard.clearResult();
+  ui.status.textContent='MUSIC SELECT';
+  $('play-selected').focus();
+}
+function useChart(next) {
+  stopSource();resetInputs();chart=next;buffer=null;
+  leaderboard.clearResult();leaderboard.setChart(next,`${next.title} / ${next.difficulty}`);
+  engine=new RhythmEngine(chart,onJudge);frozenTime=-2.5;mode='select';
+  ui.settings.disabled=false;ui.pause.disabled=true;ui.result.hidden=true;ui.restart.hidden=true;
+  ui.countdown.textContent='';ui.combo.textContent='';delete ui.combo.dataset.value;ui.judgment.style.opacity=0;
+  $('playing-jacket').src=chart.jacket;$('playing-jacket').alt=`${chart.title} ジャケット`;
+  $('playing-artist').textContent=chart.artist;$('playing-title').textContent=chart.title;
+  $('playing-difficulty').textContent=chart.difficulty;$('bpm').textContent=`${chart.bpm} BPM`;
+  $('playing-duration').textContent=clockString(chart.duration);
+  $('stage-song').textContent=chart.title;$('stage-artist').textContent=chart.artist;
+  bestUI();updateHud();ui.status.textContent='MUSIC SELECT';
+}
+async function selectSong(index,scroll) {
+  if(!songs.length)return;
+  index=Math.max(0,Math.min(songs.length-1,index));
+  if(index===selectedIndex&&chart)return;
+  selectedIndex=index;const song=songs[index],token=++chartRequest;
+  chart=null;engine=null;mode='select';
+  $('play-selected').disabled=true;$('play-selected').textContent='譜面を読み込み中…';
+  $('selection-status').textContent='';$('catalog-retry').hidden=true;
+  $('song-position').textContent=`${String(index+1).padStart(2,'0')} / ${String(songs.length).padStart(2,'0')}`;
+  $('selected-title').textContent=song.title;$('selected-artist').textContent=song.artist;
+  $('selected-jacket').src=song.jacket;$('selected-jacket').alt=`${song.title} ジャケット`;
+  $('selected-difficulty').textContent=song.difficulty;$('selected-bpm').textContent=`${song.bpm} BPM`;
+  $('selected-duration').textContent=clockString(song.duration);
+  $('song-prev').disabled=index===0;$('song-next').disabled=index===songs.length-1;
+  [...wheel.children].forEach((item,i)=>item.setAttribute('aria-selected',String(i===index)));
+  wheel.setAttribute('aria-activedescendant',`song-option-${index}`);
+  if(scroll)wheel.children[index].scrollIntoView({block:'center',behavior:reduceMotion?'instant':'smooth'});
+  leaderboard.clearResult();leaderboard.clearChart(`${song.title} / ${song.difficulty}`);
+  try {
+    const response=await fetch(`${song.midiPath}?updated=${Date.now()}`,{cache:'no-store'});
+    if(!response.ok)throw new Error(`譜面を読み込めませんでした（${response.status}）。`);
+    const next=midiToChart(await response.arrayBuffer(),song);
+    if(token!==chartRequest)return;
+    useChart(next);$('selected-bpm').textContent=`${next.bpm} BPM`;
+    $('play-selected').disabled=false;$('play-selected').textContent='▶ PLAY';
+    $('selection-status').textContent=`${next.notes.length}ノーツ / 長押しは1拍ごとに加点`;
+  } catch(error) {
+    if(token!==chartRequest)return;
+    $('selection-status').textContent=error.message;$('play-selected').textContent='プレイできません';$('catalog-retry').hidden=false;
+  }
+}
+async function loadSongs() {
+  const token=++chartRequest;
+  selectedIndex=-1;chart=null;engine=null;mode='select';
+  $('play-selected').disabled=true;$('catalog-retry').hidden=true;
+  $('selection-status').textContent='楽曲一覧を読み込んでいます…';
+  try {
+    const next=await loadCatalog();if(token!==chartRequest)return;songs=next;wheel.replaceChildren();
+    songs.forEach((song,index)=>{
+      const item=document.createElement('div');item.className='song-option';item.id=`song-option-${index}`;
+      item.setAttribute('role','option');item.setAttribute('aria-selected','false');
+      const img=document.createElement('img');img.src=song.jacket;img.alt='';img.loading='lazy';
+      const details=document.createElement('div'),title=document.createElement('strong'),artist=document.createElement('small'),level=document.createElement('em');
+      title.textContent=song.title;artist.textContent=song.artist;level.textContent=song.difficulty;
+      details.append(title,artist,level);item.append(img,details);item.addEventListener('click',()=>selectSong(index,true));wheel.append(item);
+    });
+    await selectSong(0,false);
+  } catch(error) {if(token===chartRequest){$('selection-status').textContent=error.message;$('catalog-retry').hidden=false;$('play-selected').textContent='プレイできません';}}
 }
 function resize() {
   const r = ui.stage.getBoundingClientRect(); width = r.width; height = r.height;
@@ -271,7 +357,7 @@ function draw(time, now) {
   for (let lane=0;lane<4;lane++) {
     laneQuad(lane,0,1.04,lane<2?'#102338b8':'#261b38b8','#53688744');
     if (engine?.held[lane]) laneQuad(lane,.1,1.02,lane<2?'#7deaff14':'#ff8dda14');
-    if(!reduceMotion && now-flashes[lane]<240){g.globalAlpha=(1-(now-flashes[lane])/240)*.4;laneQuad(lane,.55,1.01,colors[lane]);g.globalAlpha=1;}
+    if(!reduceMotion && now-flashes[lane]<240){g.globalAlpha=(1-(now-flashes[lane])/240)*.4;laneQuad(lane,.55,1.01,flashColors[lane]);g.globalAlpha=1;}
   }
   const approach = approachSeconds(settings.speed);
   const beat = 60 / (chart?.bpm || 162);
@@ -301,7 +387,19 @@ function draw(time, now) {
     }
   }
   const a=point(0,1),b=point(4,1);g.lineWidth=3;g.strokeStyle='#ecf8ff';g.shadowBlur=15;g.shadowColor='#b0d5ff';g.beginPath();g.moveTo(a.x,a.y);g.lineTo(b.x,b.y);g.stroke();g.shadowBlur=0;g.lineWidth=1;
-  g.font='10px PixelMplus';g.fillStyle='#96a3bf';g.textAlign='center';g.fillText('JUDGE LINE',width/2,height*.865);
+  for(let lane=0;lane<4;lane++) {
+    const p=point(lane+.5,1),age=now-errors[lane];
+    if(age<240){g.globalAlpha=(1-age/240)*.65;g.strokeStyle=judgmentColors.MISS;g.lineWidth=3;g.beginPath();g.moveTo(p.x-8,p.y-8);g.lineTo(p.x+8,p.y+8);g.moveTo(p.x+8,p.y-8);g.lineTo(p.x-8,p.y+8);g.stroke();g.globalAlpha=1;}
+    if(reduceMotion&&now-flashes[lane]<180){g.fillStyle=flashColors[lane];g.fillRect(p.x-10,p.y-4,20,8);}
+  }
+  for(let i=bursts.length-1;i>=0;i--) {
+    const burst=bursts[i],age=(now-burst.at)/360;if(age>=1){bursts.splice(i,1);continue;}
+    const p=point(burst.lane+.5,1),size=burst.sustain?.65:1;
+    g.globalAlpha=1-age;g.strokeStyle=burst.color;g.fillStyle=burst.color;g.lineWidth=2;
+    g.beginPath();g.ellipse(p.x,p.y,(8+age*32)*size,(5+age*16)*size,0,0,Math.PI*2);g.stroke();
+    for(let k=0;k<8;k++){const angle=k*Math.PI/4,x=p.x+Math.cos(angle)*(8+age*55)*size,y=p.y+Math.sin(angle)*(8+age*36)*size-age*14;g.fillRect(x-2,y-2,4,4);}
+    g.globalAlpha=1;
+  }
 }
 function clockString(time) { time=Math.floor(Math.max(0,time));return `${Math.floor(time/60)}:${String(time%60).padStart(2,'0')}`; }
 function updateHud() {
@@ -331,16 +429,4 @@ function frame(now) {
   if(now-lastHud>70){updateHud();lastHud=now;}
   requestAnimationFrame(frame);
 }
-async function loadChart() {
-  try {
-    mode='loading';ui.start.disabled=true;
-    const response=await fetch('rhythm/rolling-chart.json', {cache:'no-store'});
-    if(!response.ok)throw new Error(`譜面を読み込めませんでした（${response.status}）。`);
-    const metadata=await response.json();
-    const midi=await fetch(`${publishedMidiPath}?updated=${Date.now()}`, {cache:'no-store'});
-    if(!midi.ok)throw new Error(`譜面を読み込めませんでした（${midi.status}）。ページを再読み込みしてください。`);
-    const next=midiToChart(await midi.arrayBuffer(),metadata);
-    useChart(next,'Rolling / 2分版');
-  } catch(error) {mode='error';showOverlay('LOAD ERROR','譜面を読み込めませんでした',error.message,'再読み込み');ui.status.textContent='読み込みエラー';}
-}
-loadChart();resize();requestAnimationFrame(frame);
+loadSongs();resize();requestAnimationFrame(frame);

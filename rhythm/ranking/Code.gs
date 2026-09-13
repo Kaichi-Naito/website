@@ -2,10 +2,10 @@
 // Only this spreadsheet is read/written. No Google credentials go into the website.
 const RANKING_SPREADSHEET_ID = '1l93jSWpBLkh6tLp6wZSS_Z8YHwxMCGFK8cYgJZ8wJmw';
 const RANKING_ORIGIN = 'https://kaichi-naito.github.io';
-const RANKING_RULESET = 'hold80-empty-v3';
+const RANKING_RULESET = 'beat-hold-v4';
 
 function validateScore_(input) {
-  if(!input || input.song!=='Rolling' || input.ruleset!==RANKING_RULESET)throw new Error('対象外の曲または判定ルールです。');
+  if(!input || typeof input.song!=='string' || !input.song.trim() || input.song.length>150 || !/^[A-Za-z0-9_-]{1,80}$/.test(input.songId) || input.ruleset!==RANKING_RULESET)throw new Error('対象外の曲または判定ルールです。');
   const name=String(input.name || '').trim();
   if(!name || Array.from(name).length>16 || /[\u0000-\u001f\u007f]/.test(name))throw new Error('名前は1〜16文字で入力してください。');
   if(!/^[a-f0-9]{64}$/.test(input.chartKey))throw new Error('譜面IDが正しくありません。');
@@ -32,7 +32,11 @@ function saveScore_(raw) {
   const input=validateScore_(raw),lock=LockService.getScriptLock();
   lock.waitLock(10000);
   try {
-    const sheet=SpreadsheetApp.openById(RANKING_SPREADSHEET_ID).getSheetByName('スコア');
+    const book=SpreadsheetApp.openById(RANKING_SPREADSHEET_ID);
+    const catalog=book.getSheetByName('譜面');
+    const song=catalog&&catalog.getLastRow()>1?catalog.getRange(2,1,Math.min(catalog.getLastRow()-1,999),10).getValues().find(r=>r[8]===input.songId && r[9]===true):null;
+    if(!song||song[0]!==input.song)throw new Error('現在公開されている楽曲を選び直してください。');
+    const sheet=book.getSheetByName('スコア');
     if(!sheet||sheet.getRange('I1').getValue()!=='プレイID')throw new Error('ランキング表の設定を確認してください。');
     const last=sheet.getLastRow();
     const existing=last>1?sheet.getRange(2,9,last-1,1).createTextFinder(input.playId).matchEntireCell(true).findNext():null;
@@ -46,7 +50,7 @@ function saveScore_(raw) {
       // Quote formula-like names so public submissions never become Sheets formulas.
       const safeName=/^[=+\-@']/.test(input.name)?"'"+input.name:input.name;
       sheet.getRange(row,2).setNumberFormat('@');
-      sheet.getRange(row,1,1,15).setValues([['Rolling',safeName,input.score,input.accuracy,input.maxCombo,input.chartKey,input.ruleset,Utilities.formatDate(new Date(),'Asia/Tokyo','yyyy-MM-dd HH:mm:ss'),input.playId,c.PERFECT,c.GREAT,c.GOOD,c.MISS,input.units,input.emptyPresses]]);
+      sheet.getRange(row,1,1,15).setValues([[song[0],safeName,input.score,input.accuracy,input.maxCombo,input.chartKey,input.ruleset,Utilities.formatDate(new Date(),'Asia/Tokyo','yyyy-MM-dd HH:mm:ss'),input.playId,c.PERFECT,c.GREAT,c.GOOD,c.MISS,input.units,input.emptyPresses]]);
       sheet.getRange(row,3).setNumberFormat('#,##0');sheet.getRange(row,4).setNumberFormat('0.00');
       SpreadsheetApp.flush();
     }

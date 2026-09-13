@@ -14,16 +14,16 @@ function smf(tracks,format=tracks.length>1?1:0){
 }
 test('75 74 73 72 map to Q W E R; short notes tap, quarter+ holds; leading rest stays intact',()=>{
   const c=midiToChart(smf([[tempo(0,500000),on(960,75),off(1080,75),on(1440,74),off(1920,74),on(1920,73),on(1920,72),off(1980,73),off(1980,72)]]),base);
-  assert.deepEqual(c.notes,[{t:1,lane:0},{t:1.5,lane:1,end:2},{t:2,lane:2},{t:2,lane:3}]);
+  assert.deepEqual(c.notes,[{t:1,lane:0},{t:1.5,lane:1,end:2,ticks:[2]},{t:2,lane:2},{t:2,lane:3}]);
   assert.equal(c.bpm,120);assert.equal(c.midi.tempoFallback,false);
 });
 test('type 1 tempo map including a change during a hold yields exact seconds',()=>{
   const c=midiToChart(smf([[tempo(0,500000),tempo(960,1000000)],[on(480,75,4),off(1440,75,4)]]),base);
-  assert.deepEqual(c.notes,[{t:.5,lane:0,end:2}]);
+  assert.deepEqual(c.notes,[{t:.5,lane:0,end:2,ticks:[1,2]}]);
 });
 test('running status and zero-velocity note-on releases are understood',()=>{
   const c=midiToChart(smf([[tempo(0,500000),on(0,75),event(120,[75,0]),event(480,[74,100]),event(960,[74,0])]]),base);
-  assert.deepEqual(c.notes,[{t:0,lane:0},{t:.5,lane:1,end:1}]);
+  assert.deepEqual(c.notes,[{t:0,lane:0},{t:.5,lane:1,end:1,ticks:[1]}]);
 });
 test('missing tempo uses song BPM and reports fallback',()=>{
   const c=midiToChart(smf([[on(960,75),off(1080,75)]]),base);
@@ -31,7 +31,7 @@ test('missing tempo uses song BPM and reports fallback',()=>{
 });
 test('one-minute scope clips tails, omits later starts, and reports unused pitches',()=>{
   const c=midiToChart(smf([[tempo(0,500000),on(0,70),off(120,70),on(57120,72),off(58080,72),on(58080,75),off(58200,75)]]),base);
-  assert.deepEqual(c.notes,[{t:59.5,lane:3,end:60}]);assert.equal(c.midi.clipped,2);assert.equal(c.midi.ignored,1);
+  assert.deepEqual(c.notes,[{t:59.5,lane:3,end:60,ticks:[60]}]);assert.equal(c.midi.clipped,2);assert.equal(c.midi.ignored,1);
 });
 test('rejects broken data, unmatched holds, and same-lane overlaps without modifying base',()=>{
   assert.throws(()=>midiToChart(new Uint8Array([1,2]),base));

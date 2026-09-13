@@ -5,9 +5,9 @@ import vm from 'node:vm';
 import {chartKey,validName,validEndpoint} from './leaderboard.mjs';
 const code=readFileSync(new URL('./ranking/Code.gs',import.meta.url),'utf8');
 const sandbox=vm.createContext({});vm.runInContext(code,sandbox);
-const valid={song:'Rolling',ruleset:'hold80-empty-v3',name:'かいち',chartKey:'a'.repeat(64),playId:'00000000-0000-4000-8000-000000000000',score:575000,accuracy:57.5,maxCombo:3,emptyPresses:0,units:4,counts:{PERFECT:1,GREAT:1,GOOD:1,MISS:1}};
+const valid={song:'Rolling',songId:'rolling-normal',ruleset:'beat-hold-v4',name:'かいち',chartKey:'a'.repeat(64),playId:'00000000-0000-4000-8000-000000000000',score:575000,accuracy:57.5,maxCombo:3,emptyPresses:0,units:4,counts:{PERFECT:1,GREAT:1,GOOD:1,MISS:1}};
 test('ranking identity follows note content and rules, not MIDI filenames or metadata',async()=>{
-  const chart={duration:60,notes:[{t:1,lane:0,end:2}]};
+  const chart={catalogId:'rolling-normal',duration:60,notes:[{t:1,lane:0,end:2}]};
   assert.equal(await chartKey(chart),await chartKey({...chart,id:'another',title:'other'}));
   assert.notEqual(await chartKey(chart),await chartKey({...chart,notes:[{t:1.1,lane:0,end:2}]}));
 });
@@ -28,7 +28,8 @@ test('retries only append once; formula-like names stay text; response is acknow
     return {setNumberFormat:()=>{},setValues:values=>{rows[row-1]=values[0];},getValues:()=>rows.slice(row-1,row-1+count).map(r=>r.slice(col-1,col-1+width)),createTextFinder:id=>({matchEntireCell:()=>({findNext:()=>{const index=rows.findIndex(r=>r[8]===id);return index<0?null:{getRow:()=>index+1};}})})};
   }};
   sandbox.LockService={getScriptLock:()=>({waitLock:()=>locks++,releaseLock:()=>locks--})};
-  sandbox.SpreadsheetApp={openById:()=>({getSheetByName:()=>sheet}),flush:()=>flushes++};
+  const catalog={getLastRow:()=>2,getRange:()=>({getValues:()=>[['Rolling','NORMAL','','','PHALUX','',162,120,'rolling-normal',true]]})};
+  sandbox.SpreadsheetApp={openById:()=>({getSheetByName:name=>name==='譜面'?catalog:sheet}),flush:()=>flushes++};
   sandbox.Utilities={formatDate:()=> '2026-09-12 23:00:00'};
   sandbox.HtmlService={XFrameOptionsMode:{ALLOWALL:1},createHtmlOutput:html=>({setXFrameOptionsMode:()=>html})};
   const entry={...valid,name:'=1+1'};

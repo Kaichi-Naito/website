@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import {readSettings,tapLevel,approachSeconds} from './settings.mjs';
 test('new defaults center speed on old 8 and increase tap gain 2.5 times',()=>{
   assert.equal(readSettings().speed,(2+14)/2);
-  assert.equal(readSettings().tapVolume,70);
+  assert.equal(readSettings().tapVolume,100);
+  assert.equal(readSettings().volume,100);
   assert.equal(tapLevel(70),1.5);
   assert(Math.abs(approachSeconds(8)-(3.8-8*.32))<1e-12);
   assert(approachSeconds(2)>approachSeconds(8));

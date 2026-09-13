@@ -1,8 +1,8 @@
-export const SHEET_ID = '1l93jSWpBLkh6tLp6wZSS_Z8YHwxMCGFK8cYgJZ8wJmw';
-export const RULESET = 'hold80-empty-v3';
+import { readSheet } from './sheets.mjs?v=song-select-v1';
+export const RULESET = 'beat-hold-v4';
 const $ = id => document.getElementById(id);
 export async function chartKey(chart) {
-  const normalized=JSON.stringify({song:'rolling',rules:RULESET,duration:chart.duration,notes:chart.notes.map(n=>[Math.round(n.t*1e6),n.lane,n.end?Math.round(n.end*1e6):null])});
+  const normalized=JSON.stringify({song:chart.catalogId || chart.title,rules:RULESET,duration:chart.duration,notes:chart.notes.map(n=>[Math.round(n.t*1e6),n.lane,n.end?Math.round(n.end*1e6):null,n.ticks?.map(t=>Math.round(t*1e6))??[]])});
   const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(normalized));
   return Array.from(new Uint8Array(hash),b=>b.toString(16).padStart(2,'0')).join('');
 }
@@ -13,28 +13,6 @@ export function validName(value) {
   const name=value.trim();
   if(!name || Array.from(name).length>16 || /[\u0000-\u001f\u007f]/u.test(name)) throw new Error('名前は1〜16文字で入力してください。');
   return name;
-}
-// Public, read-only Google Sheets queries. No credentials are placed in the site.
-function readSheet(sheet,range,query='') {
-  return new Promise((resolve,reject)=>{
-    const callback=`rhythm_${crypto.randomUUID().replaceAll('-','')}`;
-    const script=document.createElement('script');
-    const cleanup=()=>{
-      clearTimeout(timer);script.remove();
-      // A timed-out response can arrive later; let it finish harmlessly.
-      window[callback]=()=>{};setTimeout(()=>delete window[callback],60000);
-    };
-    const timer=setTimeout(()=>{cleanup();reject(new Error('ランキングを取得できませんでした。更新ボタンで再試行できます。'));},15000);
-    window[callback]=data=>{
-      cleanup();
-      if(data.status==='error')reject(new Error('ランキング表を読み込めませんでした。'));
-      else resolve(data.table?.rows || []);
-    };
-    script.onerror=()=>{cleanup();reject(new Error('ランキングに接続できませんでした。'));};
-    const url=new URL(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq`);
-    url.search=new URLSearchParams({sheet,range,headers:'1',tq:query,tqx:`out:json;responseHandler:${callback}`,_:String(Date.now())});
-    script.src=url.href;document.head.append(script);
-  });
 }
 function sendScore(endpoint,payload) {
   return new Promise((resolve,reject)=>{
@@ -64,6 +42,11 @@ export class Leaderboard {
       this.result=null;$('score-form').hidden=true;
       $('score-message').hidden=false;$('score-message').textContent='今回は登録をスキップしました。';
     });
+  }
+  clearChart(label) {
+    ++this.generation;this.keyPromise=null;this.chart=null;
+    $('ranking-chart').textContent=label;$('ranking-rows').replaceChildren();
+    $('ranking-status').textContent='譜面を確認しています…';$('ranking-refresh').disabled=true;
   }
   setChart(chart,label) {
     this.chart=chart;this.keyPromise=chartKey(chart);
@@ -108,7 +91,7 @@ export class Leaderboard {
     this.result=null;$('score-form').hidden=true;$('score-message').hidden=true;
   }
   showResult(stats) {
-    this.result={...stats,playId:crypto.randomUUID(),ruleset:RULESET,song:'Rolling',keyPromise:this.keyPromise};
+    this.result={...stats,playId:crypto.randomUUID(),ruleset:RULESET,song:this.chart.title,songId:this.chart.catalogId,keyPromise:this.keyPromise};
     $('player-name').value='';$('score-form').hidden=false;$('score-message').hidden=true;
     $('score-submit').disabled=false;$('score-skip').disabled=false;
   }
@@ -123,7 +106,7 @@ export class Leaderboard {
         const config=await readSheet('設定','A1:B2');const endpoint=config[0]?.c?.[1]?.v;
         if(validEndpoint(endpoint))this.endpoint=endpoint.trim();
       }
-      if(!this.endpoint)throw new Error('ランキング登録は準備中です。今回は登録せずに進めます。');
+      if(!this.endpoint)throw new Error('登録先にまだ接続されていません。管理者による初回設定が必要です。');
       const {keyPromise,...stats}=result;
       const response=await sendScore(this.endpoint,{...stats,name,chartKey:await keyPromise});
       if(this.result!==result)return;

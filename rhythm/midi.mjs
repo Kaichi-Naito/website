@@ -66,7 +66,12 @@ export function midiToChart(input, base) {
     const rawEnd=toSeconds(n.stop), stop=Math.min(base.duration,rawEnd);
     if(rawEnd>base.duration)clipped++;
     const hold=n.stop-n.start>=ppq*HOLD_BEATS && stop-t>=.1;
-    return [{t,lane:n.lane,...(hold?{end:stop}:{})}];
+    const ticks=[];
+    if(hold){
+      for(let tick=n.start+ppq;tick<=n.stop;tick+=ppq){const at=toSeconds(tick);if(at>base.duration)break;ticks.push(at);}
+      if(!ticks.length)ticks.push(stop);
+    }
+    return [{t,lane:n.lane,...(hold?{end:stop,ticks}:{})}];
   }).sort((a,b)=>a.t-b.t||a.lane-b.lane);
   if(!notes.length)throw new Error(`冒頭${base.duration}秒にノーツがありません。MIDIの開始位置を確認してください。`);
   const last=[-1,-1,-1,-1];

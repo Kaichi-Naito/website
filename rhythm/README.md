@@ -9,8 +9,9 @@ audio fetching are not supported by opening the HTML as a `file://` URL.
 ## Test song and chart
 
 - Source: user-uploaded `rhythm/Rolling_Game.mp3`, PHALUX.
-- Scope: first **120 seconds**. Playback stops at the boundary even for a longer MP3.
-- `rolling-chart.json` contains song metadata; `charts/Rolling_Game.mid` is the chart.
+- Scope: configured in the catalog; Rolling currently uses **120 seconds**. Playback stops at the boundary even for a longer MP3.
+- The original ranking spreadsheet’s `譜面` tab contains the song catalog.
+  `rolling-chart.json` retains test metadata; it is not fetched by the game.
 - MIDI is parsed on every page load with cache bypass. Notes after 120 seconds
   are excluded and crossing holds are shortened. A load error offers retry;
   there is no fallback to an outdated generated chart.
@@ -23,20 +24,19 @@ audio fetching are not supported by opening the HTML as a `file://` URL.
 - Web Audio decodes the song before starting. One audio clock drives rendering
   and scoring; `getOutputTimestamp()` compensates for device buffering where available.
 - PERFECT ±45 ms, GREAT ±90 ms, GOOD ±140 ms; positive user offset delays the target.
-- Holds score the head timing and sustained input separately. Sustaining for
-  80% of the note's duration automatically earns PERFECT for the hold; releasing
-  after that or continuing to hold has no timing penalty. Releasing before
-  completion misses the sustain unit. Input before the head does not count
-  toward duration; late input must still sustain for the full 80% duration.
-  Completion removes the note from the stage. Best scores use a new ruleset key.
+- Holds score the head plus one unit per complete MIDI quarter beat. The parser
+  exports tempo-aware `ticks`; each beat succeeds after 80% held coverage.
+  Releases have no timing judgment, re-grips recover later beats, and only
+  insufficient beats miss. A four-beat hold therefore has five scoring units.
+  Brief interruptions accumulate within each beat; rapid tapping does not replace a hold.
 - Missing notes never ends a song early. Score is normalized to 1,000,000.
 - Space/Escape/pause, tab hiding, and focus loss pause the audio and chart. Resume gives
   a countdown; a hold in progress can be re-gripped before the timeline resumes.
 - Speed, offset, volume, and personal best are stored locally when storage is available.
 - Speed defaults to 8, at the midpoint of the 2–14 slider. This matches old speed 8.
   The range is exponential around that point to remain playable at both extremes.
-- Tap volume defaults to 70%, with gain 1.5 (2.5 times the previous .6).
-  Existing slider preferences are preserved; music volume is unchanged.
+- Music and tap volume default to 100%. Tap gain retains the prior 2.5× increase.
+  Settings v3 resets both volume defaults while retaining speed and timing offset.
 - Each fresh press outside a note's ±140 ms window during the song deducts one
   PERFECT scoring unit and breaks combo. Penalty debt persists even at zero;
   displayed score and accuracy are clamped at zero. Countdown, held-key repeats,
@@ -45,6 +45,22 @@ audio fetching are not supported by opening the HTML as a `file://` URL.
   resolved judgments minus empty penalties, divided by resolved judgments.
 - Touch buttons hide key letters on phone layouts. The page uses the homepage's
   fixed Windows 95 wallpaper and 10% dark overlay.
+
+## Song selection and settings
+
+The initial screen has a vertical scroll-snap song wheel, jacket, artist, title,
+and difficulty. The catalog has one row per song/difficulty. Arrow keys,
+buttons, wheel scrolling, and touch swipes select an entry. Only checked public
+rows are displayed. Invalid public rows fail visibly; no stale generated chart
+is substituted. All catalog fields are rendered as text and asset URLs are
+restricted to this homepage. Switching songs cancels stale MIDI responses and
+clears audio/score state. Rankings are separated by catalog ID and chart content.
+
+The gear button opens a native modal settings dialog. Opening it during play
+pauses first. Space/Escape and the two-bar pause icon open the pause menu, with
+resume, retry, and return-to-selection actions. PERFECT is gold, GREAT purple,
+GOOD green, misses red. Success produces a small ring and sparks at the judge
+line; misses produce a red cross. Reduced-motion mode omits moving particles.
 
 ## User MIDI charts and tap sound
 
@@ -73,8 +89,7 @@ from the game UI. See `charts/README.md` for the REAPER/update workflow.
 - Imported chart scores have separate IDs derived from MIDI contents.
 - The user-supplied tap WAV is converted to mono 44.1 kHz/16-bit PCM without
   changing its speed. Each new gameplay key/pointer press triggers it, even
-  when no note is hit. Holding a key does not retrigger. Tap volume and preview
-  are separate from music volume. The output limiter controls overlapping peaks.
+  when no note is hit. Holding a key does not retrigger. Tap volume is separate from music volume. The output limiter controls overlapping peaks.
 
 Run `node --test rhythm/*.test.mjs` to include MIDI parsing and tempo-map tests.
 
