@@ -54,7 +54,7 @@ export class RhythmEngine {
     if(this.lanes[lane].some(n=>n.state==='holding'))return;
     const n=this.lanes[lane].find(n=>n.state==='pending');
     if(!n||Math.abs(time-n.t)>WINDOWS.good) {
-      if(time>=0&&time<this.duration){this.emptyPresses++;this.combo=0;this.onJudge({label:'EMPTY',lane,delta:0,combo:0});}
+      if(time>=0&&time<this.duration){this.emptyPresses++;this.combo=0;this.onJudge({label:'MISS',lane,delta:0,combo:0});}
       return;
     }
     const delta=time-n.t;
