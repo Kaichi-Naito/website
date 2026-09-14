@@ -1,5 +1,6 @@
 import { readSheet } from './sheets.mjs?v=song-select-v1';
 export const RULESET = 'beat-hold-v4';
+const MAX_RANKING_ENTRIES=20;
 const $ = id => document.getElementById(id);
 export async function chartKey(chart) {
   const normalized=JSON.stringify({song:chart.catalogId || chart.title,rules:RULESET,duration:chart.duration,notes:chart.notes.map(n=>[Math.round(n.t*1e6),n.lane,n.end?Math.round(n.end*1e6):null,n.ticks?.map(t=>Math.round(t*1e6))??[]])});
@@ -13,6 +14,13 @@ export function validName(value) {
   const name=value.trim();
   if(!name || Array.from(name).length>16 || /[\u0000-\u001f\u007f]/u.test(name)) throw new Error('名前は1〜16文字で入力してください。');
   return name;
+}
+function beatsCutoff(candidate,cutoff) {
+  if(candidate.score!==cutoff.score)return candidate.score>cutoff.score;
+  if(candidate.accuracy!==cutoff.accuracy)return candidate.accuracy>cutoff.accuracy;
+  if(candidate.maxCombo!==cutoff.maxCombo)return candidate.maxCombo>cutoff.maxCombo;
+  // An existing score keeps its place when every ranking value is tied.
+  return false;
 }
 function sendScore(endpoint,payload) {
   return new Promise((resolve,reject)=>{
@@ -52,7 +60,7 @@ function ensureSubmitProgress() {
 }
 export class Leaderboard {
   constructor() {
-    this.generation=0;this.result=null;this.endpoint='';this.submitting=false;this.progressTimer=0;this.progressValue=0;
+    this.generation=0;this.result=null;this.endpoint='';this.submitting=false;this.progressTimer=0;this.progressValue=0;this.entries=[];
     this.progress=ensureSubmitProgress();
     $('ranking-refresh').addEventListener('click',()=>this.refresh());
     $('score-form').addEventListener('submit',event=>{event.preventDefault();this.submit();});
@@ -72,8 +80,6 @@ export class Leaderboard {
     clearInterval(this.progressTimer);this.progress.hidden=false;this.progress.dataset.state='running';this.progressValue=8;
     const fill=$('score-submit-progress-fill'),track=$('score-submit-progress-track');
     fill.style.width='8%';track.setAttribute('aria-valuenow','8');track.setAttribute('aria-valuetext','ランキングに登録中');
-    // Apps Script cannot stream intermediate progress. Ease toward 90% as waiting feedback;
-    // 100% is shown only after the server confirms that the score was saved.
     this.progressTimer=setInterval(()=>{
       const step=this.progressValue<45?7:this.progressValue<70?4:this.progressValue<84?2:1;
       this.progressValue=Math.min(90,this.progressValue+step);
@@ -83,7 +89,7 @@ export class Leaderboard {
   finishProgress() {
     clearInterval(this.progressTimer);this.progressTimer=0;this.progressValue=100;this.progress.dataset.state='done';
     const fill=$('score-submit-progress-fill'),track=$('score-submit-progress-track');
-    fill.style.width='100%';track.setAttribute('aria-valuenow','100');track.setAttribute('aria-valuetext','登録完了');
+    fill.style.width='100%';track.setAttribute('aria-valuenow','100');track.setAttribute('aria-valuetext','登録処理完了');
     setTimeout(()=>{if(!this.submitting)this.progress.hidden=true;},700);
   }
   failProgress() {
@@ -92,55 +98,86 @@ export class Leaderboard {
     fill.style.width='100%';track.setAttribute('aria-valuenow','100');track.setAttribute('aria-valuetext','登録エラー');
   }
   clearChart(label) {
-    ++this.generation;this.keyPromise=null;this.chart=null;
+    ++this.generation;this.keyPromise=null;this.chart=null;this.entries=[];
     $('ranking-chart').textContent=label;$('ranking-rows').replaceChildren();
     $('ranking-status').textContent='譜面を確認しています…';$('ranking-refresh').disabled=true;
   }
   setChart(chart,label) {
-    this.chart=chart;this.keyPromise=chartKey(chart);
+    this.chart=chart;this.keyPromise=chartKey(chart);this.entries=[];
     $('ranking-chart').textContent=`${label} / ${chart.notes.length}ノーツ`;
     this.refresh();
   }
   async refresh() {
-    if(!this.keyPromise)return;
+    if(!this.keyPromise)return false;
     const generation=++this.generation;
     $('ranking-refresh').disabled=true;$('ranking-status').textContent='ランキングを読み込み中…';
-    // Hide old chart scores immediately, including while its replacement loads.
     $('ranking-rows').replaceChildren();
     try {
       const key=await this.keyPromise;
-      const query=`select B,C,D,E,H where F = '${key}' and G = '${RULESET}' order by C desc,D desc,E desc,H asc limit 20`;
+      const query=`select B,C,D,E,H where F = '${key}' and G = '${RULESET}' order by C desc,D desc,E desc,H asc limit ${MAX_RANKING_ENTRIES}`;
       const [scores,config]=await Promise.all([
         readSheet('スコア','A1:N',query),
         readSheet('設定','A1:B2').catch(()=>[])
       ]);
-      if(generation!==this.generation)return;
+      if(generation!==this.generation)return false;
       const endpoint=config[0]?.c?.[1]?.v;
       this.endpoint=validEndpoint(endpoint)?endpoint.trim():'';
-      this.render(scores.map(r=>({name:r.c?.[0]?.v,score:r.c?.[1]?.v,accuracy:r.c?.[2]?.v,maxCombo:r.c?.[3]?.v})));
+      const entries=scores.map(r=>({
+        name:r.c?.[0]?.v,
+        score:Number(r.c?.[1]?.v),
+        accuracy:Number(r.c?.[2]?.v),
+        maxCombo:Number(r.c?.[3]?.v),
+        registeredAt:r.c?.[4]?.v
+      }));
+      this.render(entries);
+      return true;
     } catch(error) {
-      if(generation===this.generation)$('ranking-status').textContent=error.message;
+      if(generation===this.generation){this.entries=[];$('ranking-status').textContent=error.message;}
+      return false;
     } finally { if(generation===this.generation)$('ranking-refresh').disabled=false; }
   }
   render(entries) {
+    this.entries=entries.filter(e=>typeof e.name==='string' && Number.isFinite(e.score) && Number.isFinite(e.accuracy) && Number.isFinite(e.maxCombo)).slice(0,MAX_RANKING_ENTRIES);
     $('ranking-rows').replaceChildren();
-    entries.filter(e=>typeof e.name==='string' && Number.isFinite(e.score)).slice(0,20).forEach((entry,i)=>{
+    this.entries.forEach((entry,i)=>{
       const row=document.createElement('tr');
       for(const value of [i+1,entry.name,entry.score.toLocaleString()]) {
         const cell=document.createElement('td');cell.textContent=value;row.append(cell);
       }
-      row.title=`精度 ${Number(entry.accuracy).toFixed(2)}% / 最大コンボ ${entry.maxCombo}`;
+      row.title=`精度 ${entry.accuracy.toFixed(2)}% / 最大コンボ ${entry.maxCombo}`;
       $('ranking-rows').append(row);
     });
-    const any=$('ranking-rows').children.length>0;
+    const any=this.entries.length>0;
     $('ranking-status').textContent=any?'スコア順 / 上位20件':'この譜面の登録はまだありません。';
+  }
+  qualifies(stats) {
+    if(this.entries.length<MAX_RANKING_ENTRIES)return true;
+    return beatsCutoff(stats,this.entries[MAX_RANKING_ENTRIES-1]);
   }
   clearResult() {
     this.result=null;$('score-form').hidden=true;$('score-message').hidden=true;this.resetProgress();
   }
-  showResult(stats) {
-    this.result={...stats,playId:crypto.randomUUID(),ruleset:RULESET,song:this.chart.title,songId:this.chart.catalogId,keyPromise:this.keyPromise};
-    $('player-name').value='';$('score-form').hidden=false;$('score-message').hidden=true;this.resetProgress();
+  async showResult(stats) {
+    const result=this.result={...stats,playId:crypto.randomUUID(),ruleset:RULESET,song:this.chart.title,songId:this.chart.catalogId,keyPromise:this.keyPromise};
+    $('player-name').value='';$('score-form').hidden=true;this.resetProgress();
+    $('score-message').hidden=false;$('score-message').textContent='ランキング判定中…';
+
+    const loaded=await this.refresh();
+    if(this.result!==result)return;
+    if(!loaded) {
+      this.result=null;
+      $('score-message').hidden=false;$('score-message').textContent='ランキングを確認できなかったため、今回は登録できませんでした。';
+      return;
+    }
+    if(!this.qualifies(stats)) {
+      this.result=null;
+      const cutoff=this.entries[MAX_RANKING_ENTRIES-1];
+      $('score-message').hidden=false;
+      $('score-message').textContent=`ランキング20位圏外でした。現在の20位は ${cutoff.score.toLocaleString()} 点です。`;
+      return;
+    }
+
+    $('score-form').hidden=false;$('score-message').hidden=true;
     $('score-submit').disabled=false;$('score-skip').disabled=false;
   }
   async submit() {
@@ -156,12 +193,17 @@ export class Leaderboard {
       }
       if(!this.endpoint)throw new Error('登録先にまだ接続されていません。管理者による初回設定が必要です。');
       const {keyPromise,...stats}=result;
-      await sendScore(this.endpoint,{...stats,name,chartKey:await keyPromise});
+      const response=await sendScore(this.endpoint,{...stats,name,chartKey:await keyPromise});
       if(this.result!==result)return;
-      this.result=null;$('score-form').hidden=true;$('score-message').textContent='ランキングに登録しました！';this.finishProgress();
+
+      this.result=null;$('score-form').hidden=true;this.finishProgress();
+      if(response.registration?.qualified===false) {
+        $('score-message').hidden=false;
+        $('score-message').textContent='直前にランキングが更新されたため20位圏外となり、登録されませんでした。';
+      } else {
+        $('score-message').hidden=false;$('score-message').textContent='ランキングに登録しました！';
+      }
       $('ranking-status').textContent='ランキングを更新中…';
-      // Registration is already complete. Refresh the public ranking separately so the
-      // confirmation does not wait for Apps Script to scan and return the whole score table.
       void this.refresh();
     } catch(error) {
       if(this.result===result){this.failProgress();$('score-message').hidden=false;$('score-message').textContent=error.message;}
