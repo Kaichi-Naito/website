@@ -4,6 +4,7 @@ const RANKING_SPREADSHEET_ID = '1l93jSWpBLkh6tLp6wZSS_Z8YHwxMCGFK8cYgJZ8wJmw';
 const RANKING_ORIGIN = 'https://kaichi-naito.github.io';
 const RANKING_RULESET = 'beat-hold-v4';
 const CATALOG_CACHE_SECONDS = 300;
+const MAX_RANKING_ENTRIES = 20;
 
 function validateScore_(input) {
   if(!input || typeof input.song!=='string' || !input.song.trim() || input.song.length>150 || !/^[A-Za-z0-9_-]{1,80}$/.test(input.songId) || input.ruleset!==RANKING_RULESET)throw new Error('対象外の曲または判定ルールです。');
@@ -35,7 +36,6 @@ function publishedSongTitle_(book,input) {
   const catalog=book.getSheetByName('譜面');
   const last=catalog?.getLastRow() || 0;
   if(last<2)throw new Error('現在公開されている楽曲を選び直してください。');
-  // Search only the catalog ID column instead of loading the whole catalog table.
   const cell=catalog.getRange(2,9,last-1,1).createTextFinder(input.songId).matchEntireCell(true).findNext();
   if(!cell)throw new Error('現在公開されている楽曲を選び直してください。');
   const row=catalog.getRange(cell.getRow(),1,1,10).getValues()[0];
@@ -55,6 +55,38 @@ function scoreSheet_(book) {
   return sheet;
 }
 
+function compareRankingRows_(a,b) {
+  return Number(b.values[2])-Number(a.values[2]) ||
+    Number(b.values[3])-Number(a.values[3]) ||
+    Number(b.values[4])-Number(a.values[4]) ||
+    String(a.values[7]).localeCompare(String(b.values[7]));
+}
+
+function rankingRows_(sheet,chartKey) {
+  const last=sheet.getLastRow();
+  if(last<2)return [];
+  return sheet.getRange(2,1,last-1,15).getValues()
+    .map((values,index)=>({row:index+2,values}))
+    .filter(entry=>entry.values[5]===chartKey && entry.values[6]===RANKING_RULESET)
+    .sort(compareRankingRows_);
+}
+
+function candidateBeats_(input,existingValues) {
+  const score=Number(existingValues[2]),accuracy=Number(existingValues[3]),maxCombo=Number(existingValues[4]);
+  if(input.score!==score)return input.score>score;
+  if(input.accuracy!==accuracy)return input.accuracy>accuracy;
+  if(input.maxCombo!==maxCombo)return input.maxCombo>maxCombo;
+  // Existing record wins a complete tie because it was registered first.
+  return false;
+}
+
+function trimLegacyRows_(sheet,rows) {
+  if(rows.length<=MAX_RANKING_ENTRIES)return rows;
+  const deleteRows=rows.slice(MAX_RANKING_ENTRIES).map(entry=>entry.row).sort((a,b)=>b-a);
+  for(const row of deleteRows)sheet.deleteRow(row);
+  return rankingRows_(sheet,rows[0].values[5]);
+}
+
 function saveScore_(raw) {
   const input=validateScore_(raw);
   const book=SpreadsheetApp.openById(RANKING_SPREADSHEET_ID);
@@ -64,21 +96,38 @@ function saveScore_(raw) {
   lock.waitLock(10000);
   try {
     const last=sheet.getLastRow();
-    // Keep idempotency, but search only the Play ID column on Google's side.
-    const existing=last>1?sheet.getRange(2,9,last-1,1).createTextFinder(input.playId).matchEntireCell(true).findNext():null;
-    if(existing) {
-      const prior=sheet.getRange(existing.getRow(),3,1,4).getValues()[0];
+    const existingPlay=last>1?sheet.getRange(2,9,last-1,1).createTextFinder(input.playId).matchEntireCell(true).findNext():null;
+    if(existingPlay) {
+      const prior=sheet.getRange(existingPlay.getRow(),3,1,4).getValues()[0];
       if(prior[3]!==input.chartKey || prior[0]!==input.score)throw new Error('このプレイは既に登録されています。');
-      return {saved:true,duplicate:true};
+      return {saved:true,qualified:true,duplicate:true};
     }
-    if(last>=50000)throw new Error('登録上限に達しました。管理者による整理をお待ちください。');
-    if(last>=sheet.getMaxRows())sheet.insertRowsAfter(last,1000);
-    const c=input.counts,row=last+1;
-    // Quote formula-like names so public submissions never become Sheets formulas.
+
+    let rows=trimLegacyRows_(sheet,rankingRows_(sheet,input.chartKey));
+    const cutoff=rows.length>=MAX_RANKING_ENTRIES?rows[MAX_RANKING_ENTRIES-1]:null;
+    if(cutoff && !candidateBeats_(input,cutoff.values)) {
+      return {
+        saved:false,
+        qualified:false,
+        cutoff:{score:Number(cutoff.values[2]),accuracy:Number(cutoff.values[3]),maxCombo:Number(cutoff.values[4])}
+      };
+    }
+
+    const c=input.counts;
     const safeName=/^[=+\-@']/.test(input.name)?"'"+input.name:input.name;
-    // One write only. Column formatting is left to the sheet instead of formatting every new row.
-    sheet.getRange(row,1,1,15).setValues([[songTitle,safeName,input.score,input.accuracy,input.maxCombo,input.chartKey,input.ruleset,Utilities.formatDate(new Date(),'Asia/Tokyo','yyyy-MM-dd HH:mm:ss'),input.playId,c.PERFECT,c.GREAT,c.GOOD,c.MISS,input.units,input.emptyPresses]]);
-    return {saved:true,duplicate:false};
+    const values=[songTitle,safeName,input.score,input.accuracy,input.maxCombo,input.chartKey,input.ruleset,Utilities.formatDate(new Date(),'Asia/Tokyo','yyyy-MM-dd HH:mm:ss'),input.playId,c.PERFECT,c.GREAT,c.GOOD,c.MISS,input.units,input.emptyPresses];
+
+    let targetRow;
+    let replaced=false;
+    if(rows.length>=MAX_RANKING_ENTRIES) {
+      targetRow=rows[MAX_RANKING_ENTRIES-1].row;
+      replaced=true;
+    } else {
+      targetRow=sheet.getLastRow()+1;
+      if(targetRow>sheet.getMaxRows())sheet.insertRowsAfter(sheet.getMaxRows(),Math.max(100,MAX_RANKING_ENTRIES));
+    }
+    sheet.getRange(targetRow,1,1,15).setValues([values]);
+    return {saved:true,qualified:true,duplicate:false,replaced};
   } finally { lock.releaseLock(); }
 }
 
@@ -91,8 +140,6 @@ function doPost(e) {
     if(typeof raw!=='string'||raw.length>8000)throw new Error('送信内容を確認してください。');
     result.registration=saveScore_(JSON.parse(raw));result.ok=true;
   } catch(error) { result.error=String(error.message || '登録できませんでした。'); }
-  // Return immediately after the write. The browser refreshes TOP 20 separately,
-  // so this request no longer scans the entire score sheet before acknowledging success.
   const json=JSON.stringify(result).replace(/</g,'\\u003c');
   return HtmlService.createHtmlOutput('<!doctype html><meta charset="utf-8"><script>window.top.postMessage('+json+','+JSON.stringify(RANKING_ORIGIN)+');</script>')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
