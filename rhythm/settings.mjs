@@ -1,4 +1,5 @@
 import './effects.mjs?v=compact-hud-v1';
+import './song-wheel-fix.mjs?v=scroll-sync-v1';
 
 export const DEFAULT_SETTINGS = Object.freeze({speed:8,offset:0,volume:75,tapVolume:75});
 export function readSettings(saved) {
