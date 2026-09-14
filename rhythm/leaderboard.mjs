@@ -32,16 +32,64 @@ function sendScore(endpoint,payload) {
     window.addEventListener('message',receive);document.body.append(frame,form);form.submit();
   });
 }
+function ensureSubmitProgress() {
+  let panel=$('score-submit-progress');
+  if(panel)return panel;
+  const style=document.createElement('style');
+  style.textContent=`
+    #score-submit-progress{margin:10px 0 4px}
+    #score-submit-progress-track{height:10px;padding:2px;background:#0b0f1a;border:1px solid;border-color:#060810 #68728a #68728a #060810;overflow:hidden}
+    #score-submit-progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--mint));transition:width .18s ease-out}
+    #score-submit-progress[data-state="error"] #score-submit-progress-fill{background:#ff6f8a}
+    @media(prefers-reduced-motion:reduce){#score-submit-progress-fill{transition:none}}
+  `;
+  document.head.append(style);
+  panel=document.createElement('div');panel.id='score-submit-progress';panel.hidden=true;
+  const track=document.createElement('div');track.id='score-submit-progress-track';track.setAttribute('role','progressbar');track.setAttribute('aria-label','ランキング登録の進行状況');track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','100');
+  const fill=document.createElement('div');fill.id='score-submit-progress-fill';track.append(fill);panel.append(track);
+  $('score-message').insertAdjacentElement('afterend',panel);
+  return panel;
+}
 export class Leaderboard {
   constructor() {
-    this.generation=0;this.result=null;this.endpoint='';this.submitting=false;
+    this.generation=0;this.result=null;this.endpoint='';this.submitting=false;this.progressTimer=0;this.progressValue=0;
+    this.progress=ensureSubmitProgress();
     $('ranking-refresh').addEventListener('click',()=>this.refresh());
     $('score-form').addEventListener('submit',event=>{event.preventDefault();this.submit();});
     $('score-skip').addEventListener('click',()=>{
       if(this.submitting)return;
-      this.result=null;$('score-form').hidden=true;
+      this.result=null;$('score-form').hidden=true;this.resetProgress();
       $('score-message').hidden=false;$('score-message').textContent='今回は登録をスキップしました。';
     });
+  }
+  resetProgress() {
+    clearInterval(this.progressTimer);this.progressTimer=0;this.progressValue=0;
+    this.progress.hidden=true;this.progress.dataset.state='';
+    const fill=$('score-submit-progress-fill'),track=$('score-submit-progress-track');
+    fill.style.width='0%';track.removeAttribute('aria-valuenow');track.setAttribute('aria-valuetext','待機中');
+  }
+  startProgress() {
+    clearInterval(this.progressTimer);this.progress.hidden=false;this.progress.dataset.state='running';this.progressValue=8;
+    const fill=$('score-submit-progress-fill'),track=$('score-submit-progress-track');
+    fill.style.width='8%';track.setAttribute('aria-valuenow','8');track.setAttribute('aria-valuetext','ランキングに登録中');
+    // Apps Script cannot stream intermediate progress. Ease toward 90% as waiting feedback;
+    // 100% is shown only after the server confirms that the score was saved.
+    this.progressTimer=setInterval(()=>{
+      const step=this.progressValue<45?7:this.progressValue<70?4:this.progressValue<84?2:1;
+      this.progressValue=Math.min(90,this.progressValue+step);
+      fill.style.width=`${this.progressValue}%`;track.setAttribute('aria-valuenow',String(this.progressValue));
+    },220);
+  }
+  finishProgress() {
+    clearInterval(this.progressTimer);this.progressTimer=0;this.progressValue=100;this.progress.dataset.state='done';
+    const fill=$('score-submit-progress-fill'),track=$('score-submit-progress-track');
+    fill.style.width='100%';track.setAttribute('aria-valuenow','100');track.setAttribute('aria-valuetext','登録完了');
+    setTimeout(()=>{if(!this.submitting)this.progress.hidden=true;},700);
+  }
+  failProgress() {
+    clearInterval(this.progressTimer);this.progressTimer=0;this.progress.dataset.state='error';
+    const fill=$('score-submit-progress-fill'),track=$('score-submit-progress-track');
+    fill.style.width='100%';track.setAttribute('aria-valuenow','100');track.setAttribute('aria-valuetext','登録エラー');
   }
   clearChart(label) {
     ++this.generation;this.keyPromise=null;this.chart=null;
@@ -88,11 +136,11 @@ export class Leaderboard {
     $('ranking-status').textContent=any?'スコア順 / 上位20件':'この譜面の登録はまだありません。';
   }
   clearResult() {
-    this.result=null;$('score-form').hidden=true;$('score-message').hidden=true;
+    this.result=null;$('score-form').hidden=true;$('score-message').hidden=true;this.resetProgress();
   }
   showResult(stats) {
     this.result={...stats,playId:crypto.randomUUID(),ruleset:RULESET,song:this.chart.title,songId:this.chart.catalogId,keyPromise:this.keyPromise};
-    $('player-name').value='';$('score-form').hidden=false;$('score-message').hidden=true;
+    $('player-name').value='';$('score-form').hidden=false;$('score-message').hidden=true;this.resetProgress();
     $('score-submit').disabled=false;$('score-skip').disabled=false;
   }
   async submit() {
@@ -101,20 +149,22 @@ export class Leaderboard {
     try {
       const name=validName($('player-name').value);
       this.submitting=true;$('score-submit').disabled=true;$('score-skip').disabled=true;
-      $('score-message').hidden=false;$('score-message').textContent='スコアを登録しています…';
+      $('score-message').hidden=false;$('score-message').textContent='ランキングに登録中…';this.startProgress();
       if(!this.endpoint) {
         const config=await readSheet('設定','A1:B2');const endpoint=config[0]?.c?.[1]?.v;
         if(validEndpoint(endpoint))this.endpoint=endpoint.trim();
       }
       if(!this.endpoint)throw new Error('登録先にまだ接続されていません。管理者による初回設定が必要です。');
       const {keyPromise,...stats}=result;
-      const response=await sendScore(this.endpoint,{...stats,name,chartKey:await keyPromise});
+      await sendScore(this.endpoint,{...stats,name,chartKey:await keyPromise});
       if(this.result!==result)return;
-      this.result=null;$('score-form').hidden=true;$('score-message').textContent='ランキングに登録しました！';
-      ++this.generation;$('ranking-refresh').disabled=false;
-      this.render(response.entries || []);
+      this.result=null;$('score-form').hidden=true;$('score-message').textContent='ランキングに登録しました！';this.finishProgress();
+      $('ranking-status').textContent='ランキングを更新中…';
+      // Registration is already complete. Refresh the public ranking separately so the
+      // confirmation does not wait for Apps Script to scan and return the whole score table.
+      void this.refresh();
     } catch(error) {
-      if(this.result===result){$('score-message').hidden=false;$('score-message').textContent=error.message;}
+      if(this.result===result){this.failProgress();$('score-message').hidden=false;$('score-message').textContent=error.message;}
     } finally {
       this.submitting=false;$('score-submit').disabled=false;$('score-skip').disabled=false;
     }
