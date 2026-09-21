@@ -5,7 +5,7 @@ const number = value => Number(value).toLocaleString('ja-JP');
 // Keep the completed run independent of the next song / retry.
 export function resultSnapshot(chart, result) {
   return Object.freeze({
-    title: String(chart.title), artist: String(chart.artist || ''),
+    title: String(chart.title), artist: String(chart.artist || ''), jacket: String(chart.jacket || ''),
     difficulty: String(chart.difficulty || ''), score: result.score,
     accuracy: result.accuracy, maxCombo: result.maxCombo,
     emptyPresses: result.emptyPresses, rank: result.rank,
@@ -24,13 +24,23 @@ export function xIntent(result) {
   return url.href;
 }
 
-function loadLogo() {
+export function xDestination(result, device = globalThis.navigator || {}) {
+  const ua = device.userAgent || '';
+  const message = encodeURIComponent(shareText(result));
+  if (/Android/i.test(ua)) return `intent://post?message=${message}#Intent;scheme=twitter;package=com.twitter.android;S.browser_fallback_url=${encodeURIComponent(xIntent(result))};end`;
+  if (/iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && device.maxTouchPoints > 1)) return `twitter://post?message=${message}`;
+  return xIntent(result);
+}
+
+function loadImage(url) {
+  if (!url) return Promise.resolve(null);
   return new Promise(resolve => {
     const image = new Image();
     const timer = setTimeout(() => resolve(null), 5000);
     image.onload = () => { clearTimeout(timer); resolve(image); };
     image.onerror = () => { clearTimeout(timer); resolve(null); };
-    image.src = LOGO_URL;
+    image.crossOrigin = 'anonymous';
+    image.src = url;
   });
 }
 function lines(context, text, width) {
@@ -44,19 +54,28 @@ function lines(context, text, width) {
   output.push(line);
   return output;
 }
-export async function renderScoreImage(result, logo) {
+export async function renderScoreImage(result, logo, jacket = null, gameplay = null) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas unavailable');
   const font = size => `${size}px PixelMplus, monospace`;
-  ctx.font = font(46);
+  ctx.font = font(64);
   const titleLines = lines(ctx, result.title, 1056);
+  const titleEnd = ctx.measureText(titleLines.at(-1)).width;
+  ctx.font = font(46);
+  const artistText = result.artist ? ` / ${result.artist}` : '';
+  const artistInline = titleEnd + ctx.measureText(artistText).width <= 1056;
+  const artistLines = artistInline ? [] : lines(ctx, result.artist, 1056);
   ctx.font = font(28);
-  const artistLines = lines(ctx, result.artist, 1056);
   const difficultyLines = lines(ctx, result.difficulty, 1056);
-  const headingBottom = 220 + titleLines.length * 54 + artistLines.length * 36 + difficultyLines.length * 34;
+  const headingBottom = 346 + titleLines.length * 76 + artistLines.length * 54 + difficultyLines.length * 34;
   canvas.width = 1200; canvas.height = headingBottom + 430;
   ctx.fillStyle = '#0e1320'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (gameplay?.width && gameplay?.height) {
+    const scale = Math.max(canvas.width / gameplay.width, canvas.height / gameplay.height);
+    ctx.drawImage(gameplay, (canvas.width - gameplay.width * scale) / 2, (canvas.height - gameplay.height * scale) / 2, gameplay.width * scale, gameplay.height * scale);
+    ctx.fillStyle = '#080d1c99'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
   ctx.strokeStyle = '#e6edf5'; ctx.lineWidth = 6; ctx.strokeRect(15, 15, 1170, canvas.height - 30);
   const colors = ['#00c6e7', '#c0c0c0', '#ff008e', '#2464ff'];
   colors.forEach((color, i) => { ctx.fillStyle = color; ctx.fillRect(18 + i * 291, 18, 291, 10); });
@@ -69,24 +88,32 @@ export async function renderScoreImage(result, logo) {
   } else text('T4P', 64, 152, 90, '#00c6e7');
   text('PLAY RESULT', 328, 101, 30, '#a5b5cc');
   text(`RANK ${result.rank}`, 328, 164, 56, '#ffe37a');
-  let y = 244;
-  titleLines.forEach(line => { text(line, 64, y, 46); y += 54; });
-  artistLines.forEach(line => { text(line, 64, y, 28, '#b5c4d8'); y += 36; });
+  if (jacket) {
+    const size = Math.min(jacket.naturalWidth || jacket.width, jacket.naturalHeight || jacket.height);
+    ctx.drawImage(jacket, ((jacket.naturalWidth || jacket.width) - size) / 2, ((jacket.naturalHeight || jacket.height) - size) / 2, size, size, 930, 48, 212, 212);
+    ctx.strokeStyle = '#e6edf5'; ctx.lineWidth = 3; ctx.strokeRect(930, 48, 212, 212);
+  }
+  let y = 328;
+  titleLines.forEach((line, index) => {
+    text(line, 64, y, 64);
+    if (artistInline && index === titleLines.length - 1) text(artistText, 64 + titleEnd, y, 46, '#d2ddeb');
+    y += 76;
+  });
+  artistLines.forEach(line => { text(line, 64, y, 46, '#d2ddeb'); y += 54; });
   difficultyLines.forEach(line => { text(line, 64, y, 28, '#00c6e7'); y += 34; });
   const base = headingBottom;
-  ctx.fillStyle = '#202b40'; ctx.fillRect(58, base, 1084, 136);
+  ctx.fillStyle = '#202b40dc'; ctx.fillRect(58, base, 1084, 136);
   text('SCORE', 84, base + 42, 26, '#a5b5cc');
   text(number(result.score), 84, base + 111, 68);
   text(`${result.accuracy.toFixed(2)}%`, 782, base + 71, 48, '#00c6e7');
   text(`MAX COMBO  ${number(result.maxCombo)}`, 780, base + 110, 23, '#b5c4d8');
   const stats = [
     ['PERFECT', result.counts.PERFECT, '#ffe37a'], ['GREAT', result.counts.GREAT, '#c4a2ff'],
-    ['GOOD', result.counts.GOOD, '#80e5b0'], ['MISS', result.counts.MISS, '#ff6f8a'],
-    ['空押し', result.emptyPresses, '#ff6f8a']
+    ['GOOD', result.counts.GOOD, '#80e5b0'], ['MISS', result.counts.MISS + (result.emptyPresses || 0), '#ff6f8a']
   ];
   stats.forEach(([label, value, color], i) => {
-    const x = 64 + (i % 3) * 370, y = base + 192 + Math.floor(i / 3) * 54;
-    text(label, x, y, 25, color); text(number(value), x + 215, y, 28);
+    const x = 64 + (i % 2) * 550, y = base + 192 + Math.floor(i / 2) * 54;
+    text(label, x, y, 25, color); text(number(value), x + 320, y, 28);
   });
   text('#T4P', 64, canvas.height - 100, 34, '#ff008e');
   text(APP_URL, 64, canvas.height - 54, 25, '#b5c4d8');
@@ -94,27 +121,39 @@ export async function renderScoreImage(result, logo) {
 }
 
 export class ResultShare {
-  constructor(root) { this.root = root; this.version = 0; this.logo = loadLogo(); }
+  constructor(root) { this.root = root; this.version = 0; this.logo = loadImage(LOGO_URL); }
   clear() {
     ++this.version;
     if (this.imageURL) URL.revokeObjectURL(this.imageURL);
-    this.imageURL = null; this.snapshot = null; this.link = null; this.root.hidden = true; this.root.replaceChildren();
+    this.imageURL = null; this.snapshot = null; this.link = null; this.fallback = null; this.root.hidden = true; this.root.replaceChildren();
   }
-  show(chart, result) {
+  show(chart, result, gameplay = null) {
     this.clear(); const version = this.version;
     const snapshot = this.snapshot = resultSnapshot(chart, result);
     this.root.hidden = false;
     const actions = document.createElement('div'); actions.className = 'share-actions';
     const link = this.link = document.createElement('a');
-    link.className = 'share-x'; link.href = xIntent(snapshot); link.target = '_blank'; link.rel = 'noopener noreferrer';
+    link.className = 'share-x'; link.href = xDestination(snapshot); link.target = link.href.startsWith('https:') ? '_blank' : '_self'; link.rel = 'noopener noreferrer';
     link.textContent = 'Xに投稿'; actions.append(link);
     const status = document.createElement('p'); status.className = 'share-status'; status.setAttribute('role', 'status');
     status.textContent = 'スコア画像を準備しています…';
     this.root.append(actions, status);
+    const mobile = link.target === '_self';
+    if (mobile) {
+      const fallback = this.fallback = document.createElement('a');
+      fallback.className = 'share-fallback'; fallback.href = xIntent(snapshot); fallback.target = '_blank'; fallback.rel = 'noopener noreferrer';
+      fallback.textContent = 'アプリが開かない場合はブラウザで投稿'; fallback.hidden = true;
+      actions.append(fallback);
+    }
     const current = () => this.version === version;
     let imageBlob = null;
     link.addEventListener('click', async event => {
       if (!current()) { event.preventDefault(); return; }
+      if (this.fallback) this.fallback.hidden = false;
+      if (mobile) {
+        status.textContent = 'Xアプリの投稿画面を開きます。画像を付ける場合は、下の画像を長押しで保存して添付してください。';
+        return;
+      }
       // Let the anchor open X immediately, even if PNG generation or clipboard
       // access fails. Image copying is optional and must never block navigation.
       if (!imageBlob || !navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
@@ -128,7 +167,7 @@ export class ResultShare {
         if (current()) status.textContent = 'Xの投稿画面を開きました。画像をコピーできなかったため、下の画像を右クリック・長押しで保存して添付してください。';
       }
     });
-    this.prepare(snapshot).then(blob => {
+    this.prepare(snapshot, gameplay).then(blob => {
       if (!current()) return;
       imageBlob = blob;
       this.imageURL = URL.createObjectURL(blob);
@@ -136,7 +175,7 @@ export class ResultShare {
       const image = document.createElement('img'); image.src = this.imageURL;
       image.alt = `${snapshot.title} / ${snapshot.artist}：${number(snapshot.score)}点、RANK ${snapshot.rank}`;
       preview.append(image); this.root.append(preview);
-      status.textContent = '「Xに投稿」でXの投稿画面を直接開きます。画像を付ける場合は、コピー対応環境ではXで貼り付け（Ctrl+V / ⌘V）してください。';
+      status.textContent = mobile ? '「Xに投稿」でXアプリの投稿画面を開きます。画像は下の画像を長押しで保存して添付してください。' : '「Xに投稿」でXの投稿画面を直接開きます。画像を付ける場合は、コピー対応環境ではXで貼り付け（Ctrl+V / ⌘V）してください。';
     }).catch(() => {
       if (current()) status.textContent = '画像を作れませんでした。「Xに投稿」から本文を入れた投稿画面を開けます。';
     });
@@ -145,13 +184,14 @@ export class ResultShare {
     if (!this.snapshot) return;
     const rankingPosition = Number.isInteger(position) && position >= 1 && position <= 20 ? position : null;
     this.snapshot = Object.freeze({...this.snapshot, rankingPosition});
-    if (this.link) this.link.href = xIntent(this.snapshot);
+    if (this.link) this.link.href = xDestination(this.snapshot);
+    if (this.fallback) this.fallback.href = xIntent(this.snapshot);
   }
-  async prepare(result) {
-    const [, logo] = await Promise.all([
+  async prepare(result, gameplay) {
+    const [, logo, jacket] = await Promise.all([
       Promise.race([document.fonts?.load('28px PixelMplus'), new Promise(resolve => setTimeout(resolve, 2000))]),
-      this.logo
+      this.logo, loadImage(result.jacket)
     ]);
-    return renderScoreImage(result, logo);
+    return renderScoreImage(result, logo, jacket, gameplay);
   }
 }

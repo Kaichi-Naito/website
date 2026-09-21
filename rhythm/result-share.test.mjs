@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {APP_URL, ResultShare, resultSnapshot, shareText, xIntent} from './result-share.mjs';
+import {APP_URL, ResultShare, resultSnapshot, shareText, xIntent, xDestination} from './result-share.mjs';
 
 const chart = {title: '曲 &「光」 #1 🎸', artist: 'PHALUX / A+B', difficulty: 'NORMAL'};
 const score = {score: 987654, rank: 'S', accuracy: 98.34, maxCombo: 123, emptyPresses: 1, counts: {PERFECT: 120, GREAT: 3, GOOD: 0, MISS: 1}};
@@ -22,6 +22,38 @@ test('completed result survives chart changes and score resets', () => {
 });
 test('zero score remains shareable', () => {
   assert.match(shareText(resultSnapshot(chart, {...score, score: 0})), /0点/);
+});
+
+test('app links preserve the exact draft on iOS, iPadOS and Android with a web fallback', () => {
+  const result = resultSnapshot(chart, {...score, rankingPosition: 2});
+  for (const device of [{userAgent:'iPhone'}, {userAgent:'iPad'}, {userAgent:'Macintosh', maxTouchPoints:5}]) {
+    const url = new URL(xDestination(result, device));
+    assert.equal(url.protocol, 'twitter:'); assert.equal(url.host, 'post');
+    assert.equal(url.searchParams.get('message'), shareText(result));
+  }
+  const intent = xDestination(result, {userAgent:'Android'});
+  assert.equal(new URL(intent).searchParams.get('message'), shareText(result));
+  assert.match(intent, /package=com\.twitter\.android;/);
+  assert.equal(decodeURIComponent(intent.split('S.browser_fallback_url=')[1].split(';end')[0]), xIntent(result));
+  for (const device of [{userAgent:'Windows'}, {userAgent:'Macintosh',maxTouchPoints:0}]) assert.equal(xDestination(result,device),xIntent(result));
+});
+
+test('mobile opens the app link directly and reveals fallback only after tapping', async () => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+  try {
+    for (const userAgent of ['iPhone', 'Android']) {
+      Object.defineProperty(globalThis, 'navigator', {configurable:true,value:{userAgent,share:()=>assert.fail('No system share menu'),clipboard:{write:()=>assert.fail('Do not delay app navigation')}}});
+      const {root,controller}=fixture(); controller.prepare=async()=>new Blob(['png']);
+      controller.show(chart,score); await settle(); controller.setRanking(3);
+      const [link,fallback]=root.children[0].children;
+      assert.equal(link.target,'_self'); assert.equal(fallback.hidden,true);
+      await link.events.click({preventDefault(){assert.fail('Native anchor must navigate');}});
+      assert.equal(fallback.hidden,false);
+      assert.equal(new URL(link.href).searchParams.get('message'),shareText(controller.snapshot));
+      assert.equal(fallback.href,xIntent(controller.snapshot));
+      controller.clear(); assert.equal(controller.fallback,null);
+    }
+  } finally { if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator; }
 });
 
 // A small DOM fixture exercises asynchronous lifecycle without a browser dependency.

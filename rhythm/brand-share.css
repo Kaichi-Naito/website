@@ -23,5 +23,11 @@
 .overlay.is-results .result-score{font-size:36px;clear:both}
 .overlay.is-results #result-share{margin:8px 0 14px;padding-top:10px}
 .overlay.is-results .overlay-foot{display:none}
+.overlay.is-results{background-image:linear-gradient(#080d1c9c,#080d1ccc),var(--result-backdrop,none);background-size:cover;background-position:center}
+.overlay.is-results .overlay-card{background:#10182be8}
+.overlay.is-results .result-jacket{float:right;width:80px;height:80px;object-fit:cover;margin:0 0 8px 12px;border:1px solid #aebdd3}
+.overlay.is-results .result-song{font-size:24px}
+.result-artist{font-size:18px;color:#d2ddeb}
+.share-actions .share-fallback{flex-basis:100%;font-size:11px;background:transparent;color:#adbed7;border:0;text-decoration:underline}
+.share-actions [hidden]{display:none}
 @media(max-height:650px){.overlay.is-results{padding:8px}.overlay.is-results .overlay-card{max-height:calc(100dvh - 16px);padding:12px}.overlay.is-results .result-brand{width:48px}.overlay.is-results #overlay-description{display:none}}
-

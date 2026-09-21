@@ -1,4 +1,4 @@
-import { ResultShare } from './result-share.mjs?v=t4p-share-v6';
+import { ResultShare } from './result-share.mjs?v=t4p-result-v8';
 import { loadCatalog } from './catalog.mjs?v=test30-fix-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
@@ -22,6 +22,7 @@ const audioDataCache=new Map(),audioBufferCache=new Map(),audioFetchPromises=new
 let scrollLockState=null;
 let mode = 'loading', startAt = 0, resumeAt = 0, frozenTime = -2.5, judgmentUntil = 0;
 let width = 800, height = 600, lastHud = 0, requestId = 0;
+let resultBackdrop = null, lastBackdropAt = -Infinity;
 const settingsKey = 'kaichi-rhythm-settings-v3';
 let savedSettings = {};
 try {
@@ -173,6 +174,8 @@ async function startGame() {
   if (!chart || mode === 'playing' || mode === 'loading') return;
   clearTimeout(wheelTimer); ++chartRequest;
   resultShare.clear(); ui.result.hidden=true; leaderboard.clearResult();
+  resultBackdrop = null; lastBackdropAt = -Infinity;
+  ui.overlay.style.removeProperty('--result-backdrop');
   $('selection-screen').hidden=true; $('play-workspace').hidden=false; resize();
   $('settings-dialog').close();
   showOverlay('LOADING', chart.title, '音源を準備しています。', '音源を読み込み中…');
@@ -231,20 +234,22 @@ function finish() {
   const allPerfect = fullCombo && engine.counts.PERFECT === engine.units;
   const rank = engine.accuracy >= 97 ? 'S' : engine.accuracy >= 90 ? 'A' : engine.accuracy >= 80 ? 'B' : engine.accuracy >= 65 ? 'C' : 'D';
   showOverlay(allPerfect ? 'ALL PERFECT' : fullCombo ? 'FULL COMBO' : 'SONG COMPLETE', `RANK ${rank}`, engine.score > best ? 'NEW PERSONAL BEST!' : '最後までプレイしてくれてありがとう。', 'もう一度プレイ');
+  if (resultBackdrop) ui.overlay.style.setProperty('--result-backdrop', `url("${resultBackdrop.toDataURL('image/png')}")`);
   ui.result.hidden = false;
   ui.result.replaceChildren();
-  const brand = document.createElement('img'); brand.src='rhythm/t4p-logo.png'; brand.alt='T4P'; brand.className='result-brand';
+  const brand = document.createElement('img'); brand.src=chart.jacket; brand.alt=`${chart.title} ジャケット`; brand.className='result-jacket';
   const song = document.createElement('p'); song.className='result-song'; song.textContent=chart.title;
-  const artist = document.createElement('small'); artist.textContent=`${chart.artist} / ${chart.difficulty}`; song.append(artist);
+  const artist = document.createElement('span'); artist.className='result-artist'; artist.textContent=` / ${chart.artist}`; song.append(artist);
+  const difficulty = document.createElement('small'); difficulty.textContent=chart.difficulty; song.append(difficulty);
   ui.result.append(brand, song);
   const score = document.createElement('div'); score.className = 'result-score'; score.textContent = engine.score.toLocaleString(); ui.result.append(score);
-  resultShare.show(chart, {score:engine.score, accuracy:engine.accuracy, maxCombo:engine.maxCombo, emptyPresses:engine.emptyPresses, counts:engine.counts, rank});
+  resultShare.show(chart, {score:engine.score, accuracy:engine.accuracy, maxCombo:engine.maxCombo, emptyPresses:engine.emptyPresses, counts:engine.counts, rank}, resultBackdrop);
   leaderboard.showResult({score:engine.score,accuracy:Number(engine.accuracy.toFixed(2)),maxCombo:engine.maxCombo,units:engine.units,emptyPresses:engine.emptyPresses,counts:{...engine.counts}});
   ui.status.textContent = 'COMPLETE — おつかれさまでした';
 }
 function onJudge({label,lane,delta,sustain}) {
   const now=performance.now(); judgmentUntil=now+550;
-  ui.judgment.replaceChildren(document.createTextNode(label==='EMPTY'?'空押し':label));
+  ui.judgment.replaceChildren(document.createTextNode(label==='EMPTY'?'MISS':label));
   ui.judgment.style.color=judgmentColors[label];ui.judgment.style.opacity=1;
   if(label==='GREAT'||label==='GOOD'){const small=document.createElement('small');small.textContent=delta<0?'FAST':'LATE';ui.judgment.append(small);}
   if(label==='MISS'||label==='EMPTY')errors[lane]=now;
@@ -494,6 +499,16 @@ function frame(now) {
   }
   // Event and effect ages must use the same clock, including slow desktop frames.
   draw(engine?time:-2.5,performance.now());
+  // Retain a real frame with approaching notes, before the stage empties out.
+  // Reuse one canvas per run; image encoding only happens when results open.
+  if (mode === 'playing' && time > 0 && now - lastBackdropAt > 1000 &&
+      engine.notes.some(note => note.t > time && note.t < time + approachSeconds(settings.speed))) {
+    resultBackdrop ||= document.createElement('canvas');
+    resultBackdrop.width = Math.min(1200, ui.canvas.width);
+    resultBackdrop.height = Math.round(ui.canvas.height * resultBackdrop.width / ui.canvas.width);
+    resultBackdrop.getContext('2d').drawImage(ui.canvas, 0, 0, resultBackdrop.width, resultBackdrop.height);
+    lastBackdropAt = now;
+  }
   if(now>judgmentUntil)ui.judgment.style.opacity=0;
   if(now-lastHud>70){updateHud();lastHud=now;}
   requestAnimationFrame(frame);
