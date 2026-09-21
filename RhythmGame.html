@@ -3,9 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="PHALUXのRollingで遊べる、Q・W・E・Rの4キー音楽ゲーム。">
-  <title>Rolling / Rhythm Game — Kaichi Guitar Music</title>
-  <link rel="icon" href="rhythm/game-icon.svg" type="image/svg+xml">
+  <meta name="description" content="T4P — 4つのキー・タップで遊ぶ音楽ゲーム。曲を選んで演奏し、スコアをシェアしよう。">
+  <meta property="og:title" content="T4P — 4レーン音楽ゲーム">
+  <meta property="og:description" content="4つのキー・タップで遊ぶ音楽ゲーム。あなたのスコアをシェアしよう。">
+  <meta property="og:image" content="https://kaichi-naito.github.io/website/rhythm/t4p-logo.png">
+  <meta property="og:url" content="https://kaichi-naito.github.io/website/RhythmGame.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>T4P — 4レーン音楽ゲーム</title>
+  <link rel="icon" href="rhythm/t4p-logo.png" type="image/png">
   <link rel="stylesheet" href="rhythm/game.css?v=song-select-v1">
   <style>
     .song-wheel{height:360px;padding:136px 10px}
@@ -57,15 +62,16 @@
     .rhythm-start-item img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
     @media(max-width:700px){.song-wheel{height:300px;padding:108px 10px}.song-option{height:84px;padding:5px 8px;margin-bottom:6px}.song-play-button{min-width:60px;height:32px;padding:3px 6px;font-size:10px}.settings-gear{font-size:23px}#rhythm-taskbar{height:28px}#rhythm-start-btn,#rhythm-task{height:22px}#rhythm-start-btn img{height:16px}#rhythm-task{width:120px;font-size:10px}#rhythm-tray{height:22px;padding:0 5px}#rhythm-tray img{width:25px;height:25px}#rhythm-clock{font-size:11px;min-width:36px}#rhythm-start-menu{bottom:30px}}
   </style>
+  <link rel="stylesheet" href="rhythm/brand-share.css?v=t4p-share-v1">
 </head>
 <body>
   <header class="desktop-header"><a href="index.html">← Kaichi Guitar Music</a><span>GAMES / 001</span></header>
   <div class="desktop-layout">
   <main class="app-window" id="app">
-    <div class="titlebar"><span><img src="rhythm/game-icon.svg" alt=""> Rhythm_Player.exe</span><a href="index.html" aria-label="ホームに戻る" class="close rhythm-close">×</a></div>
-    <div class="menubar"><span>KAICHI MUSIC ARCADE</span><button id="settings-open" class="icon-button" aria-label="設定を開く"><span class="settings-gear" aria-hidden="true">⚙</span><span>設定</span></button></div>
+    <div class="titlebar"><span><img src="rhythm/t4p-logo.png" alt=""> T4P.exe</span><a href="index.html" aria-label="ホームに戻る" class="close rhythm-close">×</a></div>
+    <div class="menubar"><span>T4P / MUSIC ARCADE</span><button id="settings-open" class="icon-button" aria-label="設定を開く"><span class="settings-gear" aria-hidden="true">⚙</span><span>設定</span></button></div>
     <section id="selection-screen" class="selection-screen" aria-label="曲選択">
-      <div class="selection-heading"><div><p class="eyebrow">MUSIC SELECT</p></div><span id="song-position">— / —</span></div>
+      <div class="selection-heading"><img class="t4p-logo" src="rhythm/t4p-logo.png" alt="T4P" width="154" height="109"><span id="song-position">— / —</span></div>
       <div class="selection-body">
         <div class="song-preview"><img id="selected-jacket" src="images/CDjacket/Rolling500x500.png" alt=""><p id="selected-artist">—</p><h2 id="selected-title">楽曲を読み込み中…</h2><div class="preview-tags"><span id="selected-difficulty">—</span><span id="selected-bpm">— BPM</span><span id="selected-duration">—</span></div></div>
         <div class="song-picker"><button id="song-prev" class="wheel-arrow" aria-label="前の曲" disabled>▲</button><div id="song-wheel" class="song-wheel" role="listbox" aria-label="楽曲一覧" tabindex="0"></div><button id="song-next" class="wheel-arrow" aria-label="次の曲" disabled>▼</button><button id="play-selected" class="primary-button" disabled>楽曲を読み込み中…</button><p id="selection-status" role="status">楽曲一覧を読み込んでいます</p><button id="catalog-retry" class="secondary-button" hidden>一覧を再読み込み</button></div>
@@ -100,6 +106,7 @@
                 <div id="loading-progress-label" class="loading-progress-label">音源を準備しています…</div>
               </div>
               <div id="result" hidden></div>
+              <section id="result-share" aria-label="結果を共有" hidden></section>
               <form id="score-form" hidden>
                 <label for="player-name">名前を入れてランキングに登録</label>
                 <input id="player-name" name="playerName" type="text" maxlength="32" autocomplete="nickname" placeholder="名前（16文字まで）" aria-describedby="score-privacy">
@@ -311,7 +318,7 @@
       syncLoadingPanel();
     })();
   </script>
-  <script type="module" src="rhythm/game.mjs?v=linear-motion-v1"></script>
+  <script type="module" src="rhythm/game.mjs?v=t4p-share-v1"></script>
   <dialog id="settings-dialog" aria-labelledby="settings-title">
     <form method="dialog" class="dialog-heading"><h2 id="settings-title">プレイ設定</h2><button aria-label="設定を閉じる" class="icon-button">×</button></form>
         <fieldset id="settings"><legend>PLAY SETTINGS</legend>
@@ -336,7 +343,7 @@
   </div>
   <div id="rhythm-taskbar" aria-label="Kaichi 95 taskbar">
     <button id="rhythm-start-btn" type="button" aria-label="Start" aria-expanded="false"><img src="images/start.png" alt="Start"></button>
-    <div id="rhythm-task" aria-label="現在のアプリ">Rhythm_Player.exe</div>
+    <div id="rhythm-task" aria-label="現在のアプリ">T4P.exe</div>
     <div id="rhythm-tray"><img src="images/volume-icon.png" alt="Volume"><span id="rhythm-clock">00:00</span></div>
   </div>
   <script>
@@ -438,3 +445,4 @@
   </script>
 </body>
 </html>
+

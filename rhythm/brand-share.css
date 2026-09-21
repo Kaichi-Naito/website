@@ -1,0 +1,17 @@
+/* T4P branding and result sharing. */
+.titlebar img{object-fit:contain;width:28px}
+.selection-heading .t4p-logo{display:block;width:154px;height:auto;max-height:112px;object-fit:contain}
+.selection-heading{align-items:center;margin-bottom:20px}
+.result-brand{display:block;width:96px;height:auto;margin:0 auto 8px}
+.result-song{font-size:16px;line-height:1.5;overflow-wrap:anywhere;margin:0 0 8px}
+.result-song small{display:block;font-size:11px;color:#aebdd3;margin-top:3px}
+#result-share{margin:16px 0 20px;padding-top:14px;border-top:1px solid #46526b;text-align:left}
+.share-actions{display:flex;flex-wrap:wrap;gap:8px}
+.share-actions a,.share-actions button{flex:1 1 auto;display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 10px;border:1px solid #718099;background:#26334a;color:#f3f7ff;font:12px var(--mono);text-decoration:none;text-align:center}
+.share-actions .share-x{flex-basis:100%;background:#f2f5fa;color:#101521;border:2px solid;border-color:#fff #8290a5 #8290a5 #fff;font-size:15px}
+.share-actions a:hover,.share-actions button:hover:not(:disabled){filter:brightness(1.12)}
+.share-status{font:11px/1.7 var(--mono);color:#adbed7;margin:9px 0;overflow-wrap:anywhere}
+.share-preview{font-size:11px;color:#d2dff4}
+.share-preview summary{cursor:pointer;padding:8px 0}
+.share-preview img{display:block;width:100%;height:auto;margin:8px 0;border:1px solid #65738c}
+@media(max-width:700px){.selection-heading .t4p-logo{width:115px;max-height:84px}.selection-heading{margin-bottom:12px}}

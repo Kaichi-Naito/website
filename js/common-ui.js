@@ -467,7 +467,7 @@
                 '<img src="' + asset('images/gif/Plugin.png') + '" alt="Plugin"><span>Plugin</span>' +
             '</a>' +
             '<a href="RhythmGame.html" class="desktop-icon">' +
-                '<img src="' + asset('rhythm/game-icon.svg') + '" alt=""><span>Rhythm Game</span>' +
+                '<img src="' + asset('rhythm/t4p-logo.png') + '" alt=""><span>T4P</span>' +
             '</a>' +
             '<a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" rel="noopener noreferrer" class="desktop-icon">' +
                 '<img src="' + asset('images/gif/Earth.gif') + '" alt="Works"><span>Works</span>' +
@@ -1328,3 +1328,4 @@
         init();
     }
 })();
+

@@ -1,3 +1,4 @@
+import { ResultShare } from './result-share.mjs?v=t4p-share-v1';
 import { loadCatalog } from './catalog.mjs?v=song-select-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
@@ -33,6 +34,7 @@ try {
 } catch {}
 let settings = readSettings(savedSettings);
 const leaderboard = new Leaderboard();
+const resultShare = new ResultShare($('result-share'));
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 for (const key of ['speed','offset','volume','tapVolume']) {
   $(key).value = settings[key];
@@ -165,6 +167,7 @@ function schedule(from, leadIn) {
 }
 async function startGame() {
   if (!chart || mode === 'playing' || mode === 'loading') return;
+  resultShare.clear(); ui.result.hidden=true; leaderboard.clearResult();
   $('selection-screen').hidden=true; $('play-workspace').hidden=false; resize();
   $('settings-dialog').close();
   showOverlay('LOADING', chart.title, '音源を準備しています。', '音源を読み込み中…');
@@ -222,6 +225,10 @@ function finish() {
   showOverlay(allPerfect ? 'ALL PERFECT' : fullCombo ? 'FULL COMBO' : 'SONG COMPLETE', `RANK ${rank}`, engine.score > best ? 'NEW PERSONAL BEST!' : '最後までプレイしてくれてありがとう。', 'もう一度プレイ');
   ui.result.hidden = false;
   ui.result.replaceChildren();
+  const brand = document.createElement('img'); brand.src='rhythm/t4p-logo.png'; brand.alt='T4P'; brand.className='result-brand';
+  const song = document.createElement('p'); song.className='result-song'; song.textContent=chart.title;
+  const artist = document.createElement('small'); artist.textContent=`${chart.artist} / ${chart.difficulty}`; song.append(artist);
+  ui.result.append(brand, song);
   const score = document.createElement('div'); score.className = 'result-score'; score.textContent = engine.score.toLocaleString(); ui.result.append(score);
   const stats = document.createElement('div'); stats.className = 'result-stats';
   for (const [label, value] of [...Object.entries(engine.counts), ['空押し', engine.emptyPresses], ['MAX COMBO', engine.maxCombo], ['ACCURACY', `${engine.accuracy.toFixed(2)}%`]]) {
@@ -229,6 +236,7 @@ function finish() {
     row.dataset.judge=label; name.textContent = label; number.textContent = value; row.append(name, number); stats.append(row);
   }
   ui.result.append(stats);
+  resultShare.show(chart, {score:engine.score, accuracy:engine.accuracy, maxCombo:engine.maxCombo, emptyPresses:engine.emptyPresses, counts:engine.counts, rank});
   leaderboard.showResult({score:engine.score,accuracy:Number(engine.accuracy.toFixed(2)),maxCombo:engine.maxCombo,units:engine.units,emptyPresses:engine.emptyPresses,counts:{...engine.counts}});
   ui.status.textContent = 'COMPLETE — おつかれさまでした';
 }
@@ -305,6 +313,7 @@ wheel.addEventListener('scroll',()=>{
   },110);
 });
 function showSelection() {
+  resultShare.clear();
   ++requestId;stopSource();resetInputs();unlockPageScroll();mode='select';frozenTime=-2.5;
   $('selection-screen').hidden=false;$('play-workspace').hidden=true;ui.overlay.hidden=true;
   ui.pause.disabled=true;ui.settings.disabled=false;leaderboard.clearResult();
@@ -312,6 +321,7 @@ function showSelection() {
   $('play-selected').focus();
 }
 function useChart(next) {
+  resultShare.clear();
   stopSource();resetInputs();chart=next;buffer=audioBufferCache.get(next.audio)||null;preloadAudio(next.audio);
   leaderboard.clearResult();leaderboard.setChart(next,`${next.title} / ${next.difficulty}`);
   engine=new RhythmEngine(chart,onJudge);frozenTime=-2.5;mode='select';

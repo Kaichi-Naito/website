@@ -111,3 +111,13 @@ automatic completion, release timing independence, and pause/re-grip behavior.
 Browser checks should cover start, keyboard input, pause/resume, retry, the
 two-minute result screen, and mobile layout. Subjective audio alignment should
 also be checked on the player's actual output device.
+
+
+## T4P / 結果の共有
+
+正式名称は **T4P**。採用ロゴは `rhythm/t4p-logo.png` です。
+結果画面の「Xに投稿」は曲名・アーティスト・難易度・点数・`#T4P`・公開URLを入れた投稿画面を開きます。投稿の確定はプレイヤーが行います。
+
+画像は端末内で生成したPNGです。曲名・アーティスト・点数・ランク・精度・最大コンボ・判定内訳を収録し、名前やランキング登録情報は含めません。「画像をコピー」してXに貼り付けるか、「画像を保存」して添付できます。ファイル共有対応端末では「画像付きで共有」から共有先を選べます（X側が本文・画像を両方受け取るかは端末に依存）。XのWeb Intentにローカル画像を自動添付する機能はありません。
+
+共有はランキングの順位・登録の有無に関係なく利用できます。次の曲や再プレイを始めると、前の結果と画像URLを破棄します。
