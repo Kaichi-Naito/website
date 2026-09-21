@@ -65,7 +65,9 @@ test('mobile opens the app link directly and reveals fallback only after tapping
 // A small DOM fixture exercises asynchronous lifecycle without a browser dependency.
 class Element {
   constructor(tag) { this.tag = tag; this.children = []; this.hidden = false; this.textContent = ''; this.events = {}; }
-  append(...nodes) { this.children.push(...nodes); }
+  append(...nodes) { nodes.forEach(node=>node.parent=this); this.children.push(...nodes); }
+  click() { downloads.push({href:this.href,filename:this.download,target:this.target}); if(downloadError) throw downloadError; }
+  remove() { if(this.parent)this.parent.children=this.parent.children.filter(node=>node!==this); }
   replaceChildren(...nodes) { this.children = nodes; }
   setAttribute() {}
   removeAttribute() {}
@@ -77,7 +79,8 @@ function fixture() {
   controller.root = root; controller.version = 0;
   return {root, controller};
 }
-globalThis.document = {createElement: tag => new Element(tag)};
+const downloads=[]; let downloadError=null;
+globalThis.document = {body:new Element('body'),createElement: tag => new Element(tag)};
 const settle = () => new Promise(resolve => setImmediate(resolve));
 test('leaving results discards a PNG that finishes preparing later', async () => {
   const {root, controller} = fixture(); let ready;
@@ -133,49 +136,51 @@ test('X opens directly even when the device supports native file sharing',async(
     assert.equal(link.target,'_blank');controller.clear();
   } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;}
 });
-test('image copy is explicit and never blocks the X draft when successful or unavailable',async()=>{
-  const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator');const oldItem=globalThis.ClipboardItem;
-  globalThis.ClipboardItem=class{constructor(data){assert.ok(data['image/png']);}};
-  try {
-    for(const mode of ['success','rejected','throws','unavailable']) {
-      let copied=0,prevented=false;
-      const clipboard=mode==='unavailable'?undefined:{write:()=>{copied++;if(mode==='throws')throw Error('denied');return mode==='rejected'?Promise.reject(Error('denied')):Promise.resolve();}};
-      Object.defineProperty(globalThis,'navigator',{configurable:true,value:{clipboard}});
-      const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png'],{type:'image/png'});
-      controller.show(chart,score);await settle();
-      const link=root.children[1].children[0];
-      await link.events.click({preventDefault(){prevented=true;}});
-      assert.equal(prevented,false,mode);assert.equal(link.target,'_blank');
-      assert.equal(new URL(link.href).searchParams.get('text'),shareText(resultSnapshot(chart,score)));
-      assert.equal(copied,0,'Opening X does not access the clipboard');
-      const [save,copy]=root.children[1].children.slice(1);
-      assert.equal(save.textContent,'結果画像を保存');assert.equal(save.href,controller.imageURL);
-      assert.ok(save.download.endsWith('.png'));assert.ok(!save.download.includes('/'));
-      assert.equal(copy.textContent,'結果画像をコピー');
-      await copy.events.click();
-      assert.equal(copied,mode==='unavailable'?0:1);
-      assert.match(root.children[2].textContent,mode==='success'?/コピーしました/:/コピーできません/);
-      assert.equal(root.children[1].children.length,3);
-      assert.equal(root.children[3].tag,'div');assert.equal(root.children[3].children[0].tag,'img');
-      controller.clear();
-    }
-  } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;globalThis.ClipboardItem=oldItem;}
+test('one X tap starts one named PNG download synchronously and keeps the result screen',async()=>{
+  downloads.length=0;
+  const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png'],{type:'image/png'});
+  controller.show(chart,score);await settle();
+  const link=controller.link;
+  link.events.click({preventDefault(){assert.fail('Keep the native new-tab navigation');}});
+  assert.equal(downloads.length,1);assert.equal(downloads[0].href,controller.imageURL);
+  assert.ok(downloads[0].filename.endsWith('-987654.png'));assert.doesNotMatch(downloads[0].filename,/[\\/:*?"<>|]/);
+  assert.equal(downloads[0].target,'_blank');assert.equal(document.body.children.length,0);
+  assert.equal(root.children[1].children.length,1);assert.equal(link.textContent,'Xに投稿');
+  assert.equal(root.children[3].children[0].tag,'img');assert.equal(root.hidden,false);
+  assert.match(root.children[2].textContent,/保存を開始/);assert.doesNotMatch(root.children[2].textContent,/保存しました/);
+  controller.clear();
 });
-test('X opens even before PNG is ready, or after image generation fails',async()=>{
+test('image preparation blocks premature taps; generation failure still allows the X draft',async()=>{
+  downloads.length=0;
   const {root,controller}=fixture();let reject;
-  controller.prepare=()=>new Promise((resolve,no)=>{reject=no;});
-  controller.show(chart,score);
-  let prevented=false;
-  await root.children[1].children[0].events.click({preventDefault(){prevented=true;}});
-  assert.equal(prevented,false);
-  reject(Error('canvas'));await settle();
-  await root.children[1].children[0].events.click({preventDefault(){prevented=true;}});
-  assert.equal(prevented,false);controller.clear();
+  controller.prepare=()=>new Promise((resolve,no)=>{reject=no;});controller.show(chart,score);
+  let prevented=false;controller.link.events.click({preventDefault(){prevented=true;}});
+  assert.equal(prevented,true);assert.equal(downloads.length,0);assert.equal(controller.link.textContent,'画像を準備中…');
+  reject(Error('canvas'));await settle();prevented=false;
+  controller.link.events.click({preventDefault(){prevented=true;}});
+  assert.equal(prevented,false);assert.equal(downloads.length,0);assert.equal(controller.link.textContent,'Xに投稿');
+  assert.match(root.children[2].textContent,/画像を保存できません/);controller.clear();
+});
+test('download failure never blocks the X draft or claims a completed save',async()=>{
+  const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png']);
+  controller.show(chart,score);await settle();downloadError=Error('blocked');
+  try {
+    controller.link.events.click({preventDefault(){assert.fail('Text is still shareable');}});
+    assert.match(root.children[2].textContent,/画像を保存できません/);
+    assert.match(root.children[2].textContent,/長押し/);assert.equal(document.body.children.length,0);
+  } finally {downloadError=null;controller.clear();}
+});
+test('stale result buttons cannot download a new run or navigate',async()=>{
+  downloads.length=0;const {controller}=fixture();controller.prepare=async()=>new Blob(['png']);
+  controller.show(chart,score);await settle();const old=controller.link;
+  controller.show({...chart,title:'Next'},score);await settle();let prevented=false;
+  old.events.click({preventDefault(){prevented=true;}});assert.equal(prevented,true);assert.equal(downloads.length,0);
+  controller.clear();
 });
 test('shared URL uses the supplied short link',()=>assert.equal(APP_URL,'https://x.gd/T4P_game'));
 test('X cannot open an unranked draft while registration is pending, then uses the confirmed rank',async()=>{
-  const {controller}=fixture(); controller.prepare=()=>new Promise(()=>{});
-  controller.show(chart,score); controller.setRankingPending(true);
+  const {controller}=fixture(); controller.prepare=async()=>new Blob(['png']);
+  controller.show(chart,score); await settle(); controller.setRankingPending(true);
   let prevented=false;
   await controller.link.events.click({preventDefault(){prevented=true;}});
   assert.equal(prevented,true); assert.equal(controller.link.textContent,'ランキング確認中…');
@@ -205,31 +210,3 @@ test('top preview is separate from posting controls and clears between results',
   assert.equal(preview.hidden,true);assert.equal(preview.children.length,0);
 });
 
-test('copy writes inside the tap, shows pending and completes only after the browser resolves',async()=>{
-  const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator'),oldItem=globalThis.ClipboardItem;
-  let resolveWrite,writes=0,payload;
-  globalThis.ClipboardItem=class{constructor(data){payload=data['image/png'];}};
-  Object.defineProperty(globalThis,'navigator',{configurable:true,value:{clipboard:{write:()=>{writes++;return new Promise(resolve=>{resolveWrite=resolve;});}}}});
-  try {
-    const {root,controller}=fixture();const blob=new Blob(['png'],{type:'image/png'});controller.prepare=async()=>blob;
-    controller.show(chart,score);await settle();const copy=root.children[1].children.at(-1);
-    const pending=copy.events.click();
-    assert.equal(writes,1);assert.equal(copy.disabled,true);assert.equal(copy.textContent,'コピー中…');
-    assert.equal(await payload,blob);assert.doesNotMatch(root.children[2].textContent,/コピーしました/);
-    resolveWrite();await pending;assert.equal(copy.disabled,false);assert.equal(copy.textContent,'画像をコピーしました');controller.clear();
-  } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;globalThis.ClipboardItem=oldItem;}
-});
-
-test('unsupported PNG and denied clipboard access have distinct actionable messages',async()=>{
-  const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator'),oldItem=globalThis.ClipboardItem;
-  try {
-    for(const mode of ['unsupported','denied']) {
-      globalThis.ClipboardItem=class{static supports(type){assert.equal(type,'image/png');return mode!=='unsupported';}};
-      Object.defineProperty(globalThis,'navigator',{configurable:true,value:{clipboard:{write:()=>{assert.notEqual(mode,'unsupported');return Promise.reject(new DOMException('denied','NotAllowedError'));}}}});
-      const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png']);controller.show(chart,score);await settle();
-      const copy=root.children[1].children.at(-1);await copy.events.click();
-      assert.match(root.children[2].textContent,mode==='unsupported'?/このブラウザー/:/アクセスが許可されず/);
-      assert.match(root.children[2].textContent,/長押し/);assert.doesNotMatch(copy.textContent,/しました/);controller.clear();
-    }
-  } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;globalThis.ClipboardItem=oldItem;}
-});

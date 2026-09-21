@@ -131,7 +131,7 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
 export class ResultShare {
   constructor(root, previewRoot = root) { this.root = root; this.previewRoot = previewRoot; this.version = 0; this.logo = loadImage(LOGO_URL); this.background = loadImage(BACKGROUND_URL); }
   clear() {
-    this.rankingPending = false;
+    this.rankingPending = false; this.imagePending = false;
     if (this.previewRoot && this.previewRoot !== this.root) { this.previewRoot.hidden = true; this.previewRoot.replaceChildren(); }
     ++this.version;
     if (this.imageURL) URL.revokeObjectURL(this.imageURL);
@@ -144,7 +144,8 @@ export class ResultShare {
     const actions = document.createElement('div'); actions.className = 'share-actions';
     const link = this.link = document.createElement('a');
     link.className = 'share-x'; link.href = xDestination(snapshot); link.target = '_blank'; link.rel = 'noopener noreferrer';
-    link.textContent = 'Xに投稿'; actions.append(link);
+    this.imagePending = true;
+    link.textContent = '画像を準備中…'; link.setAttribute('aria-disabled', 'true'); actions.append(link);
     const status = document.createElement('p'); status.className = 'share-status'; status.setAttribute('role', 'status');
     status.textContent = 'スコア画像を準備しています…';
     const heading = document.createElement('h3'); heading.className = 'share-heading'; heading.textContent = '演奏結果をXでポストしよう！';
@@ -157,64 +158,48 @@ export class ResultShare {
       actions.append(fallback);
     }
     const current = () => this.version === version;
-    const guide = '画像は自動添付されません。先に「結果画像を保存」で保存し、Xの画像ボタンから選ぶか、「結果画像をコピー」でコピーしてXの投稿欄に貼り付けてください。';
+    const guide = '画像はXの投稿画面で添付してください。保存先はブラウザーのダウンロード先です。保存されない場合は、この結果画像を長押し・右クリックして保存できます。';
     link.addEventListener('click', event => {
       if (!current()) { event.preventDefault(); return; }
       if (this.rankingPending) {
         event.preventDefault(); status.textContent = 'ランキングの登録・順位確認が終わるまでお待ちください。'; return;
       }
+      if (this.imagePending) {
+        event.preventDefault(); status.textContent = '画像の準備が終わるまでお待ちください。'; return;
+      }
+      let downloadStarted = false;
+      if (this.imageURL) {
+        // Keep both actions inside the original tap; awaiting work here can block app launch.
+        const download = document.createElement('a');
+        download.href = this.imageURL;
+        download.download = `T4P-${snapshot.title.replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_')}-${snapshot.score}.png`;
+        download.target = '_blank'; download.rel = 'noopener noreferrer'; download.hidden = true;
+        document.body.append(download);
+        try { download.click(); downloadStarted = true; }
+        catch { /* The X draft remains available if the browser refuses downloading. */ }
+        finally { download.remove(); }
+      }
       if (this.fallback) this.fallback.hidden = false;
-      status.textContent = `投稿文を付けて${mobile ? 'Xアプリ' : 'Xの投稿画面'}を開きます。${guide}`;
+      // Download requests have no completion event: never claim that the file is saved.
+      status.textContent = `${downloadStarted ? '画像の保存を開始し、' : '画像を保存できませんでした。'}投稿文を付けて${mobile ? 'Xアプリ' : 'Xの投稿画面'}を開きます。${guide}`;
+
     });
     this.prepare(snapshot).then(blob => {
       if (!current()) return;
       this.imageURL = URL.createObjectURL(blob);
-      const save = document.createElement('a');
-      save.className = 'share-save'; save.href = this.imageURL;
-      save.download = `T4P-${snapshot.title.replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_')}-${snapshot.score}.png`;
-      save.textContent = '結果画像を保存';
-      save.addEventListener('click', event => {
-        if (!current()) { event.preventDefault(); return; }
-        status.textContent = '保存した画像をXの画像ボタンから選んで添付してください。保存が始まらない場合は、結果画像を長押し・右クリックして保存してください。';
-      });
-      const copy = document.createElement('button');
-      copy.type = 'button'; copy.className = 'share-copy'; copy.textContent = '結果画像をコピー';
-      copy.addEventListener('click', async () => {
-        if (!current() || copy.disabled) return;
-        const fallback = '結果画像を長押ししてコピーするか、「結果画像を保存」で保存してXへ添付してください。';
-        if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined' || (typeof ClipboardItem.supports === 'function' && !ClipboardItem.supports('image/png'))) {
-          copy.textContent = '画像コピー非対応';
-          status.textContent = `このブラウザーでは画像をコピーできません。${fallback}`;
-          return;
-        }
-        copy.disabled = true; copy.textContent = 'コピー中…';
-        status.textContent = '画像をコピーしています。完了するまでこの画面を開いたままお待ちください。';
-        try {
-          // Invoke the write in the tap handler, with the Promise representation
-          // supported by WebKit. Do not await image preparation before writing.
-          await navigator.clipboard.write([new ClipboardItem({'image/png':Promise.resolve(blob)})]);
-          if (current()) {
-            copy.textContent = '画像をコピーしました';
-            status.textContent = '結果画像をコピーしました。Xの投稿欄に貼り付けてください。貼り付けが出ない・画像が添付されない場合は、「結果画像を保存」で保存し、Xの画像ボタンから選んでください。';
-          }
-        } catch (error) {
-          if (current()) {
-            copy.textContent = 'コピーできません・再試行';
-            const reason = error?.name === 'NotAllowedError' ? 'クリップボードへのアクセスが許可されず、画像をコピーできませんでした。' : error?.name === 'NotSupportedError' ? 'このブラウザーでは画像をコピーできません。' : '画像をコピーできませんでした。';
-            status.textContent = `${reason}${fallback}`;
-          }
-        } finally { if (current()) copy.disabled = false; }
-      });
-      actions.append(save, copy);
+      this.imagePending = false; this.setRankingPending(this.rankingPending);
       const preview = document.createElement('div'); preview.className = 'share-preview';
       const image = document.createElement('img'); image.src = this.imageURL;
       image.alt = `${snapshot.title} / ${snapshot.artist}、${snapshot.difficulty}：${number(snapshot.score)}点、RANK ${snapshot.rank}`;
       preview.append(image);
       const previewRoot = this.previewRoot || this.root;
       previewRoot.append(preview); previewRoot.hidden = false;
-      status.textContent = `「Xに投稿」で投稿文を開きます。${guide}`;
+      status.textContent = `「Xに投稿」で結果画像の保存を開始し、投稿画面を開きます。${guide}`;
     }).catch(() => {
-      if (current()) status.textContent = '画像を作れませんでした。「Xに投稿」から本文を入れた投稿画面を開けます。';
+      if (current()) {
+        this.imagePending = false; this.setRankingPending(this.rankingPending);
+        status.textContent = '画像を作れませんでした。「Xに投稿」から本文を入れた投稿画面を開けます。';
+      }
     });
   }
   setRanking(position) {
@@ -227,8 +212,8 @@ export class ResultShare {
   setRankingPending(pending) {
     this.rankingPending = pending;
     if (this.link) {
-      this.link.setAttribute('aria-disabled', String(pending));
-      this.link.textContent = pending ? 'ランキング確認中…' : 'Xに投稿';
+      this.link.setAttribute('aria-disabled', String(pending || this.imagePending));
+      this.link.textContent = pending ? 'ランキング確認中…' : this.imagePending ? '画像を準備中…' : 'Xに投稿';
     }
     if (this.fallback && pending) this.fallback.hidden = true;
   }
