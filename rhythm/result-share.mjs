@@ -18,7 +18,7 @@ export function shareText(result) {
   const difficultyIcon = {NORMAL:'🎸', HARD:'🔥'}[result.difficulty.toUpperCase()] || '';
   const medal = {S:'💎', A:'🥇', B:'🥈', C:'🥉', D:'🌱'}[result.rank] || '';
   const ranking = Number.isInteger(result.rankingPosition) && result.rankingPosition >= 1 && result.rankingPosition <= 10 ? `\n👑${result.rankingPosition}位にランクイン！！` : '';
-  return `(自動保存された結果画像を添付してポストしてね)\n#T4P で ♬ ${result.title} / ${result.artist} をプレイしたよ！！🎮\n\n${difficultyIcon}${result.difficulty}${difficultyIcon}\n${medal}RANK ${result.rank}${medal}\nスコア ${number(result.score)}点${ranking}\n\n${APP_URL}`;
+  return `(自動保存された結果画像を添付してポストしてね)\n\n#T4P で ♬ ${result.title} / ${result.artist} をプレイしたよ！！🎮\n\n${difficultyIcon}${result.difficulty}${difficultyIcon}\n${medal}RANK ${result.rank}${medal}\nスコア ${number(result.score)}点${ranking}\n\n${APP_URL}`;
 }
 export function xIntent(result) {
   const url = new URL('https://x.com/intent/tweet');
