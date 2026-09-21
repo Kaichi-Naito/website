@@ -2,7 +2,7 @@ import { ResultShare } from './result-share.mjs?v=t4p-image-tools-v12';
 import { loadCatalog } from './catalog.mjs?v=test30-fix-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
-import { Leaderboard } from './leaderboard.mjs?v=t4p-share-v3';
+import { Leaderboard } from './leaderboard.mjs?v=t4p-personal-best-v13';
 import { approachSeconds, tapLevel, readSettings } from './settings.mjs?v=song-select-v1';
 const $ = id => document.getElementById(id);
 const ui = Object.fromEntries(['canvas','stage','score','accuracy','accuracy-meter','accuracy-fill','combo','judgment','countdown','overlay','overlay-title','overlay-eyebrow','overlay-description','overlay-foot','start','restart','pause','result','status','progress','elapsed','settings','best-score'].map(id => [id, $(id)]));

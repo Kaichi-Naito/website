@@ -6,6 +6,39 @@ export function registeredRank(entries, playId) {
   const index = entries.findIndex(entry => entry.playId === playId);
   return index >= 0 && index < MAX_RANKING_ENTRIES ? index + 1 : null;
 }
+const PLAYER_STORAGE_KEY = 't4p-player-id-v1';
+const UUID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
+export function getPlayerId(storage) {
+  try {
+    storage ||= globalThis.localStorage;
+    const previous = storage.getItem(PLAYER_STORAGE_KEY);
+    if (UUID.test(previous || '')) return previous;
+    const id = crypto.randomUUID(); storage.setItem(PLAYER_STORAGE_KEY, id);
+    return storage.getItem(PLAYER_STORAGE_KEY) === id ? id : null;
+  } catch { return null; }
+}
+export async function playerKey(playerId, key) {
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`t4p-player-v1:${playerId}:${key}`));
+  return Array.from(new Uint8Array(hash), b => b.toString(16).padStart(2,'0')).join('');
+}
+export function uniqueBestEntries(entries) {
+  const seen = new Set();
+  return [...entries].sort((a,b) => b.score-a.score || b.accuracy-a.accuracy || b.maxCombo-a.maxCombo || String(a.registeredAt).localeCompare(String(b.registeredAt))).filter(entry => {
+    if (!/^[a-f0-9]{64}$/.test(entry.playerKey || '')) return true; // Legacy identities are unknown.
+    if (seen.has(entry.playerKey)) return false;
+    seen.add(entry.playerKey); return true;
+  });
+}
+const receiverChecks = new Map();
+async function requirePlayerBestReceiver(endpoint) {
+  if (!receiverChecks.has(endpoint)) receiverChecks.set(endpoint, sendScore(endpoint,{action:'capabilities'}).then(response => {
+    if (response.capabilities?.playerBest !== true) throw new Error('old receiver');
+  }).catch(() => {
+    receiverChecks.delete(endpoint);
+    throw new Error('登録プログラムの更新確認ができませんでした。管理者はApps Scriptを最新版に更新してください。');
+  }));
+  await receiverChecks.get(endpoint);
+}
 const $ = id => document.getElementById(id);
 export async function chartKey(chart) {
   const normalized=JSON.stringify({song:chart.catalogId || chart.title,rules:RULESET,duration:chart.duration,notes:chart.notes.map(n=>[Math.round(n.t*1e6),n.lane,n.end?Math.round(n.end*1e6):null,n.ticks?.map(t=>Math.round(t*1e6))??[]])});
@@ -65,6 +98,7 @@ function ensureSubmitProgress() {
 }
 export class Leaderboard {
   constructor({onRanked = () => {}} = {}) {
+    this.playerId = getPlayerId();
     this.onRanked = onRanked; this.registeredPlayId = null;
     this.generation=0;this.result=null;this.endpoint='';this.submitting=false;this.progressTimer=0;this.progressValue=0;this.entries=[];
     this.progress=ensureSubmitProgress();
@@ -120,9 +154,9 @@ export class Leaderboard {
     $('ranking-rows').replaceChildren();
     try {
       const key=await this.keyPromise;
-      const query=`select B,C,D,E,H,I where F = '${key}' and G = '${RULESET}' order by C desc,D desc,E desc,H asc limit ${MAX_RANKING_ENTRIES}`;
+      const query=`select B,C,D,E,H,I,P where F = '${key}' and G = '${RULESET}' order by C desc,D desc,E desc,H asc`;
       const [scores,config]=await Promise.all([
-        readSheet('スコア','A1:N',query),
+        readSheet('スコア','A1:R',query),
         readSheet('設定','A1:B2').catch(()=>[])
       ]);
       if(generation!==this.generation)return false;
@@ -134,7 +168,8 @@ export class Leaderboard {
         accuracy:Number(r.c?.[2]?.v),
         maxCombo:Number(r.c?.[3]?.v),
         registeredAt:r.c?.[4]?.v,
-        playId:r.c?.[5]?.v
+        playId:r.c?.[5]?.v,
+        playerKey:r.c?.[6]?.v
       }));
       this.render(entries);
       return true;
@@ -144,7 +179,7 @@ export class Leaderboard {
     } finally { if(generation===this.generation)$('ranking-refresh').disabled=false; }
   }
   render(entries) {
-    this.entries=entries.filter(e=>typeof e.name==='string' && Number.isFinite(e.score) && Number.isFinite(e.accuracy) && Number.isFinite(e.maxCombo)).slice(0,MAX_RANKING_ENTRIES);
+    this.entries=uniqueBestEntries(entries).filter(e=>typeof e.name==='string' && Number.isFinite(e.score) && Number.isFinite(e.accuracy) && Number.isFinite(e.maxCombo)).slice(0,MAX_RANKING_ENTRIES);
     $('ranking-rows').replaceChildren();
     this.entries.forEach((entry,i)=>{
       const row=document.createElement('tr');
@@ -160,7 +195,7 @@ export class Leaderboard {
       if (position) $('score-message').textContent = `ランキング${position}位に登録しました！`;
     }
     const any=this.entries.length>0;
-    $('ranking-status').textContent=any?'スコア順 / 上位20件':'この譜面の登録はまだありません。';
+    $('ranking-status').textContent=any?'自己ベスト順 / 上位20人':'この譜面の登録はまだありません。';
   }
   qualifies(stats) {
     if(this.entries.length<MAX_RANKING_ENTRIES)return true;
@@ -172,7 +207,7 @@ export class Leaderboard {
   }
   async showResult(stats) {
     this.registeredPlayId = null;
-    const result=this.result={...stats,playId:crypto.randomUUID(),ruleset:RULESET,song:this.chart.title,songId:this.chart.catalogId,keyPromise:this.keyPromise};
+    const result=this.result={...stats,playId:crypto.randomUUID(),ruleset:RULESET,song:this.chart.title,songId:this.chart.catalogId,difficulty:this.chart.difficulty,playerId:this.playerId,keyPromise:this.keyPromise};
     $('player-name').value='';$('score-form').hidden=true;this.resetProgress();
     $('score-message').hidden=false;$('score-message').textContent='ランキング判定中…';
 
@@ -182,6 +217,15 @@ export class Leaderboard {
       this.result=null;
       $('score-message').hidden=false;$('score-message').textContent='ランキングを確認できなかったため、今回は登録できませんでした。';
       return;
+    }
+    if (!result.playerId) {
+      this.result=null; $('score-message').textContent='プレイヤーIDを保存できないため登録できません。ブラウザのサイトデータ保存を有効にしてください。'; return;
+    }
+    const ownKey = await playerKey(result.playerId, await result.keyPromise);
+    if (this.result !== result) return;
+    const previous = this.entries.find(entry => entry.playerKey === ownKey);
+    if (previous && stats.score <= previous.score) {
+      this.result=null; $('score-message').textContent=`自己ベスト ${previous.score.toLocaleString()} 点を保持しました。今回のスコアは重複登録しません。`; return;
     }
     if(!this.qualifies(stats)) {
       this.result=null;
@@ -206,12 +250,17 @@ export class Leaderboard {
         if(validEndpoint(endpoint))this.endpoint=endpoint.trim();
       }
       if(!this.endpoint)throw new Error('登録先にまだ接続されていません。管理者による初回設定が必要です。');
+      await requirePlayerBestReceiver(this.endpoint);
       const {keyPromise,...stats}=result;
       const response=await sendScore(this.endpoint,{...stats,name,chartKey:await keyPromise});
       if(this.result!==result)return;
 
       this.result=null;$('score-form').hidden=true;this.finishProgress();
-      if(response.registration?.qualified===false) {
+      if(response.registration?.personalBestKept) {
+        this.registeredPlayId=null; this.onRanked(null);
+        $('score-message').hidden=false;
+        $('score-message').textContent=`自己ベスト ${Number(response.registration.score).toLocaleString()} 点を保持しました。今回のスコアは重複登録しません。`;
+      } else if(response.registration?.qualified===false) {
         $('score-message').hidden=false;
         $('score-message').textContent='直前にランキングが更新されたため20位圏外となり、登録されませんでした。';
       } else {
