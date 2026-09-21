@@ -1,0 +1,34 @@
+{
+  "checkedAt": "2026-09-21T19:37:15.230914+00:00",
+  "page": {
+    "status": 200,
+    "containsGameVersion": true
+  },
+  "catalog": {
+    "status": 200,
+    "playDurationLimit": 30
+  },
+  "newAudio": {
+    "status": 200,
+    "bytes": 5039040,
+    "sha256": "cdf8e11564b09aed3dfc1457d6950f3530ab6ffb1cbb506b62117c05bf1cd50a"
+  },
+  "hardMidi": {
+    "status": 200,
+    "bytes": 4289,
+    "sha256": "91e1394c73a5fee70ba071236620eb5a8dc006c571a623cbe3f141c0075633e0"
+  },
+  "oldAudio": {
+    "Rolling_Game.mp3": 404,
+    "rolling.mp3": 404
+  },
+  "sheet": {
+    "status": 200,
+    "rollingNormal": true,
+    "rollingHard": true,
+    "newAudioPath": true,
+    "hardMidiPath": true
+  },
+  "interactiveGameplayChecked": false,
+  "scoreRegistered": false
+}
