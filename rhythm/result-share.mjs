@@ -103,7 +103,7 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
     y += 76;
   });
   artistLines.forEach(line => { text(line, 64, y, 46, '#d2ddeb'); y += 54; });
-  difficultyLines.forEach(line => { text(line, 64, y, 36, '#00c6e7'); y += 44; });
+  difficultyLines.forEach(line => { text(line, 64, y, 36, result.difficulty.toUpperCase()==='HARD'?'#ff9393':'#7deaff'); y += 44; });
   const base = headingBottom;
   ctx.fillStyle = '#202b40dc'; ctx.fillRect(58, base, 1084, 136);
   text('SCORE', 84, base + 42, 26, '#a5b5cc');

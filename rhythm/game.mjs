@@ -1,6 +1,6 @@
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
 import { PlaybackClock } from './playback-clock.mjs?v=clock-fix-v26';
-import { ResultShare } from './result-share.mjs?v=result-ranking-v29';
+import { ResultShare } from './result-share.mjs?v=difficulty-colors-v34';
 import { loadCatalog, groupSongs } from './catalog.mjs?v=grouped-songs-v2';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
@@ -279,7 +279,7 @@ function showResults() {
   const brand = document.createElement('img'); brand.src=chart.jacket; brand.alt=`${chart.title} ジャケット`; brand.className='result-jacket';
   const song = document.createElement('p'); song.className='result-song'; song.textContent=chart.title;
   const artist = document.createElement('span'); artist.className='result-artist'; artist.textContent=` / ${chart.artist}`; song.append(artist);
-  const difficulty = document.createElement('small'); difficulty.textContent=chart.difficulty; song.append(difficulty);
+  const difficulty = document.createElement('small'); difficulty.textContent=chart.difficulty; difficulty.setAttribute('data-difficulty',chart.difficulty.toUpperCase()); song.append(difficulty);
   ui.result.append(brand, song);
   const score = document.createElement('div'); score.className = 'result-score'; score.textContent = engine.score.toLocaleString(); ui.result.append(score);
   resultShare.show(chart, {score:engine.score, accuracy:engine.accuracy, maxCombo:engine.maxCombo, emptyPresses:engine.emptyPresses, counts:engine.counts, rank});
@@ -370,6 +370,7 @@ function handleDeveloperLogo() {
   if(++logoTaps<5)return;
   logoTaps=0;developerMode=!developerMode;
   $('developer-indicator').hidden=!developerMode;
+  $('developer-logo-indicator').hidden=!developerMode;
   $('play-duration-note').textContent=developerMode?'開発者モード：冒頭15秒をプレイします。':'各曲をフル尺でプレイします。';
   clearTimeout(wheelTimer);
   chart=null;
@@ -414,7 +415,7 @@ function useChart(next) {
   ui.countdown.textContent='';ui.combo.textContent='';delete ui.combo.dataset.value;ui.judgment.style.opacity=0;
   $('playing-jacket').src=chart.jacket;$('playing-jacket').alt=`${chart.title} ジャケット`;
   $('playing-artist').textContent=chart.artist;$('playing-title').textContent=chart.title;
-  $('playing-difficulty').textContent=chart.difficulty;$('bpm').textContent=`${chart.bpm} BPM`;
+  $('playing-difficulty').textContent=chart.difficulty;$('playing-difficulty').setAttribute('data-difficulty',chart.difficulty.toUpperCase());$('bpm').textContent=`${chart.bpm} BPM`;
   $('playing-duration').textContent=clockString(chart.duration);
   $('stage-song').textContent=chart.title;$('stage-artist').textContent=chart.artist;
   bestUI();updateHud();ui.status.textContent='MUSIC SELECT';
@@ -434,7 +435,7 @@ async function selectSong(index,scroll,difficulty,autoplay=false) {
   $('song-position').textContent=`${String(index+1).padStart(2,'0')} / ${String(songs.length).padStart(2,'0')}`;
   $('selected-title').textContent=song.title;$('selected-artist').textContent=song.artist;
   $('selected-jacket').src=song.jacket;$('selected-jacket').alt=`${song.title} ジャケット`;
-  $('selected-difficulty').textContent=song.difficulty;$('selected-bpm').textContent=`${song.bpm} BPM`;
+  $('selected-difficulty').textContent=song.difficulty;$('selected-difficulty').setAttribute('data-difficulty',song.difficulty.toUpperCase());$('ranking-chart').setAttribute('data-difficulty',song.difficulty.toUpperCase());$('selected-bpm').textContent=`${song.bpm} BPM`;
   $('selected-duration').textContent=clockString(song.duration);
   $('song-prev').disabled=index===0;$('song-next').disabled=index===songs.length-1;
   [...wheel.children].forEach((item,i)=>item.setAttribute('aria-selected',String(i===index)));
@@ -472,6 +473,7 @@ async function loadSongs() {
       song.charts.forEach((entry,difficulty)=>{
         const button=document.createElement('button');button.type='button';button.className='song-play-button';
         button.textContent=`${entry.difficulty} ▶`;
+        button.setAttribute('data-difficulty',entry.difficulty.toUpperCase());
         button.setAttribute('aria-label',`${song.title} ${entry.difficulty}をプレイ`);
         button.addEventListener('click',event=>{
           event.stopPropagation();
