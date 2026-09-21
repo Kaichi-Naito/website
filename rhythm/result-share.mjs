@@ -1,4 +1,4 @@
-export const APP_URL = 'https://kaichi-naito.github.io/website/T4P.html';
+export const APP_URL = 'https://x.gd/T4P_game';
 const LOGO_URL = new URL('./t4p-logo.png', import.meta.url).href;
 const number = value => Number(value).toLocaleString('ja-JP');
 
@@ -97,7 +97,7 @@ export class ResultShare {
   clear() {
     ++this.version;
     if (this.imageURL) URL.revokeObjectURL(this.imageURL);
-    this.imageURL = null; this.snapshot = null; this.link = null; this.textLink = null; this.root.hidden = true; this.root.replaceChildren();
+    this.imageURL = null; this.snapshot = null; this.link = null; this.root.hidden = true; this.root.replaceChildren();
   }
   show(chart, result) {
     this.clear(); const version = this.version;
@@ -106,101 +106,57 @@ export class ResultShare {
     const actions = document.createElement('div'); actions.className = 'share-actions';
     const link = this.link = document.createElement('a');
     link.className = 'share-x'; link.href = xIntent(snapshot); link.target = '_blank'; link.rel = 'noopener noreferrer';
-    link.textContent = '画像を準備中…'; link.setAttribute('aria-disabled','true'); actions.append(link);
-    let imageReady = false, imageFailed = false;
-    link.addEventListener('click', event => { if (!imageReady && !imageFailed) event.preventDefault(); });
+    link.textContent = 'Xに投稿'; actions.append(link);
     const status = document.createElement('p'); status.className = 'share-status'; status.setAttribute('role', 'status');
     status.textContent = 'スコア画像を準備しています…';
     this.root.append(actions, status);
     const current = () => this.version === version;
-    this.prepare(snapshot).then(blob => {
-      if (!current()) return;
-      this.imageURL = URL.createObjectURL(blob);
-      const fileName = `T4P-score-${snapshot.score}.png`;
-      const download = document.createElement('a'); download.href = this.imageURL;
-      download.download = fileName; download.textContent = '画像を保存'; actions.append(download);
-      const button = label => {
-        const el = document.createElement('button'); el.type = 'button'; el.textContent = label; actions.append(el); return el;
-      };
-      if (navigator.clipboard?.write && typeof ClipboardItem !== 'undefined') {
-        const copy = button('画像をコピー');
-        copy.addEventListener('click', async () => {
-          copy.disabled = true;
-          try {
-            await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
-            if (current()) status.textContent = 'コピーしました。「Xに投稿」を開き、投稿欄に画像を貼り付けてください。';
-          } catch {
-            if (current()) status.textContent = 'コピーできませんでした。「画像を保存」から保存してXに添付してください。';
-          } finally { copy.disabled = false; }
-        });
-      }
-      const file = new File([blob], fileName, {type: 'image/png'});
-      const shareData = () => ({title:'T4P プレイ結果', text:shareText(this.snapshot), files:[file]});
-      const data = shareData();
-      let canShare = false;
-      try { canShare = Boolean(navigator.share && navigator.canShare?.(data)); } catch { /* use download */ }
-      imageReady = true; link.textContent = 'Xに投稿'; link.removeAttribute('aria-disabled');
-      let sharing = false;
-      link.addEventListener('click', async event => {
+    let imageBlob = null, file = null, nativeSharing = false, sharing = false;
+    link.addEventListener('click', async event => {
+      if (!current()) { event.preventDefault(); return; }
+      if (nativeSharing && file) {
         event.preventDefault();
-        if (sharing || !current()) return;
+        if (sharing) return;
         sharing = true;
         try {
-          if (canShare) {
-            await navigator.share(shareData());
-            if (current()) status.textContent = '共有先で本文と画像を確認してください。本文が入らない場合は「投稿文をコピー」を使えます。';
-            return;
-          }
-          if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
-            status.textContent = 'このブラウザーは画像コピーに非対応です。画像を保存してから「本文をXで開く」で添付してください。';
-            return;
-          }
-          // Start writing while this page still has focus; reserve the new tab
-          // synchronously so async clipboard work cannot trigger popup blocking.
-          const copyTask = navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-          const draft = window.open('', '_blank');
-          if (draft) {
-            draft.opener = null;
-            draft.document.title = 'T4P / X投稿を準備中';
-            draft.document.body.textContent = 'スコア画像をコピーしています。Xが開いたら投稿欄に画像を貼り付けてください。';
-          }
-          try {
-            await copyTask;
-            if (!current()) { draft?.close(); return; }
-            status.textContent = draft
-              ? '画像をコピーしました。Xの投稿欄で貼り付け（Ctrl+V / ⌘V）してください。'
-              : '画像をコピーしました。「本文をXで開く」を押し、投稿欄で貼り付けてください。';
-            if (draft) draft.location.replace(xIntent(this.snapshot));
-          } catch {
-            draft?.close();
-            if (current()) status.textContent = '画像をコピーできませんでした。画像を保存してから「本文をXで開く」で添付してください。';
-          }
+          await navigator.share({title:'T4P プレイ結果', text:shareText(this.snapshot), files:[file]});
+          if (current()) status.textContent = '共有先で本文と画像を確認してください。';
         } catch (error) {
-          if (current() && error.name !== 'AbortError') status.textContent = '共有できませんでした。画像を保存してから「本文をXで開く」で添付してください。';
+          if (current() && error.name !== 'AbortError') {
+            nativeSharing = false;
+            status.textContent = '画像付き共有を開けませんでした。もう一度「Xに投稿」を押すとXの投稿画面を開きます。';
+          }
         } finally { sharing = false; }
-      });
-      const textCopy = button('投稿文をコピー');
-      textCopy.addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText(shareText(this.snapshot));
-          if (current()) status.textContent = '投稿文をコピーしました。共有先の本文欄に貼り付けてください。';
-        } catch { if (current()) status.textContent = 'コピーできませんでした。「本文をXで開く」から投稿文を開けます。'; }
-      });
-      const textOnly = document.createElement('a'); textOnly.textContent = '本文をXで開く';
-      textOnly.href = xIntent(this.snapshot); textOnly.target = '_blank'; textOnly.rel='noopener noreferrer';
-      textOnly.className = 'share-text-only'; this.textLink = textOnly;
-      this.root.append(textOnly);
-      const preview = document.createElement('details'); preview.className = 'share-preview';
-      const summary = document.createElement('summary'); summary.textContent = 'スコア画像を見る';
-      const image = document.createElement('img'); image.src = this.imageURL; image.alt = `${snapshot.title} / ${snapshot.artist}：${number(snapshot.score)}点、RANK ${snapshot.rank}`;
-      preview.append(summary, image); this.root.append(preview);
-      status.textContent = canShare
-        ? '「Xに投稿」で共有先にXを選んでください。本文と画像をまとめて渡します。引き継ぎは端末・アプリによって異なります。'
-        : '「Xに投稿」で画像をコピーしてXを開きます。Xの投稿欄で貼り付け（Ctrl+V / ⌘V）してください。';
+        return;
+      }
+      // Let the anchor open X immediately, even if PNG generation or clipboard
+      // access fails. Image copying is optional and must never block navigation.
+      if (!imageBlob || !navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
+        status.textContent = 'Xの投稿画面を開きます。画像は自動添付されません。下の画像を右クリック・長押しで保存して添付できます。';
+        return;
+      }
+      try {
+        await navigator.clipboard.write([new ClipboardItem({'image/png':imageBlob})]);
+        if (current()) status.textContent = '画像をコピーしました。Xの投稿欄で貼り付け（Ctrl+V / ⌘V）してください。';
+      } catch {
+        if (current()) status.textContent = 'Xの投稿画面を開きました。画像をコピーできなかったため、下の画像を右クリック・長押しで保存して添付してください。';
+      }
+    });
+    this.prepare(snapshot).then(blob => {
+      if (!current()) return;
+      imageBlob = blob;
+      this.imageURL = URL.createObjectURL(blob);
+      file = new File([blob], `T4P-score-${snapshot.score}.png`, {type:'image/png'});
+      try { nativeSharing = Boolean(navigator.share && navigator.canShare?.({title:'T4P プレイ結果', text:shareText(this.snapshot), files:[file]})); } catch { /* open X directly */ }
+      const preview = document.createElement('div'); preview.className = 'share-preview';
+      const image = document.createElement('img'); image.src = this.imageURL;
+      image.alt = `${snapshot.title} / ${snapshot.artist}：${number(snapshot.score)}点、RANK ${snapshot.rank}`;
+      preview.append(image); this.root.append(preview);
+      status.textContent = nativeSharing
+        ? '「Xに投稿」で共有先にXを選んでください。本文と画像の引き継ぎは端末・アプリによって異なります。'
+        : '「Xに投稿」でXを開きます。画像の自動添付には非対応です。画像コピーに対応した環境では、Xで貼り付け（Ctrl+V / ⌘V）できます。';
     }).catch(() => {
-      imageFailed = true;
-      if (current()) { link.textContent='本文だけXに投稿'; link.removeAttribute('aria-disabled'); }
-      if (current()) status.textContent = '画像を作れませんでした。端末のスクリーンショットをお使いください。投稿文は「Xに投稿」から開けます。';
+      if (current()) status.textContent = '画像を作れませんでした。「Xに投稿」から本文を入れた投稿画面を開けます。';
     });
   }
   setRanking(position) {
@@ -208,7 +164,6 @@ export class ResultShare {
     const rankingPosition = Number.isInteger(position) && position >= 1 && position <= 20 ? position : null;
     this.snapshot = Object.freeze({...this.snapshot, rankingPosition});
     if (this.link) this.link.href = xIntent(this.snapshot);
-    if (this.textLink) this.textLink.href = xIntent(this.snapshot);
   }
   async prepare(result) {
     const [, logo] = await Promise.all([

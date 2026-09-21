@@ -1,4 +1,4 @@
-import { ResultShare } from './result-share.mjs?v=t4p-share-v3';
+import { ResultShare } from './result-share.mjs?v=t4p-share-v4';
 import { loadCatalog } from './catalog.mjs?v=test30-fix-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
@@ -234,14 +234,6 @@ function finish() {
   const artist = document.createElement('small'); artist.textContent=`${chart.artist} / ${chart.difficulty}`; song.append(artist);
   ui.result.append(brand, song);
   const score = document.createElement('div'); score.className = 'result-score'; score.textContent = engine.score.toLocaleString(); ui.result.append(score);
-  const stats = document.createElement('div'); stats.className = 'result-stats';
-  for (const [label, value] of [...Object.entries(engine.counts), ['空押し', engine.emptyPresses], ['MAX COMBO', engine.maxCombo], ['ACCURACY', `${engine.accuracy.toFixed(2)}%`]]) {
-    const row = document.createElement('div'), name = document.createElement('span'), number = document.createElement('b');
-    row.dataset.judge=label; name.textContent = label; number.textContent = value; row.append(name, number); stats.append(row);
-  }
-  const breakdown = document.createElement('details'); breakdown.className='result-breakdown';
-  const summary = document.createElement('summary'); summary.textContent='判定の内訳';
-  breakdown.append(summary, stats); ui.result.append(breakdown);
   resultShare.show(chart, {score:engine.score, accuracy:engine.accuracy, maxCombo:engine.maxCombo, emptyPresses:engine.emptyPresses, counts:engine.counts, rank});
   leaderboard.showResult({score:engine.score,accuracy:Number(engine.accuracy.toFixed(2)),maxCombo:engine.maxCombo,units:engine.units,emptyPresses:engine.emptyPresses,counts:{...engine.counts}});
   ui.status.textContent = 'COMPLETE — おつかれさまでした';

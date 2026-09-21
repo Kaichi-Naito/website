@@ -12,7 +12,6 @@
 .share-actions a:hover,.share-actions button:hover:not(:disabled){filter:brightness(1.12)}
 .share-status{font:11px/1.7 var(--mono);color:#adbed7;margin:9px 0;overflow-wrap:anywhere}
 .share-preview{font-size:11px;color:#d2dff4}
-.share-preview summary{cursor:pointer;padding:8px 0}
 .share-preview img{display:block;width:100%;height:auto;margin:8px 0;border:1px solid #65738c}
 @media(max-width:700px){.selection-heading .t4p-logo{width:115px;max-height:84px}.selection-heading{margin-bottom:12px}}
 
@@ -22,10 +21,7 @@
 .overlay.is-results .result-brand{float:right;width:64px;margin:0 0 4px 8px}
 .overlay.is-results .result-song{text-align:left;font-size:18px;padding-top:4px}
 .overlay.is-results .result-score{font-size:36px;clear:both}
-.result-breakdown{text-align:left;font-size:12px;margin:10px 0;color:#bac9df}
-.result-breakdown summary{cursor:pointer;padding:8px 0}
 .overlay.is-results #result-share{margin:8px 0 14px;padding-top:10px}
 .overlay.is-results .overlay-foot{display:none}
 @media(max-height:650px){.overlay.is-results{padding:8px}.overlay.is-results .overlay-card{max-height:calc(100dvh - 16px);padding:12px}.overlay.is-results .result-brand{width:48px}.overlay.is-results #overlay-description{display:none}}
 
-.share-text-only{display:inline-block;padding:6px 0;font:11px var(--mono);color:#b8d7ef}.share-x[aria-disabled=true]{opacity:.6;cursor:wait}

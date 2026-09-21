@@ -91,20 +91,39 @@ test('primary sharing hands native sharing the PNG and current ranking text toge
     controller.clear();
   } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;}
 });
-test('desktop sharing starts image copy before opening X and preserves the game page',async()=>{
-  const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator');const oldWindow=globalThis.window,oldItem=globalThis.ClipboardItem;
-  const events=[];let target='';
+test('desktop X link stays usable when copying succeeds, fails, or is unsupported',async()=>{
+  const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator');const oldItem=globalThis.ClipboardItem;
   globalThis.ClipboardItem=class{constructor(data){assert.ok(data['image/png']);}};
-  Object.defineProperty(globalThis,'navigator',{configurable:true,value:{clipboard:{write:async()=>{events.push('copy');}}}});
-  globalThis.window={open:()=>{events.push('open');return {document:{body:{}},location:{replace:url=>{target=url;}}};}};
   try {
-    const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png'],{type:'image/png'});
-    controller.show(chart,score);await settle();
-    await root.children[0].children[0].events.click({preventDefault(){}});
-    assert.deepEqual(events,['copy','open']);assert.equal(new URL(target).searchParams.get('text'),shareText(resultSnapshot(chart,score)));
-    assert.match(root.children[1].textContent,/貼り付け/);controller.clear();
-  } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;globalThis.window=oldWindow;globalThis.ClipboardItem=oldItem;}
+    for(const mode of ['success','rejected','throws','unavailable']) {
+      let copied=0,prevented=false;
+      const clipboard=mode==='unavailable'?undefined:{write:()=>{copied++;if(mode==='throws')throw Error('denied');return mode==='rejected'?Promise.reject(Error('denied')):Promise.resolve();}};
+      Object.defineProperty(globalThis,'navigator',{configurable:true,value:{clipboard}});
+      const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png'],{type:'image/png'});
+      controller.show(chart,score);await settle();
+      const link=root.children[0].children[0];
+      await link.events.click({preventDefault(){prevented=true;}});
+      assert.equal(prevented,false,mode);assert.equal(link.target,'_blank');
+      assert.equal(new URL(link.href).searchParams.get('text'),shareText(resultSnapshot(chart,score)));
+      assert.equal(copied,mode==='unavailable'?0:1);
+      assert.equal(root.children[0].children.length,1);
+      assert.equal(root.children[2].tag,'div');assert.equal(root.children[2].children[0].tag,'img');
+      controller.clear();
+    }
+  } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;globalThis.ClipboardItem=oldItem;}
 });
+test('X opens even before PNG is ready, or after image generation fails',async()=>{
+  const {root,controller}=fixture();let reject;
+  controller.prepare=()=>new Promise((resolve,no)=>{reject=no;});
+  controller.show(chart,score);
+  let prevented=false;
+  await root.children[0].children[0].events.click({preventDefault(){prevented=true;}});
+  assert.equal(prevented,false);
+  reject(Error('canvas'));await settle();
+  await root.children[0].children[0].events.click({preventDefault(){prevented=true;}});
+  assert.equal(prevented,false);controller.clear();
+});
+test('shared URL uses the supplied short link',()=>assert.equal(APP_URL,'https://x.gd/T4P_game'));
 test('ranking identity is the registered play ID, not a matching name or score',async()=>{
   const {registeredRank}=await import('./leaderboard.mjs');
   const entries=[{name:'同名',score:123,playId:'other'},{name:'同名',score:123,playId:'current'}];
