@@ -1,9 +1,9 @@
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
-import { ResultShare } from './result-share.mjs?v=result-layout-v16';
+import { ResultShare } from './result-share.mjs?v=compact-result-v20';
 import { loadCatalog } from './catalog.mjs?v=test30-fix-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
-import { Leaderboard } from './leaderboard.mjs?v=result-layout-v16';
+import { Leaderboard } from './leaderboard.mjs?v=compact-result-v20';
 import { approachSeconds, tapLevel, readSettings } from './settings.mjs?v=song-select-v1';
 const $ = id => document.getElementById(id);
 const ui = Object.fromEntries(['canvas','stage','score','accuracy','accuracy-meter','accuracy-fill','combo','judgment','countdown','overlay','overlay-title','overlay-eyebrow','overlay-description','overlay-foot','start','restart','pause','result','status','progress','elapsed','settings','best-score'].map(id => [id, $(id)]));
@@ -35,7 +35,7 @@ try {
   }
 } catch {}
 let settings = readSettings(savedSettings);
-const resultShare = new ResultShare($('result-share'));
+const resultShare = new ResultShare($('result-share'), $('result-image'));
 const leaderboard = new Leaderboard({
   onRanked:position => resultShare.setRanking(position),
   onRankingState:(state, position) => {
@@ -43,7 +43,7 @@ const leaderboard = new Leaderboard({
     notice.hidden=state==='clear'; notice.dataset.state=state;
     notice.textContent={
       checking:'ランキングを確認しています…',
-      eligible:'ランクイン圏内！名前を登録すると、順位付きでXに投稿できます。',
+      eligible:`👑現在${position}位相当！名前を登録して順位を確定しよう。`,
       submitting:'ランキングに登録しています…',
       verifying:'登録完了。順位を確認しています…',
       ranked:`👑${position}位にランクイン！！`,
@@ -272,7 +272,7 @@ function showResults() {
   const fullCombo = engine.counts.MISS === 0 && engine.emptyPresses === 0;
   const allPerfect = fullCombo && engine.counts.PERFECT === engine.units;
   const rank = engine.accuracy >= 97 ? 'S' : engine.accuracy >= 90 ? 'A' : engine.accuracy >= 80 ? 'B' : engine.accuracy >= 65 ? 'C' : 'D';
-  showOverlay(allPerfect ? 'ALL PERFECT' : fullCombo ? 'FULL COMBO' : 'SONG COMPLETE', `RANK ${rank}`, engine.score > best ? 'NEW PERSONAL BEST!' : '最後までプレイしてくれてありがとう。', 'もう一度プレイ');
+  showOverlay(allPerfect ? 'ALL PERFECT' : fullCombo ? 'FULL COMBO' : 'SONG COMPLETE', `RANK ${rank}`, engine.score > best ? 'NEW PERSONAL BEST!' : '最後までプレイしてくれてありがとう！！！', 'もう一度プレイ');
   ui.result.hidden = false;
   ui.result.replaceChildren();
   const brand = document.createElement('img'); brand.src=chart.jacket; brand.alt=`${chart.title} ジャケット`; brand.className='result-jacket';

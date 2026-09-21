@@ -60,6 +60,12 @@ function beatsCutoff(candidate,cutoff) {
   // An existing score keeps its place when every ranking value is tied.
   return false;
 }
+// New ties follow existing scores; replacing a player's best consumes one place.
+export function projectedRank(entries, stats, ownKey) {
+  const others = entries.filter(entry => !ownKey || entry.playerKey !== ownKey);
+  const position = 1 + others.filter(entry => !beatsCutoff(stats, entry)).length;
+  return position <= MAX_RANKING_ENTRIES ? position : null;
+}
 function sendScore(endpoint,payload) {
   return new Promise((resolve,reject)=>{
     const requestId=crypto.randomUUID(), frame=document.createElement('iframe'), form=document.createElement('form');
@@ -237,7 +243,8 @@ export class Leaderboard {
       this.onRankingState('kept', this.entries.indexOf(previous) + 1);
       this.result=null; $('score-message').textContent=`自己ベスト ${previous.score.toLocaleString()} 点を保持しました。今回のスコアは重複登録しません。`; return;
     }
-    if(!this.qualifies(stats)) {
+    const position = projectedRank(this.entries, stats, ownKey);
+    if(!position) {
       this.onRankingState('unranked');
       this.result=null;
       const cutoff=this.entries[MAX_RANKING_ENTRIES-1];
@@ -246,7 +253,7 @@ export class Leaderboard {
       return;
     }
 
-    this.onRankingState('eligible');
+    this.onRankingState('eligible', position);
     $('score-form').hidden=false;$('score-message').hidden=true;
     $('score-submit').disabled=false;$('score-skip').disabled=false;
   }

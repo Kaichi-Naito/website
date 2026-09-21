@@ -63,16 +63,16 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
   if (!ctx) throw new Error('Canvas unavailable');
   const font = size => `${size}px PixelMplus, monospace`;
   ctx.font = font(64);
-  const titleLines = lines(ctx, result.title, 1056);
+  const titleLines = lines(ctx, result.title, 720);
   const titleEnd = ctx.measureText(titleLines.at(-1)).width;
   ctx.font = font(46);
   const artistText = result.artist ? ` / ${result.artist}` : '';
-  const artistInline = titleEnd + ctx.measureText(artistText).width <= 1056;
-  const artistLines = artistInline ? [] : lines(ctx, result.artist, 1056);
+  const artistInline = titleEnd + ctx.measureText(artistText).width <= 720;
+  const artistLines = artistInline ? [] : lines(ctx, result.artist, 720);
   ctx.font = font(36);
-  const difficultyLines = lines(ctx, result.difficulty, 1056);
-  const headingBottom = 444 + titleLines.length * 76 + artistLines.length * 54 + difficultyLines.length * 44;
-  canvas.width = 1200; canvas.height = headingBottom + 430;
+  const difficultyLines = lines(ctx, result.difficulty, 720);
+  const headingBottom = Math.max(398, 278 + titleLines.length * 76 + artistLines.length * 54 + difficultyLines.length * 44);
+  canvas.width = 1200; canvas.height = headingBottom + 350;
   ctx.fillStyle = '#0e1320'; ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (gameplay?.width && gameplay?.height) {
     const scale = Math.min(canvas.width / gameplay.width, canvas.height / gameplay.height);
@@ -96,7 +96,7 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
     ctx.drawImage(jacket, ((jacket.naturalWidth || jacket.width) - size) / 2, ((jacket.naturalHeight || jacket.height) - size) / 2, size, size, 822, 48, 320, 320);
     ctx.strokeStyle = '#e6edf5'; ctx.lineWidth = 3; ctx.strokeRect(822, 48, 320, 320);
   }
-  let y = 426;
+  let y = 270;
   titleLines.forEach((line, index) => {
     text(line, 64, y, 64);
     if (artistInline && index === titleLines.length - 1) text(artistText, 64 + titleEnd, y, 46, '#d2ddeb');
@@ -121,15 +121,16 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
     text(number(value), x, base + 252, 48);
   });
   ctx.textAlign = 'left';
-  text('#T4P', 64, canvas.height - 100, 34, '#ff008e');
-  text(APP_URL, 64, canvas.height - 54, 25, '#b5c4d8');
+  text('#T4P', 64, canvas.height - 44, 34, '#ff008e');
+  text(APP_URL, 234, canvas.height - 44, 25, '#b5c4d8');
   return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('PNG unavailable')), 'image/png'));
 }
 
 export class ResultShare {
-  constructor(root) { this.root = root; this.version = 0; this.logo = loadImage(LOGO_URL); this.background = loadImage(BACKGROUND_URL); }
+  constructor(root, previewRoot = root) { this.root = root; this.previewRoot = previewRoot; this.version = 0; this.logo = loadImage(LOGO_URL); this.background = loadImage(BACKGROUND_URL); }
   clear() {
     this.rankingPending = false;
+    if (this.previewRoot && this.previewRoot !== this.root) { this.previewRoot.hidden = true; this.previewRoot.replaceChildren(); }
     ++this.version;
     if (this.imageURL) URL.revokeObjectURL(this.imageURL);
     this.imageURL = null; this.snapshot = null; this.link = null; this.fallback = null; this.root.hidden = true; this.root.replaceChildren();
@@ -172,7 +173,7 @@ export class ResultShare {
       save.textContent = '結果画像を保存';
       save.addEventListener('click', event => {
         if (!current()) { event.preventDefault(); return; }
-        status.textContent = '保存した画像をXの画像ボタンから選んで添付してください。保存が始まらない場合は、下の画像を長押し・右クリックして保存してください。';
+        status.textContent = '保存した画像をXの画像ボタンから選んで添付してください。保存が始まらない場合は、結果画像を長押し・右クリックして保存してください。';
       });
       const copy = document.createElement('button');
       copy.type = 'button'; copy.className = 'share-copy'; copy.textContent = '結果画像をコピー';
@@ -194,7 +195,9 @@ export class ResultShare {
       const preview = document.createElement('div'); preview.className = 'share-preview';
       const image = document.createElement('img'); image.src = this.imageURL;
       image.alt = `${snapshot.title} / ${snapshot.artist}：${number(snapshot.score)}点、RANK ${snapshot.rank}`;
-      preview.append(image); this.root.append(preview);
+      preview.append(image);
+      const previewRoot = this.previewRoot || this.root;
+      previewRoot.append(preview); previewRoot.hidden = false;
       status.textContent = `「Xに投稿」で投稿文を開きます。${guide}`;
     }).catch(() => {
       if (current()) status.textContent = '画像を作れませんでした。「Xに投稿」から本文を入れた投稿画面を開けます。';

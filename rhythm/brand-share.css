@@ -11,6 +11,7 @@
 .share-actions .share-x{flex-basis:100%;background:#f2f5fa;color:#101521;border:2px solid;border-color:#fff #8290a5 #8290a5 #fff;font-size:15px}
 .share-actions a:hover,.share-actions button:hover:not(:disabled){filter:brightness(1.12)}
 .share-status{font:11px/1.7 var(--mono);color:#adbed7;margin:9px 0;overflow-wrap:anywhere}
+#result-image{margin:12px 0 16px;clear:both}
 .share-preview{font-size:11px;color:#d2dff4}
 .share-preview img{display:block;width:100%;height:auto;margin:8px 0;border:1px solid #65738c}
 @media(max-width:700px){.selection-heading .t4p-logo{width:115px;max-height:84px}.selection-heading{margin-bottom:12px}}

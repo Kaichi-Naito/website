@@ -191,3 +191,16 @@ test('ranking identity is the registered play ID, not a matching name or score',
   const entries=[{name:'同名',score:123,playId:'other'},{name:'同名',score:123,playId:'current'}];
   assert.equal(registeredRank(entries,'current'),2);assert.equal(registeredRank(entries,'missing'),null);assert.equal(registeredRank(entries,null),null);
 });
+
+test('top preview is separate from posting controls and clears between results',async()=>{
+  const {root,controller}=fixture();const preview=new Element('div');controller.previewRoot=preview;
+  const pending=[];controller.prepare=()=>new Promise(resolve=>pending.push(resolve));
+  controller.show(chart,score);assert.equal(preview.hidden,true);
+  pending.shift()(new Blob(['first']));await settle();
+  assert.equal(preview.hidden,false);assert.equal(preview.children.length,1);
+  assert.equal(preview.children[0].children[0].tag,'img');assert.equal(root.children.length,3);
+  controller.show({...chart,title:'Next'},score);
+  assert.equal(preview.hidden,true);assert.equal(preview.children.length,0);
+  controller.clear();pending.shift()(new Blob(['late']));await settle();
+  assert.equal(preview.hidden,true);assert.equal(preview.children.length,0);
+});
