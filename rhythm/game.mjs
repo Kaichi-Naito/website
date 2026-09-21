@@ -1,5 +1,5 @@
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
-import { ResultShare } from './result-share.mjs?v=score-focus-v22';
+import { ResultShare } from './result-share.mjs?v=copy-feedback-v23';
 import { loadCatalog } from './catalog.mjs?v=test30-fix-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';

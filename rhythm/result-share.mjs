@@ -180,17 +180,29 @@ export class ResultShare {
       const copy = document.createElement('button');
       copy.type = 'button'; copy.className = 'share-copy'; copy.textContent = '結果画像をコピー';
       copy.addEventListener('click', async () => {
-        if (!current()) return;
-        if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
-          status.textContent = 'この環境では画像をコピーできません。「結果画像を保存」で保存し、Xの画像ボタンから添付してください。';
+        if (!current() || copy.disabled) return;
+        const fallback = '結果画像を長押ししてコピーするか、「結果画像を保存」で保存してXへ添付してください。';
+        if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined' || (typeof ClipboardItem.supports === 'function' && !ClipboardItem.supports('image/png'))) {
+          copy.textContent = '画像コピー非対応';
+          status.textContent = `このブラウザーでは画像をコピーできません。${fallback}`;
           return;
         }
-        copy.disabled = true;
+        copy.disabled = true; copy.textContent = 'コピー中…';
+        status.textContent = '画像をコピーしています。完了するまでこの画面を開いたままお待ちください。';
         try {
-          await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-          if (current()) status.textContent = '結果画像をコピーしました。「Xに投稿」で投稿画面を開き、貼り付けてください（PC：Ctrl+V / ⌘V、スマホ：投稿欄を長押し）。貼り付けられない場合は、画像を保存して添付してください。';
-        } catch {
-          if (current()) status.textContent = '画像をコピーできませんでした。「結果画像を保存」で保存し、Xの画像ボタンから添付してください。';
+          // Invoke the write in the tap handler, with the Promise representation
+          // supported by WebKit. Do not await image preparation before writing.
+          await navigator.clipboard.write([new ClipboardItem({'image/png':Promise.resolve(blob)})]);
+          if (current()) {
+            copy.textContent = '画像をコピーしました';
+            status.textContent = '結果画像をコピーしました。Xの投稿欄に貼り付けてください。貼り付けが出ない・画像が添付されない場合は、「結果画像を保存」で保存し、Xの画像ボタンから選んでください。';
+          }
+        } catch (error) {
+          if (current()) {
+            copy.textContent = 'コピーできません・再試行';
+            const reason = error?.name === 'NotAllowedError' ? 'クリップボードへのアクセスが許可されず、画像をコピーできませんでした。' : error?.name === 'NotSupportedError' ? 'このブラウザーでは画像をコピーできません。' : '画像をコピーできませんでした。';
+            status.textContent = `${reason}${fallback}`;
+          }
         } finally { if (current()) copy.disabled = false; }
       });
       actions.append(save, copy);

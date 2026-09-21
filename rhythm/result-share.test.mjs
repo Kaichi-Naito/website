@@ -204,3 +204,32 @@ test('top preview is separate from posting controls and clears between results',
   controller.clear();pending.shift()(new Blob(['late']));await settle();
   assert.equal(preview.hidden,true);assert.equal(preview.children.length,0);
 });
+
+test('copy writes inside the tap, shows pending and completes only after the browser resolves',async()=>{
+  const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator'),oldItem=globalThis.ClipboardItem;
+  let resolveWrite,writes=0,payload;
+  globalThis.ClipboardItem=class{constructor(data){payload=data['image/png'];}};
+  Object.defineProperty(globalThis,'navigator',{configurable:true,value:{clipboard:{write:()=>{writes++;return new Promise(resolve=>{resolveWrite=resolve;});}}}});
+  try {
+    const {root,controller}=fixture();const blob=new Blob(['png'],{type:'image/png'});controller.prepare=async()=>blob;
+    controller.show(chart,score);await settle();const copy=root.children[1].children.at(-1);
+    const pending=copy.events.click();
+    assert.equal(writes,1);assert.equal(copy.disabled,true);assert.equal(copy.textContent,'コピー中…');
+    assert.equal(await payload,blob);assert.doesNotMatch(root.children[2].textContent,/コピーしました/);
+    resolveWrite();await pending;assert.equal(copy.disabled,false);assert.equal(copy.textContent,'画像をコピーしました');controller.clear();
+  } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;globalThis.ClipboardItem=oldItem;}
+});
+
+test('unsupported PNG and denied clipboard access have distinct actionable messages',async()=>{
+  const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator'),oldItem=globalThis.ClipboardItem;
+  try {
+    for(const mode of ['unsupported','denied']) {
+      globalThis.ClipboardItem=class{static supports(type){assert.equal(type,'image/png');return mode!=='unsupported';}};
+      Object.defineProperty(globalThis,'navigator',{configurable:true,value:{clipboard:{write:()=>{assert.notEqual(mode,'unsupported');return Promise.reject(new DOMException('denied','NotAllowedError'));}}}});
+      const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png']);controller.show(chart,score);await settle();
+      const copy=root.children[1].children.at(-1);await copy.events.click();
+      assert.match(root.children[2].textContent,mode==='unsupported'?/このブラウザー/:/アクセスが許可されず/);
+      assert.match(root.children[2].textContent,/長押し/);assert.doesNotMatch(copy.textContent,/しました/);controller.clear();
+    }
+  } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;globalThis.ClipboardItem=oldItem;}
+});
