@@ -6,9 +6,12 @@
 .result-song{font-size:16px;line-height:1.5;overflow-wrap:anywhere;margin:0 0 8px}
 .result-song small{display:block;font-size:11px;color:#aebdd3;margin-top:3px}
 #result-share{margin:16px 0 20px;padding-top:14px;border-top:1px solid #46526b;text-align:left}
-.share-actions{display:flex;flex-wrap:wrap;gap:8px}
+.share-actions{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:stretch;gap:8px}
+.share-arrow{align-self:center;color:#adbed7;font-size:13px}
+.share-actions .share-save{background:#b5e8f7;color:#17394b;border:2px solid;border-color:#e5f8ff #4e94ad #4e94ad #e5f8ff;cursor:pointer}
+.share-actions .share-save:disabled{opacity:.5;cursor:wait}
 .share-actions a,.share-actions button{flex:1 1 auto;display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 10px;border:1px solid #718099;background:#26334a;color:#f3f7ff;font:12px var(--mono);text-decoration:none;text-align:center}
-.share-actions .share-x{flex-basis:100%;background:#f2f5fa;color:#101521;border:2px solid;border-color:#fff #8290a5 #8290a5 #fff;font-size:15px}
+.share-actions .share-x{background:#f2f5fa;color:#101521;border:2px solid;border-color:#fff #8290a5 #8290a5 #fff;font-size:12px}
 .share-actions a:hover,.share-actions button:hover:not(:disabled){filter:brightness(1.12)}
 .share-status{font:11px/1.7 var(--mono);color:#adbed7;margin:9px 0;overflow-wrap:anywhere}
 #result-image{margin:12px 0 16px;clear:both}
@@ -32,7 +35,7 @@
 .overlay.is-results .result-jacket{float:right;width:80px;height:80px;object-fit:cover;margin:0 0 8px 12px;border:1px solid #aebdd3}
 .overlay.is-results .result-song{font-size:24px}
 .result-artist{font-size:18px;color:#d2ddeb}
-.share-actions .share-fallback{flex-basis:100%;font-size:11px;background:transparent;color:#adbed7;border:0;text-decoration:underline}
+.share-actions .share-fallback{grid-column:1 / -1;font-size:11px;background:transparent;color:#adbed7;border:0;text-decoration:underline}
 .share-actions [hidden]{display:none}
 @media(max-height:650px){.overlay.is-results{padding:8px}.overlay.is-results .overlay-card{max-height:calc(100dvh - 16px);padding:12px}.overlay.is-results .result-brand{width:48px}.overlay.is-results #overlay-description{display:none}}
 

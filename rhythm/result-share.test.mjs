@@ -49,7 +49,7 @@ test('mobile opens the app link directly and reveals fallback only after tapping
       Object.defineProperty(globalThis, 'navigator', {configurable:true,value:{userAgent,share:()=>assert.fail('No system share menu'),clipboard:{write:()=>assert.fail('Do not delay app navigation')}}});
       const {root,controller}=fixture(); controller.prepare=async()=>new Blob(['png']);
       controller.show(chart,score); await settle(); controller.setRanking(3);
-      const [link,fallback]=root.children[1].children;
+      const {link,fallback}=controller;
       assert.equal(link.target,'_blank'); assert.equal(fallback.hidden,true);
       await link.events.click({preventDefault(){assert.fail('Native anchor must navigate');}});
       assert.equal(fallback.hidden,false);
@@ -92,7 +92,7 @@ test('leaving results discards a PNG that finishes preparing later', async () =>
 test('image preparation failure keeps the X draft accessible', async () => {
   const {root, controller} = fixture(); controller.prepare = async () => { throw Error('canvas'); };
   controller.show(chart, score); await settle();
-  assert.equal(root.children[1].children[0].href, xIntent(resultSnapshot(chart, score)));
+  assert.equal(controller.link.href, xIntent(resultSnapshot(chart, score)));
   assert.match(root.children[2].textContent, /画像を作れません/);
 });
 test('a new result replaces the old draft and invalidates pending image work', async () => {
@@ -100,7 +100,7 @@ test('a new result replaces the old draft and invalidates pending image work', a
   controller.prepare = () => new Promise(resolve => resolvers.push(resolve));
   controller.show(chart, score); controller.show({...chart, title:'Next song'}, {...score, score:0});
   resolvers[0](new Blob(['old'], {type:'image/png'})); await settle();
-  assert.match(new URL(root.children[1].children[0].href).searchParams.get('text'), /Next song/);
+  assert.match(new URL(controller.link.href).searchParams.get('text'), /Next song/);
   assert.equal(root.children.length, 3); assert.equal(controller.imageURL, null);
   controller.clear(); resolvers[1](new Blob(['new'])); await settle();
 });
@@ -115,10 +115,10 @@ test('share template matches the requested wording and blank lines',()=>{
 test('confirmed ranking updates the draft but clearing prevents carryover',()=>{
   const {root,controller}=fixture();controller.prepare=()=>new Promise(()=>{});
   controller.show(chart,score);controller.setRanking(2);
-  assert.match(new URL(root.children[1].children[0].href).searchParams.get('text'),/👑2位/);
+  assert.match(new URL(controller.link.href).searchParams.get('text'),/👑2位/);
   controller.clear();controller.setRanking(1);
   controller.show(chart,score);
-  assert.ok(!new URL(root.children[1].children[0].href).searchParams.get('text').includes('位にランクイン'));
+  assert.ok(!new URL(controller.link.href).searchParams.get('text').includes('位にランクイン'));
 });
 
 test('X opens directly even when the device supports native file sharing',async()=>{
@@ -128,7 +128,7 @@ test('X opens directly even when the device supports native file sharing',async(
   try {
     const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png'],{type:'image/png'});
     controller.show(chart,score);await settle();controller.setRanking(4);
-    const link=root.children[1].children[0];
+    const link=controller.link;
     await link.events.click({preventDefault(){prevented=true;}});
     assert.equal(shared,false);assert.equal(prevented,false);
     assert.equal(new URL(link.href).origin+new URL(link.href).pathname,'https://x.com/intent/tweet');
@@ -136,45 +136,52 @@ test('X opens directly even when the device supports native file sharing',async(
     assert.equal(link.target,'_blank');controller.clear();
   } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;}
 });
-test('one X tap starts one named PNG download synchronously and keeps the result screen',async()=>{
+test('save downloads one PNG while X opens separately without another download',async()=>{
   downloads.length=0;
   const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png'],{type:'image/png'});
   controller.show(chart,score);await settle();
   const link=controller.link;
-  link.events.click({preventDefault(){assert.fail('Keep the native new-tab navigation');}});
+  assert.equal(controller.saveButton.textContent,'結果画像を保存');
+  assert.equal(controller.saveButton.disabled,false);
+  controller.saveButton.events.click();
   assert.equal(downloads.length,1);assert.equal(downloads[0].href,controller.imageURL);
   assert.ok(downloads[0].filename.endsWith('-987654.png'));assert.doesNotMatch(downloads[0].filename,/[\\/:*?"<>|]/);
   assert.equal(downloads[0].target,controller.downloadFrame.name);assert.equal(controller.downloadFrame.tag,'iframe');
   assert.equal(document.body.children.length,1);assert.equal(controller.downloadFrame.hidden,true);
-  assert.equal(root.children[1].children.length,1);assert.equal(link.textContent,'Xに投稿');
+  assert.equal(root.children[1].children.length,3);assert.equal(link.textContent,'Xでポスト');
   assert.equal(root.children[3].children[0].tag,'img');assert.equal(root.hidden,false);
   assert.match(root.children[2].textContent,/保存を開始/);assert.doesNotMatch(root.children[2].textContent,/保存しました/);
+  link.events.click({preventDefault(){assert.fail('Keep the native new-tab navigation');}});
+  assert.equal(downloads.length,1);
   controller.clear();
 });
-test('image preparation blocks premature taps; generation failure still allows the X draft',async()=>{
+test('save is disabled during preparation and after failure while X stays independent',async()=>{
   downloads.length=0;
   const {root,controller}=fixture();let reject;
   controller.prepare=()=>new Promise((resolve,no)=>{reject=no;});controller.show(chart,score);
   let prevented=false;controller.link.events.click({preventDefault(){prevented=true;}});
-  assert.equal(prevented,true);assert.equal(downloads.length,0);assert.equal(controller.link.textContent,'画像を準備中…');
+  assert.equal(prevented,false);assert.equal(downloads.length,0);assert.equal(controller.saveButton.disabled,true);
+  controller.saveButton.events.click();assert.equal(downloads.length,0);
   reject(Error('canvas'));await settle();prevented=false;
   controller.link.events.click({preventDefault(){prevented=true;}});
-  assert.equal(prevented,false);assert.equal(downloads.length,0);assert.equal(controller.link.textContent,'Xに投稿');
-  assert.match(root.children[2].textContent,/画像を保存できません/);controller.clear();
+  assert.equal(prevented,false);assert.equal(downloads.length,0);assert.equal(controller.link.textContent,'Xでポスト');
+  assert.equal(controller.saveButton.disabled,true);controller.clear();
 });
 test('download failure never blocks the X draft or claims a completed save',async()=>{
   const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png']);
   controller.show(chart,score);await settle();downloadError=Error('blocked');
   try {
-    controller.link.events.click({preventDefault(){assert.fail('Text is still shareable');}});
+    controller.saveButton.events.click();
     assert.match(root.children[2].textContent,/画像を保存できません/);
     assert.match(root.children[2].textContent,/長押し/);assert.equal(document.body.children.length,1);
+    controller.link.events.click({preventDefault(){assert.fail('Text is still shareable');}});
   } finally {downloadError=null;controller.clear();}
 });
 test('stale result buttons cannot download a new run or navigate',async()=>{
   downloads.length=0;const {controller}=fixture();controller.prepare=async()=>new Blob(['png']);
-  controller.show(chart,score);await settle();const old=controller.link;
+  controller.show(chart,score);await settle();const old=controller.link,oldSave=controller.saveButton;
   controller.show({...chart,title:'Next'},score);await settle();let prevented=false;
+  oldSave.events.click();
   old.events.click({preventDefault(){prevented=true;}});assert.equal(prevented,true);assert.equal(downloads.length,0);
   controller.clear();
 });
@@ -188,7 +195,7 @@ test('X cannot open an unranked draft while registration is pending, then uses t
   controller.setRanking(3); controller.setRankingPending(false);
   prevented=false;
   await controller.link.events.click({preventDefault(){prevented=true;}});
-  assert.equal(prevented,false); assert.equal(controller.link.textContent,'Xに投稿');
+  assert.equal(prevented,false); assert.equal(controller.link.textContent,'Xでポスト');
   assert.match(new URL(controller.link.href).searchParams.get('text'),/👑3位にランクイン！！/);
   controller.clear(); assert.equal(controller.rankingPending,false);
 });

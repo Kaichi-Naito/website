@@ -137,17 +137,20 @@ export class ResultShare {
     if (this.previewRoot && this.previewRoot !== this.root) { this.previewRoot.hidden = true; this.previewRoot.replaceChildren(); }
     ++this.version;
     if (this.imageURL) URL.revokeObjectURL(this.imageURL);
-    this.imageURL = null; this.snapshot = null; this.link = null; this.fallback = null; this.root.hidden = true; this.root.replaceChildren();
+    this.imageURL = null; this.snapshot = null; this.link = null; this.saveButton = null; this.fallback = null; this.root.hidden = true; this.root.replaceChildren();
   }
   show(chart, result) {
     this.clear(); const version = this.version;
     const snapshot = this.snapshot = resultSnapshot(chart, result);
     this.root.hidden = false;
     const actions = document.createElement('div'); actions.className = 'share-actions';
+    const save = this.saveButton = document.createElement('button');
+    save.type = 'button'; save.className = 'share-save'; save.textContent = '結果画像を保存'; save.disabled = true;
+    const arrow = document.createElement('span'); arrow.className = 'share-arrow'; arrow.textContent = '▶'; arrow.setAttribute('aria-hidden', 'true');
     const link = this.link = document.createElement('a');
     link.className = 'share-x'; link.href = xDestination(snapshot); link.target = '_blank'; link.rel = 'noopener noreferrer';
     this.imagePending = true;
-    link.textContent = '画像を準備中…'; link.setAttribute('aria-disabled', 'true'); actions.append(link);
+    link.textContent = 'Xでポスト'; link.setAttribute('aria-disabled', 'false'); actions.append(save, arrow, link);
     const status = document.createElement('p'); status.className = 'share-status'; status.setAttribute('role', 'status');
     status.textContent = 'スコア画像を準備しています…';
     const heading = document.createElement('h3'); heading.className = 'share-heading'; heading.textContent = '演奏結果をXでポストしよう！';
@@ -161,21 +164,15 @@ export class ResultShare {
     }
     const current = () => this.version === version;
     const guide = '画像はXの投稿画面で添付してください。保存先はブラウザーのダウンロード先です。保存されない場合は、この結果画像を長押し・右クリックして保存できます。';
-    link.addEventListener('click', event => {
-      if (!current()) { event.preventDefault(); return; }
-      if (this.rankingPending) {
-        event.preventDefault(); status.textContent = 'ランキングの登録・順位確認が終わるまでお待ちください。'; return;
-      }
-      if (this.imagePending) {
-        event.preventDefault(); status.textContent = '画像の準備が終わるまでお待ちください。'; return;
-      }
+    save.addEventListener('click', () => {
+      if (!current() || this.imagePending || !this.imageURL) return;
       let downloadStarted = false;
       if (this.imageURL) {
-        // Keep both actions inside the original tap; awaiting work here can block app launch.
+        // Start the download directly in the save-button gesture.
         const download = document.createElement('a');
         download.href = this.imageURL;
         download.download = `T4P-${snapshot.title.replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_')}-${snapshot.score}.png`;
-        // A dedicated frame keeps the game intact and avoids a second popup competing with X.
+        // A dedicated frame keeps the result screen intact during download.
         if (!this.downloadFrame) {
           this.downloadFrame = document.createElement('iframe');
           this.downloadFrame.name = `t4p-download-${version}`;
@@ -185,29 +182,35 @@ export class ResultShare {
         download.target = this.downloadFrame.name; download.hidden = true;
         document.body.append(download);
         try { download.click(); downloadStarted = true; }
-        catch { /* The X draft remains available if the browser refuses downloading. */ }
+        catch { /* Offer manual image saving if the browser refuses downloading. */ }
         finally { download.remove(); }
       }
-      if (this.fallback) this.fallback.hidden = false;
       // Download requests have no completion event: never claim that the file is saved.
-      status.textContent = `${downloadStarted ? '画像の保存を開始し、' : '画像を保存できませんでした。'}投稿文を付けて${mobile ? 'Xアプリ' : 'Xの投稿画面'}を開きます。${guide}`;
-
+      status.textContent = `${downloadStarted ? '画像の保存を開始しました。保存後に「Xでポスト」を押してください。' : '画像を保存できませんでした。'}${guide}`;
+    });
+    link.addEventListener('click', event => {
+      if (!current()) { event.preventDefault(); return; }
+      if (this.rankingPending) {
+        event.preventDefault(); status.textContent = 'ランキングの登録・順位確認が終わるまでお待ちください。'; return;
+      }
+      if (this.fallback) this.fallback.hidden = false;
+      status.textContent = `投稿文を付けて${mobile ? 'Xアプリ' : 'Xの投稿画面'}を開きます。保存した結果画像を添付してください。`;
     });
     this.prepare(snapshot).then(blob => {
       if (!current()) return;
       this.imageURL = URL.createObjectURL(blob);
-      this.imagePending = false; this.setRankingPending(this.rankingPending);
+      this.imagePending = false; save.disabled = false; this.setRankingPending(this.rankingPending);
       const preview = document.createElement('div'); preview.className = 'share-preview';
       const image = document.createElement('img'); image.src = this.imageURL;
       image.alt = `${snapshot.title} / ${snapshot.artist}、${snapshot.difficulty}：${number(snapshot.score)}点、RANK ${snapshot.rank}`;
       preview.append(image);
       const previewRoot = this.previewRoot || this.root;
       previewRoot.append(preview); previewRoot.hidden = false;
-      status.textContent = `「Xに投稿」で結果画像の保存を開始し、投稿画面を開きます。${guide}`;
+      status.textContent = `「結果画像を保存」→「Xでポスト」の順に押してください。${guide}`;
     }).catch(() => {
       if (current()) {
         this.imagePending = false; this.setRankingPending(this.rankingPending);
-        status.textContent = '画像を作れませんでした。「Xに投稿」から本文を入れた投稿画面を開けます。';
+        status.textContent = '画像を作れませんでした。「Xでポスト」から本文を入れた投稿画面を開けます。';
       }
     });
   }
@@ -221,8 +224,8 @@ export class ResultShare {
   setRankingPending(pending) {
     this.rankingPending = pending;
     if (this.link) {
-      this.link.setAttribute('aria-disabled', String(pending || this.imagePending));
-      this.link.textContent = pending ? 'ランキング確認中…' : this.imagePending ? '画像を準備中…' : 'Xに投稿';
+      this.link.setAttribute('aria-disabled', String(pending));
+      this.link.textContent = pending ? 'ランキング確認中…' : 'Xでポスト';
     }
     if (this.fallback && pending) this.fallback.hidden = true;
   }
