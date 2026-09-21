@@ -329,7 +329,7 @@
       <p id="result-transition-hint">まもなく結果を表示します</p>
     </div>
   </div>
-  <script type="module" src="rhythm/game.mjs?v=top-ten-v24"></script>
+  <script type="module" src="rhythm/game.mjs?v=play-se-v25"></script>
   <dialog id="settings-dialog" aria-labelledby="settings-title">
     <form method="dialog" class="dialog-heading"><h2 id="settings-title">プレイ設定</h2><button aria-label="設定を閉じる" class="icon-button">×</button></form>
         <fieldset id="settings"><legend>PLAY SETTINGS</legend>
@@ -357,8 +357,17 @@
     <div id="rhythm-task" aria-label="現在のアプリ">T4P.exe</div>
     <div id="rhythm-tray"><img src="images/volume-icon.png" alt="Volume"><span id="rhythm-clock">00:00</span></div>
   </div>
+  <audio id="song-selection-sound" src="rhythm/song-selection.mp3" preload="auto" hidden></audio>
   <script>
     (() => {
+      const selectionSound = document.getElementById('song-selection-sound');
+      const playSelectionSound = () => {
+        try {
+          selectionSound.currentTime = 0;
+          const promise = selectionSound.play();
+          if (promise && typeof promise.catch === 'function') promise.catch(() => {});
+        } catch {}
+      };
       const clickSound = new Audio('Sound/MouseClick.mp3');
       clickSound.preload = 'auto';
       const playClick = () => {
@@ -371,13 +380,16 @@
 
       document.addEventListener('pointerdown', event => {
         const target = event.target.closest('button, a, .song-option');
-        if (!target || target.closest('.key-row')) return;
+        if (!target || target.closest('.key-row') || target.closest('.song-play-button')) return;
         playClick();
       });
 
       const wheel = document.getElementById('song-wheel');
       wheel.addEventListener('song-scroll-select',playClick);
       const playSelected = document.getElementById('play-selected');
+      wheel.addEventListener('keydown', event => {
+        if (event.key === 'Enter' && !event.repeat && event.target === wheel && !playSelected.disabled && !document.getElementById('selection-screen').hidden) playSelectionSound();
+      });
       const selectionStatus = document.getElementById('selection-status');
       const cleanSelectionStatus = () => {
         if (selectionStatus.textContent.includes('ノーツ')) selectionStatus.textContent = '';
@@ -420,6 +432,7 @@
           button.addEventListener('click', event => {
             event.preventDefault();
             event.stopPropagation();
+            playSelectionSound();
             startSongFromCard(item);
           });
           item.append(button);

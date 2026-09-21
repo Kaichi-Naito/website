@@ -364,7 +364,7 @@ $('song-next').addEventListener('click',()=>selectSong(selectedIndex+1,true));
 wheel.addEventListener('keydown',event=>{
   if(mode!=='select'||$('selection-screen').hidden)return;
   if(event.key==='ArrowDown'||event.key==='ArrowUp'){event.preventDefault();selectSong(selectedIndex+(event.key==='ArrowDown'?1:-1),true);}
-  if(event.key==='Enter'&&!$('play-selected').disabled){event.preventDefault();startGame();}
+  if(event.key==='Enter'&&event.target===wheel&&!event.repeat&&!$('play-selected').disabled){event.preventDefault();startGame();}
 });
 wheel.addEventListener('scroll',()=>{
   clearTimeout(wheelTimer);
