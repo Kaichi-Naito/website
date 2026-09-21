@@ -107,8 +107,8 @@ test('a new result replaces the old draft and invalidates pending image work', a
 
 test('share template matches the requested wording and blank lines',()=>{
   const result=resultSnapshot({title:'Rolling',artist:'PHALUX',difficulty:'NORMAL'},{...score,score:886170,rank:'B'});
-  assert.equal(shareText(result),`(自動保存された結果画像を添付してポストしてね)\n\n#T4P で ♬ Rolling / PHALUX をプレイしたよ！！🎮\n\n🎸NORMAL🎸\n🥈RANK B🥈\nスコア 886,170点\n\n${APP_URL}`);
-  assert.equal(shareText({...result,rankingPosition:3}),`(自動保存された結果画像を添付してポストしてね)\n\n#T4P で ♬ Rolling / PHALUX をプレイしたよ！！🎮\n\n🎸NORMAL🎸\n🥈RANK B🥈\nスコア 886,170点\n👑3位にランクイン！！\n\n${APP_URL}`);
+  assert.equal(shareText(result),`(保存した結果画像を添付してポストしてね)\n\n#T4P で ♬ Rolling / PHALUX をプレイしたよ！！🎮\n\n🎸NORMAL🎸\n🥈RANK B🥈\nスコア 886,170点\n\n${APP_URL}`);
+  assert.equal(shareText({...result,rankingPosition:3}),`(保存した結果画像を添付してポストしてね)\n\n#T4P で ♬ Rolling / PHALUX をプレイしたよ！！🎮\n\n🎸NORMAL🎸\n🥈RANK B🥈\nスコア 886,170点\n👑3位にランクイン！！\n\n${APP_URL}`);
   for(const [rank,medal] of Object.entries({S:'💎',A:'🥇',B:'🥈',C:'🥉',D:'🌱'})) assert.ok(shareText({...result,rank}).includes(`${medal}RANK ${rank}${medal}`));
   for(const rankingPosition of [null,undefined,0,11,20,21,1.5])assert.ok(!shareText({...result,rankingPosition}).includes('位にランクイン'));
 });
