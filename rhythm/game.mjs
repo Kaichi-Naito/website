@@ -1,3 +1,4 @@
+import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
 import { ResultShare } from './result-share.mjs?v=result-layout-v16';
 import { loadCatalog } from './catalog.mjs?v=test30-fix-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
@@ -20,6 +21,7 @@ let chart, engine, context, gain, buffer, source, tapBuffer, tapGain;
 let tapPromise;
 const audioDataCache=new Map(),audioBufferCache=new Map(),audioFetchPromises=new Map(),audioDecodePromises=new Map();
 let scrollLockState=null;
+const resultTransition = new ResultTransition();
 let mode = 'loading', startAt = 0, resumeAt = 0, frozenTime = -2.5, judgmentUntil = 0;
 let width = 800, height = 600, lastHud = 0, requestId = 0;
 const settingsKey = 'kaichi-rhythm-settings-v3';
@@ -81,19 +83,26 @@ function stopSource() {
 }
 function lockPageScroll() {
   if(scrollLockState)return;
-  const app=$('app'),rect=app.getBoundingClientRect();
-  const target=Math.max(0,window.scrollY+rect.top-Math.max(0,(window.innerHeight-rect.height)/2));
+  const rect=$('play-workspace').getBoundingClientRect();
+  const viewportHeight=window.visualViewport?.height || window.innerHeight;
+  const target=Math.max(0,window.scrollY+rect.top-Math.max(0,(viewportHeight-rect.height)/2));
   window.scrollTo(0,target);
   const body=document.body;
   scrollLockState={y:window.scrollY,position:body.style.position,top:body.style.top,left:body.style.left,right:body.style.right,width:body.style.width};
   body.style.position='fixed';body.style.top=`-${scrollLockState.y}px`;body.style.left='0';body.style.right='0';body.style.width='auto';
+  document.documentElement.classList.add('play-scroll-locked');
 }
 function unlockPageScroll() {
   if(!scrollLockState)return;
   const body=document.body,state=scrollLockState;scrollLockState=null;
+  document.documentElement.classList.remove('play-scroll-locked');
   body.style.position=state.position;body.style.top=state.top;body.style.left=state.left;body.style.right=state.right;body.style.width=state.width;
   window.scrollTo(0,state.y);
 }
+// Fixed body alone does not prevent all iOS root/visual viewport gestures.
+for (const type of ['touchmove','wheel']) document.addEventListener(type,event=>{
+  if(scrollLockState && event.cancelable) event.preventDefault();
+},{passive:false,capture:true});
 // Use the hardware output timestamp when available so audio buffering does not shift judgment.
 function audibleTime() {
   if (!context) return 0;
@@ -190,7 +199,8 @@ function schedule(from, leadIn) {
   ui.settings.disabled = true; ui.status.textContent = 'PLAYING — Q / W / E / R';
 }
 async function startGame() {
-  if (!chart || mode === 'playing' || mode === 'loading') return;
+  if (!chart || mode === 'playing' || mode === 'loading' || mode === 'finishing') return;
+  resultTransition.cancel(); $('result-transition').hidden=true;
   clearTimeout(wheelTimer); ++chartRequest;
   resultShare.clear(); ui.result.hidden=true; leaderboard.clearResult();
   $('selection-screen').hidden=true; $('play-workspace').hidden=false; resize();
@@ -241,7 +251,19 @@ async function resume() {
 function finish() {
   if (mode !== 'playing') return;
   engine.tick(chart.duration + 1);
-  frozenTime = chart.duration; mode = 'results'; stopSource(); resetInputs();unlockPageScroll();
+  frozenTime = chart.duration; mode = 'finishing'; stopSource(); resetInputs();
+  ui.pause.disabled=true; ui.settings.disabled=true; ui.countdown.textContent='';
+  ui.status.textContent='結果集計中…';
+  resultTransition.begin(performance.now());
+  $('result-transition-fill').style.width='0%';
+  $('result-transition-progress').setAttribute('aria-valuenow','0');
+  $('result-transition').hidden=false;
+  updateHud();
+}
+function showResults() {
+  if(mode!=='finishing')return;
+  resultTransition.cancel(); $('result-transition').hidden=true;
+  mode='results'; unlockPageScroll();
   updateHud();
   ui.pause.disabled = true; ui.settings.disabled = false; ui.restart.hidden = true;
   const best = readBest();
@@ -307,7 +329,23 @@ buttons.forEach((button, lane) => {
   button.addEventListener('pointerdown', event => { event.preventDefault(); button.setPointerCapture(event.pointerId); inputDown(lane, event.pointerId); });
   for (const type of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(type, event => inputUp(lane, event.pointerId));
 });
-window.addEventListener('blur', pause);
+// Physical contacts outlive scoring input resets at the end of a song.
+window.addEventListener('pointerdown',event=>{
+  if(mode==='playing'||mode==='finishing')resultTransition.press(`pointer:${event.pointerId}`,performance.now());
+  if(mode==='finishing'&&event.cancelable)event.preventDefault();
+},{capture:true,passive:false});
+for(const type of ['pointerup','pointercancel']) window.addEventListener(type,event=>{
+  resultTransition.release(`pointer:${event.pointerId}`,performance.now());
+},true);
+window.addEventListener('keydown',event=>{
+  if((mode==='playing'||mode==='finishing')&&keyCodes.includes(event.code))resultTransition.press(event.code,performance.now());
+  if(mode==='finishing'&&!event.ctrlKey&&!event.metaKey&&!event.altKey)event.preventDefault();
+},true);
+window.addEventListener('keyup',event=>resultTransition.release(event.code,performance.now()),true);
+window.addEventListener('click',event=>{
+  if(mode==='finishing'){event.preventDefault();event.stopImmediatePropagation();}
+},true);
+window.addEventListener('blur', () => {resultTransition.releaseAll(performance.now());pause();});
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
 window.addEventListener('pagehide', () => { ++requestId; pause(); stopSource();unlockPageScroll(); });
 ui.start.addEventListener('click', () => { if (mode === 'paused') resume(); else startGame(); });
@@ -315,7 +353,7 @@ ui.restart.addEventListener('click', startGame);
 ui.pause.addEventListener('click', pause);
 $('settings-open').addEventListener('click',()=>{
   if(mode==='playing')pause();
-  if(mode==='loading')return;
+  if(mode==='loading'||mode==='finishing')return;
   $('settings-dialog').showModal();
 });
 $('back-to-select').addEventListener('click',showSelection);
@@ -336,10 +374,12 @@ wheel.addEventListener('scroll',()=>{
     const center=wheel.scrollTop+wheel.clientHeight/2;
     let nearest=selectedIndex,distance=Infinity;
     [...wheel.children].forEach((item,index)=>{const d=Math.abs(item.offsetTop-wheel.offsetTop+item.offsetHeight/2-center);if(d<distance){distance=d;nearest=index;}});
-    if(nearest!==selectedIndex)selectSong(nearest,false);
+    if(nearest!==selectedIndex){wheel.dispatchEvent(new Event('song-scroll-select'));selectSong(nearest,false);}
   },110);
 });
 function showSelection() {
+  if(mode==='finishing')return;
+  resultTransition.cancel(); $('result-transition').hidden=true;
   clearTimeout(wheelTimer); ++chartRequest;
   resultShare.clear();
   ++requestId;stopSource();resetInputs();unlockPageScroll();mode='select';frozenTime=-2.5;
@@ -512,6 +552,13 @@ function frame(now) {
     const remain=resumeCountdown?resumeAt-context.currentTime:-songTime();
     ui.countdown.textContent=remain>0?String(Math.ceil(remain)):'';
     if(songTime()>=Math.min(buffer.duration,chart.duration)+.2)finish();
+  }
+  if(mode==='finishing') {
+    const percent=Math.round(resultTransition.progress(now)*100);
+    $('result-transition-fill').style.width=`${percent}%`;
+    $('result-transition-progress').setAttribute('aria-valuenow',String(percent));
+    $('result-transition-hint').textContent=resultTransition.held.size ? '指を離すと結果を表示します' : 'まもなく結果を表示します';
+    if(resultTransition.ready(now) && !document.hidden)showResults();
   }
   // Event and effect ages must use the same clock, including slow desktop frames.
   draw(engine?time:-2.5,performance.now());

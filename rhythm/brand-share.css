@@ -40,3 +40,12 @@
 #result-ranking-notice[data-state="ranked"]{font-size:23px;color:#ffe37a;padding:12px 8px;border:2px solid #ffe37a;background:#372f1966}
 #result-ranking-notice[data-state="eligible"]{color:#ffe37a}
 .share-actions .share-x[aria-disabled="true"]{opacity:.6;cursor:wait}
+
+/* Lock the root as well as the body; gestures are cancelled while playing. */
+html.play-scroll-locked,html.play-scroll-locked body{overflow:hidden;overscroll-behavior:none;touch-action:none}
+#result-transition{position:fixed;inset:0;z-index:60000;display:grid;place-items:center;padding:24px;background:#080d1ce8;touch-action:none;overscroll-behavior:none}
+.result-transition-card{width:min(340px,100%);padding:28px 24px;text-align:center;border:1px solid #66718b;background:#171d30;box-shadow:6px 6px 0 #04081880}
+.result-transition-card h2{font:22px var(--mono);margin:0 0 22px}
+#result-transition-progress{height:12px;border:1px solid #718099;background:#0a1020;overflow:hidden}
+#result-transition-fill{width:0;height:100%;background:linear-gradient(90deg,#7deaff,#ff8dda)}
+#result-transition-hint{font:12px/1.7 var(--mono);color:#adbed7;margin:16px 0 0}
