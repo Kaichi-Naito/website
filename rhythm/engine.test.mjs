@@ -4,20 +4,20 @@ import {readFileSync} from 'node:fs';
 import {RhythmEngine} from './engine.mjs';
 import {midiToChart} from './midi.mjs';
 const base=JSON.parse(readFileSync(new URL('./Rolling/rolling-chart.json',import.meta.url)));
-const chart=midiToChart(readFileSync(new URL('./Rolling/Rolling_Game.mid',import.meta.url)),base);
+const chart=midiToChart(readFileSync(new URL('./Rolling/Rolling_T4P_NORMAL.mid',import.meta.url)),base);
 const hold=()=>new RhythmEngine({duration:6,bpm:60,notes:[{t:1,end:5,lane:0}]});
 test('the actual two-minute MIDI has playable lanes, tempo-aware ticks, and notes after one minute',()=>{
-  assert.equal(chart.duration,120);assert(chart.notes.some(n=>n.t>60));
+  assert.equal(chart.duration,125.952);assert(chart.notes.some(n=>n.t>60));
   const last=[-1,-1,-1,-1];
-  for(const n of chart.notes){assert(n.t>=0&&n.t<120);assert(n.t>=last[n.lane]+.02);last[n.lane]=n.end??n.t;if(n.end){assert(n.end<=120);assert(n.ticks.length>0);assert(n.ticks.every(t=>t>n.t&&t<=n.end));}}
+  for(const n of chart.notes){assert(n.t>=0&&n.t<chart.duration);assert(n.t>=last[n.lane]+.02);last[n.lane]=n.end??n.t;if(n.end){assert(n.end<=chart.duration);assert(n.ticks.length>0);assert(n.ticks.every(t=>t>n.t&&t<=n.end));}}
 });
 test('perfect full-chart play resolves every beat and scores one million',()=>{
   const e=new RhythmEngine(chart);
   const events=chart.notes.flatMap(n=>[{t:n.t,lane:n.lane,down:true},{t:n.end??n.t+.01,lane:n.lane,down:false}]).sort((a,b)=>a.t-b.t||Number(a.down)-Number(b.down));
   for(const event of events)e[event.down?'press':'release'](event.lane,event.t);
-  e.tick(121);assert.equal(e.score,1000000);assert.equal(e.counts.PERFECT,e.units);assert.equal(e.counts.MISS,0);assert.equal(e.emptyPresses,0);
+  e.tick(chart.duration+1);assert.equal(e.score,1000000);assert.equal(e.counts.PERFECT,e.units);assert.equal(e.counts.MISS,0);assert.equal(e.emptyPresses,0);
 });
-test('hands-off play resolves all head and beat units as misses',()=>{const e=new RhythmEngine(chart);e.tick(121);assert.equal(e.resolved,e.units);assert.equal(e.score,0);assert.equal(e.counts.MISS,e.units);});
+test('hands-off play resolves all head and beat units as misses',()=>{const e=new RhythmEngine(chart);e.tick(chart.duration+1);assert.equal(e.resolved,e.units);assert.equal(e.score,0);assert.equal(e.counts.MISS,e.units);});
 test('a four-beat hold earns one head and four separate sustain judgments',()=>{
   const e=hold();e.press(0,1);assert.equal(e.units,5);
   for(let beat=0;beat<4;beat++){e.tick(1.799+beat);assert.equal(e.resolved,beat+1);e.tick(1.8+beat);assert.equal(e.resolved,beat+2);}

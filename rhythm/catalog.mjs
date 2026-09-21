@@ -1,6 +1,6 @@
 import { readSheet } from './sheets.mjs?v=song-select-v1';
-// Temporary test cap; set to Infinity to restore catalog durations.
-export const PLAY_DURATION_LIMIT = 30;
+// Play each song for its configured full duration.
+export const PLAY_DURATION_LIMIT = Infinity;
 // Repository-relative paths and this homepage's absolute URLs are accepted.
 export function assetPath(value, kind) {
   let path=String(value??'').trim();

@@ -1,7 +1,7 @@
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
 import { PlaybackClock } from './playback-clock.mjs?v=clock-fix-v26';
 import { ResultShare } from './result-share.mjs?v=result-ranking-v29';
-import { loadCatalog } from './catalog.mjs?v=test30-fix-v1';
+import { loadCatalog } from './catalog.mjs?v=full-length-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
 import { Leaderboard } from './leaderboard.mjs?v=result-ranking-v29';
@@ -15,6 +15,7 @@ const keyCodes = ['KeyQ','KeyW','KeyE','KeyR'];
 const judgmentColors = {PERFECT:'#ffe37a',GREAT:'#c4a2ff',GOOD:'#80e5b0',MISS:'#ff6f8a',EMPTY:'#ff6f8a'};
 const flashColors=[...colors], errors=[0,0,0,0], bursts=[];
 let songs=[], selectedIndex=-1, chartRequest=0, wheelTimer;
+let developerMode=false, logoTaps=0;
 const wheel=$('song-wheel');
 const inputSources = [new Set(), new Set(), new Set(), new Set()];
 const flashes = [-Infinity,-Infinity,-Infinity,-Infinity];
@@ -362,6 +363,17 @@ $('settings-open').addEventListener('click',()=>{
 $('back-to-select').addEventListener('click',showSelection);
 $('play-selected').addEventListener('click',startGame);
 $('catalog-retry').addEventListener('click',loadSongs);
+$('developer-logo').addEventListener('click',handleDeveloperLogo);
+function handleDeveloperLogo() {
+  if(mode!=='select'||$('selection-screen').hidden){logoTaps=0;return;}
+  if(++logoTaps<5)return;
+  logoTaps=0;developerMode=!developerMode;
+  $('developer-indicator').hidden=!developerMode;
+  $('play-duration-note').textContent=developerMode?'開発者モード：冒頭15秒をプレイします。':'各曲をフル尺でプレイします。';
+  clearTimeout(wheelTimer);
+  chart=null;
+  if(songs.length)void selectSong(Math.max(0,selectedIndex),false);
+}
 $('song-prev').addEventListener('click',()=>selectSong(selectedIndex-1,true));
 $('song-next').addEventListener('click',()=>selectSong(selectedIndex+1,true));
 wheel.addEventListener('keydown',event=>{
@@ -410,7 +422,7 @@ async function selectSong(index,scroll) {
   if(!songs.length||mode!=='select'||$('selection-screen').hidden)return;
   index=Math.max(0,Math.min(songs.length-1,index));
   if(index===selectedIndex&&chart)return;
-  selectedIndex=index;const song=songs[index],token=++chartRequest;
+  selectedIndex=index;const song={...songs[index],duration:Math.min(songs[index].duration,developerMode?15:Infinity)},token=++chartRequest;
   preloadAudio(song.audio);
   chart=null;engine=null;mode='select';
   $('play-selected').disabled=true;$('play-selected').textContent='譜面を読み込み中…';

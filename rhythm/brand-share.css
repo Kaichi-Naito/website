@@ -65,3 +65,7 @@ html.play-scroll-locked,html.play-scroll-locked body{overflow:hidden;overscroll-
 #result-transition-progress{height:12px;border:1px solid #718099;background:#0a1020;overflow:hidden}
 #result-transition-fill{width:0;height:100%;background:linear-gradient(90deg,#7deaff,#ff8dda)}
 #result-transition-hint{font:12px/1.7 var(--mono);color:#adbed7;margin:16px 0 0}
+
+.developer-logo{display:block;padding:0;border:0;background:transparent;box-shadow:none;cursor:pointer;touch-action:manipulation;user-select:none}
+.developer-logo:focus-visible{outline:2px solid #7deaff;outline-offset:4px}
+#developer-indicator{color:#8b2900;font-size:11px;margin-left:8px}

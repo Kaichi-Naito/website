@@ -9,10 +9,10 @@ audio fetching are not supported by opening the HTML as a `file://` URL.
 ## Test song and chart
 
 - Source: user-uploaded `rhythm/Rolling/Rolling_T4P.ver.mp3`, PHALUX.
-- Scope: the catalog keeps each song's source duration, while `catalog.mjs` currently limits gameplay to the first **30 seconds**. Playback stops at that test boundary even for a longer MP3.
+- Scope: gameplay uses the full duration configured in the catalog. Rolling NORMAL and HARD use **125.952 seconds**.
 - The original ranking spreadsheet’s `譜面` tab contains the song catalog.
   `Rolling/rolling-chart.json` retains test metadata; it is not fetched by the game.
-- MIDI is parsed on every page load with cache bypass. Notes after 30 seconds
+- MIDI is parsed on every page load with cache bypass. Notes after the configured duration
   are excluded and crossing holds are shortened. A load error offers retry;
   there is no fallback to an outdated generated chart.
 - The MIDI tempo map is used, with 162 BPM as the fallback if no initial tempo exists.
@@ -88,7 +88,7 @@ from the game UI. See `Rolling/README.md` for the REAPER/update workflow.
 - Align MIDI zero with the audio zero; do not trim the leading rest. Export the
   tempo map from REAPER. Missing initial tempo uses
   Rolling's 162 BPM fallback. MIDI duration need not equal the audio duration.
-- Playback currently remains the first **30 seconds**. Later notes are excluded and holds
+- Playback covers the full catalog duration. Later notes are excluded and holds
   crossing the end are shortened; these adjustments are retained in parser diagnostics.
 - Imported chart scores have separate IDs derived from MIDI contents.
 - The user-supplied tap WAV is converted to mono 44.1 kHz/16-bit PCM without
@@ -113,7 +113,7 @@ See `ranking/README.md` for the one-time Google Apps Script deployment and
 perfect/miss outcomes, lane overlap, held-key repeats, chords, sustain duration,
 automatic completion, release timing independence, and pause/re-grip behavior.
 Browser checks should cover start, keyboard input, pause/resume, retry, the
-30-second result screen, and mobile layout. Subjective audio alignment should
+full-song result screen, and mobile layout. Subjective audio alignment should
 also be checked on the player's actual output device.
 
 
@@ -126,9 +126,9 @@ also be checked on the player's actual output device.
 
 共有はランキングの順位・登録の有無に関係なく利用できます。次の曲や再プレイを始めると、前の結果と画像URLを破棄します。
 
-## 30秒テスト（2026-09-21）
+## フル尺プレイ
 
-現在は `catalog.mjs` の `PLAY_DURATION_LIMIT = 30` で全曲を冒頭30秒に制限しています。シートの元のプレイ時間は保持し、MIDIも30秒で切り詰めます。元の長さへ戻す場合はこの上限を `Infinity` に戻します。譜面識別子には演奏時間とノーツ内容が入るため、2分版のランキングとは別集計です。
+`catalog.mjs` の `PLAY_DURATION_LIMIT = Infinity` により30秒制限を解除しています。プレイ時間はSheetの値に従い、RollingはNORMAL・HARDとも125.952秒です。譜面識別子には演奏時間とノーツ内容が入るため、30秒版のランキングとは別集計です。
 
 結果画面は画面全体に表示し、判定内訳の欄を削除してX投稿を見つけやすくしました。動きを減らす端末設定でも、成功したレーンと判定ラインの静止した光は表示します。
 
@@ -137,3 +137,7 @@ also be checked on the player's actual output device.
 X投稿文とスコア画像の表示URLは `https://x.gd/T4P_game` を使用します。ゲーム本体のURLと旧URL転送は維持します。
 
 曲選択のスクロール予約はプレイ開始時に破棄します。非表示の曲選択イベントや遅れて返るMIDI読み込みは、演奏中・一時停止中・結果表示中の譜面や結果を上書きしません。
+
+## 開発者モード
+
+曲選択画面のT4Pロゴを5回タップすると、冒頭15秒の開発者モードに切り替わります。もう5回でフル尺に戻り、再読み込みでも通常モードに戻ります。切り替えは曲選択中だけ有効です。選択中の譜面を読み直して15秒を超えるノーツ・長押しを切り詰めます。元のSheetや音源は変更しません。ランキングと自己ベストは演奏時間を含むキーでフル尺と分離されます。

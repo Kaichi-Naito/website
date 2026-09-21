@@ -10,8 +10,9 @@ function fixture() {
   const element=()=>({hidden:false,disabled:false,textContent:'',setAttribute(){},scrollIntoView(){}});
   const $=id=>{if(!elements.has(id))elements.set(id,element());return elements.get(id);};
   const wheel={children:[0,116].map(offsetTop=>({...element(),offsetTop,offsetHeight:104})),offsetTop:0,clientHeight:280,scrollTop:0,setAttribute(){},dispatchEvent:event=>events.push(event.type),addEventListener:(name,fn)=>{handlers[name]=fn;}};
-  const context=vm.createContext({Event,$,wheel,mode:'select',songs:[{title:'first'},{title:'second'}],selectedIndex:0,chart:{id:'kept'},engine:{score:123},chartRequest:0,wheelTimer:null,reduceMotion:true,preloadAudio(){},leaderboard:{clearResult(){},clearChart(){}},clockString:()=>'',midiToChart:()=>({id:'late'}),useChart:next=>{context.chart=next;context.mode='select';},fetch:()=>{fetches++;return new Promise(resolve=>responses.push(resolve));},setTimeout:fn=>{timers.set(++timerId,fn);return timerId;},clearTimeout:id=>timers.delete(id)});
-  vm.runInContext(select+'\n'+wheelHandlers,context);
+  const context=vm.createContext({Event,$,wheel,mode:'select',developerMode:false,logoTaps:0,songs:[{title:'first',duration:125.952},{title:'second',duration:125.952}],selectedIndex:0,chart:{id:'kept'},engine:{score:123},chartRequest:0,wheelTimer:null,reduceMotion:true,preloadAudio(){},leaderboard:{clearResult(){},clearChart(){}},clockString:()=>'',midiToChart:()=>({id:'late'}),useChart:next=>{context.chart=next;context.mode='select';},fetch:()=>{fetches++;return new Promise(resolve=>responses.push(resolve));},setTimeout:fn=>{timers.set(++timerId,fn);return timerId;},clearTimeout:id=>timers.delete(id)});
+  const developer=source.slice(source.indexOf('function handleDeveloperLogo('),source.indexOf("$('song-prev').addEventListener"));
+  vm.runInContext(select+'\n'+wheelHandlers+'\n'+developer,context);
   return {context,$,wheel,handlers,events,timers,responses,fetches:()=>fetches};
 }
 test('a queued song-wheel scroll cannot replace the chart after gameplay starts or ends',()=>{
@@ -46,4 +47,28 @@ test('a MIDI response arriving after leaving selection cannot overwrite results'
     await pending;
     assert.equal(f.context.mode,mode);assert.equal(f.context.chart.id,'finished');assert.equal(f.context.engine.score,456);
   }
+});
+
+test('five logo taps toggle 15-second mode and five more restore full duration',async()=>{
+ const f=fixture();f.context.selectedIndex=0;
+ for(let i=0;i<4;i++)f.context.handleDeveloperLogo();
+ assert.equal(f.context.developerMode,false);assert.equal(f.fetches(),0);
+ f.context.handleDeveloperLogo();assert.equal(f.context.developerMode,true);
+ assert.equal(f.$('developer-indicator').hidden,false);
+ const parsed=[];f.context.midiToChart=(_,song)=>{parsed.push(song);return {notes:[],bpm:162};};
+ f.context.useChart=next=>{f.context.chart=next;};
+ f.responses[0]({ok:true,arrayBuffer:async()=>new ArrayBuffer(0)});
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(parsed[0].duration,15);assert.equal(f.context.songs[0].duration,125.952);
+ for(let i=0;i<5;i++)f.context.handleDeveloperLogo();
+ assert.equal(f.context.developerMode,false);assert.equal(f.$('developer-indicator').hidden,true);
+ f.responses[1]({ok:true,arrayBuffer:async()=>new ArrayBuffer(0)});
+ await new Promise(resolve=>setImmediate(resolve));assert.equal(parsed[1].duration,125.952);
+});
+test('logo taps cannot alter active gameplay or results',()=>{
+ for(const mode of ['loading','playing','paused','finishing','results']){
+  const f=fixture();f.context.mode=mode;
+  for(let i=0;i<5;i++)f.context.handleDeveloperLogo();
+  assert.equal(f.context.developerMode,false);assert.equal(f.context.chart.id,'kept');assert.equal(f.fetches(),0);
+ }
 });
