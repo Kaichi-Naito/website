@@ -80,16 +80,19 @@ test('confirmed ranking updates the draft but clearing prevents carryover',()=>{
   assert.ok(!new URL(root.children[0].children[0].href).searchParams.get('text').includes('位にランクイン'));
 });
 
-test('primary sharing hands native sharing the PNG and current ranking text together',async()=>{
+test('X opens directly even when the device supports native file sharing',async()=>{
   const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator');
-  let handed;
-  Object.defineProperty(globalThis,'navigator',{configurable:true,value:{canShare:data=>data.files[0].type==='image/png',share:async data=>{handed=data;}}});
+  let shared=false, prevented=false;
+  Object.defineProperty(globalThis,'navigator',{configurable:true,value:{canShare:()=>true,share:async()=>{shared=true;}}});
   try {
     const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png'],{type:'image/png'});
     controller.show(chart,score);await settle();controller.setRanking(4);
-    await root.children[0].children[0].events.click({preventDefault(){}});
-    assert.equal(handed.files.length,1);assert.equal(handed.files[0].type,'image/png');assert.match(handed.text,/👑4位/);
-    controller.clear();
+    const link=root.children[0].children[0];
+    await link.events.click({preventDefault(){prevented=true;}});
+    assert.equal(shared,false);assert.equal(prevented,false);
+    assert.equal(new URL(link.href).origin+new URL(link.href).pathname,'https://x.com/intent/tweet');
+    assert.match(new URL(link.href).searchParams.get('text'),/👑4位/);
+    assert.equal(link.target,'_blank');controller.clear();
   } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;}
 });
 test('desktop X link stays usable when copying succeeds, fails, or is unsupported',async()=>{

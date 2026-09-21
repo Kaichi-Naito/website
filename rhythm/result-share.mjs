@@ -112,24 +112,9 @@ export class ResultShare {
     status.textContent = 'スコア画像を準備しています…';
     this.root.append(actions, status);
     const current = () => this.version === version;
-    let imageBlob = null, file = null, nativeSharing = false, sharing = false;
+    let imageBlob = null;
     link.addEventListener('click', async event => {
       if (!current()) { event.preventDefault(); return; }
-      if (nativeSharing && file) {
-        event.preventDefault();
-        if (sharing) return;
-        sharing = true;
-        try {
-          await navigator.share({title:'T4P プレイ結果', text:shareText(this.snapshot), files:[file]});
-          if (current()) status.textContent = '共有先で本文と画像を確認してください。';
-        } catch (error) {
-          if (current() && error.name !== 'AbortError') {
-            nativeSharing = false;
-            status.textContent = '画像付き共有を開けませんでした。もう一度「Xに投稿」を押すとXの投稿画面を開きます。';
-          }
-        } finally { sharing = false; }
-        return;
-      }
       // Let the anchor open X immediately, even if PNG generation or clipboard
       // access fails. Image copying is optional and must never block navigation.
       if (!imageBlob || !navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
@@ -147,15 +132,11 @@ export class ResultShare {
       if (!current()) return;
       imageBlob = blob;
       this.imageURL = URL.createObjectURL(blob);
-      file = new File([blob], `T4P-score-${snapshot.score}.png`, {type:'image/png'});
-      try { nativeSharing = Boolean(navigator.share && navigator.canShare?.({title:'T4P プレイ結果', text:shareText(this.snapshot), files:[file]})); } catch { /* open X directly */ }
       const preview = document.createElement('div'); preview.className = 'share-preview';
       const image = document.createElement('img'); image.src = this.imageURL;
       image.alt = `${snapshot.title} / ${snapshot.artist}：${number(snapshot.score)}点、RANK ${snapshot.rank}`;
       preview.append(image); this.root.append(preview);
-      status.textContent = nativeSharing
-        ? '「Xに投稿」で共有先にXを選んでください。本文と画像の引き継ぎは端末・アプリによって異なります。'
-        : '「Xに投稿」でXを開きます。画像の自動添付には非対応です。画像コピーに対応した環境では、Xで貼り付け（Ctrl+V / ⌘V）できます。';
+      status.textContent = '「Xに投稿」でXの投稿画面を直接開きます。画像を付ける場合は、コピー対応環境ではXで貼り付け（Ctrl+V / ⌘V）してください。';
     }).catch(() => {
       if (current()) status.textContent = '画像を作れませんでした。「Xに投稿」から本文を入れた投稿画面を開けます。';
     });
