@@ -1,6 +1,6 @@
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
 import { PlaybackClock } from './playback-clock.mjs?v=clock-fix-v26';
-import { ResultShare } from './result-share.mjs?v=difficulty-colors-v34';
+import { ResultShare } from './result-share.mjs?v=share-difficulty-v35';
 import { loadCatalog, groupSongs } from './catalog.mjs?v=grouped-songs-v2';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
