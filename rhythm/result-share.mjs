@@ -136,12 +136,13 @@ export class ResultShare {
     this.root.hidden = false;
     const actions = document.createElement('div'); actions.className = 'share-actions';
     const link = this.link = document.createElement('a');
-    link.className = 'share-x'; link.href = xDestination(snapshot); link.target = link.href.startsWith('https:') ? '_blank' : '_self'; link.rel = 'noopener noreferrer';
+    link.className = 'share-x'; link.href = xDestination(snapshot); link.target = '_blank'; link.rel = 'noopener noreferrer';
     link.textContent = 'Xに投稿'; actions.append(link);
     const status = document.createElement('p'); status.className = 'share-status'; status.setAttribute('role', 'status');
     status.textContent = 'スコア画像を準備しています…';
-    this.root.append(actions, status);
-    const mobile = link.target === '_self';
+    const heading = document.createElement('h3'); heading.className = 'share-heading'; heading.textContent = '演奏結果をXでポストしよう！';
+    this.root.append(heading, actions, status);
+    const mobile = /^(intent:|twitter:)/.test(link.href);
     if (mobile) {
       const fallback = this.fallback = document.createElement('a');
       fallback.className = 'share-fallback'; fallback.href = xIntent(snapshot); fallback.target = '_blank'; fallback.rel = 'noopener noreferrer';

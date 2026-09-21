@@ -31,3 +31,5 @@
 .share-actions .share-fallback{flex-basis:100%;font-size:11px;background:transparent;color:#adbed7;border:0;text-decoration:underline}
 .share-actions [hidden]{display:none}
 @media(max-height:650px){.overlay.is-results{padding:8px}.overlay.is-results .overlay-card{max-height:calc(100dvh - 16px);padding:12px}.overlay.is-results .result-brand{width:48px}.overlay.is-results #overlay-description{display:none}}
+
+.share-heading{margin:0 0 12px;color:#f3f7ff;font:15px/1.7 var(--mono)}

@@ -49,10 +49,12 @@ test('mobile opens the app link directly and reveals fallback only after tapping
       Object.defineProperty(globalThis, 'navigator', {configurable:true,value:{userAgent,share:()=>assert.fail('No system share menu'),clipboard:{write:()=>assert.fail('Do not delay app navigation')}}});
       const {root,controller}=fixture(); controller.prepare=async()=>new Blob(['png']);
       controller.show(chart,score); await settle(); controller.setRanking(3);
-      const [link,fallback]=root.children[0].children;
-      assert.equal(link.target,'_self'); assert.equal(fallback.hidden,true);
+      const [link,fallback]=root.children[1].children;
+      assert.equal(link.target,'_blank'); assert.equal(fallback.hidden,true);
       await link.events.click({preventDefault(){assert.fail('Native anchor must navigate');}});
       assert.equal(fallback.hidden,false);
+      assert.equal(root.hidden,false); assert.equal(root.children[0].textContent,'演奏結果をXでポストしよう！');
+      assert.equal(fallback.target,'_blank'); assert.equal(controller.snapshot.title,chart.title);
       assert.equal(new URL(link.href).searchParams.get(userAgent === 'Android' ? 'text' : 'message'),shareText(controller.snapshot));
       assert.equal(fallback.href,xIntent(controller.snapshot));
       controller.clear(); assert.equal(controller.fallback,null);
@@ -87,16 +89,16 @@ test('leaving results discards a PNG that finishes preparing later', async () =>
 test('image preparation failure keeps the X draft accessible', async () => {
   const {root, controller} = fixture(); controller.prepare = async () => { throw Error('canvas'); };
   controller.show(chart, score); await settle();
-  assert.equal(root.children[0].children[0].href, xIntent(resultSnapshot(chart, score)));
-  assert.match(root.children[1].textContent, /画像を作れません/);
+  assert.equal(root.children[1].children[0].href, xIntent(resultSnapshot(chart, score)));
+  assert.match(root.children[2].textContent, /画像を作れません/);
 });
 test('a new result replaces the old draft and invalidates pending image work', async () => {
   const {root, controller} = fixture(); const resolvers = [];
   controller.prepare = () => new Promise(resolve => resolvers.push(resolve));
   controller.show(chart, score); controller.show({...chart, title:'Next song'}, {...score, score:0});
   resolvers[0](new Blob(['old'], {type:'image/png'})); await settle();
-  assert.match(new URL(root.children[0].children[0].href).searchParams.get('text'), /Next song/);
-  assert.equal(root.children.length, 2); assert.equal(controller.imageURL, null);
+  assert.match(new URL(root.children[1].children[0].href).searchParams.get('text'), /Next song/);
+  assert.equal(root.children.length, 3); assert.equal(controller.imageURL, null);
   controller.clear(); resolvers[1](new Blob(['new'])); await settle();
 });
 
@@ -110,10 +112,10 @@ test('share template matches the requested wording and blank lines',()=>{
 test('confirmed ranking updates the draft but clearing prevents carryover',()=>{
   const {root,controller}=fixture();controller.prepare=()=>new Promise(()=>{});
   controller.show(chart,score);controller.setRanking(2);
-  assert.match(new URL(root.children[0].children[0].href).searchParams.get('text'),/👑2位/);
+  assert.match(new URL(root.children[1].children[0].href).searchParams.get('text'),/👑2位/);
   controller.clear();controller.setRanking(1);
   controller.show(chart,score);
-  assert.ok(!new URL(root.children[0].children[0].href).searchParams.get('text').includes('位にランクイン'));
+  assert.ok(!new URL(root.children[1].children[0].href).searchParams.get('text').includes('位にランクイン'));
 });
 
 test('X opens directly even when the device supports native file sharing',async()=>{
@@ -123,7 +125,7 @@ test('X opens directly even when the device supports native file sharing',async(
   try {
     const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png'],{type:'image/png'});
     controller.show(chart,score);await settle();controller.setRanking(4);
-    const link=root.children[0].children[0];
+    const link=root.children[1].children[0];
     await link.events.click({preventDefault(){prevented=true;}});
     assert.equal(shared,false);assert.equal(prevented,false);
     assert.equal(new URL(link.href).origin+new URL(link.href).pathname,'https://x.com/intent/tweet');
@@ -141,20 +143,20 @@ test('image copy is explicit and never blocks the X draft when successful or una
       Object.defineProperty(globalThis,'navigator',{configurable:true,value:{clipboard}});
       const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png'],{type:'image/png'});
       controller.show(chart,score);await settle();
-      const link=root.children[0].children[0];
+      const link=root.children[1].children[0];
       await link.events.click({preventDefault(){prevented=true;}});
       assert.equal(prevented,false,mode);assert.equal(link.target,'_blank');
       assert.equal(new URL(link.href).searchParams.get('text'),shareText(resultSnapshot(chart,score)));
       assert.equal(copied,0,'Opening X does not access the clipboard');
-      const [save,copy]=root.children[0].children.slice(1);
+      const [save,copy]=root.children[1].children.slice(1);
       assert.equal(save.textContent,'結果画像を保存');assert.equal(save.href,controller.imageURL);
       assert.ok(save.download.endsWith('.png'));assert.ok(!save.download.includes('/'));
       assert.equal(copy.textContent,'結果画像をコピー');
       await copy.events.click();
       assert.equal(copied,mode==='unavailable'?0:1);
-      assert.match(root.children[1].textContent,mode==='success'?/コピーしました/:/コピーできません/);
-      assert.equal(root.children[0].children.length,3);
-      assert.equal(root.children[2].tag,'div');assert.equal(root.children[2].children[0].tag,'img');
+      assert.match(root.children[2].textContent,mode==='success'?/コピーしました/:/コピーできません/);
+      assert.equal(root.children[1].children.length,3);
+      assert.equal(root.children[3].tag,'div');assert.equal(root.children[3].children[0].tag,'img');
       controller.clear();
     }
   } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;globalThis.ClipboardItem=oldItem;}
@@ -164,10 +166,10 @@ test('X opens even before PNG is ready, or after image generation fails',async()
   controller.prepare=()=>new Promise((resolve,no)=>{reject=no;});
   controller.show(chart,score);
   let prevented=false;
-  await root.children[0].children[0].events.click({preventDefault(){prevented=true;}});
+  await root.children[1].children[0].events.click({preventDefault(){prevented=true;}});
   assert.equal(prevented,false);
   reject(Error('canvas'));await settle();
-  await root.children[0].children[0].events.click({preventDefault(){prevented=true;}});
+  await root.children[1].children[0].events.click({preventDefault(){prevented=true;}});
   assert.equal(prevented,false);controller.clear();
 });
 test('shared URL uses the supplied short link',()=>assert.equal(APP_URL,'https://x.gd/T4P_game'));
