@@ -1,0 +1,48 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+const source=readFileSync(new URL('./game.mjs',import.meta.url),'utf8');
+const select=source.slice(source.indexOf('async function selectSong('),source.indexOf('async function loadSongs('));
+const wheelHandlers=source.slice(source.indexOf("wheel.addEventListener('keydown'"),source.indexOf('function showSelection('));
+function fixture() {
+  const elements=new Map(),handlers={},timers=new Map(),responses=[];let timerId=0,fetches=0;
+  const element=()=>({hidden:false,disabled:false,textContent:'',setAttribute(){},scrollIntoView(){}});
+  const $=id=>{if(!elements.has(id))elements.set(id,element());return elements.get(id);};
+  const wheel={children:[0,116].map(offsetTop=>({...element(),offsetTop,offsetHeight:104})),offsetTop:0,clientHeight:280,scrollTop:0,setAttribute(){},addEventListener:(name,fn)=>{handlers[name]=fn;}};
+  const context=vm.createContext({$,wheel,mode:'select',songs:[{title:'first'},{title:'second'}],selectedIndex:0,chart:{id:'kept'},engine:{score:123},chartRequest:0,wheelTimer:null,reduceMotion:true,preloadAudio(){},leaderboard:{clearResult(){},clearChart(){}},clockString:()=>'',midiToChart:()=>({id:'late'}),useChart:next=>{context.chart=next;context.mode='select';},fetch:()=>{fetches++;return new Promise(resolve=>responses.push(resolve));},setTimeout:fn=>{timers.set(++timerId,fn);return timerId;},clearTimeout:id=>timers.delete(id)});
+  vm.runInContext(select+'\n'+wheelHandlers,context);
+  return {context,$,wheel,handlers,timers,responses,fetches:()=>fetches};
+}
+test('a queued song-wheel scroll cannot replace the chart after gameplay starts or ends',()=>{
+  for(const mode of ['loading','playing','paused','results']){
+    const f=fixture();f.context.selectedIndex=1;f.handlers.scroll();
+    const queued=[...f.timers.values()];
+    f.context.mode=mode;f.$('selection-screen').hidden=true;
+    // display:none removes layout geometry; both items measure zero.
+    f.wheel.clientHeight=0;f.wheel.children.forEach(item=>{item.offsetTop=0;item.offsetHeight=0;});
+    queued.forEach(fn=>fn());
+    assert.equal(f.context.mode,mode);assert.equal(f.context.selectedIndex,1);
+    assert.equal(f.context.chart.id,'kept');assert.equal(f.context.engine.score,123);assert.equal(f.fetches(),0);
+  }
+});
+test('new hidden-wheel events and stale song clicks leave results intact',async()=>{
+  const f=fixture();f.context.mode='results';f.$('selection-screen').hidden=true;
+  f.handlers.scroll();await f.context.selectSong(1,true);
+  assert.equal(f.context.mode,'results');assert.equal(f.context.chart.id,'kept');assert.equal(f.fetches(),0);
+});
+test('visible song-wheel scrolling still selects the nearest song',()=>{
+  const f=fixture();f.handlers.scroll();[...f.timers.values()].forEach(fn=>fn());
+  assert.equal(f.context.selectedIndex,1);assert.equal(f.fetches(),1);
+});
+
+test('a MIDI response arriving after leaving selection cannot overwrite results',async()=>{
+  for(const mode of ['loading','playing','paused','results']){
+    const f=fixture();const pending=f.context.selectSong(1,false);
+    f.context.mode=mode;f.$('selection-screen').hidden=true;
+    f.context.chart={id:'finished'};f.context.engine={score:456};
+    f.responses[0]({ok:true,arrayBuffer:async()=>new ArrayBuffer(0)});
+    await pending;
+    assert.equal(f.context.mode,mode);assert.equal(f.context.chart.id,'finished');assert.equal(f.context.engine.score,456);
+  }
+});

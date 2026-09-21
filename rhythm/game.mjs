@@ -171,6 +171,7 @@ function schedule(from, leadIn) {
 }
 async function startGame() {
   if (!chart || mode === 'playing' || mode === 'loading') return;
+  clearTimeout(wheelTimer); ++chartRequest;
   resultShare.clear(); ui.result.hidden=true; leaderboard.clearResult();
   $('selection-screen').hidden=true; $('play-workspace').hidden=false; resize();
   $('settings-dialog').close();
@@ -190,6 +191,7 @@ async function startGame() {
     ui.start.blur();
     if (document.hidden) pause();
   } catch (error) {
+    if (token !== requestId) return;
     $('back-to-select').disabled=false;
     mode = 'error'; ui.status.textContent = '読み込みエラー';
     showOverlay('LOAD ERROR', '読み込みをやり直してください', error.message, '再読み込み');
@@ -207,9 +209,11 @@ function pause() {
 }
 async function resume() {
   if (mode !== 'paused') return;
+  const token = requestId;
   ui.start.disabled = true;
   try {
     await context.resume();
+    if (token !== requestId || mode !== 'paused') return;
     schedule(frozenTime, 2);
     ui.start.blur();
   } catch { ui.start.disabled = false; ui.status.textContent = '音声を再開できませんでした。もう一度お試しください。'; }
@@ -299,11 +303,15 @@ $('catalog-retry').addEventListener('click',loadSongs);
 $('song-prev').addEventListener('click',()=>selectSong(selectedIndex-1,true));
 $('song-next').addEventListener('click',()=>selectSong(selectedIndex+1,true));
 wheel.addEventListener('keydown',event=>{
+  if(mode!=='select'||$('selection-screen').hidden)return;
   if(event.key==='ArrowDown'||event.key==='ArrowUp'){event.preventDefault();selectSong(selectedIndex+(event.key==='ArrowDown'?1:-1),true);}
   if(event.key==='Enter'&&!$('play-selected').disabled){event.preventDefault();startGame();}
 });
 wheel.addEventListener('scroll',()=>{
-  clearTimeout(wheelTimer);wheelTimer=setTimeout(()=>{
+  clearTimeout(wheelTimer);
+  if(mode!=='select'||$('selection-screen').hidden)return;
+  wheelTimer=setTimeout(()=>{
+    if(mode!=='select'||$('selection-screen').hidden)return;
     const center=wheel.scrollTop+wheel.clientHeight/2;
     let nearest=selectedIndex,distance=Infinity;
     [...wheel.children].forEach((item,index)=>{const d=Math.abs(item.offsetTop-wheel.offsetTop+item.offsetHeight/2-center);if(d<distance){distance=d;nearest=index;}});
@@ -311,6 +319,7 @@ wheel.addEventListener('scroll',()=>{
   },110);
 });
 function showSelection() {
+  clearTimeout(wheelTimer); ++chartRequest;
   resultShare.clear();
   ++requestId;stopSource();resetInputs();unlockPageScroll();mode='select';frozenTime=-2.5;
   $('selection-screen').hidden=false;$('play-workspace').hidden=true;ui.overlay.hidden=true;
@@ -319,6 +328,7 @@ function showSelection() {
   $('play-selected').focus();
 }
 function useChart(next) {
+  if(mode!=='select'||$('selection-screen').hidden)return;
   resultShare.clear();
   stopSource();resetInputs();chart=next;buffer=audioBufferCache.get(next.audio)||null;preloadAudio(next.audio);
   leaderboard.clearResult();leaderboard.setChart(next,`${next.title} / ${next.difficulty}`);
@@ -333,7 +343,7 @@ function useChart(next) {
   bestUI();updateHud();ui.status.textContent='MUSIC SELECT';
 }
 async function selectSong(index,scroll) {
-  if(!songs.length)return;
+  if(!songs.length||mode!=='select'||$('selection-screen').hidden)return;
   index=Math.max(0,Math.min(songs.length-1,index));
   if(index===selectedIndex&&chart)return;
   selectedIndex=index;const song=songs[index],token=++chartRequest;
@@ -355,12 +365,12 @@ async function selectSong(index,scroll) {
     const response=await fetch(`${song.midiPath}?updated=${Date.now()}`,{cache:'no-store'});
     if(!response.ok)throw new Error(`譜面を読み込めませんでした（${response.status}）。`);
     const next=midiToChart(await response.arrayBuffer(),song);
-    if(token!==chartRequest)return;
+    if(token!==chartRequest||mode!=='select'||$('selection-screen').hidden)return;
     useChart(next);$('selected-bpm').textContent=`${next.bpm} BPM`;
     $('play-selected').disabled=false;$('play-selected').textContent='▶ PLAY';
     $('selection-status').textContent=`${next.notes.length}ノーツ / 長押しは1拍ごとに加点`;
   } catch(error) {
-    if(token!==chartRequest)return;
+    if(token!==chartRequest||mode!=='select'||$('selection-screen').hidden)return;
     $('selection-status').textContent=error.message;$('play-selected').textContent='プレイできません';$('catalog-retry').hidden=false;
   }
 }

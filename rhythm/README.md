@@ -131,3 +131,5 @@ also be checked on the player's actual output device.
 公開URLは `https://kaichi-naito.github.io/website/T4P.html`。旧 `RhythmGame.html` はクエリ・ハッシュを保持して新URLへ転送します。
 
 X投稿文とスコア画像の表示URLは `https://x.gd/T4P_game` を使用します。ゲーム本体のURLと旧URL転送は維持します。
+
+曲選択のスクロール予約はプレイ開始時に破棄します。非表示の曲選択イベントや遅れて返るMIDI読み込みは、演奏中・一時停止中・結果表示中の譜面や結果を上書きしません。
