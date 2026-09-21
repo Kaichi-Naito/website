@@ -1,0 +1,92 @@
+name: Verify published T4P Rolling assets
+on:
+  push:
+    branches:
+      - t4p-rolling-asset
+    paths:
+      - .github/workflows/t4p-public-http-qa.yml
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: t4p-rolling-asset
+          fetch-depth: 1
+      - name: Wait for final Pages deployment and verify public files
+        run: |
+          set -euo pipefail
+          BASE='https://kaichi-naito.github.io/website'
+          EXPECT_MP3='cdf8e11564b09aed3dfc1457d6950f3530ab6ffb1cbb506b62117c05bf1cd50a'
+          EXPECT_MIDI='91e1394c73a5fee70ba071236620eb5a8dc006c571a623cbe3f141c0075633e0'
+          success=0
+          for attempt in $(seq 1 48); do
+            token="1e3543ab-${attempt}-$(date +%s)"
+            page_code=$(curl -L -sS -o /tmp/T4P.html -w '%{http_code}' "$BASE/T4P.html?qa=$token")
+            catalog_code=$(curl -L -sS -o /tmp/catalog.mjs -w '%{http_code}' "$BASE/rhythm/catalog.mjs?qa=$token")
+            mp3_code=$(curl -L -sS -o /tmp/Rolling_T4P.ver.mp3 -w '%{http_code}' "$BASE/rhythm/Rolling_T4P.ver.mp3?qa=$token")
+            midi_code=$(curl -L -sS -o /tmp/Rolling_T4P_HARD.mid -w '%{http_code}' "$BASE/rhythm/charts/Rolling_T4P_HARD.mid?qa=$token")
+            old_game_code=$(curl -L -sS -o /dev/null -w '%{http_code}' "$BASE/rhythm/Rolling_Game.mp3?qa=$token")
+            old_test_code=$(curl -L -sS -o /dev/null -w '%{http_code}' "$BASE/rhythm/rolling.mp3?qa=$token")
+            mp3_sha=$(sha256sum /tmp/Rolling_T4P.ver.mp3 | cut -d' ' -f1)
+            midi_sha=$(sha256sum /tmp/Rolling_T4P_HARD.mid | cut -d' ' -f1)
+            if [ "$page_code" = 200 ] && [ "$catalog_code" = 200 ] && [ "$mp3_code" = 200 ] && [ "$midi_code" = 200 ] && [ "$old_game_code" = 404 ] && [ "$old_test_code" = 404 ] && [ "$mp3_sha" = "$EXPECT_MP3" ] && [ "$midi_sha" = "$EXPECT_MIDI" ]; then
+              success=1
+              break
+            fi
+            sleep 5
+          done
+          test "$success" = 1
+          grep -F 'rhythm/game.mjs?v=result-ranking-v29' /tmp/T4P.html
+          grep -F 'export const PLAY_DURATION_LIMIT = 30;' /tmp/catalog.mjs
+          SHEET_URL='https://docs.google.com/spreadsheets/d/1l93jSWpBLkh6tLp6wZSS_Z8YHwxMCGFK8cYgJZ8wJmw/gviz/tq?tqx=out:json&sheet=%E8%AD%9C%E9%9D%A2&range=A1:J4'
+          sheet_code=$(curl -L -sS -o /tmp/chart-sheet.txt -w '%{http_code}' "$SHEET_URL")
+          test "$sheet_code" = 200
+          grep -F 'rolling-normal' /tmp/chart-sheet.txt
+          grep -F 'rolling-hard' /tmp/chart-sheet.txt
+          grep -F 'Rolling_T4P.ver.mp3' /tmp/chart-sheet.txt
+          grep -F 'Rolling_T4P_HARD.mid' /tmp/chart-sheet.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json, datetime
+          report = {
+            'checkedAt': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'page': {'status': 200, 'containsGameVersion': True},
+            'catalog': {'status': 200, 'playDurationLimit': 30},
+            'newAudio': {
+              'status': 200,
+              'bytes': Path('/tmp/Rolling_T4P.ver.mp3').stat().st_size,
+              'sha256': hashlib.sha256(Path('/tmp/Rolling_T4P.ver.mp3').read_bytes()).hexdigest(),
+            },
+            'hardMidi': {
+              'status': 200,
+              'bytes': Path('/tmp/Rolling_T4P_HARD.mid').stat().st_size,
+              'sha256': hashlib.sha256(Path('/tmp/Rolling_T4P_HARD.mid').read_bytes()).hexdigest(),
+            },
+            'oldAudio': {
+              'Rolling_Game.mp3': 404,
+              'rolling.mp3': 404,
+            },
+            'sheet': {
+              'status': 200,
+              'rollingNormal': True,
+              'rollingHard': True,
+              'newAudioPath': True,
+              'hardMidiPath': True,
+            },
+            'interactiveGameplayChecked': False,
+            'scoreRegistered': False,
+          }
+          Path('.t4p/public-http-qa.json').parent.mkdir(exist_ok=True)
+          Path('.t4p/public-http-qa.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+          PY
+      - name: Commit QA report to temporary branch
+        run: |
+          rm .github/workflows/t4p-public-http-qa.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "Record published T4P Rolling asset verification"
+          git push origin HEAD:t4p-rolling-asset
