@@ -16,6 +16,9 @@
 @media(max-width:700px){.selection-heading .t4p-logo{width:115px;max-height:84px}.selection-heading{margin-bottom:12px}}
 
 /* Results need the viewport, not the small gameplay stage, on every device. */
+/* Let the fullscreen result escape the stage's stacking context so the compact
+   song header, ranking headings and desktop taskbar cannot cover it. */
+.stage:has(> .overlay.is-results:not([hidden])){isolation:auto}
 .overlay.is-results{position:fixed;inset:0;z-index:50002;padding:16px 12px;background:#080d1cda;overflow:hidden}
 .overlay.is-results .overlay-card{width:min(540px,100%);max-width:540px;max-height:calc(100svh - 32px);max-height:calc(100dvh - 32px);overscroll-behavior:contain;scrollbar-width:auto}
 .overlay.is-results .result-brand{float:right;width:64px;margin:0 0 4px 8px}
