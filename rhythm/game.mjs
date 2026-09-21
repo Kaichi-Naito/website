@@ -1,9 +1,9 @@
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
-import { ResultShare } from './result-share.mjs?v=copy-feedback-v23';
+import { ResultShare } from './result-share.mjs?v=top-ten-v24';
 import { loadCatalog } from './catalog.mjs?v=test30-fix-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
-import { Leaderboard } from './leaderboard.mjs?v=compact-result-v20';
+import { Leaderboard } from './leaderboard.mjs?v=top-ten-v24';
 import { approachSeconds, tapLevel, readSettings } from './settings.mjs?v=song-select-v1';
 const $ = id => document.getElementById(id);
 const ui = Object.fromEntries(['canvas','stage','score','accuracy','accuracy-meter','accuracy-fill','combo','judgment','countdown','overlay','overlay-title','overlay-eyebrow','overlay-description','overlay-foot','start','restart','pause','result','status','progress','elapsed','settings','best-score'].map(id => [id, $(id)]));
@@ -43,10 +43,10 @@ const leaderboard = new Leaderboard({
     notice.hidden=state==='clear'; notice.dataset.state=state;
     notice.textContent={
       checking:'ランキングを確認しています…',
-      eligible:`👑登録すると現在${position}位！名前を登録してランクインしよう。`,
+      eligible:`👑${position}位にランクイン！`,
       submitting:'ランキングに登録しています…',
       verifying:'登録完了。順位を確認しています…',
-      ranked:`👑${position}位にランクイン！！`,
+      ranked:`👑${position}位にランクイン！`,
       kept:position ? `自己ベストは現在${position}位。今回は記録の更新がありません。` : '前回の自己ベストを保持しました。',
       unranked:'今回はランキング圏外です。',
       unconfirmed:'登録済み・順位の反映待ちです。順位付きで投稿するには「ランキングを更新」を押してください。',

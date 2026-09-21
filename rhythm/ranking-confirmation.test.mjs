@@ -49,11 +49,11 @@ test('projected positions respect score, accuracy, combo and existing ties', asy
   assert.equal(projectedRank(entries,row(200,91,1)),3);
   assert.equal(projectedRank(entries,row(200,90,24)),4);
   assert.equal(projectedRank([],row(0)),1);
-  const full=Array.from({length:20},(_,i)=>({...row(100-i),playerKey:String(i)}));
-  assert.equal(projectedRank(full,row(80)),null);
-  assert.equal(projectedRank(full,row(81)),null);
-  assert.equal(projectedRank(full,row(81,91)),20);
-  assert.equal(projectedRank(full,row(82),'19'),20);
+  const full=Array.from({length:10},(_,i)=>({...row(100-i),playerKey:String(i)}));
+  assert.equal(projectedRank(full,row(90)),null);
+  assert.equal(projectedRank(full,row(91)),null);
+  assert.equal(projectedRank(full,row(91,91)),10);
+  assert.equal(projectedRank(full,row(92),'9'),10);
 });
 
 test('eligible result sends its numeric position without claiming registration',async()=>{

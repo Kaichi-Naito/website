@@ -4,7 +4,7 @@ const RANKING_SPREADSHEET_ID = '1l93jSWpBLkh6tLp6wZSS_Z8YHwxMCGFK8cYgJZ8wJmw';
 const RANKING_ORIGIN = 'https://kaichi-naito.github.io';
 const RANKING_RULESET = 'beat-hold-v4';
 const CATALOG_CACHE_SECONDS = 300;
-const MAX_RANKING_ENTRIES = 20;
+const MAX_RANKING_ENTRIES = 10;
 
 function validateScore_(input) {
   if(!input || typeof input.song!=='string' || !input.song.trim() || input.song.length>150 || !/^[A-Za-z0-9_-]{1,80}$/.test(input.songId) || input.ruleset!==RANKING_RULESET)throw new Error('対象外の曲または判定ルールです。');

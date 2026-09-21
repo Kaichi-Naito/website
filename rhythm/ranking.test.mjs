@@ -75,11 +75,11 @@ test('same names on different players and separate difficulties do not merge',()
   f.state.saveScore_({...valid,songId:'rolling-hard',difficulty:'HARD',chartKey:'b'.repeat(64),playId:uuid(21)});
   assert.equal(f.rows.length,4);assert.notEqual(f.rows[1][15],f.rows[2][15]);assert.notEqual(f.rows[1][15],f.rows[3][15]);
 });
-test('full top 20 updates the player in place without ejecting another player',()=>{
-  const f=fixture();for(let i=1;i<=20;i++)f.state.saveScore_({...valid,playerId:uuid(i),playId:uuid(100+i)});
-  assert.equal(f.state.saveScore_(better).updatedPersonalBest,true);assert.equal(f.rows.length,21);
-  const lost=f.state.saveScore_({...valid,playerId:uuid(21),playId:uuid(200)});assert.equal(lost.qualified,false);assert.equal(f.rows.length,21);
-  assert.equal(f.state.saveScore_({...better,playerId:uuid(21),playId:uuid(201)}).replaced,true);assert.equal(f.rows.length,21);
+test('full top 10 updates the player in place without ejecting another player',()=>{
+  const f=fixture();for(let i=1;i<=10;i++)f.state.saveScore_({...valid,playerId:uuid(i),playId:uuid(100+i)});
+  assert.equal(f.state.saveScore_(better).updatedPersonalBest,true);assert.equal(f.rows.length,11);
+  const lost=f.state.saveScore_({...valid,playerId:uuid(11),playId:uuid(200)});assert.equal(lost.qualified,false);assert.equal(f.rows.length,11);
+  assert.equal(f.state.saveScore_({...better,playerId:uuid(11),playId:uuid(201)}).replaced,true);assert.equal(f.rows.length,11);
 });
 test('legacy scores without identity are preserved, while known duplicate identities keep only the best',()=>{
   const f=fixture();f.state.saveScore_(valid);const low=[...f.rows[1]];low[8]=uuid(30);f.rows.push(low);

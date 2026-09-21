@@ -10,13 +10,13 @@ export function resultSnapshot(chart, result) {
     difficulty: String(chart.difficulty || ''), score: result.score,
     accuracy: result.accuracy, maxCombo: result.maxCombo,
     emptyPresses: result.emptyPresses, rank: result.rank,
-    rankingPosition: Number.isInteger(result.rankingPosition) && result.rankingPosition >= 1 && result.rankingPosition <= 20 ? result.rankingPosition : null,
+    rankingPosition: Number.isInteger(result.rankingPosition) && result.rankingPosition >= 1 && result.rankingPosition <= 10 ? result.rankingPosition : null,
     counts: Object.freeze({...result.counts})
   });
 }
 export function shareText(result) {
   const medal = {S:'💎', A:'🥇', B:'🥈', C:'🥉', D:'🌱'}[result.rank] || '';
-  const ranking = Number.isInteger(result.rankingPosition) && result.rankingPosition >= 1 && result.rankingPosition <= 20 ? `\n👑${result.rankingPosition}位にランクイン！！` : '';
+  const ranking = Number.isInteger(result.rankingPosition) && result.rankingPosition >= 1 && result.rankingPosition <= 10 ? `\n👑${result.rankingPosition}位にランクイン！！` : '';
   return `(結果画像を添付してポストしてね)\n#T4P で ♬ ${result.title} / ${result.artist} をプレイしたよ！！🎮\n\n🎧${result.difficulty}\n${medal}RANK ${result.rank}${medal}\nスコア ${number(result.score)}点${ranking}\n\n${APP_URL}`;
 }
 export function xIntent(result) {
@@ -219,7 +219,7 @@ export class ResultShare {
   }
   setRanking(position) {
     if (!this.snapshot) return;
-    const rankingPosition = Number.isInteger(position) && position >= 1 && position <= 20 ? position : null;
+    const rankingPosition = Number.isInteger(position) && position >= 1 && position <= 10 ? position : null;
     this.snapshot = Object.freeze({...this.snapshot, rankingPosition});
     if (this.link) this.link.href = xDestination(this.snapshot);
     if (this.fallback) this.fallback.href = xIntent(this.snapshot);

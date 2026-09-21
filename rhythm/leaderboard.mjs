@@ -1,6 +1,6 @@
 import { readSheet } from './sheets.mjs?v=song-select-v1';
 export const RULESET = 'beat-hold-v4';
-const MAX_RANKING_ENTRIES=20;
+const MAX_RANKING_ENTRIES=10;
 export function registeredRank(entries, playId) {
   if (!playId) return null;
   const index = entries.findIndex(entry => entry.playId === playId);
@@ -202,11 +202,11 @@ export class Leaderboard {
       this.onRanked(position);
       if (position) {
         this.onRankingState('ranked', position);
-        $('score-message').textContent = `👑${position}位にランクイン！！`;
+        $('score-message').textContent = `👑${position}位にランクイン！`;
       }
     }
     const any=this.entries.length>0;
-    $('ranking-status').textContent=any?'自己ベスト順 / 上位20人':'この譜面の登録はまだありません。';
+    $('ranking-status').textContent=any?'自己ベスト順 / 上位10人':'この譜面の登録はまだありません。';
   }
   qualifies(stats) {
     if(this.entries.length<MAX_RANKING_ENTRIES)return true;
@@ -249,7 +249,7 @@ export class Leaderboard {
       this.result=null;
       const cutoff=this.entries[MAX_RANKING_ENTRIES-1];
       $('score-message').hidden=false;
-      $('score-message').textContent=`ランキング20位圏外でした。現在の20位は ${cutoff.score.toLocaleString()} 点です。`;
+      $('score-message').textContent=`ランキング10位圏外でした。現在の10位は ${cutoff.score.toLocaleString()} 点です。`;
       return;
     }
 
@@ -284,7 +284,7 @@ export class Leaderboard {
       } else if(response.registration?.qualified===false) {
         this.onRankingState('unranked');
         $('score-message').hidden=false;
-        $('score-message').textContent='直前にランキングが更新されたため20位圏外となり、登録されませんでした。';
+        $('score-message').textContent='直前にランキングが更新されたため10位圏外となり、登録されませんでした。';
       } else {
         this.registeredPlayId = result.playId;
         this.onRankingState('verifying');
