@@ -17,7 +17,7 @@ export function resultSnapshot(chart, result) {
 export function shareText(result) {
   const medal = {S:'💎', A:'🥇', B:'🥈', C:'🥉', D:'🌱'}[result.rank] || '';
   const ranking = Number.isInteger(result.rankingPosition) && result.rankingPosition >= 1 && result.rankingPosition <= 20 ? `\n👑${result.rankingPosition}位にランクイン！！` : '';
-  return `#T4P で ♬ ${result.title} / ${result.artist} をプレイしたよ！！🎮\n\n🎧${result.difficulty}\n${medal}RANK ${result.rank}${medal}\nスコア ${number(result.score)}点${ranking}\n\n${APP_URL}`;
+  return `(結果画像を添付してポストしてね)\n#T4P で ♬ ${result.title} / ${result.artist} をプレイしたよ！！🎮\n\n🎧${result.difficulty}\n${medal}RANK ${result.rank}${medal}\nスコア ${number(result.score)}点${ranking}\n\n${APP_URL}`;
 }
 export function xIntent(result) {
   const url = new URL('https://x.com/intent/tweet');
@@ -115,9 +115,12 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
     ['GOOD', result.counts.GOOD, '#80e5b0'], ['MISS', result.counts.MISS + (result.emptyPresses || 0), '#ff6f8a']
   ];
   stats.forEach(([label, value, color], i) => {
-    const x = 64 + (i % 2) * 550, y = base + 192 + Math.floor(i / 2) * 54;
-    text(label, x, y, 25, color); text(number(value), x + 320, y, 28);
+    const x = 193.5 + i * 271;
+    ctx.textAlign = 'center';
+    text(label, x, base + 194, 36, color);
+    text(number(value), x, base + 252, 48);
   });
+  ctx.textAlign = 'left';
   text('#T4P', 64, canvas.height - 100, 34, '#ff008e');
   text(APP_URL, 64, canvas.height - 54, 25, '#b5c4d8');
   return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('PNG unavailable')), 'image/png'));
