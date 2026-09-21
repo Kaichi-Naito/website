@@ -1,0 +1,76 @@
+name: T4P Rolling asset probe
+on:
+  push:
+    branches:
+      - t4p-rolling-asset
+    paths:
+      - .github/workflows/t4p-asset-probe.yml
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Probe existing audio
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json
+          old = Path('rhythm/Rolling_Game.mp3').read_bytes()
+          manifest = json.loads(Path('.t4p/rolling-new-anchors.json').read_text())
+          matches = []
+          for item in manifest['anchors']:
+              needle = bytes.fromhex(item['hex'])
+              positions = []
+              start = 0
+              while True:
+                  pos = old.find(needle, start)
+                  if pos < 0:
+                      break
+                  positions.append(pos)
+                  start = pos + 1
+              matches.append({'new_offset': item['new_offset'], 'positions': positions[:20], 'count': len(positions)})
+          unique = [m for m in matches if m['count'] == 1]
+          deltas = {}
+          for m in unique:
+              delta = m['positions'][0] - m['new_offset']
+              deltas[str(delta)] = deltas.get(str(delta), 0) + 1
+          candidates = []
+          starts = {0, max(0, len(old)-manifest['size'])}
+          starts.update(int(k) for k,v in deltas.items() if v >= 2 and 0 <= int(k) <= len(old)-manifest['size'])
+          reconstructed = False
+          for start in sorted(starts):
+              blob = old[start:start+manifest['size']]
+              digest = hashlib.sha256(blob).hexdigest()
+              candidates.append({'start': start, 'sha256': digest})
+              if digest == manifest['sha256']:
+                  out = Path('rhythm/Rolling_T4P.ver.mp3')
+                  out.write_bytes(blob)
+                  reconstructed = True
+                  break
+          report = {
+              'old_size': len(old),
+              'target_size': manifest['size'],
+              'target_sha256': manifest['sha256'],
+              'anchor_count': len(matches),
+              'anchors_found': sum(1 for m in matches if m['count']),
+              'anchors_unique': len(unique),
+              'delta_counts': sorted(({'delta':int(k),'count':v} for k,v in deltas.items()), key=lambda x:-x['count'])[:20],
+              'candidates': candidates,
+              'reconstructed': reconstructed,
+              'matches': matches,
+          }
+          Path('.t4p/rolling-probe-report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2))
+          Path('.github/workflows/t4p-asset-probe.yml').unlink()
+          Path('.t4p/rolling-new-anchors.json').unlink()
+          PY
+      - name: Commit probe result
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "Record Rolling asset probe result"
+          git push
