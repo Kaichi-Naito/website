@@ -66,7 +66,7 @@ line; misses produce a red cross. Reduced-motion mode omits moving particles.
 
 Rolling uses two public chart files:
 
-- NORMAL: **`rhythm/Rolling/Rolling_Game.mid`**
+- NORMAL: **`rhythm/Rolling/Rolling_T4P_NORMAL.mid`**
 - HARD: **`rhythm/Rolling/Rolling_T4P_HARD.mid`**
 
 Upload/replace the appropriate file on `main`, wait for GitHub Pages deployment, then reload the page.

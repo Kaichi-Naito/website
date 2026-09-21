@@ -4,7 +4,7 @@
 
 - リポジトリ：`Kaichi-Naito/website`
 - フォルダー：`rhythm/Rolling/`
-- NORMAL：**`rhythm/Rolling/Rolling_Game.mid`**
+- NORMAL：**`rhythm/Rolling/Rolling_T4P_NORMAL.mid`**
 - HARD：**`rhythm/Rolling/Rolling_T4P_HARD.mid`**
 
 このフォルダーに各MIDIを追加すると、公開中の譜面設定に従ってゲームが起動・選曲時に自動で読み込みます。
@@ -12,7 +12,7 @@
 
 ## 譜面を作り直して試す場合
 
-1. REAPERでMIDIを編集し、NORMALは `Rolling_Game.mid`、HARDは `Rolling_T4P_HARD.mid` として書き出します。
+1. REAPERでMIDIを編集し、NORMALは `Rolling_T4P_NORMAL.mid`、HARDは `Rolling_T4P_HARD.mid` として書き出します。
 2. GitHubでこのフォルダーの同名ファイルを上書きし、`main` に保存します。
 3. GitHub Pagesの公開処理が完了したら、ゲームのページを再読み込みします。
 

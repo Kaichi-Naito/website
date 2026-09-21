@@ -45,7 +45,7 @@
 | --- | --- | --- |
 | A | 曲名 | Rolling |
 | B | 難易度 | NORMAL |
-| C | 譜面 | rhythm/Rolling/Rolling_Game.mid |
+| C | 譜面 | rhythm/Rolling/Rolling_T4P_NORMAL.mid |
 | D | 音源 | rhythm/Rolling/Rolling_T4P.ver.mp3 |
 | E | アーティスト | PHALUX |
 | F | ジャケット | images/CDjacket/Rolling500x500.png |
