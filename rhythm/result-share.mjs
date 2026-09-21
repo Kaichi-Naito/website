@@ -107,7 +107,7 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
   const base = headingBottom;
   ctx.fillStyle = '#202b40dc'; ctx.fillRect(58, base, 1084, 136);
   text('SCORE', 84, base + 42, 26, '#a5b5cc');
-  text(number(result.score), 84, base + 111, 68);
+  text(number(result.score), 84, base + 118, 88);
   text(`${result.accuracy.toFixed(2)}%`, 782, base + 71, 48, '#00c6e7');
   text(`MAX COMBO  ${number(result.maxCombo)}`, 780, base + 110, 23, '#b5c4d8');
   const stats = [
@@ -196,7 +196,7 @@ export class ResultShare {
       actions.append(save, copy);
       const preview = document.createElement('div'); preview.className = 'share-preview';
       const image = document.createElement('img'); image.src = this.imageURL;
-      image.alt = `${snapshot.title} / ${snapshot.artist}：${number(snapshot.score)}点、RANK ${snapshot.rank}`;
+      image.alt = `${snapshot.title} / ${snapshot.artist}、${snapshot.difficulty}：${number(snapshot.score)}点、RANK ${snapshot.rank}`;
       preview.append(image);
       const previewRoot = this.previewRoot || this.root;
       previewRoot.append(preview); previewRoot.hidden = false;

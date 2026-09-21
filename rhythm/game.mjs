@@ -1,5 +1,5 @@
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
-import { ResultShare } from './result-share.mjs?v=result-footer-v21';
+import { ResultShare } from './result-share.mjs?v=score-focus-v22';
 import { loadCatalog } from './catalog.mjs?v=test30-fix-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
@@ -273,7 +273,7 @@ function showResults() {
   const allPerfect = fullCombo && engine.counts.PERFECT === engine.units;
   const rank = engine.accuracy >= 97 ? 'S' : engine.accuracy >= 90 ? 'A' : engine.accuracy >= 80 ? 'B' : engine.accuracy >= 65 ? 'C' : 'D';
   showOverlay(allPerfect ? 'ALL PERFECT' : fullCombo ? 'FULL COMBO' : 'SONG COMPLETE', `RANK ${rank}`, engine.score > best ? 'NEW PERSONAL BEST!' : '最後までプレイしてくれてありがとう！！！', 'もう一度プレイ');
-  ui.result.hidden = false;
+  ui.result.hidden = true;
   ui.result.replaceChildren();
   const brand = document.createElement('img'); brand.src=chart.jacket; brand.alt=`${chart.title} ジャケット`; brand.className='result-jacket';
   const song = document.createElement('p'); song.className='result-song'; song.textContent=chart.title;
