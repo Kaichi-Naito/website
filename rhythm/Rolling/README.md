@@ -3,9 +3,9 @@
 ## 保存先とファイル名
 
 - リポジトリ：`Kaichi-Naito/website`
-- フォルダー：`rhythm/charts/`
-- NORMAL：**`rhythm/charts/Rolling_Game.mid`**
-- HARD：**`rhythm/charts/Rolling_T4P_HARD.mid`**
+- フォルダー：`rhythm/Rolling/`
+- NORMAL：**`rhythm/Rolling/Rolling_Game.mid`**
+- HARD：**`rhythm/Rolling/Rolling_T4P_HARD.mid`**
 
 このフォルダーに各MIDIを追加すると、公開中の譜面設定に従ってゲームが起動・選曲時に自動で読み込みます。
 読み込みに失敗するとエラーと再試行ボタンが表示されます。

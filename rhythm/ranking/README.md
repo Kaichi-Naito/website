@@ -45,8 +45,8 @@
 | --- | --- | --- |
 | A | 曲名 | Rolling |
 | B | 難易度 | NORMAL |
-| C | 譜面 | rhythm/charts/Rolling_Game.mid |
-| D | 音源 | rhythm/Rolling_T4P.ver.mp3 |
+| C | 譜面 | rhythm/Rolling/Rolling_Game.mid |
+| D | 音源 | rhythm/Rolling/Rolling_T4P.ver.mp3 |
 | E | アーティスト | PHALUX |
 | F | ジャケット | images/CDjacket/Rolling500x500.png |
 | G | BPM | 162（MIDIに初期テンポ指定がない場合に使用） |
@@ -55,7 +55,7 @@
 | J | 公開 | チェックを入れると曲選択に表示 |
 
 パスはリポジトリ内の位置です。先頭に `website/` が付いた下書きの形式も対応します。
-同じ曲の別難易度を追加する場合は、新しい行に別の譜面ID・難易度・MIDIを指定します。RollingのHARDは `rhythm/charts/Rolling_T4P_HARD.mid` を使用します。
+同じ曲の別難易度を追加する場合は、新しい行に別の譜面ID・難易度・MIDIを指定します。RollingのHARDは `rhythm/Rolling/Rolling_T4P_HARD.mid` を使用します。
 音源・ジャケットは同じファイルを使えます。シートの変更後はゲームページを再読み込みします。
 ファイル自体を差し替えた場合はGitHub Pagesの公開完了後に再読み込みしてください。
 

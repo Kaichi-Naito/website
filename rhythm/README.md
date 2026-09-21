@@ -8,10 +8,10 @@ audio fetching are not supported by opening the HTML as a `file://` URL.
 
 ## Test song and chart
 
-- Source: user-uploaded `rhythm/Rolling_T4P.ver.mp3`, PHALUX.
+- Source: user-uploaded `rhythm/Rolling/Rolling_T4P.ver.mp3`, PHALUX.
 - Scope: the catalog keeps each song's source duration, while `catalog.mjs` currently limits gameplay to the first **30 seconds**. Playback stops at that test boundary even for a longer MP3.
 - The original ranking spreadsheet’s `譜面` tab contains the song catalog.
-  `rolling-chart.json` retains test metadata; it is not fetched by the game.
+  `Rolling/rolling-chart.json` retains test metadata; it is not fetched by the game.
 - MIDI is parsed on every page load with cache bypass. Notes after 30 seconds
   are excluded and crossing holds are shortened. A load error offers retry;
   there is no fallback to an outdated generated chart.
@@ -66,12 +66,12 @@ line; misses produce a red cross. Reduced-motion mode omits moving particles.
 
 Rolling uses two public chart files:
 
-- NORMAL: **`rhythm/charts/Rolling_Game.mid`**
-- HARD: **`rhythm/charts/Rolling_T4P_HARD.mid`**
+- NORMAL: **`rhythm/Rolling/Rolling_Game.mid`**
+- HARD: **`rhythm/Rolling/Rolling_T4P_HARD.mid`**
 
 Upload/replace the appropriate file on `main`, wait for GitHub Pages deployment, then reload the page.
 MIDI filenames, diagnostics, file import, and manual MIDI reload controls are absent
-from the game UI. See `charts/README.md` for the REAPER/update workflow.
+from the game UI. See `Rolling/README.md` for the REAPER/update workflow.
 
 - MIDI note numbers **75, 74, 73, 72** map to **Q, W, E, R** respectively.
   These are D♯/D/C♯/C, one octave above middle C. Octave labels vary by DAW settings;

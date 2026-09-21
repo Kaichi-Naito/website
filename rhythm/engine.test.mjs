@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {RhythmEngine} from './engine.mjs';
 import {midiToChart} from './midi.mjs';
-const base=JSON.parse(readFileSync(new URL('./rolling-chart.json',import.meta.url)));
-const chart=midiToChart(readFileSync(new URL('./charts/Rolling_Game.mid',import.meta.url)),base);
+const base=JSON.parse(readFileSync(new URL('./Rolling/rolling-chart.json',import.meta.url)));
+const chart=midiToChart(readFileSync(new URL('./Rolling/Rolling_Game.mid',import.meta.url)),base);
 const hold=()=>new RhythmEngine({duration:6,bpm:60,notes:[{t:1,end:5,lane:0}]});
 test('the actual two-minute MIDI has playable lanes, tempo-aware ticks, and notes after one minute',()=>{
   assert.equal(chart.duration,120);assert(chart.notes.some(n=>n.t>60));
