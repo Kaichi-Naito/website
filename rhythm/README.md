@@ -49,8 +49,8 @@ audio fetching are not supported by opening the HTML as a `file://` URL.
 ## Song selection and settings
 
 The initial screen has a vertical scroll-snap song wheel, jacket, artist, title,
-and difficulty. The catalog has one row per song/difficulty. Arrow keys,
-buttons, wheel scrolling, and touch swipes select an entry. Only checked public
+and difficulty. The catalog has one row per song/difficulty; the song wheel groups rows by title and artist. Each card has difficulty buttons (for example NORMAL ▶ and HARD ▶) that load and immediately play that chart. Arrow keys,
+buttons, wheel scrolling, and touch swipes select a song. Only checked public
 rows are displayed. Invalid public rows fail visibly; no stale generated chart
 is substituted. All catalog fields are rendered as text and asset URLs are
 restricted to this homepage. Switching songs cancels stale MIDI responses and

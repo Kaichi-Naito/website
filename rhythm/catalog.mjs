@@ -27,3 +27,19 @@ export function parseCatalog(rows) {
   return songs;
 }
 export async function loadCatalog(){return parseCatalog(await readSheet('譜面','A1:J1000'));}
+
+// A catalog row is a chart; the selection wheel shows one card per song/artist.
+export function groupSongs(charts) {
+  const groups=new Map();
+  for(const chart of charts){
+    const key=JSON.stringify([chart.title,chart.artist]);
+    if(!groups.has(key))groups.set(key,{title:chart.title,artist:chart.artist,jacket:chart.jacket,charts:[]});
+    groups.get(key).charts.push(chart);
+  }
+  const order=['EASY','NORMAL','HARD','EXPERT','MASTER'];
+  for(const group of groups.values())group.charts.sort((a,b)=>{
+    const rank=d=>{const i=order.indexOf(d.toUpperCase());return i<0?order.length:i;};
+    return rank(a.difficulty)-rank(b.difficulty);
+  });
+  return [...groups.values()];
+}

@@ -63,7 +63,7 @@
     .rhythm-start-item img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
     @media(max-width:700px){.song-wheel{height:300px;padding:108px 10px}.song-option{height:84px;padding:5px 8px;margin-bottom:6px}.song-play-button{min-width:60px;height:32px;padding:3px 6px;font-size:10px}.settings-gear{font-size:23px}#rhythm-taskbar{height:28px}#rhythm-start-btn,#rhythm-task{height:22px}#rhythm-start-btn img{height:16px}#rhythm-task{width:120px;font-size:10px}#rhythm-tray{height:22px;padding:0 5px}#rhythm-tray img{width:25px;height:25px}#rhythm-clock{font-size:11px;min-width:36px}#rhythm-start-menu{bottom:30px}}
   </style>
-  <link rel="stylesheet" href="rhythm/brand-share.css?v=developer-v30">
+  <link rel="stylesheet" href="rhythm/brand-share.css?v=song-difficulty-v33">
 </head>
 <body>
   <header class="desktop-header"><a href="index.html">← Kaichi Guitar Music</a><span>GAMES / 001</span></header>
@@ -334,7 +334,7 @@
       <p id="result-transition-hint">まもなく結果を表示します</p>
     </div>
   </div>
-  <script type="module" src="rhythm/game.mjs?v=soft-rainbow-v32"></script>
+  <script type="module" src="rhythm/game.mjs?v=song-difficulty-v33"></script>
   <dialog id="settings-dialog" aria-labelledby="settings-title">
     <form method="dialog" class="dialog-heading"><h2 id="settings-title">プレイ設定</h2><button aria-label="設定を閉じる" class="icon-button">×</button></form>
         <fieldset id="settings"><legend>PLAY SETTINGS</legend>
@@ -401,53 +401,7 @@
       };
       new MutationObserver(cleanSelectionStatus).observe(selectionStatus,{childList:true,subtree:true,characterData:true});
       cleanSelectionStatus();
-      const syncSongPlayButtons = () => {
-        wheel.querySelectorAll('.song-option').forEach(item => {
-          const button = item.querySelector('.song-play-button');
-          if (!button) return;
-          const selected = item.getAttribute('aria-selected') === 'true';
-          const disabled = selected ? playSelected.disabled : false;
-          const text = selected && playSelected.disabled ? (playSelected.textContent.includes('できません') ? '×' : '…') : '▶ PLAY';
-          if (button.disabled !== disabled) button.disabled = disabled;
-          if (button.textContent !== text) button.textContent = text;
-        });
-      };
-      const startSongFromCard = item => {
-        if (item.getAttribute('aria-selected') !== 'true') item.click();
-        const attempt = () => {
-          if (item.getAttribute('aria-selected') !== 'true') { cleanup(); return; }
-          if (!playSelected.disabled) { cleanup(); playSelected.click(); return; }
-          if (playSelected.textContent.includes('できません')) cleanup();
-        };
-        const observer = new MutationObserver(attempt);
-        const cleanup = () => { observer.disconnect(); clearTimeout(timer); };
-        observer.observe(playSelected,{attributes:true,childList:true,subtree:true});
-        observer.observe(item,{attributes:true,attributeFilter:['aria-selected']});
-        const timer = setTimeout(cleanup,15000);
-        attempt();
-      };
-      const decorateSongOptions = () => {
-        wheel.querySelectorAll('.song-option').forEach(item => {
-          if (item.querySelector('.song-play-button')) return;
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'song-play-button';
-          button.textContent = '▶ PLAY';
-          button.setAttribute('aria-label','この曲をプレイ');
-          button.addEventListener('click', event => {
-            event.preventDefault();
-            event.stopPropagation();
-            playSelectionSound();
-            startSongFromCard(item);
-          });
-          item.append(button);
-        });
-        syncSongPlayButtons();
-      };
-      const songObserver = new MutationObserver(() => { decorateSongOptions(); syncSongPlayButtons(); });
-      songObserver.observe(wheel,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-selected']});
-      songObserver.observe(playSelected,{attributes:true,childList:true,subtree:true});
-      decorateSongOptions();
+      wheel.addEventListener('song-play',playSelectionSound);
 
       const startButton = document.getElementById('rhythm-start-btn');
       const startMenu = document.getElementById('rhythm-start-menu');

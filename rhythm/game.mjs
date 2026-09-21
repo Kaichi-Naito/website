@@ -1,7 +1,7 @@
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
 import { PlaybackClock } from './playback-clock.mjs?v=clock-fix-v26';
 import { ResultShare } from './result-share.mjs?v=result-ranking-v29';
-import { loadCatalog } from './catalog.mjs?v=full-length-v1';
+import { loadCatalog, groupSongs } from './catalog.mjs?v=grouped-songs-v2';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
 import { Leaderboard } from './leaderboard.mjs?v=result-ranking-v29';
@@ -14,7 +14,7 @@ const colors = ['#7deaff','#7deaff','#ff8dda','#ff8dda'];
 const keyCodes = ['KeyQ','KeyW','KeyE','KeyR'];
 const judgmentColors = {PERFECT:'#ffe37a',GREAT:'#c4a2ff',GOOD:'#80e5b0',MISS:'#ff6f8a',EMPTY:'#ff6f8a'};
 const flashColors=[...colors], errors=[0,0,0,0], bursts=[];
-let songs=[], selectedIndex=-1, chartRequest=0, wheelTimer;
+let songs=[], selectedIndex=-1, selectedDifficulty=0, chartRequest=0, wheelTimer;
 let developerMode=false, logoTaps=0;
 const wheel=$('song-wheel');
 const inputSources = [new Set(), new Set(), new Set(), new Set()];
@@ -402,7 +402,7 @@ function showSelection() {
   $('selection-screen').hidden=false;$('play-workspace').hidden=true;ui.overlay.hidden=true;
   ui.pause.disabled=true;ui.settings.disabled=false;leaderboard.clearResult();
   ui.status.textContent='MUSIC SELECT';
-  $('play-selected').focus();
+  wheel.children[selectedIndex]?.querySelectorAll('.song-play-button')[selectedDifficulty]?.focus();
 }
 function useChart(next) {
   if(mode!=='select'||$('selection-screen').hidden)return;
@@ -419,11 +419,14 @@ function useChart(next) {
   $('stage-song').textContent=chart.title;$('stage-artist').textContent=chart.artist;
   bestUI();updateHud();ui.status.textContent='MUSIC SELECT';
 }
-async function selectSong(index,scroll) {
+async function selectSong(index,scroll,difficulty,autoplay=false) {
   if(!songs.length||mode!=='select'||$('selection-screen').hidden)return;
   index=Math.max(0,Math.min(songs.length-1,index));
-  if(index===selectedIndex&&chart)return;
-  selectedIndex=index;const song={...songs[index],duration:Math.min(songs[index].duration,developerMode?15:Infinity)},token=++chartRequest;
+  difficulty=difficulty??(index===selectedIndex?selectedDifficulty:0);
+  if(index===selectedIndex&&difficulty===selectedDifficulty&&chart){if(autoplay)void startGame();return;}
+  selectedIndex=index;selectedDifficulty=difficulty;
+  const entry=songs[index].charts[difficulty];
+  const song={...entry,duration:Math.min(entry.duration,developerMode?15:Infinity)},token=++chartRequest;
   preloadAudio(song.audio);
   chart=null;engine=null;mode='select';
   $('play-selected').disabled=true;$('play-selected').textContent='譜面を読み込み中…';
@@ -445,7 +448,8 @@ async function selectSong(index,scroll) {
     if(token!==chartRequest||mode!=='select'||$('selection-screen').hidden)return;
     useChart(next);$('selected-bpm').textContent=`${next.bpm} BPM`;
     $('play-selected').disabled=false;$('play-selected').textContent='▶ PLAY';
-    $('selection-status').textContent=`${next.notes.length}ノーツ / 長押しは1拍ごとに加点`;
+    $('selection-status').textContent='';
+    if(autoplay)void startGame();
   } catch(error) {
     if(token!==chartRequest||mode!=='select'||$('selection-screen').hidden)return;
     $('selection-status').textContent=error.message;$('play-selected').textContent='プレイできません';$('catalog-retry').hidden=false;
@@ -453,18 +457,34 @@ async function selectSong(index,scroll) {
 }
 async function loadSongs() {
   const token=++chartRequest;
-  selectedIndex=-1;chart=null;engine=null;mode='select';
+  selectedIndex=-1;selectedDifficulty=0;chart=null;engine=null;mode='select';
   $('play-selected').disabled=true;$('catalog-retry').hidden=true;
   $('selection-status').textContent='楽曲一覧を読み込んでいます…';
   try {
-    const next=await loadCatalog();if(token!==chartRequest)return;songs=next;wheel.replaceChildren();
+    const next=await loadCatalog();if(token!==chartRequest)return;songs=groupSongs(next);wheel.replaceChildren();
     songs.forEach((song,index)=>{
       const item=document.createElement('div');item.className='song-option';item.id=`song-option-${index}`;
       item.setAttribute('role','option');item.setAttribute('aria-selected','false');
       const img=document.createElement('img');img.src=song.jacket;img.alt='';img.loading='lazy';
-      const details=document.createElement('div'),title=document.createElement('strong'),artist=document.createElement('small'),level=document.createElement('em');
-      title.textContent=song.title;artist.textContent=song.artist;level.textContent=song.difficulty;
-      details.append(title,artist,level);item.append(img,details);item.addEventListener('click',()=>selectSong(index,true));wheel.append(item);
+      const details=document.createElement('div'),title=document.createElement('strong'),artist=document.createElement('small');
+      title.textContent=song.title;artist.textContent=song.artist;
+      const difficulties=document.createElement('div');difficulties.className='song-difficulties';
+      song.charts.forEach((entry,difficulty)=>{
+        const button=document.createElement('button');button.type='button';button.className='song-play-button';
+        button.textContent=`${entry.difficulty} ▶`;
+        button.setAttribute('aria-label',`${song.title} ${entry.difficulty}をプレイ`);
+        button.addEventListener('click',event=>{
+          event.stopPropagation();
+          if(mode!=='select'||$('selection-screen').hidden)return;
+          // Unlock audio during the user gesture, before loading a different chart.
+          void ensureAudioContext().catch(()=>{});
+          wheel.dispatchEvent(new Event('song-play'));
+          void selectSong(index,false,difficulty,true);
+        });
+        difficulties.append(button);
+      });
+      details.append(title,artist,difficulties);item.append(img,details);
+      item.addEventListener('click',()=>selectSong(index,true));wheel.append(item);
     });
     await selectSong(0,false);
   } catch(error) {if(token===chartRequest){$('selection-status').textContent=error.message;$('catalog-retry').hidden=false;$('play-selected').textContent='プレイできません';}}

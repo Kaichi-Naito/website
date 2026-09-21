@@ -69,3 +69,9 @@ html.play-scroll-locked,html.play-scroll-locked body{overflow:hidden;overscroll-
 .developer-logo{display:block;padding:0;border:0;background:transparent;box-shadow:none;cursor:pointer;touch-action:manipulation;user-select:none}
 .developer-logo:focus-visible{outline:2px solid #7deaff;outline-offset:4px}
 #developer-indicator{color:#8b2900;font-size:11px;margin-left:8px}
+
+.song-difficulties{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.song-difficulties .song-play-button{margin:0;min-width:82px;height:32px;padding:4px 8px;font-size:11px;cursor:pointer}
+.song-difficulties .song-play-button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.song-option{height:112px}.song-wheel{padding-top:124px;padding-bottom:124px}
+@media(max-width:700px){.song-option{height:112px}.song-option img{width:58px;height:58px}.song-wheel{padding-top:94px;padding-bottom:94px}.song-difficulties{gap:5px;margin-top:6px}.song-difficulties .song-play-button{min-width:76px;font-size:10px}}

@@ -10,7 +10,7 @@ function fixture() {
   const element=()=>({hidden:false,disabled:false,textContent:'',setAttribute(){},scrollIntoView(){}});
   const $=id=>{if(!elements.has(id))elements.set(id,element());return elements.get(id);};
   const wheel={children:[0,116].map(offsetTop=>({...element(),offsetTop,offsetHeight:104})),offsetTop:0,clientHeight:280,scrollTop:0,setAttribute(){},dispatchEvent:event=>events.push(event.type),addEventListener:(name,fn)=>{handlers[name]=fn;}};
-  const context=vm.createContext({Event,$,wheel,mode:'select',developerMode:false,logoTaps:0,songs:[{title:'first',duration:125.952},{title:'second',duration:125.952}],selectedIndex:0,chart:{id:'kept'},engine:{score:123},chartRequest:0,wheelTimer:null,reduceMotion:true,preloadAudio(){},leaderboard:{clearResult(){},clearChart(){}},clockString:()=>'',midiToChart:()=>({id:'late'}),useChart:next=>{context.chart=next;context.mode='select';},fetch:()=>{fetches++;return new Promise(resolve=>responses.push(resolve));},setTimeout:fn=>{timers.set(++timerId,fn);return timerId;},clearTimeout:id=>timers.delete(id)});
+  const context=vm.createContext({Event,$,wheel,mode:'select',developerMode:false,logoTaps:0,songs:[{charts:[{title:'first',duration:125.952,catalogId:'normal'},{title:'first',duration:125.952,catalogId:'hard'}]},{charts:[{title:'second',duration:125.952}]}],selectedIndex:0,selectedDifficulty:0,chart:{id:'kept'},engine:{score:123},chartRequest:0,wheelTimer:null,reduceMotion:true,preloadAudio(){},leaderboard:{clearResult(){},clearChart(){}},clockString:()=>'',midiToChart:()=>({id:'late'}),useChart:next=>{context.chart=next;context.mode='select';},fetch:()=>{fetches++;return new Promise(resolve=>responses.push(resolve));},setTimeout:fn=>{timers.set(++timerId,fn);return timerId;},clearTimeout:id=>timers.delete(id)});
   const developer=source.slice(source.indexOf('function handleDeveloperLogo('),source.indexOf("$('song-prev').addEventListener"));
   vm.runInContext(select+'\n'+wheelHandlers+'\n'+developer,context);
   return {context,$,wheel,handlers,events,timers,responses,fetches:()=>fetches};
@@ -59,7 +59,7 @@ test('five logo taps toggle 15-second mode and five more restore full duration',
  f.context.useChart=next=>{f.context.chart=next;};
  f.responses[0]({ok:true,arrayBuffer:async()=>new ArrayBuffer(0)});
  await new Promise(resolve=>setImmediate(resolve));
- assert.equal(parsed[0].duration,15);assert.equal(f.context.songs[0].duration,125.952);
+ assert.equal(parsed[0].duration,15);assert.equal(f.context.songs[0].charts[0].duration,125.952);
  for(let i=0;i<5;i++)f.context.handleDeveloperLogo();
  assert.equal(f.context.developerMode,false);assert.equal(f.$('developer-indicator').hidden,true);
  f.responses[1]({ok:true,arrayBuffer:async()=>new ArrayBuffer(0)});
@@ -71,4 +71,24 @@ test('logo taps cannot alter active gameplay or results',()=>{
   for(let i=0;i<5;i++)f.context.handleDeveloperLogo();
   assert.equal(f.context.developerMode,false);assert.equal(f.context.chart.id,'kept');assert.equal(f.fetches(),0);
  }
+});
+
+test('difficulty button loads and starts its exact chart, not the previously selected chart',async()=>{
+ const f=fixture();let started=0;
+ f.context.startGame=()=>{started++;f.context.mode='playing';};
+ f.context.midiToChart=(_,song)=>({...song,notes:[]});
+ const pending=f.context.selectSong(0,false,1,true);
+ assert.equal(started,0);
+ f.responses[0]({ok:true,arrayBuffer:async()=>new ArrayBuffer(0)});await pending;
+ assert.equal(f.context.chart.catalogId,'hard');assert.equal(started,1);
+});
+test('rapid difficulty clicks only start the latest selected chart',async()=>{
+ const f=fixture();let started=0;
+ f.context.startGame=()=>{started++;f.context.mode='playing';};
+ f.context.midiToChart=(_,song)=>({...song,notes:[]});
+ const hard=f.context.selectSong(0,false,1,true);
+ const normal=f.context.selectSong(0,false,0,true);
+ f.responses[1]({ok:true,arrayBuffer:async()=>new ArrayBuffer(0)});await normal;
+ f.responses[0]({ok:true,arrayBuffer:async()=>new ArrayBuffer(0)});await hard;
+ assert.equal(f.context.chart.catalogId,'normal');assert.equal(started,1);
 });

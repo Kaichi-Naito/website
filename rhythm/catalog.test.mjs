@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {assetPath,parseCatalog} from './catalog.mjs';
+import {assetPath,parseCatalog,groupSongs} from './catalog.mjs';
 const row=['Rolling','NORMAL','website/rhythm/Rolling/Rolling_T4P_NORMAL.mid','website/rhythm/Rolling/Rolling_T4P.ver.mp3','PHALUX','images/CDjacket/Rolling500x500.png',162,125.952,'rolling-normal',true];
 test('sheet rows bind song details and assets; multiple difficulties have separate IDs',()=>{
   const hard=[...row];hard[1]='HARD';hard[2]='website/rhythm/Rolling/Rolling_T4P_HARD.mid';hard[8]='rolling-hard';
@@ -21,4 +21,14 @@ test('catalog preserves full song durations without modifying rows',()=>{
   assert.equal(parseCatalog([short])[0].duration,20);
   assert.equal(parseCatalog([row])[0].duration,125.952);
   assert.equal(row[7],125.952);
+});
+
+test('song cards group difficulties while preserving chart IDs and different artists',()=>{
+ const normal={title:'Rolling',artist:'PHALUX',difficulty:'NORMAL',catalogId:'normal'};
+ const hard={...normal,difficulty:'HARD',catalogId:'hard'};
+ const other={...normal,artist:'Other artist',catalogId:'other'};
+ const groups=groupSongs([hard,normal,other]);
+ assert.equal(groups.length,2);
+ assert.deepEqual(groups[0].charts.map(c=>c.catalogId),['normal','hard']);
+ assert.equal(groups[1].charts[0].catalogId,'other');
 });
