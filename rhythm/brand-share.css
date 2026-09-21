@@ -23,7 +23,7 @@
 .overlay.is-results .result-score{font-size:36px;clear:both}
 .overlay.is-results #result-share{margin:8px 0 14px;padding-top:10px}
 .overlay.is-results .overlay-foot{display:none}
-.overlay.is-results{background-image:linear-gradient(#080d1c9c,#080d1ccc),var(--result-backdrop,none);background-size:cover;background-position:center}
+.overlay.is-results{background-image:linear-gradient(#080d1c9c,#080d1ccc),url("./result-background.svg");background-size:contain;background-position:center;background-repeat:no-repeat}
 .overlay.is-results .overlay-card{background:#10182be8}
 .overlay.is-results .result-jacket{float:right;width:80px;height:80px;object-fit:cover;margin:0 0 8px 12px;border:1px solid #aebdd3}
 .overlay.is-results .result-song{font-size:24px}

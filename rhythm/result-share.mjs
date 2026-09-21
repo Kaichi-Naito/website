@@ -1,4 +1,5 @@
 export const APP_URL = 'https://x.gd/T4P_game';
+const BACKGROUND_URL = new URL('./result-background.svg', import.meta.url).href;
 const LOGO_URL = new URL('./t4p-logo.png', import.meta.url).href;
 const number = value => Number(value).toLocaleString('ja-JP');
 
@@ -74,7 +75,7 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
   canvas.width = 1200; canvas.height = headingBottom + 430;
   ctx.fillStyle = '#0e1320'; ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (gameplay?.width && gameplay?.height) {
-    const scale = Math.max(canvas.width / gameplay.width, canvas.height / gameplay.height);
+    const scale = Math.min(canvas.width / gameplay.width, canvas.height / gameplay.height);
     ctx.drawImage(gameplay, (canvas.width - gameplay.width * scale) / 2, (canvas.height - gameplay.height * scale) / 2, gameplay.width * scale, gameplay.height * scale);
     ctx.fillStyle = '#080d1c99'; ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
@@ -123,13 +124,13 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
 }
 
 export class ResultShare {
-  constructor(root) { this.root = root; this.version = 0; this.logo = loadImage(LOGO_URL); }
+  constructor(root) { this.root = root; this.version = 0; this.logo = loadImage(LOGO_URL); this.background = loadImage(BACKGROUND_URL); }
   clear() {
     ++this.version;
     if (this.imageURL) URL.revokeObjectURL(this.imageURL);
     this.imageURL = null; this.snapshot = null; this.link = null; this.fallback = null; this.root.hidden = true; this.root.replaceChildren();
   }
-  show(chart, result, gameplay = null) {
+  show(chart, result) {
     this.clear(); const version = this.version;
     const snapshot = this.snapshot = resultSnapshot(chart, result);
     this.root.hidden = false;
@@ -169,7 +170,7 @@ export class ResultShare {
         if (current()) status.textContent = 'Xの投稿画面を開きました。画像をコピーできなかったため、下の画像を右クリック・長押しで保存して添付してください。';
       }
     });
-    this.prepare(snapshot, gameplay).then(blob => {
+    this.prepare(snapshot).then(blob => {
       if (!current()) return;
       imageBlob = blob;
       this.imageURL = URL.createObjectURL(blob);
@@ -189,10 +190,10 @@ export class ResultShare {
     if (this.link) this.link.href = xDestination(this.snapshot);
     if (this.fallback) this.fallback.href = xIntent(this.snapshot);
   }
-  async prepare(result, gameplay) {
-    const [, logo, jacket] = await Promise.all([
+  async prepare(result) {
+    const [, logo, jacket, gameplay] = await Promise.all([
       Promise.race([document.fonts?.load('28px PixelMplus'), new Promise(resolve => setTimeout(resolve, 2000))]),
-      this.logo, loadImage(result.jacket)
+      this.logo, loadImage(result.jacket), this.background
     ]);
     return renderScoreImage(result, logo, jacket, gameplay);
   }
