@@ -33,3 +33,7 @@
 @media(max-height:650px){.overlay.is-results{padding:8px}.overlay.is-results .overlay-card{max-height:calc(100dvh - 16px);padding:12px}.overlay.is-results .result-brand{width:48px}.overlay.is-results #overlay-description{display:none}}
 
 .share-heading{margin:0 0 12px;color:#f3f7ff;font:15px/1.7 var(--mono)}
+#result-ranking-notice{font:14px/1.7 var(--mono);color:#d4e3f5;margin:12px 0}
+#result-ranking-notice[data-state="ranked"]{font-size:23px;color:#ffe37a;padding:12px 8px;border:2px solid #ffe37a;background:#372f1966}
+#result-ranking-notice[data-state="eligible"]{color:#ffe37a}
+.share-actions .share-x[aria-disabled="true"]{opacity:.6;cursor:wait}

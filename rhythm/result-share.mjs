@@ -126,6 +126,7 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
 export class ResultShare {
   constructor(root) { this.root = root; this.version = 0; this.logo = loadImage(LOGO_URL); this.background = loadImage(BACKGROUND_URL); }
   clear() {
+    this.rankingPending = false;
     ++this.version;
     if (this.imageURL) URL.revokeObjectURL(this.imageURL);
     this.imageURL = null; this.snapshot = null; this.link = null; this.fallback = null; this.root.hidden = true; this.root.replaceChildren();
@@ -153,6 +154,9 @@ export class ResultShare {
     const guide = '画像は自動添付されません。先に「結果画像を保存」で保存し、Xの画像ボタンから選ぶか、「結果画像をコピー」でコピーしてXの投稿欄に貼り付けてください。';
     link.addEventListener('click', event => {
       if (!current()) { event.preventDefault(); return; }
+      if (this.rankingPending) {
+        event.preventDefault(); status.textContent = 'ランキングの登録・順位確認が終わるまでお待ちください。'; return;
+      }
       if (this.fallback) this.fallback.hidden = false;
       status.textContent = `投稿文を付けて${mobile ? 'Xアプリ' : 'Xの投稿画面'}を開きます。${guide}`;
     });
@@ -199,6 +203,14 @@ export class ResultShare {
     this.snapshot = Object.freeze({...this.snapshot, rankingPosition});
     if (this.link) this.link.href = xDestination(this.snapshot);
     if (this.fallback) this.fallback.href = xIntent(this.snapshot);
+  }
+  setRankingPending(pending) {
+    this.rankingPending = pending;
+    if (this.link) {
+      this.link.setAttribute('aria-disabled', String(pending));
+      this.link.textContent = pending ? 'ランキング確認中…' : 'Xに投稿';
+    }
+    if (this.fallback && pending) this.fallback.hidden = true;
   }
   async prepare(result) {
     const [, logo, jacket, gameplay] = await Promise.all([

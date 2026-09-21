@@ -173,6 +173,19 @@ test('X opens even before PNG is ready, or after image generation fails',async()
   assert.equal(prevented,false);controller.clear();
 });
 test('shared URL uses the supplied short link',()=>assert.equal(APP_URL,'https://x.gd/T4P_game'));
+test('X cannot open an unranked draft while registration is pending, then uses the confirmed rank',async()=>{
+  const {controller}=fixture(); controller.prepare=()=>new Promise(()=>{});
+  controller.show(chart,score); controller.setRankingPending(true);
+  let prevented=false;
+  await controller.link.events.click({preventDefault(){prevented=true;}});
+  assert.equal(prevented,true); assert.equal(controller.link.textContent,'ランキング確認中…');
+  controller.setRanking(3); controller.setRankingPending(false);
+  prevented=false;
+  await controller.link.events.click({preventDefault(){prevented=true;}});
+  assert.equal(prevented,false); assert.equal(controller.link.textContent,'Xに投稿');
+  assert.match(new URL(controller.link.href).searchParams.get('text'),/👑3位にランクイン！！/);
+  controller.clear(); assert.equal(controller.rankingPending,false);
+});
 test('ranking identity is the registered play ID, not a matching name or score',async()=>{
   const {registeredRank}=await import('./leaderboard.mjs');
   const entries=[{name:'同名',score:123,playId:'other'},{name:'同名',score:123,playId:'current'}];

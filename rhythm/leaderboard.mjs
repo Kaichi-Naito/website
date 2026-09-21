@@ -97,7 +97,8 @@ function ensureSubmitProgress() {
   return panel;
 }
 export class Leaderboard {
-  constructor({onRanked = () => {}} = {}) {
+  constructor({onRanked = () => {}, onRankingState = () => {}} = {}) {
+    this.onRankingState = onRankingState;
     this.playerId = getPlayerId();
     this.onRanked = onRanked; this.registeredPlayId = null;
     this.generation=0;this.result=null;this.endpoint='';this.submitting=false;this.progressTimer=0;this.progressValue=0;this.entries=[];
@@ -107,6 +108,7 @@ export class Leaderboard {
     $('score-skip').addEventListener('click',()=>{
       if(this.submitting)return;
       this.result=null;$('score-form').hidden=true;this.resetProgress();
+      this.onRankingState('skipped');
       $('score-message').hidden=false;$('score-message').textContent='今回は登録をスキップしました。';
     });
   }
@@ -192,7 +194,10 @@ export class Leaderboard {
     if (this.registeredPlayId) {
       const position = registeredRank(this.entries, this.registeredPlayId);
       this.onRanked(position);
-      if (position) $('score-message').textContent = `ランキング${position}位に登録しました！`;
+      if (position) {
+        this.onRankingState('ranked', position);
+        $('score-message').textContent = `👑${position}位にランクイン！！`;
+      }
     }
     const any=this.entries.length>0;
     $('ranking-status').textContent=any?'自己ベスト順 / 上位20人':'この譜面の登録はまだありません。';
@@ -202,10 +207,12 @@ export class Leaderboard {
     return beatsCutoff(stats,this.entries[MAX_RANKING_ENTRIES-1]);
   }
   clearResult() {
+    this.onRankingState('clear');
     this.registeredPlayId = null;
     this.result=null;$('score-form').hidden=true;$('score-message').hidden=true;this.resetProgress();
   }
   async showResult(stats) {
+    this.onRankingState('checking');
     this.registeredPlayId = null;
     const result=this.result={...stats,playId:crypto.randomUUID(),ruleset:RULESET,song:this.chart.title,songId:this.chart.catalogId,difficulty:this.chart.difficulty,playerId:this.playerId,keyPromise:this.keyPromise};
     $('player-name').value='';$('score-form').hidden=true;this.resetProgress();
@@ -214,20 +221,24 @@ export class Leaderboard {
     const loaded=await this.refresh();
     if(this.result!==result)return;
     if(!loaded) {
+      this.onRankingState('failed');
       this.result=null;
       $('score-message').hidden=false;$('score-message').textContent='ランキングを確認できなかったため、今回は登録できませんでした。';
       return;
     }
     if (!result.playerId) {
+      this.onRankingState('failed');
       this.result=null; $('score-message').textContent='プレイヤーIDを保存できないため登録できません。ブラウザのサイトデータ保存を有効にしてください。'; return;
     }
     const ownKey = await playerKey(result.playerId, await result.keyPromise);
     if (this.result !== result) return;
     const previous = this.entries.find(entry => entry.playerKey === ownKey);
     if (previous && stats.score <= previous.score) {
+      this.onRankingState('kept', this.entries.indexOf(previous) + 1);
       this.result=null; $('score-message').textContent=`自己ベスト ${previous.score.toLocaleString()} 点を保持しました。今回のスコアは重複登録しません。`; return;
     }
     if(!this.qualifies(stats)) {
+      this.onRankingState('unranked');
       this.result=null;
       const cutoff=this.entries[MAX_RANKING_ENTRIES-1];
       $('score-message').hidden=false;
@@ -235,6 +246,7 @@ export class Leaderboard {
       return;
     }
 
+    this.onRankingState('eligible');
     $('score-form').hidden=false;$('score-message').hidden=true;
     $('score-submit').disabled=false;$('score-skip').disabled=false;
   }
@@ -243,6 +255,7 @@ export class Leaderboard {
     const result=this.result;
     try {
       const name=validName($('player-name').value);
+      this.onRankingState('submitting');
       this.submitting=true;$('score-submit').disabled=true;$('score-skip').disabled=true;
       $('score-message').hidden=false;$('score-message').textContent='ランキングに登録中…';this.startProgress();
       if(!this.endpoint) {
@@ -257,22 +270,40 @@ export class Leaderboard {
 
       this.result=null;$('score-form').hidden=true;this.finishProgress();
       if(response.registration?.personalBestKept) {
+        this.onRankingState('kept');
         this.registeredPlayId=null; this.onRanked(null);
         $('score-message').hidden=false;
         $('score-message').textContent=`自己ベスト ${Number(response.registration.score).toLocaleString()} 点を保持しました。今回のスコアは重複登録しません。`;
       } else if(response.registration?.qualified===false) {
+        this.onRankingState('unranked');
         $('score-message').hidden=false;
         $('score-message').textContent='直前にランキングが更新されたため20位圏外となり、登録されませんでした。';
       } else {
         this.registeredPlayId = result.playId;
+        this.onRankingState('verifying');
         $('score-message').hidden=false;$('score-message').textContent='ランキングに登録しました！ 順位を確認しています…';
       }
       $('ranking-status').textContent='ランキングを更新中…';
-      void this.refresh();
+      if (this.registeredPlayId) await this.confirmRegisteredRank(result.playId);
+      else await this.refresh();
     } catch(error) {
+      if(this.result===result)this.onRankingState('failed');
       if(this.result===result){this.failProgress();$('score-message').hidden=false;$('score-message').textContent=error.message;}
     } finally {
       this.submitting=false;$('score-submit').disabled=false;$('score-skip').disabled=false;
     }
+  }
+  async confirmRegisteredRank(playId, wait = ms => new Promise(resolve => setTimeout(resolve, ms))) {
+    for (const delay of [0, 1000, 2500, 5000]) {
+      if (delay) await wait(delay);
+      if (this.registeredPlayId !== playId) return;
+      const loaded = await this.refresh();
+      if (this.registeredPlayId !== playId) return;
+      if (loaded && registeredRank(this.entries, playId)) return;
+    }
+    if (this.registeredPlayId !== playId) return;
+    this.onRankingState('unconfirmed');
+    $('score-message').hidden=false;
+    $('score-message').textContent='登録は完了しましたが、順位の反映を確認できませんでした。「ランキングを更新」で再確認できます。';
   }
 }
