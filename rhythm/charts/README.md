@@ -4,15 +4,15 @@
 
 - リポジトリ：`Kaichi-Naito/website`
 - フォルダー：`rhythm/charts/`
-- ファイル名：**`Rolling_Game.mid`**（大文字・小文字もこの通り）
-- 完全なパス：**`rhythm/charts/Rolling_Game.mid`**
+- NORMAL：**`rhythm/charts/Rolling_Game.mid`**
+- HARD：**`rhythm/charts/Rolling_T4P_HARD.mid`**
 
-このフォルダーに `Rolling_Game.mid` を追加すると、ゲームが起動時に自動で読み込みます。
+このフォルダーに各MIDIを追加すると、公開中の譜面設定に従ってゲームが起動・選曲時に自動で読み込みます。
 読み込みに失敗するとエラーと再試行ボタンが表示されます。
 
 ## 譜面を作り直して試す場合
 
-1. REAPERでMIDIを編集し、`Rolling_Game.mid` として書き出します。
+1. REAPERでMIDIを編集し、NORMALは `Rolling_Game.mid`、HARDは `Rolling_T4P_HARD.mid` として書き出します。
 2. GitHubでこのフォルダーの同名ファイルを上書きし、`main` に保存します。
 3. GitHub Pagesの公開処理が完了したら、ゲームのページを再読み込みします。
 
@@ -37,7 +37,7 @@
   1拍未満の端数は追加の1判定にはしません。MIDI内のテンポ変更も拍間隔に反映します。
 - 音源の0秒とMIDIの0秒を揃え、冒頭の休符を残します。ファイル全体の長さは音源と一致しなくても構いません。
 - Rollingは162 BPM。譜面トラックとテンポ情報を含めてStandard MIDI（Type 0または1）で書き出します。
-- プレイ時間はスプレッドシートの「譜面」タブで指定します。Rollingは現在120秒です。境界より後の音符は省略し、またぐ長押しは短縮します。
+- プレイ時間はスプレッドシートの「譜面」タブで指定しますが、現在のテスト版はゲーム側で冒頭30秒に制限しています。境界より後の音符は省略し、またぐ長押しは短縮します。
 - 同じレーンで重なる音符は作らないでください。別レーンの同時押しは対応しています。
 
 [ゲームを開く](https://kaichi-naito.github.io/website/T4P.html)

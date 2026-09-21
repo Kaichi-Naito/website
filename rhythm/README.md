@@ -8,11 +8,11 @@ audio fetching are not supported by opening the HTML as a `file://` URL.
 
 ## Test song and chart
 
-- Source: user-uploaded `rhythm/Rolling_Game.mp3`, PHALUX.
-- Scope: configured in the catalog; Rolling currently uses **120 seconds**. Playback stops at the boundary even for a longer MP3.
+- Source: user-uploaded `rhythm/Rolling_T4P.ver.mp3`, PHALUX.
+- Scope: the catalog keeps each song's source duration, while `catalog.mjs` currently limits gameplay to the first **30 seconds**. Playback stops at that test boundary even for a longer MP3.
 - The original ranking spreadsheet’s `譜面` tab contains the song catalog.
   `rolling-chart.json` retains test metadata; it is not fetched by the game.
-- MIDI is parsed on every page load with cache bypass. Notes after 120 seconds
+- MIDI is parsed on every page load with cache bypass. Notes after 30 seconds
   are excluded and crossing holds are shortened. A load error offers retry;
   there is no fallback to an outdated generated chart.
 - The MIDI tempo map is used, with 162 BPM as the fallback if no initial tempo exists.
@@ -64,8 +64,12 @@ line; misses produce a red cross. Reduced-motion mode omits moving particles.
 
 ## User MIDI charts and tap sound
 
-The public chart has one fixed location: **`rhythm/charts/Rolling_Game.mid`**.
-Upload/replace it on `main`, wait for GitHub Pages deployment, then reload the page.
+Rolling uses two public chart files:
+
+- NORMAL: **`rhythm/charts/Rolling_Game.mid`**
+- HARD: **`rhythm/charts/Rolling_T4P_HARD.mid`**
+
+Upload/replace the appropriate file on `main`, wait for GitHub Pages deployment, then reload the page.
 MIDI filenames, diagnostics, file import, and manual MIDI reload controls are absent
 from the game UI. See `charts/README.md` for the REAPER/update workflow.
 
@@ -84,7 +88,7 @@ from the game UI. See `charts/README.md` for the REAPER/update workflow.
 - Align MIDI zero with the audio zero; do not trim the leading rest. Export the
   tempo map from REAPER. Missing initial tempo uses
   Rolling's 162 BPM fallback. MIDI duration need not equal the audio duration.
-- Playback remains the first **120 seconds**. Later notes are excluded and holds
+- Playback currently remains the first **30 seconds**. Later notes are excluded and holds
   crossing the end are shortened; these adjustments are retained in parser diagnostics.
 - Imported chart scores have separate IDs derived from MIDI contents.
 - The user-supplied tap WAV is converted to mono 44.1 kHz/16-bit PCM without
@@ -96,7 +100,7 @@ Run `node --test rhythm/*.test.mjs` to include MIDI parsing and tempo-map tests.
 ## Public rankings
 
 The separate ranking window appears to the right on desktop (1000px and wider),
-and below on narrow/mobile screens. It lists the selected chart's top 20 scores.
+and below on narrow/mobile screens. It lists the selected chart's top 10 scores.
 Each completed play offers a name field and an explicit skip button. Submission
 is optional, confirmed by the server, and uses an idempotent play ID for retries.
 Chart contents are hashed with SHA-256 so different arrangements are not mixed.
@@ -109,7 +113,7 @@ See `ranking/README.md` for the one-time Google Apps Script deployment and
 perfect/miss outcomes, lane overlap, held-key repeats, chords, sustain duration,
 automatic completion, release timing independence, and pause/re-grip behavior.
 Browser checks should cover start, keyboard input, pause/resume, retry, the
-two-minute result screen, and mobile layout. Subjective audio alignment should
+30-second result screen, and mobile layout. Subjective audio alignment should
 also be checked on the player's actual output device.
 
 

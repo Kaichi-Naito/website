@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { midiToChart } from './midi.mjs';
-const base={id:'test',title:'Rolling',artist:'PHALUX',bpm:162,duration:60,audio:'rhythm/rolling.mp3'};
+const base={id:'test',title:'Rolling',artist:'PHALUX',bpm:162,duration:60,audio:'rhythm/Rolling_T4P.ver.mp3'};
 const vlq=n=>{const a=[n&127];while(n>>=7)a.unshift((n&127)|128);return a;};
 const be=(n,len)=>Array.from({length:len},(_,i)=>(n>>((len-1-i)*8))&255);
 const event=(tick,bytes)=>({tick,bytes});
