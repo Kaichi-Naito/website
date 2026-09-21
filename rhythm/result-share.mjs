@@ -132,6 +132,7 @@ export class ResultShare {
   constructor(root, previewRoot = root) { this.root = root; this.previewRoot = previewRoot; this.version = 0; this.logo = loadImage(LOGO_URL); this.background = loadImage(BACKGROUND_URL); }
   clear() {
     this.rankingPending = false; this.imagePending = false;
+    this.downloadFrame?.remove(); this.downloadFrame = null;
     if (this.previewRoot && this.previewRoot !== this.root) { this.previewRoot.hidden = true; this.previewRoot.replaceChildren(); }
     ++this.version;
     if (this.imageURL) URL.revokeObjectURL(this.imageURL);
@@ -173,7 +174,14 @@ export class ResultShare {
         const download = document.createElement('a');
         download.href = this.imageURL;
         download.download = `T4P-${snapshot.title.replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_')}-${snapshot.score}.png`;
-        download.target = '_blank'; download.rel = 'noopener noreferrer'; download.hidden = true;
+        // A dedicated frame keeps the game intact and avoids a second popup competing with X.
+        if (!this.downloadFrame) {
+          this.downloadFrame = document.createElement('iframe');
+          this.downloadFrame.name = `t4p-download-${version}`;
+          this.downloadFrame.hidden = true;
+          document.body.append(this.downloadFrame);
+        }
+        download.target = this.downloadFrame.name; download.hidden = true;
         document.body.append(download);
         try { download.click(); downloadStarted = true; }
         catch { /* The X draft remains available if the browser refuses downloading. */ }

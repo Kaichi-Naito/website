@@ -144,7 +144,8 @@ test('one X tap starts one named PNG download synchronously and keeps the result
   link.events.click({preventDefault(){assert.fail('Keep the native new-tab navigation');}});
   assert.equal(downloads.length,1);assert.equal(downloads[0].href,controller.imageURL);
   assert.ok(downloads[0].filename.endsWith('-987654.png'));assert.doesNotMatch(downloads[0].filename,/[\\/:*?"<>|]/);
-  assert.equal(downloads[0].target,'_blank');assert.equal(document.body.children.length,0);
+  assert.equal(downloads[0].target,controller.downloadFrame.name);assert.equal(controller.downloadFrame.tag,'iframe');
+  assert.equal(document.body.children.length,1);assert.equal(controller.downloadFrame.hidden,true);
   assert.equal(root.children[1].children.length,1);assert.equal(link.textContent,'Xに投稿');
   assert.equal(root.children[3].children[0].tag,'img');assert.equal(root.hidden,false);
   assert.match(root.children[2].textContent,/保存を開始/);assert.doesNotMatch(root.children[2].textContent,/保存しました/);
@@ -167,7 +168,7 @@ test('download failure never blocks the X draft or claims a completed save',asyn
   try {
     controller.link.events.click({preventDefault(){assert.fail('Text is still shareable');}});
     assert.match(root.children[2].textContent,/画像を保存できません/);
-    assert.match(root.children[2].textContent,/長押し/);assert.equal(document.body.children.length,0);
+    assert.match(root.children[2].textContent,/長押し/);assert.equal(document.body.children.length,1);
   } finally {downloadError=null;controller.clear();}
 });
 test('stale result buttons cannot download a new run or navigate',async()=>{
