@@ -1,0 +1,818 @@
+{
+  "old_size": 6508800,
+  "target_size": 5039040,
+  "target_sha256": "cdf8e11564b09aed3dfc1457d6950f3530ab6ffb1cbb506b62117c05bf1cd50a",
+  "anchor_count": 155,
+  "anchors_found": 1,
+  "anchors_unique": 0,
+  "delta_counts": [],
+  "candidates": [
+    {
+      "start": 0,
+      "sha256": "cfd36321fff549a79e84f73df173af707682aed2eb2c07071bc410d5bbf71306"
+    },
+    {
+      "start": 1469760,
+      "sha256": "f98468952a7b7a3c923e5ad5c12e8811e03148ec5abe20cff79f32c32c6bdcfb"
+    }
+  ],
+  "reconstructed": false,
+  "matches": [
+    {
+      "new_offset": 0,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 32768,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 65536,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 98304,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 131072,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 163840,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 196608,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 229376,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 262144,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 294912,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 327680,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 360448,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 393216,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 425984,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 458752,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 491520,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 524288,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 557056,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 589824,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 622592,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 655360,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 688128,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 720896,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 753664,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 786432,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 819200,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 851968,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 884736,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 917504,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 950272,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 983040,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1015808,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1048576,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1081344,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1114112,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1146880,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1179648,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1212416,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1245184,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1277952,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1310720,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1343488,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1376256,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1409024,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1441792,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1474560,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1507328,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1540096,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1572864,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1605632,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1638400,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1671168,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1703936,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1736704,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1769472,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1802240,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1835008,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1867776,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1900544,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1933312,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1966080,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 1998848,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2031616,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2064384,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2097152,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2129920,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2162688,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2195456,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2228224,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2260992,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2293760,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2326528,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2359296,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2392064,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2424832,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2457600,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2490368,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2523136,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2555904,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2588672,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2621440,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2654208,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2686976,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2719744,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2752512,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2785280,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2818048,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2850816,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2883584,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2916352,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2949120,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 2981888,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3014656,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3047424,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3080192,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3112960,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3145728,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3178496,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3211264,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3244032,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3276800,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3309568,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3342336,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3375104,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3407872,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3440640,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3473408,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3506176,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3538944,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3571712,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3604480,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3637248,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3670016,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3702784,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3735552,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3768320,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3801088,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3833856,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3866624,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3899392,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3932160,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3964928,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 3997696,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4030464,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4063232,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4096000,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4128768,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4161536,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4194304,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4227072,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4259840,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4292608,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4325376,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4358144,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4390912,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4423680,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4456448,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4489216,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4521984,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4554752,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4587520,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4620288,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4653056,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4685824,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4718592,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4751360,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4784128,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4816896,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4849664,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4882432,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4915200,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4947968,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 4980736,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 5013504,
+      "positions": [],
+      "count": 0
+    },
+    {
+      "new_offset": 5039008,
+      "positions": [
+        821,
+        822,
+        823,
+        824,
+        825,
+        826,
+        827,
+        828,
+        829,
+        830,
+        831,
+        832,
+        833,
+        834,
+        835,
+        836,
+        837,
+        838,
+        839,
+        840
+      ],
+      "count": 6573
+    }
+  ]
+}
