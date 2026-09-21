@@ -1,5 +1,5 @@
 export const APP_URL = 'https://x.gd/T4P_game';
-const BACKGROUND_URL = new URL('./result-background.svg', import.meta.url).href;
+const BACKGROUND_URL = new URL('./result-background.svg?v=scattered-notes-v14', import.meta.url).href;
 const LOGO_URL = new URL('./t4p-logo.png', import.meta.url).href;
 const number = value => Number(value).toLocaleString('ja-JP');
 
