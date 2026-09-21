@@ -63,7 +63,7 @@
     .rhythm-start-item img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
     @media(max-width:700px){.song-wheel{height:300px;padding:108px 10px}.song-option{height:84px;padding:5px 8px;margin-bottom:6px}.song-play-button{min-width:60px;height:32px;padding:3px 6px;font-size:10px}.settings-gear{font-size:23px}#rhythm-taskbar{height:28px}#rhythm-start-btn,#rhythm-task{height:22px}#rhythm-start-btn img{height:16px}#rhythm-task{width:120px;font-size:10px}#rhythm-tray{height:22px;padding:0 5px}#rhythm-tray img{width:25px;height:25px}#rhythm-clock{font-size:11px;min-width:36px}#rhythm-start-menu{bottom:30px}}
   </style>
-  <link rel="stylesheet" href="rhythm/brand-share.css?v=compact-result-v20">
+  <link rel="stylesheet" href="rhythm/brand-share.css?v=result-ranking-v29">
 </head>
 <body>
   <header class="desktop-header"><a href="index.html">← Kaichi Guitar Music</a><span>GAMES / 001</span></header>
@@ -120,6 +120,12 @@
               <button id="start" class="primary-button" disabled>譜面を読み込み中…</button>
               <button id="restart" class="secondary-button" hidden>最初からやり直す</button>
               <button id="back-to-select" class="secondary-button">曲選択に戻る</button>
+              <section id="result-ranking" aria-label="今回の結果を含むトップ10" hidden>
+                <h3>TOP 10 RANKING</h3>
+                <p id="result-ranking-status" role="status"></p>
+                <table class="ranking-table"><thead><tr><th scope="col">順位</th><th scope="col">名前</th><th scope="col">スコア</th></tr></thead><tbody id="result-ranking-rows"></tbody></table>
+                <button id="result-ranking-refresh" type="button" class="secondary-button">ランキングを更新</button>
+              </section>
               <p class="overlay-foot" id="overlay-foot">PCキーボード推奨 / ヘッドホン推奨</p>
             </div>
           </div>
@@ -329,7 +335,7 @@
       <p id="result-transition-hint">まもなく結果を表示します</p>
     </div>
   </div>
-  <script type="module" src="rhythm/game.mjs?v=auto-save-v28"></script>
+  <script type="module" src="rhythm/game.mjs?v=result-ranking-v29"></script>
   <dialog id="settings-dialog" aria-labelledby="settings-title">
     <form method="dialog" class="dialog-heading"><h2 id="settings-title">プレイ設定</h2><button aria-label="設定を閉じる" class="icon-button">×</button></form>
         <fieldset id="settings"><legend>PLAY SETTINGS</legend>

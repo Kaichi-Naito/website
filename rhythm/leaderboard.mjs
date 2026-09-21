@@ -66,6 +66,26 @@ export function projectedRank(entries, stats, ownKey) {
   const position = 1 + others.filter(entry => !beatsCutoff(stats, entry)).length;
   return position <= MAX_RANKING_ENTRIES ? position : null;
 }
+// Preview the same single-best-score rule used by registration, without writing a score.
+export function resultStandings(entries, candidate) {
+  const rows = entries.slice(0, MAX_RANKING_ENTRIES).map(entry => ({...entry}));
+  if (!candidate) return {rows, position:null};
+  const registered = rows.findIndex(entry => entry.playId === candidate.playId);
+  if (registered >= 0) {
+    rows[registered].current = true;
+    return {rows, position:registered+1, registered:true};
+  }
+  const previous = candidate.ownKey && rows.find(entry => entry.playerKey === candidate.ownKey);
+  if (previous && candidate.score <= previous.score) {
+    previous.personalBest = true;
+    return {rows, position:null, kept:true};
+  }
+  const position = projectedRank(rows, candidate, candidate.ownKey);
+  if (!position) return {rows, position:null};
+  const projected = rows.filter(entry => !candidate.ownKey || entry.playerKey !== candidate.ownKey);
+  projected.splice(position-1, 0, {...candidate, name:'今回の結果', current:true});
+  return {rows:projected.slice(0, MAX_RANKING_ENTRIES), position, registered:false};
+}
 function sendScore(endpoint,payload) {
   return new Promise((resolve,reject)=>{
     const requestId=crypto.randomUUID(), frame=document.createElement('iframe'), form=document.createElement('form');
@@ -104,12 +124,24 @@ function ensureSubmitProgress() {
 }
 export class Leaderboard {
   constructor({onRanked = () => {}, onRankingState = () => {}} = {}) {
-    this.onRankingState = onRankingState;
+    this.onRankingState = (state, position) => {
+      this.resultRankingState = state;
+      onRankingState(state, position);
+      this.renderResultRanking();
+    };
     this.playerId = getPlayerId();
     this.onRanked = onRanked; this.registeredPlayId = null;
     this.generation=0;this.result=null;this.endpoint='';this.submitting=false;this.progressTimer=0;this.progressValue=0;this.entries=[];
     this.progress=ensureSubmitProgress();
     $('ranking-refresh').addEventListener('click',()=>this.refresh());
+    $('result-ranking-refresh')?.addEventListener('click',async()=>{
+      if(this.submitting || !this.resultPreview)return;
+      if(this.registeredPlayId) { await this.confirmRegisteredRank(this.registeredPlayId); return; }
+      const name=$('player-name').value;
+      const pending=this.showResult(this.resultPreview), next=this.resultPreview;
+      await pending;
+      if(this.resultPreview===next)$('player-name').value=name;
+    });
     $('score-form').addEventListener('submit',event=>{event.preventDefault();this.submit();});
     $('score-skip').addEventListener('click',()=>{
       if(this.submitting)return;
@@ -207,20 +239,51 @@ export class Leaderboard {
     }
     const any=this.entries.length>0;
     $('ranking-status').textContent=any?'自己ベスト順 / 上位10人':'この譜面の登録はまだありません。';
+    this.renderResultRanking();
+  }
+  renderResultRanking() {
+    const panel=$('result-ranking');
+    if (!panel) return;
+    panel.hidden=!this.resultPreview;
+    const body=$('result-ranking-rows'), status=$('result-ranking-status');
+    body.replaceChildren();
+    if (!this.resultPreview) return;
+    const state=this.resultRankingState;
+    if (state==='checking') { status.textContent='最新のランキングを読み込んでいます…'; return; }
+    if (state==='failed') { status.textContent='ランキングを確認できませんでした。下のボタンから再読み込みできます。'; return; }
+    let preview=resultStandings(this.entries, this.resultPreview);
+    if(state==='unranked' || (state==='kept' && !preview.kept))preview={rows:this.entries,position:null,kept:state==='kept'};
+    preview.rows.forEach((entry,index)=>{
+      const row=document.createElement('tr');
+      if(entry.current)row.className='result-ranking-current';
+      if(entry.personalBest)row.className='result-ranking-best';
+      const rank=document.createElement('td');rank.textContent=`${index+1}位`;
+      const name=document.createElement('td');name.textContent=entry.name;
+      if(entry.current || entry.personalBest) {
+        const badge=document.createElement('small');
+        badge.textContent=entry.personalBest ? '自己ベスト' : preview.registered ? '今回の結果・登録済み' : ['verifying','unconfirmed'].includes(state) ? '登録内容の反映待ち' : '未登録';
+        name.append(badge);
+      }
+      const score=document.createElement('td');score.textContent=entry.score.toLocaleString('ja-JP');
+      row.append(rank,name,score);body.append(row);
+    });
+    status.textContent=preview.registered ? '登録済みのランキングです。今回の結果を強調しています。' : preview.kept ? '前回の自己ベストを保持しています。今回のスコアは重複登録しません。' : preview.position ? ['verifying','unconfirmed'].includes(state) ? '今回の結果を含めて表示しています。登録内容の反映を確認中です。' : state==='skipped' ? '今回の結果を含めた順位です。今回は登録をスキップしています。' : '今回の結果を含めた順位です。ランキングへの登録は名前入力から行えます。' : '今回の結果はトップ10圏外です。';
   }
   qualifies(stats) {
     if(this.entries.length<MAX_RANKING_ENTRIES)return true;
     return beatsCutoff(stats,this.entries[MAX_RANKING_ENTRIES-1]);
   }
   clearResult() {
+    this.resultPreview=null;
     this.onRankingState('clear');
     this.registeredPlayId = null;
     this.result=null;$('score-form').hidden=true;$('score-message').hidden=true;this.resetProgress();
   }
   async showResult(stats) {
-    this.onRankingState('checking');
     this.registeredPlayId = null;
     const result=this.result={...stats,playId:crypto.randomUUID(),ruleset:RULESET,song:this.chart.title,songId:this.chart.catalogId,difficulty:this.chart.difficulty,playerId:this.playerId,keyPromise:this.keyPromise};
+    this.resultPreview={...stats, playId:result.playId};
+    this.onRankingState('checking');
     $('player-name').value='';$('score-form').hidden=true;this.resetProgress();
     $('score-message').hidden=false;$('score-message').textContent='ランキング判定中…';
 
@@ -238,6 +301,7 @@ export class Leaderboard {
     }
     const ownKey = await playerKey(result.playerId, await result.keyPromise);
     if (this.result !== result) return;
+    this.resultPreview.ownKey=ownKey;
     const previous = this.entries.find(entry => entry.playerKey === ownKey);
     if (previous && stats.score <= previous.score) {
       this.onRankingState('kept', this.entries.indexOf(previous) + 1);

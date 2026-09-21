@@ -41,6 +41,21 @@
 #result-ranking-notice[data-state="ranked"]{font-size:23px;color:#ffe37a;padding:12px 8px;border:2px solid #ffe37a;background:#372f1966}
 #result-ranking-notice[data-state="eligible"]{color:#ffe37a}
 .share-actions .share-x[aria-disabled="true"]{opacity:.6;cursor:wait}
+#result-ranking{margin-top:24px;padding-top:18px;border-top:1px solid #46526b;text-align:left}
+#result-ranking h3{font:19px/1.5 var(--mono);color:#ffe37a;margin:0 0 8px}
+#result-ranking-status{font:12px/1.7 var(--mono);color:#b9c8dc;margin:8px 0 12px}
+#result-ranking .ranking-table{font-size:14px}
+#result-ranking .ranking-table th{position:static;font-size:12px;background:transparent}
+#result-ranking .ranking-table th:first-child{width:46px}
+#result-ranking .ranking-table th:last-child{width:110px}
+#result-ranking .ranking-table td{padding:12px 6px}
+#result-ranking .result-ranking-current td{color:#ffe37a;background:#51401d;border-block:2px solid #ffe37a}
+#result-ranking .result-ranking-current td:first-child{border-left:3px solid #ffe37a}
+#result-ranking .result-ranking-current td:last-child{border-right:3px solid #ffe37a}
+#result-ranking .result-ranking-best td{background:#20394a;color:#a9eeff}
+#result-ranking small{display:block;font:11px/1.5 var(--mono);margin-top:4px}
+#result-ranking-refresh{margin-top:14px}
+@media(max-width:420px){#result-ranking .ranking-table{font-size:12px}#result-ranking .ranking-table th:last-child{width:90px}#result-ranking .ranking-table th:first-child{width:38px}}
 
 /* Lock the root as well as the body; gestures are cancelled while playing. */
 html.play-scroll-locked,html.play-scroll-locked body{overflow:hidden;overscroll-behavior:none;touch-action:none}

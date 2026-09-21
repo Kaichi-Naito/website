@@ -1,10 +1,10 @@
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
 import { PlaybackClock } from './playback-clock.mjs?v=clock-fix-v26';
-import { ResultShare } from './result-share.mjs?v=auto-save-v28';
+import { ResultShare } from './result-share.mjs?v=result-ranking-v29';
 import { loadCatalog } from './catalog.mjs?v=test30-fix-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
-import { Leaderboard } from './leaderboard.mjs?v=top-ten-v24';
+import { Leaderboard } from './leaderboard.mjs?v=result-ranking-v29';
 import { approachSeconds, tapLevel, readSettings } from './settings.mjs?v=song-select-v1';
 const $ = id => document.getElementById(id);
 const ui = Object.fromEntries(['canvas','stage','score','accuracy','accuracy-meter','accuracy-fill','combo','judgment','countdown','overlay','overlay-title','overlay-eyebrow','overlay-description','overlay-foot','start','restart','pause','result','status','progress','elapsed','settings','best-score'].map(id => [id, $(id)]));
