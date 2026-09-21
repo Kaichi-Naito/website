@@ -27,7 +27,9 @@ export function xIntent(result) {
 export function xDestination(result, device = globalThis.navigator || {}) {
   const ua = device.userAgent || '';
   const message = encodeURIComponent(shareText(result));
-  if (/Android/i.test(ua)) return `intent://post?message=${message}#Intent;scheme=twitter;package=com.twitter.android;S.browser_fallback_url=${encodeURIComponent(xIntent(result))};end`;
+  // Android must receive the documented HTTPS composer URL and its `text`
+  // parameter. The legacy twitter://post?message route can open X without a draft.
+  if (/Android/i.test(ua)) return `${xIntent(result).replace(/^https:/, 'intent:')}#Intent;scheme=https;package=com.twitter.android;S.browser_fallback_url=${encodeURIComponent(xIntent(result))};end`;
   if (/iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && device.maxTouchPoints > 1)) return `twitter://post?message=${message}`;
   return xIntent(result);
 }
@@ -66,9 +68,9 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
   const artistText = result.artist ? ` / ${result.artist}` : '';
   const artistInline = titleEnd + ctx.measureText(artistText).width <= 1056;
   const artistLines = artistInline ? [] : lines(ctx, result.artist, 1056);
-  ctx.font = font(28);
+  ctx.font = font(36);
   const difficultyLines = lines(ctx, result.difficulty, 1056);
-  const headingBottom = 346 + titleLines.length * 76 + artistLines.length * 54 + difficultyLines.length * 34;
+  const headingBottom = 444 + titleLines.length * 76 + artistLines.length * 54 + difficultyLines.length * 44;
   canvas.width = 1200; canvas.height = headingBottom + 430;
   ctx.fillStyle = '#0e1320'; ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (gameplay?.width && gameplay?.height) {
@@ -90,17 +92,17 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
   text(`RANK ${result.rank}`, 328, 164, 56, '#ffe37a');
   if (jacket) {
     const size = Math.min(jacket.naturalWidth || jacket.width, jacket.naturalHeight || jacket.height);
-    ctx.drawImage(jacket, ((jacket.naturalWidth || jacket.width) - size) / 2, ((jacket.naturalHeight || jacket.height) - size) / 2, size, size, 930, 48, 212, 212);
-    ctx.strokeStyle = '#e6edf5'; ctx.lineWidth = 3; ctx.strokeRect(930, 48, 212, 212);
+    ctx.drawImage(jacket, ((jacket.naturalWidth || jacket.width) - size) / 2, ((jacket.naturalHeight || jacket.height) - size) / 2, size, size, 822, 48, 320, 320);
+    ctx.strokeStyle = '#e6edf5'; ctx.lineWidth = 3; ctx.strokeRect(822, 48, 320, 320);
   }
-  let y = 328;
+  let y = 426;
   titleLines.forEach((line, index) => {
     text(line, 64, y, 64);
     if (artistInline && index === titleLines.length - 1) text(artistText, 64 + titleEnd, y, 46, '#d2ddeb');
     y += 76;
   });
   artistLines.forEach(line => { text(line, 64, y, 46, '#d2ddeb'); y += 54; });
-  difficultyLines.forEach(line => { text(line, 64, y, 28, '#00c6e7'); y += 34; });
+  difficultyLines.forEach(line => { text(line, 64, y, 36, '#00c6e7'); y += 44; });
   const base = headingBottom;
   ctx.fillStyle = '#202b40dc'; ctx.fillRect(58, base, 1084, 136);
   text('SCORE', 84, base + 42, 26, '#a5b5cc');
@@ -151,7 +153,7 @@ export class ResultShare {
       if (!current()) { event.preventDefault(); return; }
       if (this.fallback) this.fallback.hidden = false;
       if (mobile) {
-        status.textContent = 'Xアプリの投稿画面を開きます。画像を付ける場合は、下の画像を長押しで保存して添付してください。';
+        status.textContent = '本文を付けてXアプリを開きます。画像は自動添付されません。下の画像を長押しで保存し、Xで添付してください。';
         return;
       }
       // Let the anchor open X immediately, even if PNG generation or clipboard
@@ -175,7 +177,7 @@ export class ResultShare {
       const image = document.createElement('img'); image.src = this.imageURL;
       image.alt = `${snapshot.title} / ${snapshot.artist}：${number(snapshot.score)}点、RANK ${snapshot.rank}`;
       preview.append(image); this.root.append(preview);
-      status.textContent = mobile ? '「Xに投稿」でXアプリの投稿画面を開きます。画像は下の画像を長押しで保存して添付してください。' : '「Xに投稿」でXの投稿画面を直接開きます。画像を付ける場合は、コピー対応環境ではXで貼り付け（Ctrl+V / ⌘V）してください。';
+      status.textContent = mobile ? '「Xに投稿」で本文を付けてXアプリを開きます。画像は自動添付されません。下の画像を長押しで保存し、Xで添付してください。' : '「Xに投稿」でXの投稿画面を直接開きます。画像を付ける場合は、コピー対応環境ではXで貼り付け（Ctrl+V / ⌘V）してください。';
     }).catch(() => {
       if (current()) status.textContent = '画像を作れませんでした。「Xに投稿」から本文を入れた投稿画面を開けます。';
     });

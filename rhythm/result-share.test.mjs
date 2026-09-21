@@ -32,7 +32,11 @@ test('app links preserve the exact draft on iOS, iPadOS and Android with a web f
     assert.equal(url.searchParams.get('message'), shareText(result));
   }
   const intent = xDestination(result, {userAgent:'Android'});
-  assert.equal(new URL(intent).searchParams.get('message'), shareText(result));
+  assert.equal(new URL(intent).searchParams.get('text'), shareText(result));
+  assert.equal(new URL(intent).host, 'x.com');
+  assert.equal(new URL(intent).pathname, '/intent/tweet');
+  assert.match(intent, /#Intent;scheme=https;/);
+  assert.equal(new URL(intent).searchParams.has('message'), false);
   assert.match(intent, /package=com\.twitter\.android;/);
   assert.equal(decodeURIComponent(intent.split('S.browser_fallback_url=')[1].split(';end')[0]), xIntent(result));
   for (const device of [{userAgent:'Windows'}, {userAgent:'Macintosh',maxTouchPoints:0}]) assert.equal(xDestination(result,device),xIntent(result));
@@ -49,7 +53,7 @@ test('mobile opens the app link directly and reveals fallback only after tapping
       assert.equal(link.target,'_self'); assert.equal(fallback.hidden,true);
       await link.events.click({preventDefault(){assert.fail('Native anchor must navigate');}});
       assert.equal(fallback.hidden,false);
-      assert.equal(new URL(link.href).searchParams.get('message'),shareText(controller.snapshot));
+      assert.equal(new URL(link.href).searchParams.get(userAgent === 'Android' ? 'text' : 'message'),shareText(controller.snapshot));
       assert.equal(fallback.href,xIntent(controller.snapshot));
       controller.clear(); assert.equal(controller.fallback,null);
     }
