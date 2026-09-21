@@ -1,4 +1,5 @@
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
+import { PlaybackClock } from './playback-clock.mjs?v=clock-fix-v26';
 import { ResultShare } from './result-share.mjs?v=top-ten-v24';
 import { loadCatalog } from './catalog.mjs?v=test30-fix-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
@@ -22,6 +23,7 @@ let tapPromise;
 const audioDataCache=new Map(),audioBufferCache=new Map(),audioFetchPromises=new Map(),audioDecodePromises=new Map();
 let scrollLockState=null;
 const resultTransition = new ResultTransition();
+const playbackClock = new PlaybackClock();
 let mode = 'loading', startAt = 0, resumeAt = 0, frozenTime = -2.5, judgmentUntil = 0;
 let width = 800, height = 600, lastHud = 0, requestId = 0;
 const settingsKey = 'kaichi-rhythm-settings-v3';
@@ -104,18 +106,12 @@ for (const type of ['touchmove','wheel']) document.addEventListener(type,event=>
   if(scrollLockState && event.cancelable) event.preventDefault();
 },{passive:false,capture:true});
 // Use the hardware output timestamp when available so audio buffering does not shift judgment.
-function audibleTime() {
-  if (!context) return 0;
-  if (context.getOutputTimestamp) {
-    const stamp = context.getOutputTimestamp();
-    if (stamp.contextTime > 0 && stamp.performanceTime > 0) {
-      const estimate = stamp.contextTime + (performance.now() - stamp.performanceTime) / 1000;
-      if (Math.abs(estimate - context.currentTime) < .5) return estimate;
-    }
-  }
-  return context.currentTime - (context.outputLatency || 0);
+function playbackState() { return playbackClock.read(context, performance.now()); }
+function songTime() { return mode === 'playing' ? playbackState().time : frozenTime; }
+function pauseForClockReset() {
+  pause();
+  ui['overlay-description'].textContent = '音声の時刻に問題が発生したため一時停止しました。「プレイを再開」で続きから遊べます。';
 }
-function songTime() { return mode === 'playing' ? (context.currentTime < resumeAt ? frozenTime : audibleTime() - startAt) : frozenTime; }
 function judgeTime() { return songTime() - settings.offset / 1000; }
 function showOverlay(eyebrow, title, description, button) {
   ui.overlay.classList.toggle('is-results', mode === 'results');
@@ -188,9 +184,11 @@ async function loadAudio() {
 function schedule(from, leadIn) {
   stopSource();
   const playFrom = Math.max(0, from);
-  const when = context.currentTime + leadIn + Math.max(0, -from);
+  const currentTime = context.currentTime;
+  const when = currentTime + leadIn + Math.max(0, -from);
   startAt = when - playFrom;
-  resumeAt = context.currentTime + leadIn;
+  resumeAt = currentTime + leadIn;
+  playbackClock.reset({from, currentTime, startAt, resumeAt});
   source = context.createBufferSource(); source.buffer = buffer; source.connect(gain);
   const remaining = Math.max(0, Math.min(chart.duration, buffer.duration) - playFrom);
   source.start(when, playFrom, remaining);
@@ -229,8 +227,9 @@ async function startGame() {
 }
 function pause() {
   if (mode !== 'playing') return;
-  frozenTime = Math.max(-2.5, Math.min(songTime(), chart.duration));
-  if (context.currentTime >= resumeAt) engine.tick(frozenTime - settings.offset / 1000);
+  const state = playbackState();
+  frozenTime = Math.max(-2.5, Math.min(state.time, chart.duration));
+  if (!state.waiting && !state.interrupted) engine.tick(frozenTime - settings.offset / 1000);
   mode = 'paused'; stopSource(); resetInputs();unlockPageScroll();
   ui.pause.disabled = true; ui.settings.disabled = false; ui.countdown.textContent = '';
   ui.restart.hidden = false; ui.result.hidden = true;
@@ -298,12 +297,14 @@ function onJudge({label,lane,delta,sustain}) {
 }
 function inputDown(lane, sourceId) {
   if (mode !== 'playing') return;
+  const state = playbackState();
+  if (state.interrupted) { pauseForClockReset(); return; }
   const s = inputSources[lane]; if (s.has(sourceId)) return;
   const wasHeld = s.size > 0; s.add(sourceId); buttons[lane].classList.add('active');
   if (!wasHeld) {
     playTap();
-    if (context.currentTime < resumeAt) engine.held[lane] = true;
-    else engine.press(lane, judgeTime());
+    if (state.waiting) engine.held[lane] = true;
+    else engine.press(lane, state.time - settings.offset / 1000);
   }
 }
 function inputUp(lane, sourceId) {
@@ -311,8 +312,10 @@ function inputUp(lane, sourceId) {
   if (!s.size) {
     buttons[lane].classList.remove('active');
     if (mode === 'playing') {
-      if (context.currentTime < resumeAt) engine.held[lane] = false;
-      else engine.release(lane, judgeTime());
+      const state = playbackState();
+      if (state.interrupted) { pauseForClockReset(); return; }
+      if (state.waiting) engine.held[lane] = false;
+      else engine.release(lane, state.time - settings.offset / 1000);
     }
   }
 }
@@ -545,13 +548,13 @@ function updateHud() {
   const time=songTime();ui.elapsed.textContent=`${clockString(time)} / ${clockString(chart?.duration || 30)}`;ui.progress.style.width=`${Math.max(0,Math.min(100,time/(chart?.duration || 30)*100))}%`;
 }
 function frame(now) {
-  const resumeCountdown = mode==='playing' && context.currentTime < resumeAt;
-  const time = resumeCountdown ? frozenTime-settings.offset/1000 : judgeTime();
+  const state = mode==='playing' ? playbackState() : null;
+  if (state?.interrupted) pauseForClockReset();
+  const time = (mode==='playing' ? state.time : frozenTime)-settings.offset/1000;
   if(mode==='playing') {
-    if(!resumeCountdown) engine.tick(time);
-    const remain=resumeCountdown?resumeAt-context.currentTime:-songTime();
-    ui.countdown.textContent=remain>0?String(Math.ceil(remain)):'';
-    if(songTime()>=Math.min(buffer.duration,chart.duration)+.2)finish();
+    if(!state.waiting) engine.tick(time);
+    ui.countdown.textContent=state.countdown ? String(state.countdown) : '';
+    if(state.time>=Math.min(buffer.duration,chart.duration)+.2)finish();
   }
   if(mode==='finishing') {
     const percent=Math.round(resultTransition.progress(now)*100);
