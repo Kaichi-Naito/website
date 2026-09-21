@@ -11,7 +11,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>T4P — 4レーン音楽ゲーム</title>
   <link rel="icon" href="rhythm/t4p-logo.png" type="image/png">
-  <link rel="stylesheet" href="rhythm/game.css?v=song-select-v1">
+  <link rel="stylesheet" href="rhythm/game.css?v=test30-fix-v1">
   <style>
     .song-wheel{height:360px;padding:136px 10px}
     .song-option{height:88px;padding:6px 10px;margin-bottom:8px}
@@ -62,7 +62,7 @@
     .rhythm-start-item img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
     @media(max-width:700px){.song-wheel{height:300px;padding:108px 10px}.song-option{height:84px;padding:5px 8px;margin-bottom:6px}.song-play-button{min-width:60px;height:32px;padding:3px 6px;font-size:10px}.settings-gear{font-size:23px}#rhythm-taskbar{height:28px}#rhythm-start-btn,#rhythm-task{height:22px}#rhythm-start-btn img{height:16px}#rhythm-task{width:120px;font-size:10px}#rhythm-tray{height:22px;padding:0 5px}#rhythm-tray img{width:25px;height:25px}#rhythm-clock{font-size:11px;min-width:36px}#rhythm-start-menu{bottom:30px}}
   </style>
-  <link rel="stylesheet" href="rhythm/brand-share.css?v=t4p-share-v1">
+  <link rel="stylesheet" href="rhythm/brand-share.css?v=test30-fix-v1">
 </head>
 <body>
   <header class="desktop-header"><a href="index.html">← Kaichi Guitar Music</a><span>GAMES / 001</span></header>
@@ -82,7 +82,7 @@
         <div class="section-label">NOW PLAYING</div>
         <div class="artwork"><img id="playing-jacket" src="images/CDjacket/Rolling500x500.png" alt="Rolling ジャケット"><span class="artwork-tag">4 KEYS</span></div>
         <div class="song-heading"><p id="playing-artist">PHALUX</p><h1 id="playing-title">Rolling</h1></div>
-        <div class="song-meta"><span id="playing-difficulty">NORMAL</span><span id="bpm">— BPM</span><span id="playing-duration">2:00</span></div>
+        <div class="song-meta"><span id="playing-difficulty">NORMAL</span><span id="bpm">— BPM</span><span id="playing-duration">0:30</span></div>
         <div class="rule"><span class="tiny-label">HOW TO PLAY</span><p>判定ラインに重なったらキーを押す。<br>長押しは1拍ごとに加点。各拍の80％以上を押すと成功です。離すタイミングは判定しません。<br>空押しは減点され、コンボが途切れます。</p><div class="mini-keys"><kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd></div></div>
         <p class="best-score">PERSONAL BEST <strong id="best-score">—</strong></p>
       </aside>
@@ -122,7 +122,7 @@
           </div>
         </div>
         <div class="progress-track"><div id="progress"></div></div>
-        <div class="playback-footer"><span id="elapsed">0:00 / 2:00</span><span>SPACE / ESC 一時停止 <span class="footer-divider">/</span> Q W E R プレイ</span></div>
+        <div class="playback-footer"><span id="elapsed">0:00 / 0:30</span><span>SPACE / ESC 一時停止 <span class="footer-divider">/</span> Q W E R プレイ</span></div>
       </section>
     </div>
     <footer class="statusbar"><span id="status" role="status">譜面を読み込んでいます</span><span>♪ KAICHI GUITAR MUSIC</span></footer>
@@ -140,7 +140,7 @@
     </div>
   </aside>
   </div>
-  <p class="page-note">空押しはPERFECT 1判定分の減点です。長押しは1拍ごとに加点されます。</p>
+  <p class="page-note">テスト版：各曲の冒頭30秒をプレイします。空押しは減点、長押しは1拍ごとに加点されます。</p>
   <noscript>このゲームを遊ぶにはJavaScriptを有効にしてください。</noscript>
   <script>
     (() => {
@@ -318,7 +318,7 @@
       syncLoadingPanel();
     })();
   </script>
-  <script type="module" src="rhythm/game.mjs?v=t4p-share-v1"></script>
+  <script type="module" src="rhythm/game.mjs?v=test30-fix-v1"></script>
   <dialog id="settings-dialog" aria-labelledby="settings-title">
     <form method="dialog" class="dialog-heading"><h2 id="settings-title">プレイ設定</h2><button aria-label="設定を閉じる" class="icon-button">×</button></form>
         <fieldset id="settings"><legend>PLAY SETTINGS</legend>
@@ -445,4 +445,3 @@
   </script>
 </body>
 </html>
-

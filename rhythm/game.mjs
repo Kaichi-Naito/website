@@ -1,5 +1,5 @@
 import { ResultShare } from './result-share.mjs?v=t4p-share-v1';
-import { loadCatalog } from './catalog.mjs?v=song-select-v1';
+import { loadCatalog } from './catalog.mjs?v=test30-fix-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
 import { Leaderboard } from './leaderboard.mjs?v=song-select-v1';
@@ -15,7 +15,7 @@ const flashColors=[...colors], errors=[0,0,0,0], bursts=[];
 let songs=[], selectedIndex=-1, chartRequest=0, wheelTimer;
 const wheel=$('song-wheel');
 const inputSources = [new Set(), new Set(), new Set(), new Set()];
-const flashes = [0,0,0,0];
+const flashes = [-Infinity,-Infinity,-Infinity,-Infinity];
 let chart, engine, context, gain, buffer, source, tapBuffer, tapGain;
 let tapPromise;
 const audioDataCache=new Map(),audioBufferCache=new Map(),audioFetchPromises=new Map(),audioDecodePromises=new Map();
@@ -35,7 +35,9 @@ try {
 let settings = readSettings(savedSettings);
 const leaderboard = new Leaderboard();
 const resultShare = new ResultShare($('result-share'));
-const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+let reduceMotion = motionPreference.matches;
+motionPreference.addEventListener('change', event => { reduceMotion = event.matches; bursts.length = 0; });
 for (const key of ['speed','offset','volume','tapVolume']) {
   $(key).value = settings[key];
   const update = () => {
@@ -87,6 +89,8 @@ function audibleTime() {
 function songTime() { return mode === 'playing' ? (context.currentTime < resumeAt ? frozenTime : audibleTime() - startAt) : frozenTime; }
 function judgeTime() { return songTime() - settings.offset / 1000; }
 function showOverlay(eyebrow, title, description, button) {
+  ui.overlay.classList.toggle('is-results', mode === 'results');
+  $('overlay-card').scrollTop = 0;
   ui.overlay.hidden = false;
   ui['overlay-eyebrow'].textContent = eyebrow;
   ui['overlay-title'].textContent = title;
@@ -178,7 +182,7 @@ async function startGame() {
   try {
     await loadAudio();
     if (token !== requestId) return;
-    resetInputs(); bursts.length=0; flashes.fill(0); errors.fill(0); engine = new RhythmEngine(chart, onJudge);
+    resetInputs(); bursts.length=0; flashes.fill(-Infinity); errors.fill(0); engine = new RhythmEngine(chart, onJudge);
     leaderboard.clearResult();
     frozenTime = -2.5; ui.result.hidden = true; ui.restart.hidden = true;
     ui.combo.textContent = ''; ui.judgment.style.opacity = 0; judgmentUntil = 0;
@@ -235,7 +239,9 @@ function finish() {
     const row = document.createElement('div'), name = document.createElement('span'), number = document.createElement('b');
     row.dataset.judge=label; name.textContent = label; number.textContent = value; row.append(name, number); stats.append(row);
   }
-  ui.result.append(stats);
+  const breakdown = document.createElement('details'); breakdown.className='result-breakdown';
+  const summary = document.createElement('summary'); summary.textContent='判定の内訳';
+  breakdown.append(summary, stats); ui.result.append(breakdown);
   resultShare.show(chart, {score:engine.score, accuracy:engine.accuracy, maxCombo:engine.maxCombo, emptyPresses:engine.emptyPresses, counts:engine.counts, rank});
   leaderboard.showResult({score:engine.score,accuracy:Number(engine.accuracy.toFixed(2)),maxCombo:engine.maxCombo,units:engine.units,emptyPresses:engine.emptyPresses,counts:{...engine.counts}});
   ui.status.textContent = 'COMPLETE — おつかれさまでした';
@@ -407,7 +413,12 @@ function draw(time, now) {
   for (let lane=0;lane<4;lane++) {
     laneQuad(lane,0,1.04,lane<2?'#102338b8':'#261b38b8','#53688744');
     if (engine?.held[lane]) laneQuad(lane,.1,1.02,lane<2?'#7deaff14':'#ff8dda14');
-    if(!reduceMotion && now-flashes[lane]<240){g.globalAlpha=(1-(now-flashes[lane])/240)*.4;laneQuad(lane,.55,1.01,flashColors[lane]);g.globalAlpha=1;}
+    const hitAge = now - flashes[lane];
+    if(hitAge >= 0 && hitAge < 320){
+      // Reduced motion keeps a stationary highlight instead of hiding feedback.
+      g.globalAlpha = reduceMotion ? .32 : (1-hitAge/320)*.55;
+      laneQuad(lane,.70,1.01,flashColors[lane]); g.globalAlpha=1;
+    }
   }
   const approach = approachSeconds(settings.speed);
   const beat = 60 / (chart?.bpm || 162);
@@ -440,7 +451,12 @@ function draw(time, now) {
   for(let lane=0;lane<4;lane++) {
     const p=point(lane+.5,1),age=now-errors[lane];
     if(age<240){g.globalAlpha=(1-age/240)*.65;g.strokeStyle=judgmentColors.MISS;g.lineWidth=3;g.beginPath();g.moveTo(p.x-8,p.y-8);g.lineTo(p.x+8,p.y+8);g.moveTo(p.x+8,p.y-8);g.lineTo(p.x-8,p.y+8);g.stroke();g.globalAlpha=1;}
-    if(reduceMotion&&now-flashes[lane]<180){g.fillStyle=flashColors[lane];g.fillRect(p.x-10,p.y-4,20,8);}
+    const hitAge=now-flashes[lane];
+    if(hitAge>=0 && hitAge<320){
+      const left=point(lane+.10,1),right=point(lane+.90,1);
+      g.fillStyle=flashColors[lane];g.fillRect(left.x,p.y-7,right.x-left.x,14);
+      g.fillStyle='#fff';g.fillRect(left.x,p.y-2,right.x-left.x,4);
+    }
   }
   for(let i=bursts.length-1;i>=0;i--) {
     const burst=bursts[i],age=(now-burst.at)/360;if(age>=1){bursts.splice(i,1);continue;}
@@ -463,7 +479,7 @@ function updateHud() {
     ui.combo.dataset.value = combo; ui.combo.replaceChildren();
     if(combo>=2){ui.combo.append(document.createTextNode(combo));const small=document.createElement('small');small.textContent='COMBO';ui.combo.append(small);}
   }
-  const time=songTime();ui.elapsed.textContent=`${clockString(time)} / ${clockString(chart?.duration || 120)}`;ui.progress.style.width=`${Math.max(0,Math.min(100,time/(chart?.duration || 120)*100))}%`;
+  const time=songTime();ui.elapsed.textContent=`${clockString(time)} / ${clockString(chart?.duration || 30)}`;ui.progress.style.width=`${Math.max(0,Math.min(100,time/(chart?.duration || 30)*100))}%`;
 }
 function frame(now) {
   const resumeCountdown = mode==='playing' && context.currentTime < resumeAt;
@@ -474,7 +490,8 @@ function frame(now) {
     ui.countdown.textContent=remain>0?String(Math.ceil(remain)):'';
     if(songTime()>=Math.min(buffer.duration,chart.duration)+.2)finish();
   }
-  draw(engine?time:-2.5,now);
+  // Event and effect ages must use the same clock, including slow desktop frames.
+  draw(engine?time:-2.5,performance.now());
   if(now>judgmentUntil)ui.judgment.style.opacity=0;
   if(now-lastHud>70){updateHud();lastHud=now;}
   requestAnimationFrame(frame);

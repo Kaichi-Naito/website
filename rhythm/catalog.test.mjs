@@ -4,7 +4,7 @@ import {assetPath,parseCatalog} from './catalog.mjs';
 const row=['Rolling','NORMAL','website/rhythm/charts/Rolling_Game.mid','website/rhythm/Rolling_Game.mp3','PHALUX','images/CDjacket/Rolling500x500.png',162,120,'rolling-normal',true];
 test('sheet rows bind song details and assets; multiple difficulties have separate IDs',()=>{
   const hard=[...row];hard[1]='HARD';hard[8]='rolling-hard';
-  const songs=parseCatalog([row,hard]);assert.equal(songs.length,2);assert.equal(songs[0].midiPath,'rhythm/charts/Rolling_Game.mid');assert.equal(songs[1].difficulty,'HARD');assert.equal(songs[0].duration,120);
+  const songs=parseCatalog([row,hard]);assert.equal(songs.length,2);assert.equal(songs[0].midiPath,'rhythm/charts/Rolling_Game.mid');assert.equal(songs[1].difficulty,'HARD');assert.equal(songs[0].duration,30);
   assert.equal(assetPath('https://kaichi-naito.github.io/website/rhythm/Rolling_Game.mp3','audio'),'rhythm/Rolling_Game.mp3');
 });
 test('private rows are omitted; invalid or duplicate public entries report errors',()=>{
@@ -14,4 +14,11 @@ test('private rows are omitted; invalid or duplicate public entries report error
 });
 test('asset paths reject remote hosts, scripts and encoded directory traversal',()=>{
   for(const path of ['https://evil.example/a.mp3','javascript:a.mp3','../private.mp3','%2e%2e/private.mp3','/secret.mp3','a%5cb.mp3'])assert.throws(()=>assetPath(path,'audio'));
+});
+
+test('test duration cap keeps shorter songs and clips longer songs without modifying rows',()=>{
+  const short=[...row];short[7]=20;
+  assert.equal(parseCatalog([short])[0].duration,20);
+  assert.equal(parseCatalog([row])[0].duration,30);
+  assert.equal(row[7],120);
 });
