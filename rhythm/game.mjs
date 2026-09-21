@@ -7,7 +7,7 @@ import { midiToChart } from './midi.mjs?v=song-select-v1';
 import { Leaderboard } from './leaderboard.mjs?v=result-ranking-v29';
 import { approachSeconds, tapLevel, readSettings } from './settings.mjs?v=song-select-v1';
 const $ = id => document.getElementById(id);
-const ui = Object.fromEntries(['canvas','stage','score','accuracy','accuracy-meter','accuracy-fill','combo','judgment','countdown','overlay','overlay-title','overlay-eyebrow','overlay-description','overlay-foot','start','restart','pause','result','status','progress','elapsed','settings','best-score'].map(id => [id, $(id)]));
+const ui = Object.fromEntries(['canvas','stage','score','accuracy','accuracy-meter','accuracy-fill','combo','judgment','countdown','overlay','overlay-title','overlay-eyebrow','overlay-description','start','restart','pause','result','status','progress','elapsed','settings','best-score'].map(id => [id, $(id)]));
 const g = ui.canvas.getContext('2d');
 const buttons = [...document.querySelectorAll('[data-lane]')];
 const colors = ['#7deaff','#7deaff','#ff8dda','#ff8dda'];
@@ -272,7 +272,8 @@ function showResults() {
   const fullCombo = engine.counts.MISS === 0 && engine.emptyPresses === 0;
   const allPerfect = fullCombo && engine.counts.PERFECT === engine.units;
   const rank = engine.accuracy >= 97 ? 'S' : engine.accuracy >= 90 ? 'A' : engine.accuracy >= 80 ? 'B' : engine.accuracy >= 65 ? 'C' : 'D';
-  showOverlay(allPerfect ? 'ALL PERFECT' : fullCombo ? 'FULL COMBO' : 'SONG COMPLETE', `RANK ${rank}`, engine.score > best ? 'NEW PERSONAL BEST!' : '最後までプレイしてくれてありがとう！！！', 'もう一度プレイ');
+  const rankEmoji={S:'💎',A:'🥇',B:'🥈',C:'🥉',D:'🌱'}[rank];
+  showOverlay(allPerfect ? 'ALL PERFECT' : fullCombo ? 'FULL COMBO' : 'SONG COMPLETE', `${rankEmoji} RANK ${rank} ${rankEmoji}`, engine.score > best ? 'NEW PERSONAL BEST!' : '最後までプレイしてくれてありがとう！！！', 'もう一度プレイ');
   ui.result.hidden = true;
   ui.result.replaceChildren();
   const brand = document.createElement('img'); brand.src=chart.jacket; brand.alt=`${chart.title} ジャケット`; brand.className='result-jacket';
@@ -483,6 +484,13 @@ function polygon(points, fill, stroke) {
   if (fill) { g.fillStyle = fill; g.fill(); } if (stroke) { g.strokeStyle = stroke; g.stroke(); }
 }
 function laneQuad(lane, d1, d2, fill, stroke) { polygon([point(lane,d1),point(lane+1,d1),point(lane+1,d2),point(lane,d2)],fill,stroke); }
+// Static, desaturated rainbow: no hue cycling or flashing.
+function holdRainbow(x1,y1,x2,y2,alpha=1) {
+  const gradient=g.createLinearGradient(x1,y1,x2,y2);
+  const palette=[[224,163,178],[225,187,155],[217,209,158],[165,207,183],[157,201,216],[177,177,218],[205,168,211]];
+  palette.forEach(([r,g,b],i)=>gradient.addColorStop(i/(palette.length-1),`rgba(${r},${g},${b},${alpha})`));
+  return gradient;
+}
 function draw(time, now) {
   g.clearRect(0,0,width,height);
   const sky = g.createLinearGradient(0,0,0,height); sky.addColorStop(0,'#0c122d'); sky.addColorStop(1,'#100c21'); g.fillStyle=sky; g.fillRect(0,0,width,height);
@@ -514,14 +522,14 @@ function draw(time, now) {
         const head=n.state==='holding'?1:Math.min(1.08,d);
         if(tail>1.12)continue;
         const a=point(n.lane+.17,tail),b=point(n.lane+.83,tail),c=point(n.lane+.83,head),e=point(n.lane+.17,head);
-        polygon([a,b,c,e],n.state==='holding'?'#b9ffb880':'#82eac74d','#a9ffd280');
-        const cap=point(n.lane+.5,tail);g.fillStyle='#d6ffce';g.fillRect(cap.x-5,cap.y-2,10,4);
+        polygon([a,b,c,e],holdRainbow(0,a.y,0,c.y,n.state==='holding'?.55:.34),'#d1c7df70');
+        const cap=point(n.lane+.5,tail);g.fillStyle='#ded5e8';g.fillRect(cap.x-5,cap.y-2,10,4);
       }
       const nd=n.state==='holding'?1:d;
       const left=point(n.lane+.06,nd),right=point(n.lane+.94,nd);
       const noteHeight=4+nd*8;
-      g.shadowBlur=reduceMotion?0:12;g.shadowColor=n.end?'#abffd5':colors[n.lane];
-      g.fillStyle=n.end?'#b9ffbf':colors[n.lane];g.fillRect(left.x,left.y-noteHeight/2,right.x-left.x,noteHeight);
+      g.shadowBlur=reduceMotion?0:(n.end?7:12);g.shadowColor=n.end?'#c9bed7':colors[n.lane];
+      g.fillStyle=n.end?holdRainbow(left.x,left.y,right.x,right.y):colors[n.lane];g.fillRect(left.x,left.y-noteHeight/2,right.x-left.x,noteHeight);
       g.shadowBlur=0;g.fillStyle='#f2ffff';g.fillRect(left.x+1,left.y-noteHeight/2,right.x-left.x-2,2);
     }
   }
