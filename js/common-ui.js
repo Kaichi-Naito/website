@@ -466,7 +466,7 @@
             '<a href="Plugin.html" class="desktop-icon">' +
                 '<img src="' + asset('images/gif/Plugin.png') + '" alt="Plugin"><span>Plugin</span>' +
             '</a>' +
-            '<a href="RhythmGame.html" class="desktop-icon">' +
+            '<a href="T4P.html" class="desktop-icon">' +
                 '<img src="' + asset('rhythm/t4p-logo.png') + '" alt=""><span>T4P</span>' +
             '</a>' +
             '<a href="https://www.youtube.com/playlist?list=PLaOBQu1YWaALTPxFLYkV7YeZQMcRz8wqo" target="_blank" rel="noopener noreferrer" class="desktop-icon">' +

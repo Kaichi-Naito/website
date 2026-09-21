@@ -1,6 +1,6 @@
 # Rolling — 4-key rhythm game, test version 01
 
-Entry point: `../RhythmGame.html`. The shared site navigation links to the game.
+Entry point: `../T4P.html`. The shared site navigation links to the game.
 Gameplay needs no build step, external game library, or player account.
 Optional public rankings use the owner's Google Sheet and an Apps Script receiver.
 Serve the repository over HTTP (for example `python -m http.server`); ES modules and
@@ -116,9 +116,9 @@ also be checked on the player's actual output device.
 ## T4P / 結果の共有
 
 正式名称は **T4P**。採用ロゴは `rhythm/t4p-logo.png` です。
-結果画面の「Xに投稿」は曲名・アーティスト・難易度・点数・`#T4P`・公開URLを入れた投稿画面を開きます。投稿の確定はプレイヤーが行います。
+結果画面の「Xに投稿」は、指定テンプレートの本文とスコア画像を準備します。ファイル共有対応端末では共有メニューを開き、PC等では画像をコピーしてXの投稿画面を開きます（Xでの貼り付けが1回必要）。登録成功後、プレイIDで実順位が取得できた場合のみ順位の1行を追加します。投稿の確定はプレイヤーが行います。
 
-画像は端末内で生成したPNGです。曲名・アーティスト・点数・ランク・精度・最大コンボ・判定内訳を収録し、名前やランキング登録情報は含めません。「画像をコピー」してXに貼り付けるか、「画像を保存」して添付できます。ファイル共有対応端末では「画像付きで共有」から共有先を選べます（X側が本文・画像を両方受け取るかは端末に依存）。XのWeb Intentにローカル画像を自動添付する機能はありません。
+画像は端末内で生成したPNGです。曲名・アーティスト・点数・ランク・精度・最大コンボ・判定内訳を収録し、名前やランキング登録情報は含めません。「画像をコピー」してXに貼り付けるか、「画像を保存」して添付できます。ファイル共有対応端末では「Xに投稿」から共有先を選べます（X側が本文・画像を両方受け取るかは端末に依存）。XのWeb Intentにローカル画像を自動添付する機能はありません。
 
 共有はランキングの順位・登録の有無に関係なく利用できます。次の曲や再プレイを始めると、前の結果と画像URLを破棄します。
 
@@ -127,3 +127,5 @@ also be checked on the player's actual output device.
 現在は `catalog.mjs` の `PLAY_DURATION_LIMIT = 30` で全曲を冒頭30秒に制限しています。シートの元のプレイ時間は保持し、MIDIも30秒で切り詰めます。元の長さへ戻す場合はこの上限を `Infinity` に戻します。譜面識別子には演奏時間とノーツ内容が入るため、2分版のランキングとは別集計です。
 
 結果画面は画面全体に表示し、判定内訳を折りたたんでX投稿を見つけやすくしました。動きを減らす端末設定でも、成功したレーンと判定ラインの静止した光は表示します。
+
+公開URLは `https://kaichi-naito.github.io/website/T4P.html`。旧 `RhythmGame.html` はクエリ・ハッシュを保持して新URLへ転送します。

@@ -40,4 +40,4 @@
 - プレイ時間はスプレッドシートの「譜面」タブで指定します。Rollingは現在120秒です。境界より後の音符は省略し、またぐ長押しは短縮します。
 - 同じレーンで重なる音符は作らないでください。別レーンの同時押しは対応しています。
 
-[ゲームを開く](https://kaichi-naito.github.io/website/RhythmGame.html)
+[ゲームを開く](https://kaichi-naito.github.io/website/T4P.html)

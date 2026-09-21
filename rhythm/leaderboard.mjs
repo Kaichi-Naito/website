@@ -1,6 +1,11 @@
 import { readSheet } from './sheets.mjs?v=song-select-v1';
 export const RULESET = 'beat-hold-v4';
 const MAX_RANKING_ENTRIES=20;
+export function registeredRank(entries, playId) {
+  if (!playId) return null;
+  const index = entries.findIndex(entry => entry.playId === playId);
+  return index >= 0 && index < MAX_RANKING_ENTRIES ? index + 1 : null;
+}
 const $ = id => document.getElementById(id);
 export async function chartKey(chart) {
   const normalized=JSON.stringify({song:chart.catalogId || chart.title,rules:RULESET,duration:chart.duration,notes:chart.notes.map(n=>[Math.round(n.t*1e6),n.lane,n.end?Math.round(n.end*1e6):null,n.ticks?.map(t=>Math.round(t*1e6))??[]])});
@@ -59,7 +64,8 @@ function ensureSubmitProgress() {
   return panel;
 }
 export class Leaderboard {
-  constructor() {
+  constructor({onRanked = () => {}} = {}) {
+    this.onRanked = onRanked; this.registeredPlayId = null;
     this.generation=0;this.result=null;this.endpoint='';this.submitting=false;this.progressTimer=0;this.progressValue=0;this.entries=[];
     this.progress=ensureSubmitProgress();
     $('ranking-refresh').addEventListener('click',()=>this.refresh());
@@ -114,7 +120,7 @@ export class Leaderboard {
     $('ranking-rows').replaceChildren();
     try {
       const key=await this.keyPromise;
-      const query=`select B,C,D,E,H where F = '${key}' and G = '${RULESET}' order by C desc,D desc,E desc,H asc limit ${MAX_RANKING_ENTRIES}`;
+      const query=`select B,C,D,E,H,I where F = '${key}' and G = '${RULESET}' order by C desc,D desc,E desc,H asc limit ${MAX_RANKING_ENTRIES}`;
       const [scores,config]=await Promise.all([
         readSheet('スコア','A1:N',query),
         readSheet('設定','A1:B2').catch(()=>[])
@@ -127,7 +133,8 @@ export class Leaderboard {
         score:Number(r.c?.[1]?.v),
         accuracy:Number(r.c?.[2]?.v),
         maxCombo:Number(r.c?.[3]?.v),
-        registeredAt:r.c?.[4]?.v
+        registeredAt:r.c?.[4]?.v,
+        playId:r.c?.[5]?.v
       }));
       this.render(entries);
       return true;
@@ -147,6 +154,11 @@ export class Leaderboard {
       row.title=`精度 ${entry.accuracy.toFixed(2)}% / 最大コンボ ${entry.maxCombo}`;
       $('ranking-rows').append(row);
     });
+    if (this.registeredPlayId) {
+      const position = registeredRank(this.entries, this.registeredPlayId);
+      this.onRanked(position);
+      if (position) $('score-message').textContent = `ランキング${position}位に登録しました！`;
+    }
     const any=this.entries.length>0;
     $('ranking-status').textContent=any?'スコア順 / 上位20件':'この譜面の登録はまだありません。';
   }
@@ -155,9 +167,11 @@ export class Leaderboard {
     return beatsCutoff(stats,this.entries[MAX_RANKING_ENTRIES-1]);
   }
   clearResult() {
+    this.registeredPlayId = null;
     this.result=null;$('score-form').hidden=true;$('score-message').hidden=true;this.resetProgress();
   }
   async showResult(stats) {
+    this.registeredPlayId = null;
     const result=this.result={...stats,playId:crypto.randomUUID(),ruleset:RULESET,song:this.chart.title,songId:this.chart.catalogId,keyPromise:this.keyPromise};
     $('player-name').value='';$('score-form').hidden=true;this.resetProgress();
     $('score-message').hidden=false;$('score-message').textContent='ランキング判定中…';
@@ -201,7 +215,8 @@ export class Leaderboard {
         $('score-message').hidden=false;
         $('score-message').textContent='直前にランキングが更新されたため20位圏外となり、登録されませんでした。';
       } else {
-        $('score-message').hidden=false;$('score-message').textContent='ランキングに登録しました！';
+        this.registeredPlayId = result.playId;
+        $('score-message').hidden=false;$('score-message').textContent='ランキングに登録しました！ 順位を確認しています…';
       }
       $('ranking-status').textContent='ランキングを更新中…';
       void this.refresh();

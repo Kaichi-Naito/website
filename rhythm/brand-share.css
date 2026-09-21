@@ -27,3 +27,5 @@
 .overlay.is-results #result-share{margin:8px 0 14px;padding-top:10px}
 .overlay.is-results .overlay-foot{display:none}
 @media(max-height:650px){.overlay.is-results{padding:8px}.overlay.is-results .overlay-card{max-height:calc(100dvh - 16px);padding:12px}.overlay.is-results .result-brand{width:48px}.overlay.is-results #overlay-description{display:none}}
+
+.share-text-only{display:inline-block;padding:6px 0;font:11px var(--mono);color:#b8d7ef}.share-x[aria-disabled=true]{opacity:.6;cursor:wait}

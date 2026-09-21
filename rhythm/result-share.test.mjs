@@ -30,6 +30,7 @@ class Element {
   append(...nodes) { this.children.push(...nodes); }
   replaceChildren(...nodes) { this.children = nodes; }
   setAttribute() {}
+  removeAttribute() {}
   addEventListener(name, handler) { this.events[name] = handler; }
 }
 function fixture() {
@@ -61,4 +62,51 @@ test('a new result replaces the old draft and invalidates pending image work', a
   assert.match(new URL(root.children[0].children[0].href).searchParams.get('text'), /Next song/);
   assert.equal(root.children.length, 2); assert.equal(controller.imageURL, null);
   controller.clear(); resolvers[1](new Blob(['new'])); await settle();
+});
+
+test('share template matches the requested wording and blank lines',()=>{
+  const result=resultSnapshot({title:'Rolling',artist:'PHALUX',difficulty:'NORMAL'},{...score,score:367126});
+  assert.equal(shareText(result),`#T4P で ♬ Rolling / PHALUX をプレイしたよ！！🎮\n\n🎧NORMAL｜スコア：367,126点\n\n${APP_URL}`);
+  assert.equal(shareText({...result,rankingPosition:3}),`#T4P で ♬ Rolling / PHALUX をプレイしたよ！！🎮\n\n🎧NORMAL｜スコア：367,126点\n👑3位にランクイン！！\n\n${APP_URL}`);
+  for(const rankingPosition of [null,undefined,0,21,1.5])assert.ok(!shareText({...result,rankingPosition}).includes('👑'));
+});
+test('confirmed ranking updates the draft but clearing prevents carryover',()=>{
+  const {root,controller}=fixture();controller.prepare=()=>new Promise(()=>{});
+  controller.show(chart,score);controller.setRanking(2);
+  assert.match(new URL(root.children[0].children[0].href).searchParams.get('text'),/👑2位/);
+  controller.clear();controller.setRanking(1);
+  controller.show(chart,score);
+  assert.ok(!new URL(root.children[0].children[0].href).searchParams.get('text').includes('👑'));
+});
+
+test('primary sharing hands native sharing the PNG and current ranking text together',async()=>{
+  const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator');
+  let handed;
+  Object.defineProperty(globalThis,'navigator',{configurable:true,value:{canShare:data=>data.files[0].type==='image/png',share:async data=>{handed=data;}}});
+  try {
+    const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png'],{type:'image/png'});
+    controller.show(chart,score);await settle();controller.setRanking(4);
+    await root.children[0].children[0].events.click({preventDefault(){}});
+    assert.equal(handed.files.length,1);assert.equal(handed.files[0].type,'image/png');assert.match(handed.text,/👑4位/);
+    controller.clear();
+  } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;}
+});
+test('desktop sharing starts image copy before opening X and preserves the game page',async()=>{
+  const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator');const oldWindow=globalThis.window,oldItem=globalThis.ClipboardItem;
+  const events=[];let target='';
+  globalThis.ClipboardItem=class{constructor(data){assert.ok(data['image/png']);}};
+  Object.defineProperty(globalThis,'navigator',{configurable:true,value:{clipboard:{write:async()=>{events.push('copy');}}}});
+  globalThis.window={open:()=>{events.push('open');return {document:{body:{}},location:{replace:url=>{target=url;}}};}};
+  try {
+    const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png'],{type:'image/png'});
+    controller.show(chart,score);await settle();
+    await root.children[0].children[0].events.click({preventDefault(){}});
+    assert.deepEqual(events,['copy','open']);assert.equal(new URL(target).searchParams.get('text'),shareText(resultSnapshot(chart,score)));
+    assert.match(root.children[1].textContent,/貼り付け/);controller.clear();
+  } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;globalThis.window=oldWindow;globalThis.ClipboardItem=oldItem;}
+});
+test('ranking identity is the registered play ID, not a matching name or score',async()=>{
+  const {registeredRank}=await import('./leaderboard.mjs');
+  const entries=[{name:'同名',score:123,playId:'other'},{name:'同名',score:123,playId:'current'}];
+  assert.equal(registeredRank(entries,'current'),2);assert.equal(registeredRank(entries,'missing'),null);assert.equal(registeredRank(entries,null),null);
 });

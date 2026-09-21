@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="T4P — 4つのキー・タップで遊ぶ音楽ゲーム。曲を選んで演奏し、スコアをシェアしよう。">
+  <meta property="og:title" content="T4P — 4レーン音楽ゲーム">
+  <meta property="og:description" content="4つのキー・タップで遊ぶ音楽ゲーム。あなたのスコアをシェアしよう。">
+  <meta property="og:image" content="https://kaichi-naito.github.io/website/rhythm/t4p-logo.png">
+  <meta property="og:url" content="https://kaichi-naito.github.io/website/T4P.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://kaichi-naito.github.io/website/T4P.html">
+  <title>T4P — 4レーン音楽ゲーム</title>
+  <link rel="icon" href="rhythm/t4p-logo.png" type="image/png">
+  <link rel="stylesheet" href="rhythm/game.css?v=t4p-share-v3">
+  <style>
+    .song-wheel{height:360px;padding:136px 10px}
+    .song-option{height:88px;padding:6px 10px;margin-bottom:8px}
+    .song-option img{width:72px;height:72px}
+    .song-option>div{flex:1;min-width:0}
+    .song-play-button{flex:0 0 auto;min-width:72px;height:34px;margin-left:auto;padding:4px 8px;background:#b6ffb4;color:#152423;border:2px solid;border-color:#e1ffdf #648267 #648267 #e1ffdf;font:12px var(--mono);white-space:nowrap;box-shadow:2px 2px 0 #0005}
+    .song-play-button:active:not(:disabled){border-color:#648267 #e1ffdf #e1ffdf #648267;transform:translate(1px,1px);box-shadow:none}
+    .song-play-button:disabled{cursor:wait;opacity:.55}
+    #play-selected{display:none!important}
+    .wheel-help{display:none!important}
+    #selection-status:empty{display:none}
+    .rhythm-close{width:16px!important;height:14px!important;padding:0!important;position:relative;overflow:hidden;background:#c0c0c0!important;background-image:none!important;border:1px solid!important;border-color:#fff #808080 #808080 #fff!important;color:transparent!important;box-sizing:border-box;cursor:pointer;flex:0 0 auto;line-height:normal!important;font:inherit!important;text-align:initial!important}
+    .rhythm-close::before{content:"×";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#000;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;line-height:1;transform:translateY(-1px);pointer-events:none}
+    .rhythm-close:active{border-color:#808080 #fff #fff #808080!important}
+    .rhythm-close:active::before{transform:translate(1px,0)}
+    #settings-open{min-height:30px;padding:3px 9px;border:2px solid;border-color:#fff #808080 #808080 #fff;background:#c0c0c0;color:#202020}
+    #settings-open:active{border-color:#808080 #fff #fff #808080;padding:4px 8px 2px 10px}
+    .settings-gear{display:block;font-family:Arial,sans-serif;font-size:24px;line-height:1;color:#454b52;transform:none!important;animation:none!important}
+    .loading-progress-panel{margin:18px 0 6px;text-align:left}
+    .loading-progress-track{height:12px;padding:2px;background:#0b0f1a;border:1px solid;border-color:#060810 #68728a #68728a #060810;overflow:hidden}
+    .loading-progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--pink));transition:width .12s linear}
+    .loading-progress-panel.indeterminate .loading-progress-fill{width:34%!important;animation:rhythm-loading-slide .9s ease-in-out infinite alternate}
+    .loading-progress-label{margin-top:8px;font:10px var(--mono);letter-spacing:.5px;color:#aebbd1;text-align:center}
+    @keyframes rhythm-loading-slide{from{transform:translateX(-20%)}to{transform:translateX(190%)}}
+    .start-sequence{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;font:700 clamp(42px,9vw,86px) var(--mono);letter-spacing:5px;color:#fff;text-shadow:0 0 18px #7deaffaa,0 0 38px #ff8dda66}
+    .start-sequence.visible{opacity:1}
+    .start-sequence.pop{animation:rhythm-start-pop .34s ease-out}
+    .start-sequence.go{color:#b6ffb4;text-shadow:0 0 22px #b6ffb4bb,0 0 44px #7deaff88}
+    .stage.rhythm-starting .countdown{opacity:0!important}
+    @keyframes rhythm-start-pop{0%{transform:scale(.72);opacity:0}45%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:1}}
+    @media(prefers-reduced-motion:reduce){.start-sequence.pop{animation:none}.loading-progress-panel.indeterminate .loading-progress-fill{animation:none;width:100%!important;opacity:.45}}
+    body{padding-bottom:calc(50px + env(safe-area-inset-bottom))}
+    #rhythm-taskbar{position:fixed;left:0;right:0;bottom:0;width:100%;height:32px;padding:0 4px env(safe-area-inset-bottom) 4px;box-sizing:content-box;background:#c0c0c0;border-top:2px solid #fff;box-shadow:0 -1px 0 #000;z-index:50000;display:flex;align-items:center;color:#000;font-family:var(--mono)}
+    #rhythm-start-btn{height:24px;padding:0 3px;background:#c0c0c0;border:2px solid;border-color:#fff #808080 #808080 #fff;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+    #rhythm-start-btn:active,#rhythm-start-btn[aria-expanded="true"]{border-color:#808080 #fff #fff #808080;padding:1px 2px 0 4px}
+    #rhythm-start-btn img{height:18px;width:auto;image-rendering:pixelated}
+    #rhythm-task{height:24px;width:min(190px,28vw);min-width:105px;margin-left:6px;padding:0 7px;display:flex;align-items:center;background:#d4d4d4;border:2px solid;border-color:#808080 #fff #fff #808080;font-size:11px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box}
+    #rhythm-tray{margin-left:auto;height:24px;display:flex;align-items:center;gap:6px;padding:0 8px;background:#c0c0c0;border:1px solid;border-color:#808080 #fff #fff #808080;box-sizing:border-box}
+    #rhythm-tray img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
+    #rhythm-clock{min-width:42px;text-align:right;font-size:12px}
+    #rhythm-start-menu{position:fixed;left:4px;bottom:34px;width:218px;display:none;z-index:50001;background:#c0c0c0;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:1px 1px 0 #000;padding:2px;color:#000;font-family:var(--mono)}
+    #rhythm-start-menu.open{display:flex}
+    .rhythm-start-rail{width:28px;background:linear-gradient(#808080,#3f3f3f);color:#fff;display:flex;align-items:flex-end;justify-content:center;padding:8px 0;box-sizing:border-box}
+    .rhythm-start-rail span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:13px;letter-spacing:1px}
+    .rhythm-start-items{flex:1;padding:4px}
+    .rhythm-start-item{width:100%;min-height:42px;display:flex;align-items:center;gap:10px;border:0;background:transparent;color:#000;text-decoration:none;font:13px var(--mono);text-align:left;padding:5px 8px;box-sizing:border-box}
+    .rhythm-start-item:hover,.rhythm-start-item:focus{background:#000080;color:#fff;outline:none}
+    .rhythm-start-item img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
+    @media(max-width:700px){.song-wheel{height:300px;padding:108px 10px}.song-option{height:84px;padding:5px 8px;margin-bottom:6px}.song-play-button{min-width:60px;height:32px;padding:3px 6px;font-size:10px}.settings-gear{font-size:23px}#rhythm-taskbar{height:28px}#rhythm-start-btn,#rhythm-task{height:22px}#rhythm-start-btn img{height:16px}#rhythm-task{width:120px;font-size:10px}#rhythm-tray{height:22px;padding:0 5px}#rhythm-tray img{width:25px;height:25px}#rhythm-clock{font-size:11px;min-width:36px}#rhythm-start-menu{bottom:30px}}
+  </style>
+  <link rel="stylesheet" href="rhythm/brand-share.css?v=t4p-share-v3">
+</head>
+<body>
+  <header class="desktop-header"><a href="index.html">← Kaichi Guitar Music</a><span>GAMES / 001</span></header>
+  <div class="desktop-layout">
+  <main class="app-window" id="app">
+    <div class="titlebar"><span><img src="rhythm/t4p-logo.png" alt=""> T4P.exe</span><a href="index.html" aria-label="ホームに戻る" class="close rhythm-close">×</a></div>
+    <div class="menubar"><span>T4P / MUSIC ARCADE</span><button id="settings-open" class="icon-button" aria-label="設定を開く"><span class="settings-gear" aria-hidden="true">⚙</span><span>設定</span></button></div>
+    <section id="selection-screen" class="selection-screen" aria-label="曲選択">
+      <div class="selection-heading"><img class="t4p-logo" src="rhythm/t4p-logo.png" alt="T4P" width="154" height="109"><span id="song-position">— / —</span></div>
+      <div class="selection-body">
+        <div class="song-preview"><img id="selected-jacket" src="images/CDjacket/Rolling500x500.png" alt=""><p id="selected-artist">—</p><h2 id="selected-title">楽曲を読み込み中…</h2><div class="preview-tags"><span id="selected-difficulty">—</span><span id="selected-bpm">— BPM</span><span id="selected-duration">—</span></div></div>
+        <div class="song-picker"><button id="song-prev" class="wheel-arrow" aria-label="前の曲" disabled>▲</button><div id="song-wheel" class="song-wheel" role="listbox" aria-label="楽曲一覧" tabindex="0"></div><button id="song-next" class="wheel-arrow" aria-label="次の曲" disabled>▼</button><button id="play-selected" class="primary-button" disabled>楽曲を読み込み中…</button><p id="selection-status" role="status">楽曲一覧を読み込んでいます</p><button id="catalog-retry" class="secondary-button" hidden>一覧を再読み込み</button></div>
+      </div>
+    </section>
+    <div class="workspace" id="play-workspace" hidden>
+      <aside class="sidebar">
+        <div class="section-label">NOW PLAYING</div>
+        <div class="artwork"><img id="playing-jacket" src="images/CDjacket/Rolling500x500.png" alt="Rolling ジャケット"><span class="artwork-tag">4 KEYS</span></div>
+        <div class="song-heading"><p id="playing-artist">PHALUX</p><h1 id="playing-title">Rolling</h1></div>
+        <div class="song-meta"><span id="playing-difficulty">NORMAL</span><span id="bpm">— BPM</span><span id="playing-duration">0:30</span></div>
+        <div class="rule"><span class="tiny-label">HOW TO PLAY</span><p>判定ラインに重なったらキーを押す。<br>長押しは1拍ごとに加点。各拍の80％以上を押すと成功です。離すタイミングは判定しません。<br>空押しは減点され、コンボが途切れます。</p><div class="mini-keys"><kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd></div></div>
+        <p class="best-score">PERSONAL BEST <strong id="best-score">—</strong></p>
+      </aside>
+      <section class="game-area" aria-label="4レーンの音楽ゲーム">
+        <div class="hud"><div><span>SCORE</span><strong id="score">0000000</strong></div><div class="accuracy"><span>ACCURACY</span><strong id="accuracy">100.00<small>%</small></strong><div id="accuracy-meter" class="accuracy-track" role="meter" aria-label="精度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="accuracy-fill"></div></div></div><button id="pause" class="pause-button" aria-label="一時停止" title="一時停止（Space / Esc）" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="5" height="16" rx="1"/><rect x="14" y="4" width="5" height="16" rx="1"/></svg><span>一時停止</span></button></div>
+        <div class="stage" id="stage">
+          <canvas id="canvas" aria-label="上からノーツが落ちる4レーン。左からQ、W、E、R。"></canvas>
+          <div class="stage-heading"><span id="stage-song">ROLLING</span><span id="stage-artist">PHALUX</span></div>
+          <div class="combo" id="combo"></div>
+          <div class="judgment" id="judgment"></div>
+          <div class="countdown" id="countdown"></div>
+          <div class="start-sequence" id="start-sequence" aria-hidden="true"></div>
+          <div class="key-row" aria-label="タッチ操作用キー"><button data-lane="0" aria-label="Qレーン"><span class="key-label" aria-hidden="true">Q</span></button><button data-lane="1" aria-label="Wレーン"><span class="key-label" aria-hidden="true">W</span></button><button data-lane="2" aria-label="Eレーン"><span class="key-label" aria-hidden="true">E</span></button><button data-lane="3" aria-label="Rレーン"><span class="key-label" aria-hidden="true">R</span></button></div>
+          <div class="overlay" id="overlay">
+            <div class="overlay-card" id="overlay-card">
+              <p class="eyebrow" id="overlay-eyebrow">PAUSED</p>
+              <h2 id="overlay-title">ひとやすみ。</h2>
+              <p id="overlay-description">再開ボタンでプレイを続けられます。</p>
+              <div id="loading-progress-panel" class="loading-progress-panel" hidden>
+                <div class="loading-progress-track" aria-hidden="true"><div id="loading-progress-fill" class="loading-progress-fill"></div></div>
+                <div id="loading-progress-label" class="loading-progress-label">音源を準備しています…</div>
+              </div>
+              <div id="result" hidden></div>
+              <section id="result-share" aria-label="結果を共有" hidden></section>
+              <form id="score-form" hidden>
+                <label for="player-name">名前を入れてランキングに登録</label>
+                <input id="player-name" name="playerName" type="text" maxlength="32" autocomplete="nickname" placeholder="名前（16文字まで）" aria-describedby="score-privacy">
+                <p id="score-privacy">名前とスコアが公開されます。登録は任意です。</p>
+                <div class="score-actions"><button id="score-submit" type="submit">登録する</button><button id="score-skip" type="button">登録せずに進む</button></div>
+              </form>
+              <p id="score-message" role="status" hidden></p>
+              <button id="start" class="primary-button" disabled>譜面を読み込み中…</button>
+              <button id="restart" class="secondary-button" hidden>最初からやり直す</button>
+              <button id="back-to-select" class="secondary-button">曲選択に戻る</button>
+              <p class="overlay-foot" id="overlay-foot">PCキーボード推奨 / ヘッドホン推奨</p>
+            </div>
+          </div>
+        </div>
+        <div class="progress-track"><div id="progress"></div></div>
+        <div class="playback-footer"><span id="elapsed">0:00 / 0:30</span><span>SPACE / ESC 一時停止 <span class="footer-divider">/</span> Q W E R プレイ</span></div>
+      </section>
+    </div>
+    <footer class="statusbar"><span id="status" role="status">譜面を読み込んでいます</span><span>♪ KAICHI GUITAR MUSIC</span></footer>
+  </main>
+  <aside class="ranking-window" aria-label="ランキング">
+    <div class="titlebar"><span>Ranking.exe</span><span aria-hidden="true">★</span></div>
+    <div class="ranking-content">
+      <p class="eyebrow">RANKING / TOP 20</p>
+      <h2>ランキング</h2>
+      <p id="ranking-chart">譜面を確認しています…</p>
+      <p class="ranking-help">同じ譜面のスコアで競います。</p>
+      <div class="ranking-table-wrap"><table class="ranking-table"><thead><tr><th scope="col">順位</th><th scope="col">名前</th><th scope="col">スコア</th></tr></thead><tbody id="ranking-rows"></tbody></table></div>
+      <p id="ranking-status" role="status">ランキングを読み込み中…</p>
+      <button id="ranking-refresh" type="button" class="secondary-button">ランキングを更新</button>
+    </div>
+  </aside>
+  </div>
+  <p class="page-note">テスト版：各曲の冒頭30秒をプレイします。空押しは減点、長押しは1拍ごとに加点されます。</p>
+  <noscript>このゲームを遊ぶにはJavaScriptを有効にしてください。</noscript>
+  <script>
+    (() => {
+      const debug = window.__rhythmDebug = {
+        frameErrors: 0,
+        timestampFallbacks: 0,
+        longFrames: 0,
+        lastFrameError: null,
+        lastLongFrameMs: 0
+      };
+
+      const nativeRaf = window.requestAnimationFrame.bind(window);
+      let lastFrameTime = 0;
+      window.requestAnimationFrame = callback => nativeRaf(time => {
+        if (lastFrameTime && time - lastFrameTime > 1000) {
+          debug.longFrames++;
+          debug.lastLongFrameMs = Math.round(time - lastFrameTime);
+          console.warn(`[RhythmGame] long animation frame: ${debug.lastLongFrameMs} ms`);
+        }
+        lastFrameTime = time;
+        try {
+          callback(time);
+        } catch (error) {
+          debug.frameErrors++;
+          debug.lastFrameError = {
+            message: String(error?.message || error),
+            at: new Date().toISOString()
+          };
+          console.error('[RhythmGame] animation frame failed; retrying on the next frame.', error);
+          window.requestAnimationFrame(callback);
+        }
+      });
+
+      const patchAudioClock = AudioContextClass => {
+        const proto = AudioContextClass?.prototype;
+        if (!proto || typeof proto.getOutputTimestamp !== 'function' || proto.getOutputTimestamp.__rhythmSafe) return;
+        const original = proto.getOutputTimestamp;
+        const safe = function() {
+          try {
+            const stamp = original.call(this);
+            if (stamp && Number.isFinite(stamp.contextTime) && Number.isFinite(stamp.performanceTime)) return stamp;
+          } catch (error) {
+            if (debug.timestampFallbacks === 0) console.warn('[RhythmGame] getOutputTimestamp failed; using AudioContext.currentTime.', error);
+          }
+          debug.timestampFallbacks++;
+          return {contextTime:this.currentTime,performanceTime:performance.now()};
+        };
+        safe.__rhythmSafe = true;
+        try { proto.getOutputTimestamp = safe; } catch {}
+      };
+      patchAudioClock(window.AudioContext);
+      patchAudioClock(window.webkitAudioContext);
+    })();
+  </script>
+  <script>
+    (() => {
+      const loadState = window.__rhythmLoadState = {latest:null,listeners:new Set()};
+      const notify = entry => {
+        loadState.latest = entry;
+        for (const listener of loadState.listeners) listener(entry);
+      };
+      const nativeFetch = window.fetch.bind(window);
+      window.fetch = async (input, init) => {
+        const url = typeof input === 'string' ? input : input?.url || String(input);
+        const response = await nativeFetch(input, init);
+        if (!/\.mp3(?:[?#]|$)/i.test(url) || !response.body || typeof ReadableStream === 'undefined') return response;
+        const total = Number(response.headers.get('content-length')) || 0;
+        const entry = {url,loaded:0,total,done:false};
+        notify(entry);
+        const reader = response.body.getReader();
+        const stream = new ReadableStream({
+          async pull(controller) {
+            try {
+              const {done,value} = await reader.read();
+              if (done) {
+                entry.done = true;
+                if (entry.total && entry.loaded < entry.total) entry.loaded = entry.total;
+                notify(entry);
+                controller.close();
+                return;
+              }
+              entry.loaded += value.byteLength;
+              notify(entry);
+              controller.enqueue(value);
+            } catch (error) {
+              controller.error(error);
+            }
+          },
+          cancel(reason) { return reader.cancel(reason); }
+        });
+        return new Response(stream,{status:response.status,statusText:response.statusText,headers:response.headers});
+      };
+
+      const overlay = document.getElementById('overlay');
+      const eyebrow = document.getElementById('overlay-eyebrow');
+      const panel = document.getElementById('loading-progress-panel');
+      const fill = document.getElementById('loading-progress-fill');
+      const label = document.getElementById('loading-progress-label');
+      const stage = document.getElementById('stage');
+      const sequence = document.getElementById('start-sequence');
+      let sequenceTimers = [];
+      let wasOverlayHidden = overlay.hidden;
+
+      const renderLoad = entry => {
+        if (panel.hidden) return;
+        panel.classList.remove('indeterminate');
+        if (!entry) {
+          fill.style.width = '0%';
+          panel.classList.add('indeterminate');
+          label.textContent = '音源を準備しています…';
+          return;
+        }
+        if (entry.done) {
+          fill.style.width = '100%';
+          label.textContent = '音源をデコード中…';
+          return;
+        }
+        if (entry.total > 0) {
+          const percent = Math.max(0,Math.min(100,Math.round(entry.loaded / entry.total * 100)));
+          fill.style.width = `${percent}%`;
+          label.textContent = `音源を読み込み中… ${percent}%`;
+        } else {
+          fill.style.width = '34%';
+          panel.classList.add('indeterminate');
+          label.textContent = '音源を読み込み中…';
+        }
+      };
+      loadState.listeners.add(renderLoad);
+
+      const syncLoadingPanel = () => {
+        const loading = !overlay.hidden && eyebrow.textContent.trim() === 'LOADING';
+        panel.hidden = !loading;
+        if (loading) renderLoad(loadState.latest);
+      };
+
+      const cancelSequence = () => {
+        sequenceTimers.forEach(clearTimeout);
+        sequenceTimers = [];
+        stage.classList.remove('rhythm-starting');
+        sequence.classList.remove('visible','pop','go');
+        sequence.textContent = '';
+        sequence.setAttribute('aria-hidden','true');
+      };
+      const showSequenceStep = (text, go=false) => {
+        sequence.textContent = text;
+        sequence.classList.remove('pop','go');
+        void sequence.offsetWidth;
+        sequence.classList.add('visible','pop');
+        if (go) sequence.classList.add('go');
+      };
+      const runSequence = () => {
+        cancelSequence();
+        stage.classList.add('rhythm-starting');
+        sequence.setAttribute('aria-hidden','false');
+        const steps = [
+          [0,'READY',false],
+          [450,'3',false],
+          [950,'2',false],
+          [1450,'1',false],
+          [1950,'GO!',true]
+        ];
+        for (const [delay,text,go] of steps) sequenceTimers.push(setTimeout(()=>showSequenceStep(text,go),delay));
+        sequenceTimers.push(setTimeout(cancelSequence,2600));
+      };
+
+      const overlayObserver = new MutationObserver(() => {
+        const hidden = overlay.hidden;
+        if (hidden && !wasOverlayHidden && eyebrow.textContent.trim() === 'LOADING') runSequence();
+        if (!hidden && eyebrow.textContent.trim() !== 'LOADING') cancelSequence();
+        wasOverlayHidden = hidden;
+        syncLoadingPanel();
+      });
+      overlayObserver.observe(overlay,{attributes:true,attributeFilter:['hidden']});
+      new MutationObserver(syncLoadingPanel).observe(eyebrow,{childList:true,subtree:true,characterData:true});
+      syncLoadingPanel();
+    })();
+  </script>
+  <script type="module" src="rhythm/game.mjs?v=t4p-share-v3"></script>
+  <dialog id="settings-dialog" aria-labelledby="settings-title">
+    <form method="dialog" class="dialog-heading"><h2 id="settings-title">プレイ設定</h2><button aria-label="設定を閉じる" class="icon-button">×</button></form>
+        <fieldset id="settings"><legend>PLAY SETTINGS</legend>
+          <label for="speed">ノーツ速度 <output id="speed-value">8.0</output></label>
+          <input type="range" id="speed" min="2" max="14" step=".5" value="8">
+          <label for="offset">タイミング調整 <output id="offset-value">0 ms</output></label>
+          <input type="range" id="offset" min="-250" max="250" step="5" value="0" aria-describedby="offset-help">
+          <p class="setting-help" id="offset-help">＋にすると、押すタイミングが遅くなります。</p>
+          <label for="volume">楽曲音量 <output id="volume-value">100%</output></label>
+          <input type="range" id="volume" min="0" max="100" step="5" value="100">
+          <label for="tapVolume">タップ音量 <output id="tapVolume-value">100%</output></label>
+          <input type="range" id="tapVolume" min="0" max="100" step="5" value="100">
+        </fieldset>
+    <form method="dialog"><button class="primary-button">設定を閉じる</button></form>
+  </dialog>
+
+  <div id="rhythm-start-menu" aria-hidden="true">
+    <div class="rhythm-start-rail"><span>Kaichi 95</span></div>
+    <div class="rhythm-start-items">
+      <a href="index.html" class="rhythm-start-item"><img src="images/gif/Computer.gif" alt=""><span>Home</span></a>
+    </div>
+  </div>
+  <div id="rhythm-taskbar" aria-label="Kaichi 95 taskbar">
+    <button id="rhythm-start-btn" type="button" aria-label="Start" aria-expanded="false"><img src="images/start.png" alt="Start"></button>
+    <div id="rhythm-task" aria-label="現在のアプリ">T4P.exe</div>
+    <div id="rhythm-tray"><img src="images/volume-icon.png" alt="Volume"><span id="rhythm-clock">00:00</span></div>
+  </div>
+  <script>
+    (() => {
+      const clickSound = new Audio('Sound/MouseClick.mp3');
+      clickSound.preload = 'auto';
+      const playClick = () => {
+        try {
+          clickSound.currentTime = 0;
+          const promise = clickSound.play();
+          if (promise && typeof promise.catch === 'function') promise.catch(() => {});
+        } catch {}
+      };
+
+      document.addEventListener('pointerdown', event => {
+        const target = event.target.closest('button, a, .song-option');
+        if (!target || target.closest('.key-row')) return;
+        playClick();
+      });
+
+      const wheel = document.getElementById('song-wheel');
+      const playSelected = document.getElementById('play-selected');
+      const selectionStatus = document.getElementById('selection-status');
+      const cleanSelectionStatus = () => {
+        if (selectionStatus.textContent.includes('ノーツ')) selectionStatus.textContent = '';
+      };
+      new MutationObserver(cleanSelectionStatus).observe(selectionStatus,{childList:true,subtree:true,characterData:true});
+      cleanSelectionStatus();
+      const syncSongPlayButtons = () => {
+        wheel.querySelectorAll('.song-option').forEach(item => {
+          const button = item.querySelector('.song-play-button');
+          if (!button) return;
+          const selected = item.getAttribute('aria-selected') === 'true';
+          const disabled = selected ? playSelected.disabled : false;
+          const text = selected && playSelected.disabled ? (playSelected.textContent.includes('できません') ? '×' : '…') : '▶ PLAY';
+          if (button.disabled !== disabled) button.disabled = disabled;
+          if (button.textContent !== text) button.textContent = text;
+        });
+      };
+      const startSongFromCard = item => {
+        if (item.getAttribute('aria-selected') !== 'true') item.click();
+        const attempt = () => {
+          if (item.getAttribute('aria-selected') !== 'true') { cleanup(); return; }
+          if (!playSelected.disabled) { cleanup(); playSelected.click(); return; }
+          if (playSelected.textContent.includes('できません')) cleanup();
+        };
+        const observer = new MutationObserver(attempt);
+        const cleanup = () => { observer.disconnect(); clearTimeout(timer); };
+        observer.observe(playSelected,{attributes:true,childList:true,subtree:true});
+        observer.observe(item,{attributes:true,attributeFilter:['aria-selected']});
+        const timer = setTimeout(cleanup,15000);
+        attempt();
+      };
+      const decorateSongOptions = () => {
+        wheel.querySelectorAll('.song-option').forEach(item => {
+          if (item.querySelector('.song-play-button')) return;
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'song-play-button';
+          button.textContent = '▶ PLAY';
+          button.setAttribute('aria-label','この曲をプレイ');
+          button.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+            startSongFromCard(item);
+          });
+          item.append(button);
+        });
+        syncSongPlayButtons();
+      };
+      const songObserver = new MutationObserver(() => { decorateSongOptions(); syncSongPlayButtons(); });
+      songObserver.observe(wheel,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-selected']});
+      songObserver.observe(playSelected,{attributes:true,childList:true,subtree:true});
+      decorateSongOptions();
+
+      const startButton = document.getElementById('rhythm-start-btn');
+      const startMenu = document.getElementById('rhythm-start-menu');
+      const setMenu = open => {
+        startMenu.classList.toggle('open', open);
+        startMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
+        startButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+      };
+      startButton.addEventListener('click', event => {
+        event.stopPropagation();
+        setMenu(!startMenu.classList.contains('open'));
+      });
+      document.addEventListener('pointerdown', event => {
+        if (startMenu.classList.contains('open') && !startMenu.contains(event.target) && !startButton.contains(event.target)) setMenu(false);
+      });
+
+      const clock = document.getElementById('rhythm-clock');
+      const updateClock = () => {
+        const now = new Date();
+        clock.textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      };
+      updateClock();
+      setInterval(updateClock, 30000);
+    })();
+  </script>
+</body>
+</html>
