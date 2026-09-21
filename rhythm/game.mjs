@@ -1,5 +1,5 @@
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
-import { ResultShare } from './result-share.mjs?v=compact-result-v20';
+import { ResultShare } from './result-share.mjs?v=result-footer-v21';
 import { loadCatalog } from './catalog.mjs?v=test30-fix-v1';
 import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
@@ -43,7 +43,7 @@ const leaderboard = new Leaderboard({
     notice.hidden=state==='clear'; notice.dataset.state=state;
     notice.textContent={
       checking:'ランキングを確認しています…',
-      eligible:`👑現在${position}位相当！名前を登録して順位を確定しよう。`,
+      eligible:`👑登録すると現在${position}位！名前を登録してランクインしよう。`,
       submitting:'ランキングに登録しています…',
       verifying:'登録完了。順位を確認しています…',
       ranked:`👑${position}位にランクイン！！`,

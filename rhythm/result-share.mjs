@@ -122,7 +122,9 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
   });
   ctx.textAlign = 'left';
   text('#T4P', 64, canvas.height - 44, 34, '#ff008e');
-  text(APP_URL, 234, canvas.height - 44, 25, '#b5c4d8');
+  ctx.textAlign = 'right';
+  text(APP_URL, canvas.width - 42, canvas.height - 44, 25, '#b5c4d8');
+  ctx.textAlign = 'left';
   return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('PNG unavailable')), 'image/png'));
 }
 
