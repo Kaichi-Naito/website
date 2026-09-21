@@ -149,36 +149,45 @@ export class ResultShare {
       actions.append(fallback);
     }
     const current = () => this.version === version;
-    let imageBlob = null;
-    link.addEventListener('click', async event => {
+    const guide = '画像は自動添付されません。先に「結果画像を保存」で保存し、Xの画像ボタンから選ぶか、「結果画像をコピー」でコピーしてXの投稿欄に貼り付けてください。';
+    link.addEventListener('click', event => {
       if (!current()) { event.preventDefault(); return; }
       if (this.fallback) this.fallback.hidden = false;
-      if (mobile) {
-        status.textContent = '本文を付けてXアプリを開きます。画像は自動添付されません。下の画像を長押しで保存し、Xで添付してください。';
-        return;
-      }
-      // Let the anchor open X immediately, even if PNG generation or clipboard
-      // access fails. Image copying is optional and must never block navigation.
-      if (!imageBlob || !navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
-        status.textContent = 'Xの投稿画面を開きます。画像は自動添付されません。下の画像を右クリック・長押しで保存して添付できます。';
-        return;
-      }
-      try {
-        await navigator.clipboard.write([new ClipboardItem({'image/png':imageBlob})]);
-        if (current()) status.textContent = '画像をコピーしました。Xの投稿欄で貼り付け（Ctrl+V / ⌘V）してください。';
-      } catch {
-        if (current()) status.textContent = 'Xの投稿画面を開きました。画像をコピーできなかったため、下の画像を右クリック・長押しで保存して添付してください。';
-      }
+      status.textContent = `投稿文を付けて${mobile ? 'Xアプリ' : 'Xの投稿画面'}を開きます。${guide}`;
     });
     this.prepare(snapshot).then(blob => {
       if (!current()) return;
-      imageBlob = blob;
       this.imageURL = URL.createObjectURL(blob);
+      const save = document.createElement('a');
+      save.className = 'share-save'; save.href = this.imageURL;
+      save.download = `T4P-${snapshot.title.replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_')}-${snapshot.score}.png`;
+      save.textContent = '結果画像を保存';
+      save.addEventListener('click', event => {
+        if (!current()) { event.preventDefault(); return; }
+        status.textContent = '保存した画像をXの画像ボタンから選んで添付してください。保存が始まらない場合は、下の画像を長押し・右クリックして保存してください。';
+      });
+      const copy = document.createElement('button');
+      copy.type = 'button'; copy.className = 'share-copy'; copy.textContent = '結果画像をコピー';
+      copy.addEventListener('click', async () => {
+        if (!current()) return;
+        if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
+          status.textContent = 'この環境では画像をコピーできません。「結果画像を保存」で保存し、Xの画像ボタンから添付してください。';
+          return;
+        }
+        copy.disabled = true;
+        try {
+          await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+          if (current()) status.textContent = '結果画像をコピーしました。「Xに投稿」で投稿画面を開き、貼り付けてください（PC：Ctrl+V / ⌘V、スマホ：投稿欄を長押し）。貼り付けられない場合は、画像を保存して添付してください。';
+        } catch {
+          if (current()) status.textContent = '画像をコピーできませんでした。「結果画像を保存」で保存し、Xの画像ボタンから添付してください。';
+        } finally { if (current()) copy.disabled = false; }
+      });
+      actions.append(save, copy);
       const preview = document.createElement('div'); preview.className = 'share-preview';
       const image = document.createElement('img'); image.src = this.imageURL;
       image.alt = `${snapshot.title} / ${snapshot.artist}：${number(snapshot.score)}点、RANK ${snapshot.rank}`;
       preview.append(image); this.root.append(preview);
-      status.textContent = mobile ? '「Xに投稿」で本文を付けてXアプリを開きます。画像は自動添付されません。下の画像を長押しで保存し、Xで添付してください。' : '「Xに投稿」でXの投稿画面を直接開きます。画像を付ける場合は、コピー対応環境ではXで貼り付け（Ctrl+V / ⌘V）してください。';
+      status.textContent = `「Xに投稿」で投稿文を開きます。${guide}`;
     }).catch(() => {
       if (current()) status.textContent = '画像を作れませんでした。「Xに投稿」から本文を入れた投稿画面を開けます。';
     });

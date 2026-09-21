@@ -131,7 +131,7 @@ test('X opens directly even when the device supports native file sharing',async(
     assert.equal(link.target,'_blank');controller.clear();
   } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;}
 });
-test('desktop X link stays usable when copying succeeds, fails, or is unsupported',async()=>{
+test('image copy is explicit and never blocks the X draft when successful or unavailable',async()=>{
   const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator');const oldItem=globalThis.ClipboardItem;
   globalThis.ClipboardItem=class{constructor(data){assert.ok(data['image/png']);}};
   try {
@@ -145,8 +145,15 @@ test('desktop X link stays usable when copying succeeds, fails, or is unsupporte
       await link.events.click({preventDefault(){prevented=true;}});
       assert.equal(prevented,false,mode);assert.equal(link.target,'_blank');
       assert.equal(new URL(link.href).searchParams.get('text'),shareText(resultSnapshot(chart,score)));
+      assert.equal(copied,0,'Opening X does not access the clipboard');
+      const [save,copy]=root.children[0].children.slice(1);
+      assert.equal(save.textContent,'結果画像を保存');assert.equal(save.href,controller.imageURL);
+      assert.ok(save.download.endsWith('.png'));assert.ok(!save.download.includes('/'));
+      assert.equal(copy.textContent,'結果画像をコピー');
+      await copy.events.click();
       assert.equal(copied,mode==='unavailable'?0:1);
-      assert.equal(root.children[0].children.length,1);
+      assert.match(root.children[1].textContent,mode==='success'?/コピーしました/:/コピーできません/);
+      assert.equal(root.children[0].children.length,3);
       assert.equal(root.children[2].tag,'div');assert.equal(root.children[2].children[0].tag,'img');
       controller.clear();
     }
