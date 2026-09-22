@@ -1,6 +1,9 @@
-export const APP_URL = 'https://x.gd/T4P_game';
+// Use a fresh, metadata-free entry page instead of the cached short-link card.
+export const APP_URL = 'https://kaichi-naito.github.io/website/T4P-play.html';
+const IMAGE_URL_LABEL = 'https://x.gd/T4P_game';
 const BACKGROUND_URL = new URL('./result-background.svg?v=scattered-notes-v14', import.meta.url).href;
 const LOGO_URL = new URL('./t4p-logo.png', import.meta.url).href;
+const isIOS = (device = globalThis.navigator || {}) => /iPhone|iPad|iPod/i.test(device.userAgent || '') || (/Macintosh/i.test(device.userAgent || '') && device.maxTouchPoints > 1);
 const number = value => Number(value).toLocaleString('ja-JP');
 
 // Keep the completed run independent of the next song / retry.
@@ -32,7 +35,7 @@ export function xDestination(result, device = globalThis.navigator || {}) {
   // Android must receive the documented HTTPS composer URL and its `text`
   // parameter. The legacy twitter://post?message route can open X without a draft.
   if (/Android/i.test(ua)) return `${xIntent(result).replace(/^https:/, 'intent:')}#Intent;scheme=https;package=com.twitter.android;S.browser_fallback_url=${encodeURIComponent(xIntent(result))};end`;
-  if (/iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && device.maxTouchPoints > 1)) return `twitter://post?message=${message}`;
+  if (isIOS(device)) return `twitter://post?message=${message}`;
   return xIntent(result);
 }
 
@@ -124,7 +127,7 @@ export async function renderScoreImage(result, logo, jacket = null, gameplay = n
   ctx.textAlign = 'left';
   text('#T4P', 64, canvas.height - 44, 34, '#ff008e');
   ctx.textAlign = 'right';
-  text(APP_URL, canvas.width - 42, canvas.height - 44, 25, '#b5c4d8');
+  text(IMAGE_URL_LABEL, canvas.width - 42, canvas.height - 44, 25, '#b5c4d8');
   ctx.textAlign = 'left';
   return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('PNG unavailable')), 'image/png'));
 }
@@ -137,12 +140,16 @@ export class ResultShare {
     if (this.previewRoot && this.previewRoot !== this.root) { this.previewRoot.hidden = true; this.previewRoot.replaceChildren(); }
     ++this.version;
     if (this.imageURL) URL.revokeObjectURL(this.imageURL);
-    this.imageURL = null; this.snapshot = null; this.link = null; this.saveButton = null; this.fallback = null; this.root.hidden = true; this.root.replaceChildren();
+    this.imageURL = null; this.imageFile = null; this.snapshot = null; this.link = null; this.saveButton = null; this.fallback = null; this.root.hidden = true; this.root.replaceChildren();
   }
   show(chart, result) {
     this.clear(); const version = this.version;
     const snapshot = this.snapshot = resultSnapshot(chart, result);
     this.root.hidden = false;
+    const device = globalThis.navigator || {};
+    const ios = isIOS(device);
+    const filename = `T4P-${snapshot.title.replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_')}-${snapshot.score}.png`;
+    let saving = false;
     const actions = document.createElement('div'); actions.className = 'share-actions';
     const save = this.saveButton = document.createElement('button');
     save.type = 'button'; save.className = 'share-save'; save.textContent = '結果画像を保存'; save.disabled = true;
@@ -163,15 +170,41 @@ export class ResultShare {
       actions.append(fallback);
     }
     const current = () => this.version === version;
-    const guide = '画像はXの投稿画面で添付してください。保存先はブラウザーのダウンロード先です。保存されない場合は、この結果画像を長押し・右クリックして保存できます。';
-    save.addEventListener('click', () => {
-      if (!current() || this.imagePending || !this.imageURL) return;
+    const photoGuide = '共有メニューの「画像を保存」を選ぶと「写真」に保存できます。表示されない場合は、上の結果画像を長押しして保存してください。';
+    const guide = ios ? photoGuide : '画像はXの投稿画面で添付してください。保存先はブラウザーのダウンロード先です。保存されない場合は、この結果画像を長押し・右クリックして保存できます。';
+    save.addEventListener('click', async () => {
+      if (!current() || this.imagePending || !this.imageURL || saving) return;
+      if (ios) {
+        const data = this.imageFile ? {files: [this.imageFile]} : null;
+        let supported = false;
+        try { supported = !!(data && device.share && device.canShare?.(data)); } catch { /* Use the visible image instead. */ }
+        if (!supported) {
+          status.textContent = 'このブラウザーでは保存メニューを開けません。上の結果画像を長押しし、「写真に保存」または「画像を保存」を選んでください。';
+          return;
+        }
+        saving = true; save.disabled = true;
+        status.textContent = photoGuide;
+        try {
+          // Share only the already-prepared PNG, synchronously in the tap gesture.
+          // No text or URL: iOS should present image actions, including Save Image.
+          await device.share(data);
+          if (current()) status.textContent = '「写真」に画像が保存されていることを確認してから、「Xでポスト」を押してください。';
+        } catch (error) {
+          if (current()) status.textContent = error?.name === 'AbortError'
+            ? '保存メニューを閉じました。保存する場合は、もう一度「結果画像を保存」を押してください。'
+            : `保存メニューを開けませんでした。上の結果画像を長押しして保存してください。`;
+        } finally {
+          saving = false;
+          if (current()) save.disabled = false;
+        }
+        return;
+      }
       let downloadStarted = false;
       if (this.imageURL) {
         // Start the download directly in the save-button gesture.
         const download = document.createElement('a');
         download.href = this.imageURL;
-        download.download = `T4P-${snapshot.title.replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_')}-${snapshot.score}.png`;
+        download.download = filename;
         // A dedicated frame keeps the result screen intact during download.
         if (!this.downloadFrame) {
           this.downloadFrame = document.createElement('iframe');
@@ -199,6 +232,7 @@ export class ResultShare {
     this.prepare(snapshot).then(blob => {
       if (!current()) return;
       this.imageURL = URL.createObjectURL(blob);
+      if (ios && typeof File === 'function') this.imageFile = new File([blob], filename, {type: 'image/png'});
       this.imagePending = false; save.disabled = false; this.setRankingPending(this.rankingPending);
       const preview = document.createElement('div'); preview.className = 'share-preview';
       const image = document.createElement('img'); image.src = this.imageURL;

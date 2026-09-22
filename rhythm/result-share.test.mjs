@@ -185,7 +185,7 @@ test('stale result buttons cannot download a new run or navigate',async()=>{
   old.events.click({preventDefault(){prevented=true;}});assert.equal(prevented,true);assert.equal(downloads.length,0);
   controller.clear();
 });
-test('shared URL uses the supplied short link',()=>assert.equal(APP_URL,'https://x.gd/T4P_game'));
+test('post links use the fresh card-free entry page',()=>assert.equal(APP_URL,'https://kaichi-naito.github.io/website/T4P-play.html'));
 test('X cannot open an unranked draft while registration is pending, then uses the confirmed rank',async()=>{
   const {controller}=fixture(); controller.prepare=async()=>new Blob(['png']);
   controller.show(chart,score); await settle(); controller.setRankingPending(true);
@@ -218,3 +218,49 @@ test('top preview is separate from posting controls and clears between results',
   assert.equal(preview.hidden,true);assert.equal(preview.children.length,0);
 });
 
+
+test('iPhone and iPad save shares only a PNG without downloading or opening X', async()=>{
+  const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator');
+  try {
+    for (const device of [{userAgent:'iPhone'}, {userAgent:'Macintosh',maxTouchPoints:5}]) {
+      downloads.length=0;let shared,finish;
+      Object.defineProperty(globalThis,'navigator',{configurable:true,value:{...device,canShare:({files})=>files[0].type==='image/png',share:data=>{shared=data;return new Promise(resolve=>finish=resolve);}}});
+      const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png']);
+      controller.show(chart,score);await settle();
+      const pending=controller.saveButton.events.click();
+      assert.deepEqual(Object.keys(shared),['files']);assert.equal(shared.files[0].type,'image/png');
+      assert.ok(shared.files[0].name.endsWith('-987654.png'));assert.equal(await shared.files[0].text(),'png');
+      assert.equal(downloads.length,0);assert.equal(controller.saveButton.disabled,true);
+      assert.match(root.children[2].textContent,/画像を保存/);assert.match(root.children[2].textContent,/写真/);
+      const firstShare=shared;await controller.saveButton.events.click();assert.equal(shared,firstShare);
+      finish();await pending;assert.equal(controller.saveButton.disabled,false);
+      assert.doesNotMatch(root.children[2].textContent,/保存しました/);
+      controller.clear();assert.equal(controller.imageFile,null);
+    }
+  } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;}
+});
+test('iOS cancellation, errors and missing file sharing never fall back to Files download',async()=>{
+  const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator');
+  try {
+    for(const mode of ['cancel','error','unsupported']) {
+      downloads.length=0;
+      Object.defineProperty(globalThis,'navigator',{configurable:true,value:{userAgent:'iPhone',canShare:()=>mode!=='unsupported',share:async()=>{throw Object.assign(new Error(),{name:mode==='cancel'?'AbortError':'NotAllowedError'});}}});
+      const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png']);
+      controller.show(chart,score);await settle();await controller.saveButton.events.click();
+      assert.equal(downloads.length,0);assert.equal(controller.saveButton.disabled,false);
+      assert.match(root.children[2].textContent,mode==='cancel'?/保存メニューを閉じました/:/長押し/);
+      controller.link.events.click({preventDefault(){assert.fail('X remains available');}});
+      controller.clear();
+    }
+  } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;}
+});
+test('closing an old iOS save sheet cannot change the next result',async()=>{
+  const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator');let finish;
+  Object.defineProperty(globalThis,'navigator',{configurable:true,value:{userAgent:'iPhone',canShare:()=>true,share:()=>new Promise(resolve=>finish=resolve)}});
+  try {
+    const {root,controller}=fixture();controller.prepare=async()=>new Blob(['png']);
+    controller.show(chart,score);await settle();const pending=controller.saveButton.events.click();
+    controller.show({...chart,title:'Next'},score);await settle();const status=root.children[2].textContent;
+    finish();await pending;assert.equal(root.children[2].textContent,status);assert.equal(controller.saveButton.disabled,false);controller.clear();
+  } finally {if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;}
+});
