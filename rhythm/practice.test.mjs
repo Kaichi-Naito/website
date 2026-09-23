@@ -35,11 +35,11 @@ test('audio and note clocks stay aligned across count-in, pause and resume at ev
   let started;
   const audio={currentTime:100,outputLatency:0,createBufferSource:()=>({playbackRate:{value:1},connect(){},start(...args){started=args;}})};
   const clock=new PlaybackClock();
-  const state=vm.createContext({context:audio,playbackClock:clock,playRate:()=>rate,practicing:true,practiceSpeed:rate,stopSource(){},lockPageScroll(){},$:()=>({}),gain:{},buffer:{duration:15},chart:base,source:null,startAt:0,resumeAt:0,mode:'paused',ui:{overlay:{},pause:{},settings:{},status:{}}});
+  const state=vm.createContext({context:audio,practiceAudio:{schedule(destination,options){started=[options.when,options.offset,options.duration];assert.equal(options.rate,rate);return {};}},playbackClock:clock,playRate:()=>rate,practicing:true,practiceSpeed:rate,stopSource(){},lockPageScroll(){},$:()=>({}),gain:{},buffer:{duration:15},chart:base,source:null,startAt:0,resumeAt:0,mode:'paused',ui:{overlay:{},pause:{},settings:{},status:{}}});
   vm.runInContext(slice('function schedule(', 'async function startGame('),state);
   state.schedule(-2.5,.1);
   assert.equal(started[0],102.6);assert.equal(started[1],0);assert.equal(started[2],15);
-  assert.equal(state.source.playbackRate.value,rate);
+  if(rate===1)assert.equal(state.source.playbackRate.value,1);
   audio.currentTime=102.6+1/rate;assert.ok(Math.abs(clock.read(audio,0).time-1/rate)<1e-8);
   const from=5/rate;audio.currentTime=200;state.schedule(from,2);
   assert.equal(started[0],202);assert.equal(started[1],5);assert.equal(started[2],10);
@@ -57,7 +57,7 @@ test('practice completion cannot read/write best scores, rank, generate images o
 test('returning to title stops playback, cancels requests and leaves only the opening screen',()=>{
  const elements=new Map();const $=id=>{if(!elements.has(id))elements.set(id,{hidden:false,disabled:true,close(){},focus(){}});return elements.get(id);};
  const classes=new Set(['practice-active']);let stopped=0,unlocked=0;
- const state=vm.createContext({mode:'paused',practicing:true,selectionPractice:true,updateSelectionPractice(){},chartRequest:4,requestId:5,wheelTimer:1,clearTimeout(){},resultTransition:{cancel(){}},resultShare:{clear(){}},leaderboard:{clearResult(){}},stopSource(){stopped++;},resetInputs(){},unlockPageScroll(){unlocked++;},$,document:{body:{classList:{add:v=>classes.add(v),remove:v=>classes.delete(v)}}},window:{scrollTo(){}},ui:{overlay:{},pause:{},settings:{},status:{}}});
+ const state=vm.createContext({practiceAudio:{release(){}},mode:'paused',practicing:true,selectionPractice:true,updateSelectionPractice(){},chartRequest:4,requestId:5,wheelTimer:1,clearTimeout(){},resultTransition:{cancel(){}},resultShare:{clear(){}},leaderboard:{clearResult(){}},stopSource(){stopped++;},resetInputs(){},unlockPageScroll(){unlocked++;},$,document:{body:{classList:{add:v=>classes.add(v),remove:v=>classes.delete(v)}}},window:{scrollTo(){}},ui:{overlay:{},pause:{},settings:{},status:{}}});
  vm.runInContext(slice('function showTitle(', 'function useChart('),state);state.showTitle();
  assert.equal(state.mode,'title');assert.equal(state.practicing,false);assert.equal(state.selectionPractice,false);assert.equal(stopped,1);assert.equal(unlocked,1);
  assert.equal(state.chartRequest,5);assert.equal(state.requestId,6);assert.equal(state.chart,null);

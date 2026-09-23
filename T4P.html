@@ -85,7 +85,7 @@
         <button id="practice-toggle" type="button" aria-pressed="false" aria-controls="selection-practice-options">練習モードにする</button>
         <div id="selection-practice-options" hidden>
           <label for="selection-practice-speed">再生速度</label><select id="selection-practice-speed"></select>
-          <p>曲のNORMAL／HARDを押すと練習開始。スコアは記録されません。低速では音程も下がります。</p>
+          <p>曲のNORMAL／HARDを押すと練習開始。スコアは記録されません。音程はそのままで再生します。</p>
         </div>
       </div>
     </section>
@@ -348,7 +348,7 @@
       <p id="result-transition-hint">まもなく結果を表示します</p>
     </div>
   </div>
-  <script type="module" src="rhythm/game.mjs?v=practice-toggle-v44"></script>
+  <script type="module" src="rhythm/game.mjs?v=pitch-v46"></script>
   <dialog id="practice-dialog" aria-labelledby="practice-title">
     <form method="dialog" class="dialog-heading"><h2 id="practice-title">練習モード</h2><button class="icon-button" aria-label="練習設定を閉じる">×</button></form>
     <p id="practice-song"></p>

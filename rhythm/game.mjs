@@ -1,3 +1,4 @@
+import { PracticeAudio } from './practice-audio.mjs?v=pitch-v46';
 import { PRACTICE_RATES, practiceRate, practiceChart } from './practice.mjs?v=practice-v41';
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
 import { PlaybackClock } from './playback-clock.mjs?v=clock-fix-v26';
@@ -30,6 +31,10 @@ const audioDataCache=new Map(),audioBufferCache=new Map(),audioFetchPromises=new
 let scrollLockState=null;
 const resultTransition = new ResultTransition();
 const playbackClock = new PlaybackClock();
+const practiceAudio = new PracticeAudio(error=>{
+  if(mode==='playing')pause();
+  if(mode==='paused')ui['overlay-description'].textContent=error.message;
+});
 let mode = 'title', startAt = 0, resumeAt = 0, frozenTime = -2.5, judgmentUntil = 0;
 let width = 800, height = 600, lastHud = 0, requestId = 0;
 const settingsKey = 'kaichi-rhythm-settings-v3';
@@ -188,6 +193,8 @@ async function loadAudio() {
   await ensureAudioContext();
   const [songBuffer]=await Promise.all([decodeSong(chart.audio),loadTap()]);
   buffer=songBuffer;
+  if(practicing&&practiceSpeed<1)await practiceAudio.prepare(context,buffer);
+  else practiceAudio.release();
 }
 function schedule(from, leadIn) {
   stopSource();
@@ -197,9 +204,13 @@ function schedule(from, leadIn) {
   startAt = when - Math.max(0, from);
   resumeAt = currentTime + leadIn;
   playbackClock.reset({from, currentTime, startAt, resumeAt});
-  source = context.createBufferSource(); source.buffer = buffer; source.playbackRate.value=playRate(); source.connect(gain);
   const remaining = Math.max(0, Math.min(chart.duration, buffer.duration) - playFrom);
-  source.start(when, playFrom, remaining);
+  if(practicing&&practiceSpeed<1) {
+    source=practiceAudio.schedule(gain,{when,offset:playFrom,duration:remaining,rate:practiceSpeed});
+  } else {
+    source = context.createBufferSource(); source.buffer = buffer; source.connect(gain);
+    source.start(when, playFrom, remaining);
+  }
   $('back-to-select').disabled=false;
   mode = 'playing';lockPageScroll();ui.overlay.hidden = true; ui.pause.disabled = false;
   ui.settings.disabled = true; ui.status.textContent = practicing ? `練習中 — ${practiceSpeed}倍速` : 'PLAYING — Q / W / E / R';
@@ -257,6 +268,7 @@ async function resume() {
   ui.start.disabled = true;
   try {
     await context.resume();
+    if(practicing&&practiceSpeed<1)await practiceAudio.prepare(context,buffer);
     if (token !== requestId || mode !== 'paused') return;
     schedule(frozenTime, 2);
     ui.start.blur();
@@ -439,7 +451,7 @@ function showTitle() {
   resultTransition.cancel(); $('result-transition').hidden=true;
   clearTimeout(wheelTimer); ++chartRequest; ++requestId;
   resultShare.clear();leaderboard.clearResult();
-  stopSource();resetInputs();unlockPageScroll();
+  stopSource();practiceAudio.release();resetInputs();unlockPageScroll();
   mode='title';practicing=false;selectionPractice=false;updateSelectionPractice();frozenTime=-2.5;engine=null;chart=null;logoTaps=0;
   $('practice-dialog').close();$('settings-dialog').close();
   $('title-screen').hidden=false;$('title-start').disabled=false;
@@ -697,7 +709,7 @@ function openPractice(index=selectedIndex) {
   $('practice-difficulty').disabled=true;
   $('practice-speed').value=String(practiceSpeed);
   updatePracticeDifficulty();
-  $('practice-help').textContent='スコア・ランキングは記録されません。低速では音程も低くなります。';
+  $('practice-help').textContent='スコア・ランキングは記録されません。音程を保ったままゆっくり練習できます。';
   $('practice-begin').textContent='この速度で最初から練習';
   $('practice-dialog').showModal();
 }
