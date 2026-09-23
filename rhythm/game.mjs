@@ -673,7 +673,7 @@ for(const id of ['practice-speed','selection-practice-speed']) {
 }
 function updateSelectionPractice() {
   $('practice-toggle').setAttribute('aria-pressed',String(selectionPractice));
-  $('practice-toggle').textContent=selectionPractice?'✓ 練習モード中（解除）':'練習モードにする';
+  $('practice-toggle').textContent=selectionPractice?'✓ 練習モード中（解除）':'練習モード';
   $('selection-practice-options').hidden=!selectionPractice;
   $('selection-practice-speed').value=String(practiceSpeed);
   if(mode==='select')$('ranking-window').hidden=selectionPractice;
