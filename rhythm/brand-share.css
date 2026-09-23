@@ -132,3 +132,5 @@ html.play-scroll-locked,html.play-scroll-locked body{overflow:hidden;overscroll-
 .practice-active .desktop-layout{grid-template-columns:minmax(0,1fr)}
 #practice-live,#practice-adjust,#back-to-select{min-height:44px}
 @media(max-width:700px){.song-wheel{height:290px;padding:62px 6px}.song-option{height:166px;gap:10px}.song-option img{width:48px;height:48px}.song-difficulties .song-play-button{min-width:68px;font-size:11px}.song-option strong{font-size:17px}.song-practice-button{margin-top:6px}.selection-screen{padding:16px 10px}}
+#practice-live{margin-top:12px;background:#b5e8f7;color:#17394b;border-color:#e5f8ff #4e94ad #4e94ad #e5f8ff}
+.practice-active .overlay.is-results #overlay-description{display:block;font-size:13px;line-height:1.7}
