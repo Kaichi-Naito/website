@@ -1,8 +1,9 @@
+import { PRACTICE_RATES, practiceRate, practiceChart } from './practice.mjs?v=practice-v41';
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
 import { PlaybackClock } from './playback-clock.mjs?v=clock-fix-v26';
 import { ResultShare } from './result-share.mjs?v=ios-photo-save-v39';
 import { loadCatalog, groupSongs } from './catalog.mjs?v=grouped-songs-v2';
-import { RhythmEngine } from './engine.mjs?v=empty-miss-v1';
+import { RhythmEngine } from './engine.mjs?v=practice-v41';
 import { midiToChart } from './midi.mjs?v=song-select-v1';
 import { Leaderboard } from './leaderboard.mjs?v=result-ranking-v29';
 import { approachSeconds, tapLevel, readSettings } from './settings.mjs?v=song-select-v1';
@@ -16,6 +17,9 @@ const judgmentColors = {PERFECT:'#ffe37a',GREAT:'#c4a2ff',GOOD:'#80e5b0',MISS:'#
 const flashColors=[...colors], errors=[0,0,0,0], bursts=[];
 let songs=[], selectedIndex=-1, selectedDifficulty=0, chartRequest=0, wheelTimer;
 let developerMode=false, logoTaps=0;
+let practicing=false, practiceSpeed=0.7, practiceSongIndex=0, practiceReturnMode='select';
+const playRate=()=>practicing?practiceSpeed:1;
+const playDuration=()=> (chart?.duration || 0)/playRate();
 const wheel=$('song-wheel');
 const inputSources = [new Set(), new Set(), new Set(), new Set()];
 const flashes = [-Infinity,-Infinity,-Infinity,-Infinity];
@@ -116,6 +120,8 @@ function pauseForClockReset() {
 function judgeTime() { return songTime() - settings.offset / 1000; }
 function showOverlay(eyebrow, title, description, button) {
   ui.overlay.classList.toggle('is-results', mode === 'results');
+  $('practice-adjust').hidden=!practicing || !['paused','results'].includes(mode);
+  $('practice-live').hidden=!practicing || mode!=='results';
   $('overlay-card').scrollTop = 0;
   ui.overlay.hidden = false;
   ui['overlay-eyebrow'].textContent = eyebrow;
@@ -184,26 +190,33 @@ async function loadAudio() {
 }
 function schedule(from, leadIn) {
   stopSource();
-  const playFrom = Math.max(0, from);
+  const playFrom = Math.max(0, from) * playRate();
   const currentTime = context.currentTime;
   const when = currentTime + leadIn + Math.max(0, -from);
-  startAt = when - playFrom;
+  startAt = when - Math.max(0, from);
   resumeAt = currentTime + leadIn;
   playbackClock.reset({from, currentTime, startAt, resumeAt});
-  source = context.createBufferSource(); source.buffer = buffer; source.connect(gain);
+  source = context.createBufferSource(); source.buffer = buffer; source.playbackRate.value=playRate(); source.connect(gain);
   const remaining = Math.max(0, Math.min(chart.duration, buffer.duration) - playFrom);
   source.start(when, playFrom, remaining);
   $('back-to-select').disabled=false;
   mode = 'playing';lockPageScroll();ui.overlay.hidden = true; ui.pause.disabled = false;
-  ui.settings.disabled = true; ui.status.textContent = 'PLAYING — Q / W / E / R';
+  ui.settings.disabled = true; ui.status.textContent = practicing ? `練習中 — ${practiceSpeed}倍速` : 'PLAYING — Q / W / E / R';
 }
 async function startGame() {
   if (!chart || mode === 'playing' || mode === 'loading' || mode === 'finishing') return;
   resultTransition.cancel(); $('result-transition').hidden=true;
   clearTimeout(wheelTimer); ++chartRequest;
   resultShare.clear(); ui.result.hidden=true; leaderboard.clearResult();
-  $('selection-screen').hidden=true; $('play-workspace').hidden=false; resize();
+  $('selection-screen').hidden=true; $('play-workspace').hidden=false;
+  document.body.classList.toggle('practice-active',practicing);
+  $('ranking-window').hidden=practicing; $('game-page-note').hidden=practicing;
+  $('playing-duration').textContent=clockString(playDuration());
+  $('score-label').textContent=practicing?'PRACTICE':'SCORE';
+  $('practice-speed-label').textContent=`${playRate()}倍速`;
+  resize();updateHud();
   $('settings-dialog').close();
+  mode='loading';
   showOverlay('LOADING', chart.title, '音源を準備しています。', '音源を読み込み中…');
   const token = ++requestId;
   mode = 'loading'; ui.start.disabled = true; ui.start.textContent = '音源を読み込み中…';
@@ -212,7 +225,7 @@ async function startGame() {
   try {
     await loadAudio();
     if (token !== requestId) return;
-    resetInputs(); bursts.length=0; flashes.fill(-Infinity); errors.fill(0); engine = new RhythmEngine(chart, onJudge);
+    resetInputs(); bursts.length=0; flashes.fill(-Infinity); errors.fill(0); engine = new RhythmEngine(practicing?practiceChart(chart,practiceSpeed):chart, onJudge, {scoring:!practicing});
     leaderboard.clearResult();
     frozenTime = -2.5; ui.result.hidden = true; ui.restart.hidden = true;
     ui.combo.textContent = ''; ui.judgment.style.opacity = 0; judgmentUntil = 0;
@@ -229,7 +242,7 @@ async function startGame() {
 function pause() {
   if (mode !== 'playing') return;
   const state = playbackState();
-  frozenTime = Math.max(-2.5, Math.min(state.time, chart.duration));
+  frozenTime = Math.max(-2.5, Math.min(state.time, playDuration()));
   if (!state.waiting && !state.interrupted) engine.tick(frozenTime - settings.offset / 1000);
   mode = 'paused'; stopSource(); resetInputs();unlockPageScroll();
   ui.pause.disabled = true; ui.settings.disabled = false; ui.countdown.textContent = '';
@@ -250,10 +263,11 @@ async function resume() {
 }
 function finish() {
   if (mode !== 'playing') return;
-  engine.tick(chart.duration + 1);
-  frozenTime = chart.duration; mode = 'finishing'; stopSource(); resetInputs();
+  engine.tick(playDuration() + 1);
+  frozenTime = playDuration(); mode = 'finishing'; stopSource(); resetInputs();
   ui.pause.disabled=true; ui.settings.disabled=true; ui.countdown.textContent='';
-  ui.status.textContent='結果集計中…';
+  ui.status.textContent=practicing?'練習終了':'結果集計中…';
+  $('result-transition-title').textContent=practicing?'練習終了':'結果集計中…';
   resultTransition.begin(performance.now());
   $('result-transition-fill').style.width='0%';
   $('result-transition-progress').setAttribute('aria-valuenow','0');
@@ -266,6 +280,12 @@ function showResults() {
   mode='results'; unlockPageScroll();
   updateHud();
   ui.pause.disabled = true; ui.settings.disabled = false; ui.restart.hidden = true;
+  if(practicing) {
+    resultShare.clear();leaderboard.clearResult();ui.result.hidden=true;
+    showOverlay('PRACTICE COMPLETE','練習おつかれさま！',`${chart.title} / ${chart.difficulty} / ${practiceSpeed}倍速。慣れてきたら本番に挑戦してみよう。`,'もう一度練習');
+    ui.status.textContent='練習終了 — スコアは記録されません';
+    return;
+  }
   const best = readBest();
   if (engine.score > best) { try { localStorage.setItem(bestKey(), String(engine.score)); } catch { /* optional */ } }
   bestUI();
@@ -379,7 +399,8 @@ function enterSongSelection() {
   void loadSongs();
   wheel.focus();
 }
-$('back-to-select').addEventListener('click',showSelection);
+$('back-to-select').addEventListener('click',showTitle);
+$('selection-back').addEventListener('click',showTitle);
 $('play-selected').addEventListener('click',startGame);
 $('catalog-retry').addEventListener('click',loadSongs);
 $('developer-logo').addEventListener('click',handleDeveloperLogo);
@@ -412,16 +433,19 @@ wheel.addEventListener('scroll',()=>{
     if(nearest!==selectedIndex){wheel.dispatchEvent(new Event('song-scroll-select'));selectSong(nearest,false);}
   },110);
 });
-function showSelection() {
+function showTitle() {
   if(mode==='finishing')return;
   resultTransition.cancel(); $('result-transition').hidden=true;
-  clearTimeout(wheelTimer); ++chartRequest;
-  resultShare.clear();
-  ++requestId;stopSource();resetInputs();unlockPageScroll();mode='select';frozenTime=-2.5;
-  $('selection-screen').hidden=false;$('play-workspace').hidden=true;ui.overlay.hidden=true;
-  ui.pause.disabled=true;ui.settings.disabled=false;leaderboard.clearResult();
-  ui.status.textContent='MUSIC SELECT';
-  wheel.children[selectedIndex]?.querySelectorAll('.song-play-button')[selectedDifficulty]?.focus();
+  clearTimeout(wheelTimer); ++chartRequest; ++requestId;
+  resultShare.clear();leaderboard.clearResult();
+  stopSource();resetInputs();unlockPageScroll();
+  mode='title';practicing=false;frozenTime=-2.5;engine=null;chart=null;logoTaps=0;
+  $('practice-dialog').close();$('settings-dialog').close();
+  $('title-screen').hidden=false;$('title-start').disabled=false;
+  document.body.classList.add('title-screen-active');document.body.classList.remove('practice-active');
+  for(const id of ['selection-screen','play-workspace','game-menubar','ranking-window','game-page-note'])$(id).hidden=true;
+  ui.overlay.hidden=true;ui.pause.disabled=true;ui.settings.disabled=false;
+  ui.status.textContent='PRESS START';window.scrollTo(0,0);$('title-start').focus();
 }
 function useChart(next) {
   if(mode!=='select'||$('selection-screen').hidden)return;
@@ -499,11 +523,15 @@ async function loadSongs() {
           // Unlock audio during the user gesture, before loading a different chart.
           void ensureAudioContext().catch(()=>{});
           wheel.dispatchEvent(new Event('song-play'));
+          practicing=false;
           void selectSong(index,false,difficulty,true);
         });
         difficulties.append(button);
       });
-      details.append(title,artist,difficulties);item.append(img,details);
+      const practice=document.createElement('button');practice.type='button';practice.className='song-practice-button';
+      practice.textContent='練習する';practice.setAttribute('aria-label',`${song.title}を練習する`);
+      practice.addEventListener('click',event=>{event.stopPropagation();openPractice(index);});
+      details.append(title,artist,difficulties,practice);item.append(img,details);
       item.addEventListener('click',()=>selectSong(index,true));wheel.append(item);
     });
     await selectSong(0,false);
@@ -546,8 +574,8 @@ function draw(time, now) {
       laneQuad(lane,.70,1.01,flashColors[lane]); g.globalAlpha=1;
     }
   }
-  const approach = approachSeconds(settings.speed);
-  const beat = 60 / (chart?.bpm || 162);
+  const approach = approachSeconds(settings.speed)/playRate();
+  const beat = 60 / ((chart?.bpm || 162)*playRate());
   for (let k=Math.floor(time/beat);k<(time+approach)/beat+1;k++) {
     const d=1-(k*beat-time)/approach;if(d<0||d>1)continue;
     g.beginPath();const a=point(0,d),b=point(4,d);g.moveTo(a.x,a.y);g.lineTo(b.x,b.y);g.strokeStyle=k%4===0?'#667aa54a':'#667aa51c';g.lineWidth=1;g.stroke();
@@ -595,7 +623,7 @@ function draw(time, now) {
 }
 function clockString(time) { time=Math.floor(Math.max(0,time));return `${Math.floor(time/60)}:${String(time%60).padStart(2,'0')}`; }
 function updateHud() {
-  ui.score.textContent = String(engine?.score || 0).padStart(7,'0');
+  ui.score.textContent = practicing ? '練習中' : String(engine?.score || 0).padStart(7,'0');
   const accuracy = engine?.accuracy ?? 100;
   ui.accuracy.textContent = `${accuracy.toFixed(2)}%`;
   ui['accuracy-fill'].style.width = `${accuracy}%`;
@@ -605,7 +633,7 @@ function updateHud() {
     ui.combo.dataset.value = combo; ui.combo.replaceChildren();
     if(combo>=2){ui.combo.append(document.createTextNode(combo));const small=document.createElement('small');small.textContent='COMBO';ui.combo.append(small);}
   }
-  const time=songTime();ui.elapsed.textContent=`${clockString(time)} / ${clockString(chart?.duration || 30)}`;ui.progress.style.width=`${Math.max(0,Math.min(100,time/(chart?.duration || 30)*100))}%`;
+  const time=songTime();ui.elapsed.textContent=`${clockString(time)} / ${clockString(playDuration() || 0)}`;ui.progress.style.width=`${Math.max(0,Math.min(100,time/(playDuration() || 1)*100))}%`;
 }
 function frame(now) {
   const state = mode==='playing' ? playbackState() : null;
@@ -614,7 +642,7 @@ function frame(now) {
   if(mode==='playing') {
     if(!state.waiting) engine.tick(time);
     ui.countdown.textContent=state.countdown ? String(state.countdown) : '';
-    if(state.time>=Math.min(buffer.duration,chart.duration)+.2)finish();
+    if(state.time>=Math.min(buffer.duration,chart.duration)/playRate()+.2)finish();
   }
   if(mode==='finishing') {
     const percent=Math.round(resultTransition.progress(now)*100);
@@ -629,4 +657,53 @@ function frame(now) {
   if(now-lastHud>70){updateHud();lastHud=now;}
   requestAnimationFrame(frame);
 }
+// Practice setup is shared by song selection, pause and practice completion.
+for(const rate of PRACTICE_RATES) {
+  const option=document.createElement('option');option.value=String(rate);option.textContent=`${rate}倍速`;
+  $('practice-speed').append(option);
+}
+function openPractice(index=selectedIndex) {
+  if(!['select','paused','results'].includes(mode)||!songs[index])return;
+  if(mode!=='select'&&!practicing)return;
+  clearTimeout(wheelTimer);++chartRequest;
+  practiceSongIndex=index;practiceReturnMode=mode;mode='practice-setup';
+  $('practice-song').textContent=songs[index].title;
+  $('practice-difficulty').replaceChildren();
+  songs[index].charts.forEach((entry,i)=>{
+    const option=document.createElement('option');option.value=String(i);option.textContent=entry.difficulty;
+    $('practice-difficulty').append(option);
+  });
+  $('practice-difficulty').value=String(index===selectedIndex?selectedDifficulty:0);
+  $('practice-difficulty').disabled=practiceReturnMode!=='select';
+  $('practice-speed').value=String(practiceSpeed);
+  updatePracticeDifficulty();
+  $('practice-help').textContent='スコア・ランキングは記録されません。低速では音程も低くなります。';
+  $('practice-begin').textContent=practiceReturnMode==='select'?'練習を始める':'この速度で最初から練習';
+  $('practice-dialog').showModal();
+}
+function updatePracticeDifficulty() {
+  $('practice-difficulty').setAttribute('data-difficulty',songs[practiceSongIndex]?.charts[Number($('practice-difficulty').value)]?.difficulty.toUpperCase()||'NORMAL');
+}
+function cancelPracticeSetup() {
+  if(mode!=='practice-setup')return;
+  mode=practiceReturnMode;
+  // If opening the dialog cancelled a MIDI request, restore a selectable chart.
+  if(mode==='select'&&!chart)void selectSong(Math.max(0,selectedIndex),false,selectedDifficulty);
+}
+$('practice-difficulty').addEventListener('change',updatePracticeDifficulty);
+$('practice-dialog').addEventListener('close',cancelPracticeSetup);
+$('practice-adjust').addEventListener('click',()=>openPractice());
+$('practice-begin').addEventListener('click',()=>{
+  if(mode!=='practice-setup')return;
+  practiceSpeed=practiceRate($('practice-speed').value);practicing=true;
+  const difficulty=Number($('practice-difficulty').value);
+  mode=practiceReturnMode;$('practice-dialog').close();
+  wheel.dispatchEvent(new Event('song-play'));void ensureAudioContext().catch(()=>{});
+  if(mode==='select')void selectSong(practiceSongIndex,false,difficulty,true);
+  else void startGame();
+});
+$('practice-live').addEventListener('click',()=>{
+  if(mode!=='results'||!practicing)return;
+  practicing=false;wheel.dispatchEvent(new Event('song-play'));void startGame();
+});
 $('title-start').disabled=false;resize();requestAnimationFrame(frame);

@@ -108,3 +108,27 @@ html.play-scroll-locked,html.play-scroll-locked body{overflow:hidden;overscroll-
 .game-title-keys span:nth-child(n+3){border-color:#de8bce59;color:#d99acb}
 @media(max-width:700px){.game-title-screen{min-height:calc(100svh - 140px);padding:28px 16px}.game-title-logo{width:min(290px,66vw)}.game-title-eyebrow{font-size:9px;letter-spacing:2px}.game-title-caption{font-size:12px;margin:18px 0 28px}.game-title-start{font-size:18px}}
 @media(max-height:600px) and (min-width:701px){.game-title-screen{min-height:370px;padding:22px}.game-title-logo{width:190px}.game-title-eyebrow{margin-bottom:12px}.game-title-caption{margin:12px 0 20px}.game-title-keys{margin-top:20px}}
+
+/* Thumb-friendly practice controls. Keep scoring UI absent for the whole run. */
+.song-option{height:166px}
+.song-difficulties .song-play-button{min-height:44px;height:auto;flex:1;font-size:12px}
+.song-practice-button{display:block;width:100%;min-height:44px;margin-top:8px;border:1px solid #8da0bd;background:#28374c;color:#dce8fa;font:13px var(--mono);touch-action:manipulation}
+#selection-back{display:block;width:100%;max-width:330px;min-height:44px;margin:22px auto 0}
+#practice-dialog{width:min(420px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:22px;border:2px solid #79869f;background:#171e30;color:#edf3ff;box-shadow:6px 6px 0 #0005}
+#practice-dialog::backdrop{background:#020816c9}
+#practice-dialog .dialog-heading{margin-bottom:16px}
+#practice-dialog .icon-button{min-width:44px;min-height:44px}
+#practice-song{font-size:20px;margin:0 0 20px}
+#practice-dialog label{display:block;font-size:13px;color:#b9cbe0;margin:18px 0 8px}
+#practice-dialog select{display:block;width:100%;min-height:48px;padding:10px;background:#0c1425;color:#e1efff;border:1px solid #7b92ae;font:16px var(--mono);border-radius:0}
+#practice-dialog #practice-difficulty{color:var(--difficulty-ink);border-color:var(--difficulty-border);background:var(--difficulty-bg)}
+#practice-help{font:12px/1.8 var(--mono);color:#b8c8df;margin:18px 0}
+#practice-begin{min-height:48px}
+.practice-speed-label{display:none;margin:0;padding:8px 16px;background:#21354a;color:#bde6f4;font:12px var(--mono);text-align:center}
+.practice-active .practice-speed-label{display:block}
+.practice-active .accuracy,.practice-active .best-score,.practice-active .rule{display:none!important}
+.practice-active #score{font-size:22px;letter-spacing:2px;color:#bde6f4}
+.practice-active .pause-button{margin-left:auto}
+.practice-active .desktop-layout{grid-template-columns:minmax(0,1fr)}
+#practice-live,#practice-adjust,#back-to-select{min-height:44px}
+@media(max-width:700px){.song-wheel{height:290px;padding:62px 6px}.song-option{height:166px;gap:10px}.song-option img{width:48px;height:48px}.song-difficulties .song-play-button{min-width:68px;font-size:11px}.song-option strong{font-size:17px}.song-practice-button{margin-top:6px}.selection-screen{padding:16px 10px}}

@@ -8,7 +8,8 @@ export function holdTicks(note, bpm = 120) {
   return count ? Array.from({length:count},(_,i)=>note.t+(i+1)*beat) : [note.end];
 }
 export class RhythmEngine {
-  constructor(chart, onJudge = () => {}) {
+  constructor(chart, onJudge = () => {}, {scoring=true} = {}) {
+    this.scoring=scoring;
     this.notes = chart.notes.map(n => {
       let start=n.t;
       const segments=holdTicks(n,chart.bpm).map(end=>{const s={start,end,held:0,done:false};start=end;return s;});
@@ -65,6 +66,6 @@ export class RhythmEngine {
   release(lane,time) {this.tick(time);this.held[lane]=false;}
   get weightedHits(){return this.counts.PERFECT+this.counts.GREAT*.8+this.counts.GOOD*.5;}
   get netHits(){return Math.max(0,this.weightedHits-this.emptyPresses);}
-  get score(){return this.units?Math.round(this.netHits/this.units*1000000):0;}
+  get score(){return this.scoring&&this.units?Math.round(this.netHits/this.units*1000000):0;}
   get accuracy(){return this.resolved?this.netHits/this.resolved*100:this.emptyPresses?0:100;}
 }

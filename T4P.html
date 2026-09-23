@@ -59,7 +59,7 @@
     .rhythm-start-item img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
     @media(max-width:700px){.song-wheel{height:300px;padding:108px 10px}.song-option{height:84px;padding:5px 8px;margin-bottom:6px}.song-play-button{min-width:60px;height:32px;padding:3px 6px;font-size:10px}.settings-gear{font-size:23px}#rhythm-taskbar{height:28px}#rhythm-start-btn,#rhythm-task{height:22px}#rhythm-start-btn img{height:16px}#rhythm-task{width:120px;font-size:10px}#rhythm-tray{height:22px;padding:0 5px}#rhythm-tray img{width:25px;height:25px}#rhythm-clock{font-size:11px;min-width:36px}#rhythm-start-menu{bottom:30px}}
   </style>
-  <link rel="stylesheet" href="rhythm/brand-share.css?v=title-screen-v40">
+  <link rel="stylesheet" href="rhythm/brand-share.css?v=practice-v41">
 </head>
 <body class="title-screen-active">
   <header class="desktop-header"><a href="index.html">← Kaichi Guitar Music</a><span>GAMES / 001</span></header>
@@ -80,6 +80,7 @@
         <div class="song-preview"><img id="selected-jacket" src="images/CDjacket/Rolling500x500.png" alt=""><p id="selected-artist">—</p><h2 id="selected-title">楽曲を読み込み中…</h2><div class="preview-tags"><span id="selected-difficulty">—</span><span id="selected-bpm">— BPM</span><span id="selected-duration">—</span></div></div>
         <div class="song-picker"><button id="song-prev" class="wheel-arrow" aria-label="前の曲" disabled>▲</button><div id="song-wheel" class="song-wheel" role="listbox" aria-label="楽曲一覧" tabindex="0"></div><button id="song-next" class="wheel-arrow" aria-label="次の曲" disabled>▼</button><button id="play-selected" class="primary-button" disabled>楽曲を読み込み中…</button><p id="selection-status" role="status">楽曲一覧を読み込んでいます</p><button id="catalog-retry" class="secondary-button" hidden>一覧を再読み込み</button></div>
       </div>
+      <button id="selection-back" class="secondary-button">スタート画面に戻る</button>
     </section>
     <div class="workspace" id="play-workspace" hidden>
       <aside class="sidebar">
@@ -91,7 +92,8 @@
         <p class="best-score">PERSONAL BEST <strong id="best-score">—</strong></p>
       </aside>
       <section class="game-area" aria-label="4レーンの音楽ゲーム">
-        <div class="hud"><div><span>SCORE</span><strong id="score">0000000</strong></div><div class="accuracy"><span>ACCURACY</span><strong id="accuracy">100.00<small>%</small></strong><div id="accuracy-meter" class="accuracy-track" role="meter" aria-label="精度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="accuracy-fill"></div></div></div><button id="pause" class="pause-button" aria-label="一時停止" title="一時停止（Space / Esc）" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="5" height="16" rx="1"/><rect x="14" y="4" width="5" height="16" rx="1"/></svg><span>一時停止</span></button></div>
+        <div class="hud"><div><span id="score-label">SCORE</span><strong id="score">0000000</strong></div><div class="accuracy"><span>ACCURACY</span><strong id="accuracy">100.00<small>%</small></strong><div id="accuracy-meter" class="accuracy-track" role="meter" aria-label="精度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="accuracy-fill"></div></div></div><button id="pause" class="pause-button" aria-label="一時停止" title="一時停止（Space / Esc）" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="5" height="16" rx="1"/><rect x="14" y="4" width="5" height="16" rx="1"/></svg><span>一時停止</span></button></div>
+        <p id="practice-speed-label" class="practice-speed-label"></p>
         <div class="stage" id="stage">
           <canvas id="canvas" aria-label="上からノーツが落ちる4レーン。左からQ、W、E、R。"></canvas>
           <div class="stage-heading"><span id="stage-song">ROLLING</span><span id="stage-artist">PHALUX</span></div>
@@ -122,7 +124,9 @@
               <section id="result-share" aria-label="結果を共有" hidden></section>
               <button id="start" class="primary-button" disabled>譜面を読み込み中…</button>
               <button id="restart" class="secondary-button" hidden>最初からやり直す</button>
-              <button id="back-to-select" class="secondary-button">曲選択に戻る</button>
+              <button id="practice-live" class="primary-button" hidden>本番に進む</button>
+              <button id="practice-adjust" class="secondary-button" hidden>速度を変更</button>
+              <button id="back-to-select" class="secondary-button">スタート画面に戻る</button>
               <section id="result-ranking" aria-label="今回の結果を含むトップ10" hidden>
                 <h3>TOP 10 RANKING</h3>
                 <p id="result-ranking-status" role="status"></p>
@@ -332,12 +336,20 @@
   <div id="result-transition" hidden role="status" aria-live="polite">
     <div class="result-transition-card">
       <p class="eyebrow">SONG COMPLETE</p>
-      <h2>結果集計中…</h2>
+      <h2 id="result-transition-title">結果集計中…</h2>
       <div id="result-transition-progress" role="progressbar" aria-label="結果表示まで" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="result-transition-fill"></div></div>
       <p id="result-transition-hint">まもなく結果を表示します</p>
     </div>
   </div>
-  <script type="module" src="rhythm/game.mjs?v=title-screen-v40"></script>
+  <script type="module" src="rhythm/game.mjs?v=practice-v41"></script>
+  <dialog id="practice-dialog" aria-labelledby="practice-title">
+    <form method="dialog" class="dialog-heading"><h2 id="practice-title">練習モード</h2><button class="icon-button" aria-label="練習設定を閉じる">×</button></form>
+    <p id="practice-song"></p>
+    <label for="practice-difficulty">難易度</label><select id="practice-difficulty"></select>
+    <label for="practice-speed">再生速度</label><select id="practice-speed"></select>
+    <p id="practice-help"></p>
+    <button id="practice-begin" class="primary-button" type="button">練習を始める</button>
+  </dialog>
   <dialog id="settings-dialog" aria-labelledby="settings-title">
     <form method="dialog" class="dialog-heading"><h2 id="settings-title">プレイ設定</h2><button aria-label="設定を閉じる" class="icon-button">×</button></form>
         <fieldset id="settings"><legend>PLAY SETTINGS</legend>

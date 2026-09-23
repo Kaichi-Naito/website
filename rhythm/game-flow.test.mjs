@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 const source=readFileSync(new URL('./game.mjs',import.meta.url),'utf8');
 const select=source.slice(source.indexOf('async function selectSong('),source.indexOf('async function loadSongs('));
-const wheelHandlers=source.slice(source.indexOf("wheel.addEventListener('keydown'"),source.indexOf('function showSelection('));
+const wheelHandlers=source.slice(source.indexOf("wheel.addEventListener('keydown'"),source.indexOf('function showTitle('));
 function fixture() {
   const elements=new Map(),handlers={},events=[],timers=new Map(),responses=[];let timerId=0,fetches=0;
   const element=()=>({hidden:false,disabled:false,textContent:'',setAttribute(){},scrollIntoView(){}});
@@ -16,7 +16,7 @@ function fixture() {
   return {context,$,wheel,handlers,events,timers,responses,fetches:()=>fetches};
 }
 test('a queued song-wheel scroll cannot replace the chart after gameplay starts or ends',()=>{
-  for(const mode of ['loading','playing','paused','finishing','results']){
+  for(const mode of ['title','practice-setup','loading','playing','paused','finishing','results']){
     const f=fixture();f.context.selectedIndex=1;f.handlers.scroll();
     const queued=[...f.timers.values()];
     f.context.mode=mode;f.$('selection-screen').hidden=true;
@@ -39,7 +39,7 @@ test('visible song-wheel scrolling still selects the nearest song',()=>{
 });
 
 test('a MIDI response arriving after leaving selection cannot overwrite results',async()=>{
-  for(const mode of ['loading','playing','paused','finishing','results']){
+  for(const mode of ['title','practice-setup','loading','playing','paused','finishing','results']){
     const f=fixture();const pending=f.context.selectSong(1,false);
     f.context.mode=mode;f.$('selection-screen').hidden=true;
     f.context.chart={id:'finished'};f.context.engine={score:456};
@@ -66,7 +66,7 @@ test('five logo taps toggle 15-second mode and five more restore full duration',
  await new Promise(resolve=>setImmediate(resolve));assert.equal(parsed[1].duration,125.952);
 });
 test('logo taps cannot alter active gameplay or results',()=>{
- for(const mode of ['loading','playing','paused','finishing','results']){
+ for(const mode of ['title','practice-setup','loading','playing','paused','finishing','results']){
   const f=fixture();f.context.mode=mode;
   for(let i=0;i<5;i++)f.context.handleDeveloperLogo();
   assert.equal(f.context.developerMode,false);assert.equal(f.context.chart.id,'kept');assert.equal(f.fetches(),0);

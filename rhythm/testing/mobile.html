@@ -1,0 +1,6 @@
+<!doctype html>
+<html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>T4P スマホ表示テスト</title>
+<style>body{margin:0;background:#20232c;color:#fff;font:14px sans-serif}header{padding:12px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}select,button{font:inherit;padding:8px}main{display:flex;justify-content:center;padding:8px 0 24px}iframe{border:1px solid #78869d;background:#080d1c;flex:none}p{margin:0;color:#b6c3da}</style>
+<header><label>画面サイズ <select id="size"><option value="390,844">390 × 844</option><option value="360,800">360 × 800</option><option value="320,568">320 × 568</option><option value="430,932">430 × 932</option><option value="844,390">844 × 390（横向き）</option></select></label><button id="reload">再読み込み</button><p>表示幅の確認用です。実機のタッチ・Safari・音声処理は再現しません。</p></header>
+<main><iframe id="game" title="T4P スマホ表示" width="390" height="844" src="../../T4P.html" allow="autoplay; web-share"></iframe></main>
+<script>const frame=document.getElementById('game');document.getElementById('size').addEventListener('change',e=>{const [w,h]=e.target.value.split(',');frame.width=w;frame.height=h;});document.getElementById('reload').addEventListener('click',()=>{frame.src='../../T4P.html?preview='+Date.now();});</script></html>
