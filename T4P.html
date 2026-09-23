@@ -59,7 +59,7 @@
     .rhythm-start-item img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
     @media(max-width:700px){.song-wheel{height:300px;padding:108px 10px}.song-option{height:84px;padding:5px 8px;margin-bottom:6px}.song-play-button{min-width:60px;height:32px;padding:3px 6px;font-size:10px}.settings-gear{font-size:23px}#rhythm-taskbar{height:28px}#rhythm-start-btn,#rhythm-task{height:22px}#rhythm-start-btn img{height:16px}#rhythm-task{width:120px;font-size:10px}#rhythm-tray{height:22px;padding:0 5px}#rhythm-tray img{width:25px;height:25px}#rhythm-clock{font-size:11px;min-width:36px}#rhythm-start-menu{bottom:30px}}
   </style>
-  <link rel="stylesheet" href="rhythm/brand-share.css?v=practice-toggle-v44">
+  <link rel="stylesheet" href="rhythm/brand-share.css?v=practice-footer-v45">
 </head>
 <body class="title-screen-active">
   <header class="desktop-header"><a href="index.html">← Kaichi Guitar Music</a><span>GAMES / 001</span></header>
@@ -78,16 +78,16 @@
       <div class="selection-body">
         <div class="song-preview"><img id="selected-jacket" src="images/CDjacket/Rolling500x500.png" alt=""><p id="selected-artist">—</p><h2 id="selected-title">楽曲を読み込み中…</h2><div class="preview-tags"><span id="selected-difficulty">—</span><span id="selected-bpm">— BPM</span><span id="selected-duration">—</span></div></div>
         <div class="song-picker">
-          <div class="selection-practice">
-            <button id="practice-toggle" type="button" aria-pressed="false" aria-controls="selection-practice-options">練習モードにする</button>
-            <div id="selection-practice-options" hidden>
-              <label for="selection-practice-speed">再生速度</label><select id="selection-practice-speed"></select>
-              <p>下のNORMAL／HARDを押すと練習開始。スコアは記録されません。低速では音程も下がります。</p>
-            </div>
-          </div>
           <button id="song-prev" class="wheel-arrow" aria-label="前の曲" disabled>▲</button><div id="song-wheel" class="song-wheel" role="listbox" aria-label="楽曲一覧" tabindex="0"></div><button id="song-next" class="wheel-arrow" aria-label="次の曲" disabled>▼</button><button id="play-selected" class="primary-button" disabled>楽曲を読み込み中…</button><p id="selection-status" role="status">楽曲一覧を読み込んでいます</p><button id="catalog-retry" class="secondary-button" hidden>一覧を再読み込み</button></div>
       </div>
-      <button id="selection-back" class="secondary-button">スタート画面に戻る</button>
+      <div class="selection-actions">
+        <button id="selection-back" class="secondary-button">スタート画面に戻る</button>
+        <button id="practice-toggle" type="button" aria-pressed="false" aria-controls="selection-practice-options">練習モードにする</button>
+        <div id="selection-practice-options" hidden>
+          <label for="selection-practice-speed">再生速度</label><select id="selection-practice-speed"></select>
+          <p>曲のNORMAL／HARDを押すと練習開始。スコアは記録されません。低速では音程も下がります。</p>
+        </div>
+      </div>
     </section>
     <div class="workspace" id="play-workspace" hidden>
       <aside class="sidebar">

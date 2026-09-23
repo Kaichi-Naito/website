@@ -112,7 +112,7 @@ html.play-scroll-locked,html.play-scroll-locked body{overflow:hidden;overscroll-
 /* Thumb-friendly practice controls. Keep scoring UI absent for the whole run. */
 .song-option{height:120px}
 .song-difficulties .song-play-button{min-height:44px;height:auto;flex:1;font-size:12px}
-#selection-back{display:block;width:100%;max-width:330px;min-height:44px;margin:22px auto 0}
+
 #practice-dialog{width:min(420px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:22px;border:2px solid #79869f;background:#171e30;color:#edf3ff;box-shadow:6px 6px 0 #0005}
 #practice-dialog::backdrop{background:#020816c9}
 #practice-dialog .dialog-heading{margin-bottom:16px}
@@ -136,10 +136,11 @@ html.play-scroll-locked,html.play-scroll-locked body{overflow:hidden;overscroll-
 
 .game-title-logo + .game-title-start{margin-top:32px}
 
-.selection-practice{margin:0 6px 8px;text-align:left}
-#practice-toggle{width:100%;min-height:44px;padding:10px;border:1px solid #8197b0;background:#253247;color:#dce8fa;font:13px var(--mono);touch-action:manipulation}
-#practice-toggle[aria-pressed="true"]{background:#203f50;color:#b8eeff;border-color:#8ad7ec}
-#selection-practice-options{padding:12px;border:1px solid #62778d;border-top:0;background:#172535}
+.selection-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:520px;margin:22px auto 0;text-align:left}
+.selection-actions #selection-back,.selection-actions #practice-toggle{width:100%;min-width:0;min-height:44px;margin:0;padding:8px 6px;font:11px/1.5 var(--mono);text-align:center}
+#practice-toggle{border:1px solid #606e85;background:transparent;color:#b7c4d8;touch-action:manipulation}
+#practice-toggle[aria-pressed="true"]{background:#1c303d;color:#b8dce8;border-color:#7096a7}
+#selection-practice-options{grid-column:1/-1;padding:12px;border:1px solid #45566a;background:#152030}
 #selection-practice-options label{display:inline-block;font-size:12px;color:#c4d8e8;margin-right:12px}
 #selection-practice-speed{min-height:44px;padding:8px 12px;font:16px var(--mono);background:#0d1828;color:#e8f5ff;border:1px solid #8aa4ba}
 #selection-practice-options p{font:11px/1.7 var(--mono);color:#bed0e2;margin:10px 0 0}
