@@ -1,4 +1,4 @@
-export const PRACTICE_RATES = Object.freeze(Array.from({length:10},(_,i)=>(i+1)/10));
+export const PRACTICE_RATES = Object.freeze([.5,.6,.7,.8,.9,1]);
 export function practiceRate(value) {
   const rate=Number(value);
   return PRACTICE_RATES.includes(rate)?rate:1;

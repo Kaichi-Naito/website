@@ -13,9 +13,9 @@ test('stretch reuses decoded samples, schedules exact wall-time end, stops and r
  const {context,node,buffer,events}=fixture();let creates=0;
  const audio=new PracticeAudio(()=>{},async()=>{creates++;return node;});
  await audio.prepare(context,buffer);await audio.prepare(context,buffer);assert.equal(creates,1);
- const source=audio.schedule({}, {when:12,offset:5,duration:10,rate:.1});
- assert.deepEqual(events.find(e=>e[0]==='schedule')[1],{active:true,output:12,input:5,rate:.1,semitones:0});
- assert.ok(events.some(e=>e[0]==='gain'&&e[1]===0&&e[2]===112));
+ const source=audio.schedule({}, {when:12,offset:5,duration:10,rate:.5});
+ assert.deepEqual(events.find(e=>e[0]==='schedule')[1],{active:true,output:12,input:5,rate:.5,semitones:0});
+ assert.ok(events.some(e=>e[0]==='gain'&&e[1]===0&&e[2]===32));
  source.stop();source.stop();source.disconnect();assert.equal(events.filter(e=>e[0]==='stop').length,1);
  audio.release();await Promise.resolve();assert.equal(audio.node,null);assert.ok(events.some(e=>e[0]==='drop'));
 });
@@ -26,7 +26,7 @@ test('leaving while WASM is loading cannot restore a stale node',async()=>{
  await assert.rejects(pending,/中止/);assert.equal(audio.node,null);assert.ok(events.some(e=>e[0]==='drop'));
 });
 test('actual WASM keeps stereo pitch and transient timing at every slow rate and sample rate',async()=>{
- for(const sr of [44100,48000])for(const rate of [.1,.2,.3,.4,.5,.6,.7,.8,.9]){
+ for(const sr of [44100,48000])for(const rate of [.5,.6,.7,.8,.9]){
   const output=await render({sr,rate,signal:(t,c)=>.3*Math.sin(2*Math.PI*(c?660:440)*t)});
   for(const [c,target] of [440,660].entries()){
    const a=output[c],crosses=[];
@@ -43,7 +43,7 @@ test('actual WASM keeps stereo pitch and transient timing at every slow rate and
  }
 });
 test('actual WASM resumes from a source offset with compensated output timing',async()=>{
- const sr=48000,rate=.1,offset=.5;
+ const sr=48000,rate=.5,offset=.5;
  const hit=await render({sr,rate,offset,signal:t=>.5*Math.exp(-(((t-.7)/.004)**2))*Math.sin(2*Math.PI*1800*t)});
  let peak=0;for(let i=1;i<hit[0].length;i++)if(Math.abs(hit[0][i])>Math.abs(hit[0][peak]))peak=i;
  assert.ok(Math.abs(peak/sr-(1+(.7-offset)/rate))<.03);

@@ -1,5 +1,5 @@
 import { PracticeAudio } from './practice-audio.mjs?v=pitch-v46';
-import { PRACTICE_RATES, practiceRate, practiceChart } from './practice.mjs?v=practice-v41';
+import { PRACTICE_RATES, practiceRate, practiceChart } from './practice.mjs?v=practice-rates-v47';
 import { ResultTransition } from './result-transition.mjs?v=finish-guard-v19';
 import { PlaybackClock } from './playback-clock.mjs?v=clock-fix-v26';
 import { ResultShare } from './result-share.mjs?v=ios-photo-save-v39';

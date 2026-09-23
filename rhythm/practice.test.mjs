@@ -6,9 +6,9 @@ import {practiceRate,practiceChart,PRACTICE_RATES} from './practice.mjs';
 import {RhythmEngine} from './engine.mjs';
 import {PlaybackClock} from './playback-clock.mjs';
 const base={duration:15,bpm:120,title:'Rolling',difficulty:'HARD',notes:[{lane:0,t:1,end:2,ticks:[1.5,2]},{lane:1,t:3}]};
-test('all ten rates scale heads, hold ticks, tails and duration without modifying the original',()=>{
+test('all six rates scale heads, hold ticks, tails and duration without modifying the original',()=>{
  const original=JSON.stringify(base);
- assert.deepEqual(PRACTICE_RATES,[.1,.2,.3,.4,.5,.6,.7,.8,.9,1]);
+ assert.deepEqual(PRACTICE_RATES,[.5,.6,.7,.8,.9,1]);
  for(const rate of PRACTICE_RATES){
   const chart=practiceChart(base,rate);
   assert.equal(chart.notes[0].t,1/rate);assert.equal(chart.notes[0].end,2/rate);
@@ -16,7 +16,7 @@ test('all ten rates scale heads, hold ticks, tails and duration without modifyin
   assert.equal(chart.duration,15/rate);assert.equal(chart.bpm,120*rate);
  }
  assert.equal(JSON.stringify(base),original);
- for(const invalid of [0,-1,1.1,NaN,Infinity,'x'])assert.equal(practiceRate(invalid),1);
+ for(const invalid of [0,.1,.2,.3,.4,-1,1.1,NaN,Infinity,'x'])assert.equal(practiceRate(invalid),1);
 });
 test('practice provides real-time judgments and hold feedback at every speed while score stays zero',()=>{
  for(const rate of PRACTICE_RATES){
@@ -74,8 +74,8 @@ test('the separate toggle sends any difficulty to practice; turning it off resto
  handlers['practice-toggle:click']();
  assert.equal($('practice-toggle')['aria-pressed'],'true');assert.equal($('selection-practice-options').hidden,false);
  state.playSong(0,1);assert.equal(state.practicing,true);assert.equal(state.practiceSpeed,.5);assert.deepEqual(calls.pop(),[0,false,1,true]);
- $('selection-practice-speed').value='0.1';handlers['selection-practice-speed:change']();
- state.playSong(1,0);assert.equal(state.practiceSpeed,.1);assert.deepEqual(calls.pop(),[1,false,0,true]);
+ $('selection-practice-speed').value='0.9';handlers['selection-practice-speed:change']();
+ state.playSong(1,0);assert.equal(state.practiceSpeed,.9);assert.deepEqual(calls.pop(),[1,false,0,true]);
  handlers['practice-toggle:click']();state.playSong(0,0);
  assert.equal(state.practicing,false);assert.equal($('practice-toggle')['aria-pressed'],'false');assert.equal($('selection-practice-options').hidden,true);
  assert.deepEqual(calls.pop(),[0,false,0,true]);assert.equal(sounds.length,3);
