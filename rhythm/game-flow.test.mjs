@@ -92,3 +92,19 @@ test('rapid difficulty clicks only start the latest selected chart',async()=>{
  f.responses[0]({ok:true,arrayBuffer:async()=>new ArrayBuffer(0)});await hard;
  assert.equal(f.context.chart.catalogId,'normal');assert.equal(started,1);
 });
+
+test('title start enters selection once and uses the song-play sound event',()=>{
+  const elements=new Map();
+  const $=id=>{if(!elements.has(id))elements.set(id,{hidden:true,disabled:false});return elements.get(id);};
+  $('title-screen').hidden=false;
+  let loaded=0,unlocked=0,focused=0;const sounds=[],classes=[];
+  const context=vm.createContext({$,Event,mode:'title',document:{body:{classList:{remove:name=>classes.push(name)}}},ui:{status:{textContent:'PRESS START'}},wheel:{dispatchEvent:event=>sounds.push(event.type),focus:()=>focused++},ensureAudioContext:()=>{unlocked++;return Promise.resolve();},loadSongs:()=>loaded++});
+  const enter=source.slice(source.indexOf('function enterSongSelection()'),source.indexOf("$('back-to-select').addEventListener"));
+  vm.runInContext(enter,context);
+  context.enterSongSelection();context.enterSongSelection();
+  assert.equal(context.mode,'select');assert.equal($('title-screen').hidden,true);
+  for(const id of ['selection-screen','game-menubar','ranking-window','game-page-note'])assert.equal($(id).hidden,false);
+  assert.equal(loaded,1);assert.equal(unlocked,1);assert.equal(focused,1);
+  assert.deepEqual(sounds,['song-play']);assert.deepEqual(classes,['title-screen-active']);
+  assert.equal(context.ui.status.textContent,'MUSIC SELECT');
+});

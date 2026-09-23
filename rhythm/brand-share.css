@@ -90,3 +90,21 @@ html.play-scroll-locked,html.play-scroll-locked body{overflow:hidden;overscroll-
 #developer-logo-indicator{padding:9px 12px;border:1px solid #a68ccd;background:#34273f;color:#ead8ff;font:12px/1.6 var(--mono);white-space:nowrap}
 #developer-logo-indicator span{display:block;color:#c7b6dc;font-size:10px}
 @media(max-width:700px){.logo-lockup{gap:10px}#developer-logo-indicator{font-size:10px;padding:6px 8px}#developer-logo-indicator span{font-size:9px}}
+
+/* Opening screen: the song selector appears after an explicit start gesture. */
+.title-screen-active .desktop-layout{grid-template-columns:minmax(0,1fr);max-width:900px}
+.game-title-screen{position:relative;isolation:isolate;overflow:hidden;min-height:min(660px,calc(100svh - 150px));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background:radial-gradient(ellipse at 30% 20%,#21445766,transparent 65%),radial-gradient(ellipse at 75% 65%,#4d245555,transparent 60%),#0d1425;border:2px solid;border-color:#626677 #fff #fff #626677;text-align:center}
+.game-title-screen::before{content:"";position:absolute;inset:0;z-index:-1;background:repeating-linear-gradient(0deg,transparent 0 3px,#0002 3px 4px);pointer-events:none}
+.game-title-eyebrow{margin:0 0 22px;font:10px var(--mono);letter-spacing:4px;color:#9cb4ca}
+.game-title-logo{margin:0;width:min(340px,65vw)}
+.game-title-logo img{display:block;width:100%;height:auto;filter:drop-shadow(0 10px 30px #0008)}
+.game-title-caption{margin:22px 0 32px;color:#c9d6e8;font:14px var(--mono);letter-spacing:3px}
+.game-title-start{display:flex;align-items:center;justify-content:center;gap:14px;min-height:56px;width:min(280px,80%);padding:14px 24px;background:#b5e8f7;color:#17394b;border:3px solid;border-color:#e5f8ff #4e94ad #4e94ad #e5f8ff;box-shadow:4px 4px 0 #0006;font:20px var(--mono);letter-spacing:3px;touch-action:manipulation}
+.game-title-start:hover:not(:disabled){background:#c9effb}
+.game-title-start:active:not(:disabled){transform:translate(2px,2px);box-shadow:2px 2px 0 #0006;border-color:#4e94ad #e5f8ff #e5f8ff #4e94ad}
+.game-title-start>span{font-size:13px}
+.game-title-keys{display:flex;gap:10px;margin-top:34px}
+.game-title-keys span{width:28px;height:28px;display:grid;place-items:center;border:1px solid #75cfe059;color:#89cada;font:11px var(--mono)}
+.game-title-keys span:nth-child(n+3){border-color:#de8bce59;color:#d99acb}
+@media(max-width:700px){.game-title-screen{min-height:calc(100svh - 140px);padding:28px 16px}.game-title-logo{width:min(290px,66vw)}.game-title-eyebrow{font-size:9px;letter-spacing:2px}.game-title-caption{font-size:12px;margin:18px 0 28px}.game-title-start{font-size:18px}}
+@media(max-height:600px) and (min-width:701px){.game-title-screen{min-height:370px;padding:22px}.game-title-logo{width:190px}.game-title-eyebrow{margin-bottom:12px}.game-title-caption{margin:12px 0 20px}.game-title-keys{margin-top:20px}}

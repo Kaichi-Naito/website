@@ -25,7 +25,7 @@ const audioDataCache=new Map(),audioBufferCache=new Map(),audioFetchPromises=new
 let scrollLockState=null;
 const resultTransition = new ResultTransition();
 const playbackClock = new PlaybackClock();
-let mode = 'loading', startAt = 0, resumeAt = 0, frozenTime = -2.5, judgmentUntil = 0;
+let mode = 'title', startAt = 0, resumeAt = 0, frozenTime = -2.5, judgmentUntil = 0;
 let width = 800, height = 600, lastHud = 0, requestId = 0;
 const settingsKey = 'kaichi-rhythm-settings-v3';
 let savedSettings = {};
@@ -361,6 +361,24 @@ $('settings-open').addEventListener('click',()=>{
   if(mode==='loading'||mode==='finishing')return;
   $('settings-dialog').showModal();
 });
+$('title-start').addEventListener('click',enterSongSelection);
+function enterSongSelection() {
+  if(mode!=='title')return;
+  mode='select';
+  $('title-start').disabled=true;
+  $('title-screen').hidden=true;
+  document.body.classList.remove('title-screen-active');
+  $('selection-screen').hidden=false;
+  $('game-menubar').hidden=false;
+  $('ranking-window').hidden=false;
+  $('game-page-note').hidden=false;
+  // Reuse the exact same sound event as a song's play button.
+  wheel.dispatchEvent(new Event('song-play'));
+  void ensureAudioContext().catch(()=>{});
+  ui.status.textContent='MUSIC SELECT';
+  void loadSongs();
+  wheel.focus();
+}
 $('back-to-select').addEventListener('click',showSelection);
 $('play-selected').addEventListener('click',startGame);
 $('catalog-retry').addEventListener('click',loadSongs);
@@ -611,4 +629,4 @@ function frame(now) {
   if(now-lastHud>70){updateHud();lastHud=now;}
   requestAnimationFrame(frame);
 }
-loadSongs();resize();requestAnimationFrame(frame);
+$('title-start').disabled=false;resize();requestAnimationFrame(frame);

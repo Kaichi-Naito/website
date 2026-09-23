@@ -59,15 +59,22 @@
     .rhythm-start-item img{width:28px;height:28px;object-fit:contain;image-rendering:pixelated}
     @media(max-width:700px){.song-wheel{height:300px;padding:108px 10px}.song-option{height:84px;padding:5px 8px;margin-bottom:6px}.song-play-button{min-width:60px;height:32px;padding:3px 6px;font-size:10px}.settings-gear{font-size:23px}#rhythm-taskbar{height:28px}#rhythm-start-btn,#rhythm-task{height:22px}#rhythm-start-btn img{height:16px}#rhythm-task{width:120px;font-size:10px}#rhythm-tray{height:22px;padding:0 5px}#rhythm-tray img{width:25px;height:25px}#rhythm-clock{font-size:11px;min-width:36px}#rhythm-start-menu{bottom:30px}}
   </style>
-  <link rel="stylesheet" href="rhythm/brand-share.css?v=share-buttons-v37">
+  <link rel="stylesheet" href="rhythm/brand-share.css?v=title-screen-v40">
 </head>
-<body>
+<body class="title-screen-active">
   <header class="desktop-header"><a href="index.html">← Kaichi Guitar Music</a><span>GAMES / 001</span></header>
   <div class="desktop-layout">
   <main class="app-window" id="app">
     <div class="titlebar"><span><img src="rhythm/t4p-logo.png" alt=""> T4P.exe</span><a href="index.html" aria-label="ホームに戻る" class="close rhythm-close">×</a></div>
-    <div class="menubar"><span>T4P / MUSIC ARCADE <small id="developer-indicator" role="status" hidden>開発者モード・15秒</small></span><button id="settings-open" class="icon-button" aria-label="設定を開く"><span class="settings-gear" aria-hidden="true">⚙</span><span>設定</span></button></div>
-    <section id="selection-screen" class="selection-screen" aria-label="曲選択">
+    <div class="menubar" id="game-menubar" hidden><span>T4P / MUSIC ARCADE <small id="developer-indicator" role="status" hidden>開発者モード・15秒</small></span><button id="settings-open" class="icon-button" aria-label="設定を開く"><span class="settings-gear" aria-hidden="true">⚙</span><span>設定</span></button></div>
+    <section id="title-screen" class="game-title-screen" aria-label="タイトル画面">
+      <p class="game-title-eyebrow">4 LANE MUSIC ARCADE</p>
+      <h1 class="game-title-logo"><img src="rhythm/t4p-logo.png" alt="T4P" width="420" height="297" draggable="false"></h1>
+      <p class="game-title-caption">音楽を、指先で。</p>
+      <button id="title-start" class="game-title-start" type="button" disabled><span aria-hidden="true">▶</span> スタート</button>
+      <div class="game-title-keys" aria-hidden="true"><span>Q</span><span>W</span><span>E</span><span>R</span></div>
+    </section>
+    <section id="selection-screen" class="selection-screen" aria-label="曲選択" hidden>
       <div class="selection-heading"><div class="logo-lockup"><button id="developer-logo" class="developer-logo" type="button" aria-label="T4P"><img class="t4p-logo" src="rhythm/t4p-logo.png" alt="" width="154" height="109" draggable="false"></button><span id="developer-logo-indicator" role="status" hidden>開発者モード<span>15秒プレイ</span></span></div><span id="song-position">— / —</span></div>
       <div class="selection-body">
         <div class="song-preview"><img id="selected-jacket" src="images/CDjacket/Rolling500x500.png" alt=""><p id="selected-artist">—</p><h2 id="selected-title">楽曲を読み込み中…</h2><div class="preview-tags"><span id="selected-difficulty">—</span><span id="selected-bpm">— BPM</span><span id="selected-duration">—</span></div></div>
@@ -129,9 +136,9 @@
         <div class="playback-footer"><span id="elapsed">0:00 / 0:30</span><span>SPACE / ESC 一時停止 <span class="footer-divider">/</span> Q W E R プレイ</span></div>
       </section>
     </div>
-    <footer class="statusbar"><span id="status" role="status">譜面を読み込んでいます</span><span>♪ KAICHI GUITAR MUSIC</span></footer>
+    <footer class="statusbar"><span id="status" role="status">PRESS START</span><span>♪ KAICHI GUITAR MUSIC</span></footer>
   </main>
-  <aside class="ranking-window" aria-label="ランキング">
+  <aside class="ranking-window" id="ranking-window" aria-label="ランキング" hidden>
     <div class="titlebar"><span>Ranking.exe</span><span aria-hidden="true">★</span></div>
     <div class="ranking-content">
       <p class="eyebrow">RANKING / TOP 10</p>
@@ -144,7 +151,7 @@
     </div>
   </aside>
   </div>
-  <p class="page-note"><span id="play-duration-note">各曲をフル尺でプレイします。</span>空押しは減点、長押しは1拍ごとに加点されます。</p>
+  <p class="page-note" id="game-page-note" hidden><span id="play-duration-note">各曲をフル尺でプレイします。</span>空押しは減点、長押しは1拍ごとに加点されます。</p>
   <noscript>このゲームを遊ぶにはJavaScriptを有効にしてください。</noscript>
   <script>
     (() => {
@@ -330,7 +337,7 @@
       <p id="result-transition-hint">まもなく結果を表示します</p>
     </div>
   </div>
-  <script type="module" src="rhythm/game.mjs?v=ios-photo-save-v39"></script>
+  <script type="module" src="rhythm/game.mjs?v=title-screen-v40"></script>
   <dialog id="settings-dialog" aria-labelledby="settings-title">
     <form method="dialog" class="dialog-heading"><h2 id="settings-title">プレイ設定</h2><button aria-label="設定を閉じる" class="icon-button">×</button></form>
         <fieldset id="settings"><legend>PLAY SETTINGS</legend>
@@ -381,7 +388,7 @@
 
       document.addEventListener('pointerdown', event => {
         const target = event.target.closest('button, a, .song-option');
-        if (!target || target.closest('.key-row') || target.closest('.song-play-button')) return;
+        if (!target || target.closest('.key-row') || target.closest('.song-play-button') || target.closest('#title-start')) return;
         playClick();
       });
 
