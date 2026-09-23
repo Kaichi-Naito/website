@@ -110,9 +110,8 @@ html.play-scroll-locked,html.play-scroll-locked body{overflow:hidden;overscroll-
 @media(max-height:600px) and (min-width:701px){.game-title-screen{min-height:370px;padding:22px}.game-title-logo{width:190px}.game-title-eyebrow{margin-bottom:12px}.game-title-caption{margin:12px 0 20px}.game-title-keys{margin-top:20px}}
 
 /* Thumb-friendly practice controls. Keep scoring UI absent for the whole run. */
-.song-option{height:166px}
+.song-option{height:120px}
 .song-difficulties .song-play-button{min-height:44px;height:auto;flex:1;font-size:12px}
-.song-practice-button{display:block;width:100%;min-height:44px;margin-top:8px;border:1px solid #8da0bd;background:#28374c;color:#dce8fa;font:13px var(--mono);touch-action:manipulation}
 #selection-back{display:block;width:100%;max-width:330px;min-height:44px;margin:22px auto 0}
 #practice-dialog{width:min(420px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflow:auto;padding:22px;border:2px solid #79869f;background:#171e30;color:#edf3ff;box-shadow:6px 6px 0 #0005}
 #practice-dialog::backdrop{background:#020816c9}
@@ -131,6 +130,16 @@ html.play-scroll-locked,html.play-scroll-locked body{overflow:hidden;overscroll-
 .practice-active .pause-button{margin-left:auto}
 .practice-active .desktop-layout{grid-template-columns:minmax(0,1fr)}
 #practice-live,#practice-adjust,#back-to-select{min-height:44px}
-@media(max-width:700px){.song-wheel{height:290px;padding:62px 6px}.song-option{height:166px;gap:10px}.song-option img{width:48px;height:48px}.song-difficulties .song-play-button{min-width:68px;font-size:11px}.song-option strong{font-size:17px}.song-practice-button{margin-top:6px}.selection-screen{padding:16px 10px}}
+@media(max-width:700px){.song-wheel{height:240px;padding:60px 6px}.song-option{height:166px;gap:10px}.song-option img{width:48px;height:48px}.song-difficulties .song-play-button{min-width:68px;font-size:11px}.song-option strong{font-size:17px}.selection-screen{padding:16px 10px}}
 #practice-live{margin-top:12px;background:#b5e8f7;color:#17394b;border-color:#e5f8ff #4e94ad #4e94ad #e5f8ff}
 .practice-active .overlay.is-results #overlay-description{display:block;font-size:13px;line-height:1.7}
+
+.game-title-logo + .game-title-start{margin-top:32px}
+
+.selection-practice{margin:0 6px 8px;text-align:left}
+#practice-toggle{width:100%;min-height:44px;padding:10px;border:1px solid #8197b0;background:#253247;color:#dce8fa;font:13px var(--mono);touch-action:manipulation}
+#practice-toggle[aria-pressed="true"]{background:#203f50;color:#b8eeff;border-color:#8ad7ec}
+#selection-practice-options{padding:12px;border:1px solid #62778d;border-top:0;background:#172535}
+#selection-practice-options label{display:inline-block;font-size:12px;color:#c4d8e8;margin-right:12px}
+#selection-practice-speed{min-height:44px;padding:8px 12px;font:16px var(--mono);background:#0d1828;color:#e8f5ff;border:1px solid #8aa4ba}
+#selection-practice-options p{font:11px/1.7 var(--mono);color:#bed0e2;margin:10px 0 0}

@@ -57,11 +57,27 @@ test('practice completion cannot read/write best scores, rank, generate images o
 test('returning to title stops playback, cancels requests and leaves only the opening screen',()=>{
  const elements=new Map();const $=id=>{if(!elements.has(id))elements.set(id,{hidden:false,disabled:true,close(){},focus(){}});return elements.get(id);};
  const classes=new Set(['practice-active']);let stopped=0,unlocked=0;
- const state=vm.createContext({mode:'paused',practicing:true,chartRequest:4,requestId:5,wheelTimer:1,clearTimeout(){},resultTransition:{cancel(){}},resultShare:{clear(){}},leaderboard:{clearResult(){}},stopSource(){stopped++;},resetInputs(){},unlockPageScroll(){unlocked++;},$,document:{body:{classList:{add:v=>classes.add(v),remove:v=>classes.delete(v)}}},window:{scrollTo(){}},ui:{overlay:{},pause:{},settings:{},status:{}}});
+ const state=vm.createContext({mode:'paused',practicing:true,selectionPractice:true,updateSelectionPractice(){},chartRequest:4,requestId:5,wheelTimer:1,clearTimeout(){},resultTransition:{cancel(){}},resultShare:{clear(){}},leaderboard:{clearResult(){}},stopSource(){stopped++;},resetInputs(){},unlockPageScroll(){unlocked++;},$,document:{body:{classList:{add:v=>classes.add(v),remove:v=>classes.delete(v)}}},window:{scrollTo(){}},ui:{overlay:{},pause:{},settings:{},status:{}}});
  vm.runInContext(slice('function showTitle(', 'function useChart('),state);state.showTitle();
- assert.equal(state.mode,'title');assert.equal(state.practicing,false);assert.equal(stopped,1);assert.equal(unlocked,1);
+ assert.equal(state.mode,'title');assert.equal(state.practicing,false);assert.equal(state.selectionPractice,false);assert.equal(stopped,1);assert.equal(unlocked,1);
  assert.equal(state.chartRequest,5);assert.equal(state.requestId,6);assert.equal(state.chart,null);
  assert.equal($('title-screen').hidden,false);assert.equal($('title-start').disabled,false);
  for(const id of ['selection-screen','play-workspace','game-menubar','ranking-window','game-page-note'])assert.equal($(id).hidden,true);
  assert.deepEqual([...classes],['title-screen-active']);
+});
+
+test('the separate toggle sends any difficulty to practice; turning it off restores normal play',()=>{
+ const elements=new Map(),handlers={},calls=[],sounds=[];
+ const $=id=>{if(!elements.has(id))elements.set(id,{hidden:false,value:'0.5',setAttribute(key,value){this[key]=value;},addEventListener(type,fn){handlers[id+':'+type]=fn;}});return elements.get(id);};
+ const state=vm.createContext({$,Event,mode:'select',selectionPractice:false,practicing:false,practiceSpeed:.5,practiceRate,selectedIndex:0,selectedDifficulty:0,ensureAudioContext:()=>Promise.resolve(),wheel:{dispatchEvent:e=>sounds.push(e.type)},selectSong:(...args)=>calls.push(args)});
+ vm.runInContext(slice('function updateSelectionPractice()', '// The dialog is only used'),state);
+ handlers['practice-toggle:click']();
+ assert.equal($('practice-toggle')['aria-pressed'],'true');assert.equal($('selection-practice-options').hidden,false);
+ state.playSong(0,1);assert.equal(state.practicing,true);assert.equal(state.practiceSpeed,.5);assert.deepEqual(calls.pop(),[0,false,1,true]);
+ $('selection-practice-speed').value='0.1';handlers['selection-practice-speed:change']();
+ state.playSong(1,0);assert.equal(state.practiceSpeed,.1);assert.deepEqual(calls.pop(),[1,false,0,true]);
+ handlers['practice-toggle:click']();state.playSong(0,0);
+ assert.equal(state.practicing,false);assert.equal($('practice-toggle')['aria-pressed'],'false');assert.equal($('selection-practice-options').hidden,true);
+ assert.deepEqual(calls.pop(),[0,false,0,true]);assert.equal(sounds.length,3);
+ state.mode='playing';handlers['practice-toggle:click']();state.playSong();assert.equal(calls.length,0);assert.equal(state.selectionPractice,false);
 });

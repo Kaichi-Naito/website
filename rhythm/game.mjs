@@ -17,6 +17,7 @@ const judgmentColors = {PERFECT:'#ffe37a',GREAT:'#c4a2ff',GOOD:'#80e5b0',MISS:'#
 const flashColors=[...colors], errors=[0,0,0,0], bursts=[];
 let songs=[], selectedIndex=-1, selectedDifficulty=0, chartRequest=0, wheelTimer;
 let developerMode=false, logoTaps=0;
+let selectionPractice=false;
 let practicing=false, practiceSpeed=0.7, practiceSongIndex=0, practiceReturnMode='select';
 const playRate=()=>practicing?practiceSpeed:1;
 const playDuration=()=> (chart?.duration || 0)/playRate();
@@ -401,7 +402,7 @@ function enterSongSelection() {
 }
 $('back-to-select').addEventListener('click',showTitle);
 $('selection-back').addEventListener('click',showTitle);
-$('play-selected').addEventListener('click',startGame);
+$('play-selected').addEventListener('click',()=>playSong());
 $('catalog-retry').addEventListener('click',loadSongs);
 $('developer-logo').addEventListener('click',handleDeveloperLogo);
 function handleDeveloperLogo() {
@@ -420,7 +421,7 @@ $('song-next').addEventListener('click',()=>selectSong(selectedIndex+1,true));
 wheel.addEventListener('keydown',event=>{
   if(mode!=='select'||$('selection-screen').hidden)return;
   if(event.key==='ArrowDown'||event.key==='ArrowUp'){event.preventDefault();selectSong(selectedIndex+(event.key==='ArrowDown'?1:-1),true);}
-  if(event.key==='Enter'&&event.target===wheel&&!event.repeat&&!$('play-selected').disabled){event.preventDefault();startGame();}
+  if(event.key==='Enter'&&event.target===wheel&&!event.repeat&&!$('play-selected').disabled){event.preventDefault();playSong();}
 });
 wheel.addEventListener('scroll',()=>{
   clearTimeout(wheelTimer);
@@ -439,7 +440,7 @@ function showTitle() {
   clearTimeout(wheelTimer); ++chartRequest; ++requestId;
   resultShare.clear();leaderboard.clearResult();
   stopSource();resetInputs();unlockPageScroll();
-  mode='title';practicing=false;frozenTime=-2.5;engine=null;chart=null;logoTaps=0;
+  mode='title';practicing=false;selectionPractice=false;updateSelectionPractice();frozenTime=-2.5;engine=null;chart=null;logoTaps=0;
   $('practice-dialog').close();$('settings-dialog').close();
   $('title-screen').hidden=false;$('title-start').disabled=false;
   document.body.classList.add('title-screen-active');document.body.classList.remove('practice-active');
@@ -520,18 +521,11 @@ async function loadSongs() {
         button.addEventListener('click',event=>{
           event.stopPropagation();
           if(mode!=='select'||$('selection-screen').hidden)return;
-          // Unlock audio during the user gesture, before loading a different chart.
-          void ensureAudioContext().catch(()=>{});
-          wheel.dispatchEvent(new Event('song-play'));
-          practicing=false;
-          void selectSong(index,false,difficulty,true);
+          playSong(index,difficulty);
         });
         difficulties.append(button);
       });
-      const practice=document.createElement('button');practice.type='button';practice.className='song-practice-button';
-      practice.textContent='練習する';practice.setAttribute('aria-label',`${song.title}を練習する`);
-      practice.addEventListener('click',event=>{event.stopPropagation();openPractice(index);});
-      details.append(title,artist,difficulties,practice);item.append(img,details);
+      details.append(title,artist,difficulties);item.append(img,details);
       item.addEventListener('click',()=>selectSong(index,true));wheel.append(item);
     });
     await selectSong(0,false);
@@ -657,14 +651,40 @@ function frame(now) {
   if(now-lastHud>70){updateHud();lastHud=now;}
   requestAnimationFrame(frame);
 }
-// Practice setup is shared by song selection, pause and practice completion.
-for(const rate of PRACTICE_RATES) {
-  const option=document.createElement('option');option.value=String(rate);option.textContent=`${rate}倍速`;
-  $('practice-speed').append(option);
+// One practice toggle applies to every song and difficulty in the selector.
+for(const id of ['practice-speed','selection-practice-speed']) {
+  for(const rate of PRACTICE_RATES) {
+    const option=document.createElement('option');option.value=String(rate);option.textContent=`${rate}倍速`;
+    $(id).append(option);
+  }
+  $(id).value=String(practiceSpeed);
 }
+function updateSelectionPractice() {
+  $('practice-toggle').setAttribute('aria-pressed',String(selectionPractice));
+  $('practice-toggle').textContent=selectionPractice?'✓ 練習モード中（解除）':'練習モードにする';
+  $('selection-practice-options').hidden=!selectionPractice;
+  $('selection-practice-speed').value=String(practiceSpeed);
+  if(mode==='select')$('ranking-window').hidden=selectionPractice;
+}
+$('practice-toggle').addEventListener('click',()=>{
+  if(mode!=='select')return;
+  selectionPractice=!selectionPractice;practicing=selectionPractice;updateSelectionPractice();
+});
+$('selection-practice-speed').addEventListener('change',()=>{
+  if(mode==='select')practiceSpeed=practiceRate($('selection-practice-speed').value);
+});
+function playSong(index=selectedIndex,difficulty=selectedDifficulty) {
+  if(mode!=='select'||$('selection-screen').hidden)return;
+  practicing=selectionPractice;
+  practiceSpeed=practiceRate($('selection-practice-speed').value);
+  // Unlock audio during the user gesture, before loading a different chart.
+  void ensureAudioContext().catch(()=>{});
+  wheel.dispatchEvent(new Event('song-play'));
+  void selectSong(index,false,difficulty,true);
+}
+// The dialog is only used to restart an existing practice at a different speed.
 function openPractice(index=selectedIndex) {
-  if(!['select','paused','results'].includes(mode)||!songs[index])return;
-  if(mode!=='select'&&!practicing)return;
+  if(!['paused','results'].includes(mode)||!songs[index]||!practicing)return;
   clearTimeout(wheelTimer);++chartRequest;
   practiceSongIndex=index;practiceReturnMode=mode;mode='practice-setup';
   $('practice-song').textContent=songs[index].title;
@@ -674,11 +694,11 @@ function openPractice(index=selectedIndex) {
     $('practice-difficulty').append(option);
   });
   $('practice-difficulty').value=String(index===selectedIndex?selectedDifficulty:0);
-  $('practice-difficulty').disabled=practiceReturnMode!=='select';
+  $('practice-difficulty').disabled=true;
   $('practice-speed').value=String(practiceSpeed);
   updatePracticeDifficulty();
   $('practice-help').textContent='スコア・ランキングは記録されません。低速では音程も低くなります。';
-  $('practice-begin').textContent=practiceReturnMode==='select'?'練習を始める':'この速度で最初から練習';
+  $('practice-begin').textContent='この速度で最初から練習';
   $('practice-dialog').showModal();
 }
 function updatePracticeDifficulty() {
@@ -687,8 +707,6 @@ function updatePracticeDifficulty() {
 function cancelPracticeSetup() {
   if(mode!=='practice-setup')return;
   mode=practiceReturnMode;
-  // If opening the dialog cancelled a MIDI request, restore a selectable chart.
-  if(mode==='select'&&!chart)void selectSong(Math.max(0,selectedIndex),false,selectedDifficulty);
 }
 $('practice-difficulty').addEventListener('change',updatePracticeDifficulty);
 $('practice-dialog').addEventListener('close',cancelPracticeSetup);
@@ -696,11 +714,9 @@ $('practice-adjust').addEventListener('click',()=>openPractice());
 $('practice-begin').addEventListener('click',()=>{
   if(mode!=='practice-setup')return;
   practiceSpeed=practiceRate($('practice-speed').value);practicing=true;
-  const difficulty=Number($('practice-difficulty').value);
   mode=practiceReturnMode;$('practice-dialog').close();
   wheel.dispatchEvent(new Event('song-play'));void ensureAudioContext().catch(()=>{});
-  if(mode==='select')void selectSong(practiceSongIndex,false,difficulty,true);
-  else void startGame();
+  void startGame();
 });
 $('practice-live').addEventListener('click',()=>{
   if(mode!=='results'||!practicing)return;
