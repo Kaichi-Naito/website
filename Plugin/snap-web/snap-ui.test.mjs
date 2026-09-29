@@ -65,6 +65,13 @@ test('EQ drag follows visible track at different sizes and preserves thumb grab 
         handlers.pointermove(event(100)); assert.equal(Number(el.value),-12);
         handlers.pointerdown(event(100+height/2)); assert.equal(Number(el.value),0);
         handlers.pointercancel(event(100)); assert.equal(captured,null);
+        for (const value of [-12, -2.8, 7.7, 12]) {
+            el.value = String(value);
+            const previousInputs = inputs;
+            handlers.dblclick(event(100));
+            assert.equal(Number(el.value), 0);
+            assert.equal(inputs, previousInputs + 1); // Notify DSP and visual bindings.
+        }
         assert.ok(inputs>=4);
     }
 });

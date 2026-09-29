@@ -412,6 +412,11 @@
             el.addEventListener('pointerup', stop);
             el.addEventListener('pointercancel', stop);
             el.addEventListener('lostpointercapture', stop);
+            el.addEventListener('dblclick', event => {
+                event.preventDefault();
+                el.value = '0';
+                el.dispatchEvent(new Event('input', { bubbles:true }));
+            });
         });
     }
 

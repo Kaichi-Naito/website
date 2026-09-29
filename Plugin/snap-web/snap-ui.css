@@ -87,6 +87,9 @@
 #snap-vst-ui .eq-value { display:none !important; }
 /* Pointer geometry matches the visible vertical track, without a rotated native slider. */
 #snap-vst-ui .snap-eq-fader .snap-eq-native { inset:0 !important; width:100% !important; height:100% !important; transform:none !important; writing-mode:vertical-lr; direction:rtl; appearance:none; -webkit-appearance:none; touch-action:none; }
+/* Align the response plot with the 31 Hz and 16 kHz centres in the 11-column grid.
+   The last column is output volume, outside the frequency response plot. */
+#snap-vst-ui .snap-eq-response { left:calc((100% - 10.8cqw) / 22) !important; right:calc((100% - 10.8cqw) * 3 / 22 + 1.08cqw) !important; width:calc((100% + 1.08cqw) * 9 / 11) !important; top:1.55cqw !important; height:14.6cqw !important; }
 #snap-vst-ui .snap-eq-off-label { --label-height:3cqw; }
 #snap-vst-ui .snap-settings-row > label { --label-height:.8cqw; }
 #snap-vst-ui .snap-settings-profile-caption { --label-height:1.05cqw; }
