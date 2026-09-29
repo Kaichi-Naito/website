@@ -1856,6 +1856,18 @@
             line-height: 1.55;
         }
 
+        .notepad-sheet.notepad-image-sheet {
+            padding: 0;
+            line-height: 0;
+            overflow: hidden;
+        }
+
+        .notepad-about-image {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
         .notepad-sheet h2 {
             margin: 0 0 6px;
             font-size: 22px;
@@ -3208,40 +3220,14 @@
                 <button type="button" class="close-button" aria-label="Close">×</button>
             </div>
         </div>
-        <div class="window-contents notepad-contents">
-            <div class="notepad-menu" aria-hidden="true">
-                <span>File</span>
-                <span>Edit</span>
-                <span>Format</span>
-                <span>View</span>
-                <span>Help</span>
-            </div>
-
-            <div class="notepad-sheet">
-                <h2>SNAP</h2>
-                <div class="notepad-subtitle">Guitar Effect Plugin by Kaichi Naito</div>
-
-                <div class="notepad-body">
-                    <p><strong>SNAP</strong> は、タイトで輪郭のある<strong>モダンクランチサウンド</strong>を作ることに特化して開発した、ギタリスト向けのエフェクタープラグインです。</p>
-                    <p>コンプレッサーとオーバードライブをひとつにまとめ、音作りの中心となる独自の <strong>「SNAP」コントロール</strong>を搭載。</p>
-                    <p>SNAPノブでは、ピッキングの立ち上がりやアタック感をコントロールできます。軽いタッチでもピッキングニュアンスや粒立ちを出しやすく、モダンなギターサウンドに必要な、タイトでレスポンスの良い弾き心地を作ることができます。</p>
-                    <p>基本的には、アンプやアンプシミュレーターの前段に置くドライブ／ブースターとして使用可能。</p>
-                    <p>一方で、<strong>ノイズゲート、10バンドEQ、CABセクション</strong>も内蔵しているため、CABをONにすれば<strong>SNAP単体でギターサウンドを完結させる</strong>こともできます。</p>
-                    <p>クリーン寄りの軽いクランチから、BOOSTを使ったよりアグレッシブなサウンドまで対応。</p>
-                    <p><strong>モダンなクランチサウンドと、気持ちよく弾けるピッキングレスポンスをひとつのプラグインで。</strong></p>
-                    <p>それが <strong>SNAP</strong> です。</p>
-                </div>
-
-                <div class="notepad-meta">
-                    <div><span>Latest Version:</span> v0.4.109</div>
-                    <div><span>Format:</span> VST3</div>
-                    <div><span>OS:</span> Windows 64-bit</div>
-                    <div><span>Browser Demo:</span> <span class="status-dev" id="browser-demo-status">Loading Web DSP...</span></div>
-                </div>
-            </div>
-
-            <div class="small-note">
-                ※ Web試奏版はSNAP v0.4.109のDSPをブラウザ向けに移植したものです。VST3バイナリそのものを読み込んでいるわけではありません。
+        <div class="window-contents notepad-co            <div class="notepad-sheet notepad-image-sheet">
+                <img
+                    class="notepad-about-image"
+                    src="Plugin/SNAP_about.webp?v=1"
+                    width="1000"
+                    height="1250"
+                    alt="SNAP ギターエフェクトプラグインの機能紹介"
+                >
             </div>
         </div>
     </div>
