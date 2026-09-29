@@ -3259,10 +3259,10 @@
                         WINDOWS
                     </a>
 
-                    <a href="#"
+                    <a href="Plugin/download/SNAP_v1.0_Mac.pkg"
                        id="download-vst3-mac"
-                       class="win95-btn is-disabled download-main-btn"
-                       aria-disabled="true">
+                       class="win95-btn primary download-main-btn"
+                       download>
                         MAC
                     </a>
                 </div>
@@ -3449,14 +3449,6 @@
             document.body.style.minHeight = (maxBottom + 80) + 'px';
         }
 
-        /* Mac版は公開ファイルが用意できるまで無効化 */
-        var macDownloadBtn = document.getElementById('download-vst3-mac');
-        if (macDownloadBtn) {
-            macDownloadBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('SNAP VST3 Mac版は現在準備中です。');
-            });
-        }
 
 
         /* ---------------------------------------------------------
