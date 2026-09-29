@@ -85,6 +85,8 @@
 #snap-vst-ui .snap134-background button { height:2.45cqw; min-height:24px; border:1px solid #c4d0dab8; border-radius:.65cqw; background:#323a43; color:white; display:flex; align-items:center; justify-content:center; padding:0 1.15cqw; font-size:.96cqw; cursor:pointer; }
 #snap-vst-ui .snap134-background button[aria-pressed="true"] { background:#56bfd0; }
 #snap-vst-ui .eq-value { display:none !important; }
+/* Pointer geometry matches the visible vertical track, without a rotated native slider. */
+#snap-vst-ui .snap-eq-fader .snap-eq-native { inset:0 !important; width:100% !important; height:100% !important; transform:none !important; writing-mode:vertical-lr; direction:rtl; appearance:none; -webkit-appearance:none; touch-action:none; }
 #snap-vst-ui .snap-eq-off-label { --label-height:3cqw; }
 #snap-vst-ui .snap-settings-row > label { --label-height:.8cqw; }
 #snap-vst-ui .snap-settings-profile-caption { --label-height:1.05cqw; }
