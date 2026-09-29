@@ -314,6 +314,11 @@
     }
 
     function setupKnobDragging() {
+        const main = document.querySelector('.snap134-main');
+        if (main) {
+            main.addEventListener('pointerdown', () => { main.dataset.inputMethod = 'pointer'; }, true);
+            document.addEventListener('keydown', () => { main.dataset.inputMethod = 'keyboard'; }, true);
+        }
         document.querySelectorAll('.snap134-knob input[type="range"]').forEach(el => {
             updateRangeVisual(el);
             let startY = 0;
@@ -596,7 +601,9 @@
             document.getElementById('web-preset-dirty').textContent = '';
         });
 
-        Object.entries(DEFAULTS).forEach(([name,value]) => updateControlUi(name,value));
+        const initialPreset = 'Snap + CAB';
+        document.getElementById('web-preset-select').value = initialPreset;
+        applyPreset(engine, initialPreset);
 
         // Construct the graph immediately so the media element never bypasses SNAP.
         engine.init().catch(() => {});

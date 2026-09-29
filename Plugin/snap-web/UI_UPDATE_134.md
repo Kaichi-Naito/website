@@ -9,6 +9,9 @@ The GoodTarget backing is #DDF3EF at 90% opacity, above the moving meter fill.
 WOOD FLOOR keeps grey labels and a white GoodTarget label. Background buttons
 store the chosen theme locally. The save icon stores one preset in the current
 browser; the original built-in presets remain available.
+Startup selects and applies Snap + CAB before initializing audio. Pointer/touch
+interaction does not outline the knobs; keyboard navigation retains a focus ring.
+Pedal LEDs use the VST's broad mist and inner bloom, switched off with each effect.
 
 EQ keeps its frequency labels, hides all eleven numeric readouts, and uses the
 supplied OFF artwork. The original sample player, Coming Soon gate, page window

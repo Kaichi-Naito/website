@@ -39,6 +39,32 @@ test('CAB detents drive the existing OFF/A/B/C/D mix routing', () => {
     assert.equal(e.params.signalMode,0); assert.equal(e.params.driveCpuHigh,0);
 });
 
+test('startup selects and applies Snap + CAB before audio initialization', () => {
+    let start, initialized;
+    const presetSelect = { value:'default', addEventListener() {} };
+    const dirty = { textContent:'*' };
+    const context = vm.createContext({
+        window: { addEventListener(name, callback) { if (name === 'DOMContentLoaded') start = callback; } },
+        document: {
+            getElementById(id) { return ({ 'snap-sample-audio':{}, 'web-preset-select':presetSelect, 'web-preset-dirty':dirty })[id] || null; },
+            querySelector() { return null; }, querySelectorAll() { return []; }
+        }, console
+    });
+    vm.runInContext(file('snap-web.js').toString().replace('window.SnapWebParams = P;',
+        'window.SnapWebParams = P; window.TestEngine = SnapWebEngine;'), context);
+    context.window.TestEngine.prototype.init = function () { initialized = { ...this.params }; return Promise.resolve(); };
+    start();
+    assert.equal(presetSelect.value, 'Snap + CAB');
+    assert.equal(initialized.cabMode, 3);
+    assert.equal(initialized.eqOn, 1);
+    assert.equal(initialized.gate, 3);
+    assert.ok(Math.abs(initialized.drive - 5.77) < .001);
+    assert.ok(Math.abs(initialized.eq31 + 2.83) < .001);
+    assert.equal(initialized.signalMode, 0);
+    assert.equal(initialized.driveCpuHigh, 0);
+    assert.equal(dirty.textContent, '');
+});
+
 test('real AudioWorklet and WASM produce finite non-silent audio with control changes', async () => {
     let Processor;
     const messages=[];

@@ -56,7 +56,7 @@
 .snap134-utility-label { justify-content:center; }
 .snap134-knob { cursor:ns-resize; touch-action:none; }
 .snap134-knob input,.snap134-switch input,.snap134-boost input { position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:inherit; touch-action:none; }
-.snap134-knob:focus-within,.snap134-switch:focus-within,.snap134-boost:focus-within { outline:2px solid var(--scene-ink); outline-offset:3px; border-radius:50%; }
+.snap134-main[data-input-method="keyboard"] :is(.snap134-knob,.snap134-switch,.snap134-boost):focus-within { outline:2px solid var(--scene-ink); outline-offset:3px; border-radius:50%; }
 .snap134-utility-face { position:absolute; left:15%; top:12%; width:70%; height:61%; border-radius:50%; background:linear-gradient(135deg,#eee5f3,#ded3e8); border:1px solid rgba(255,255,255,.6); box-shadow:0 .4cqw 0 #bbaacb,0 .7cqw .6cqw #0002; }
 .snap134-gate::after { content:''; position:absolute; left:47%; bottom:2%; width:8%; aspect-ratio:1; border-radius:50%; background:#7bafb5; }
 .snap134-gate.gate-closed::after { background:#c8a9c5; }
@@ -68,8 +68,12 @@
 .snap134-knob:hover .snap134-value,.snap134-knob:focus-within .snap134-value { opacity:1; }
 .snap134-print { color:#fcf9f3; justify-content:center; pointer-events:none; }
 .snap134-switch { background:transparent; cursor:pointer; border-radius:40%; }
-.snap134-led { pointer-events:none; border-radius:50%; background:radial-gradient(circle,#64818c,#39596e 30%,transparent 65%); }
-.snap134-led.is-on { background:radial-gradient(circle,#fff 0%,#e3fcff 18%,#90e5ff 37%,#7ce5ff50 60%,transparent 72%); box-shadow:0 0 1.3cqw #a2efff70; }
+.snap134-led { pointer-events:none; border-radius:50%; background:radial-gradient(circle,#64818c,#39596e 30%,transparent 65%); isolation:isolate; z-index:1; }
+/* Match studioLed's broad mist and smaller bloom, extending beyond the lens. */
+.snap134-led.is-on { background:radial-gradient(circle,#fff 0%,#e3fcff 18%,#90e5ff 37%,#7ce5ff50 60%,transparent 72%); }
+.snap134-led.is-on::before,.snap134-led.is-on::after { content:''; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); border-radius:50%; pointer-events:none; }
+.snap134-led.is-on::before { width:600%; height:600%; z-index:-1; background:radial-gradient(circle closest-side,rgba(121,220,255,.84) 0%,rgba(121,220,255,.76) 14%,rgba(121,220,255,.48) 30%,rgba(41,174,255,.20) 52%,rgba(41,174,255,.045) 76%,rgba(41,174,255,0) 100%); }
+.snap134-led.is-on::after { width:255%; height:255%; background:radial-gradient(circle closest-side,rgba(224,251,255,.93) 0%,rgba(177,237,255,.67) 37%,rgba(41,174,255,.22) 68%,rgba(41,174,255,0) 100%); }
 .snap134-boost { cursor:pointer; }
 .snap134-boost > span { position:absolute; left:42%; top:47%; width:23%; height:44%; background:linear-gradient(90deg,#eeece4,#77787b); border-radius:30%; transform:rotate(-4deg); }
 .snap134-boost.is-on > span { top:8%; transform:rotate(4deg); }
