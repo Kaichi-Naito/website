@@ -373,6 +373,48 @@
         });
     }
 
+    function setupEqDragging() {
+        document.querySelectorAll('.snap-eq-native').forEach(el => {
+            const fader = el.closest('.snap-eq-fader');
+            let pointer = null, grabOffset = 0;
+            const move = event => {
+                const rect = fader.getBoundingClientRect();
+                if (rect.height <= 0) return;
+                const min = Number(el.min), max = Number(el.max), step = Number(el.step);
+                const t = Math.max(0, Math.min(1, (rect.bottom - event.clientY + grabOffset) / rect.height));
+                const value = Math.max(min, Math.min(max, min + Math.round(t * (max - min) / step) * step));
+                if (Math.abs(Number(el.value) - value) < step / 100) return;
+                el.value = String(value);
+                el.dispatchEvent(new Event('input', { bubbles:true }));
+            };
+            el.addEventListener('pointerdown', event => {
+                if (event.button !== 0 || pointer !== null) return;
+                event.preventDefault();
+                const rect = fader.getBoundingClientRect();
+                const thumb = fader.querySelector('.snap-eq-thumb').getBoundingClientRect();
+                const centre = rect.bottom - (Number(el.value) - Number(el.min)) / (Number(el.max) - Number(el.min)) * rect.height;
+                grabOffset = Math.abs(event.clientY - centre) <= thumb.height / 2 ? event.clientY - centre : 0;
+                pointer = event.pointerId;
+                el.focus({ preventScroll:true });
+                el.setPointerCapture(pointer);
+                move(event);
+            });
+            el.addEventListener('pointermove', event => {
+                if (event.pointerId !== pointer) return;
+                event.preventDefault();
+                move(event);
+            });
+            const stop = event => {
+                if (event.pointerId !== pointer) return;
+                pointer = null;
+                if (el.hasPointerCapture(event.pointerId)) el.releasePointerCapture(event.pointerId);
+            };
+            el.addEventListener('pointerup', stop);
+            el.addEventListener('pointercancel', stop);
+            el.addEventListener('lostpointercapture', stop);
+        });
+    }
+
     function updateEqResponseCurve(engine) {
         const svg = document.getElementById('snap-eq-response-svg');
         const path = document.getElementById('snap-eq-response-path');
@@ -581,6 +623,7 @@
         bindControls(engine);
         setupSegmentControls(engine);
         setupKnobDragging();
+        setupEqDragging();
         setupSettingsUi(engine);
         if (window.SnapWebUi) window.SnapWebUi.setup(engine, saved => {
             // Validate saved browser values against actual controls. Never forward

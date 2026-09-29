@@ -39,6 +39,36 @@ test('CAB detents drive the existing OFF/A/B/C/D mix routing', () => {
     assert.equal(e.params.signalMode,0); assert.equal(e.params.driveCpuHigh,0);
 });
 
+test('EQ drag follows visible track at different sizes and preserves thumb grab offset', () => {
+    for (const height of [50, 100, 220]) {
+        const handlers = {};
+        let captured = null, inputs = 0;
+        const fader = { getBoundingClientRect:() => ({top:100,bottom:100+height,height}),
+            querySelector:() => ({getBoundingClientRect:() => ({height:12})}) };
+        const el = { min:'-12', max:'12', step:'0.1', value:'0', closest:() => fader,
+            addEventListener:(name,fn) => { handlers[name]=fn; }, focus() {},
+            setPointerCapture:id => {captured=id;}, hasPointerCapture:id => captured===id,
+            releasePointerCapture:() => {captured=null;}, dispatchEvent:() => {inputs++;} };
+        const context=vm.createContext({window:{addEventListener(){}},
+            document:{querySelectorAll:() => [el]}, Event:class {}, console});
+        vm.runInContext(file('snap-web.js').toString().replace('window.SnapWebParams = P;',
+            'window.TestEqDragging = setupEqDragging;'),context);
+        context.window.TestEqDragging();
+        const event = y => ({clientY:y,button:0,pointerId:1,preventDefault(){}});
+        handlers.pointerdown(event(100+height/2+3));
+        assert.equal(Number(el.value),0); // Grabbing off-centre must not jump.
+        handlers.pointermove(event(100+height/4+3));
+        assert.ok(Math.abs(Number(el.value)-6)<1e-9);
+        handlers.pointermove(event(80)); assert.equal(Number(el.value),12);
+        handlers.pointermove(event(130+height)); assert.equal(Number(el.value),-12);
+        handlers.pointerup(event(130+height));
+        handlers.pointermove(event(100)); assert.equal(Number(el.value),-12);
+        handlers.pointerdown(event(100+height/2)); assert.equal(Number(el.value),0);
+        handlers.pointercancel(event(100)); assert.equal(captured,null);
+        assert.ok(inputs>=4);
+    }
+});
+
 test('startup selects and applies Snap + CAB before audio initialization', () => {
     let start, initialized;
     const presetSelect = { value:'default', addEventListener() {} };
