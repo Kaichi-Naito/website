@@ -2145,9 +2145,16 @@
             font-size: 12px;
         }
 
+        .download-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
         .download-main-btn {
             display: inline-flex;
-            min-width: 150px;
+            min-width: 132px;
             height: 34px;
             align-items: center;
             justify-content: center;
@@ -3255,13 +3262,24 @@
 
                 <div class="download-info">
                     <div><strong>SNAP</strong> VST3</div>
-                    <div>Windows 64-bit</div>
-                    <div>Latest Version: v0.4.109</div>
+                    <div>Latest Version: v1.0</div>
                 </div>
 
-                <a href="#" id="download-vst3" class="win95-btn primary is-disabled download-main-btn">
-                    DOWNLOAD
-                </a>
+                <div class="download-buttons">
+                    <a href="Plugin/download/SNAP_v1.0_Windows.vst3"
+                       id="download-vst3-windows"
+                       class="win95-btn primary download-main-btn"
+                       download>
+                        WINDOWS
+                    </a>
+
+                    <a href="#"
+                       id="download-vst3-mac"
+                       class="win95-btn is-disabled download-main-btn"
+                       aria-disabled="true">
+                        MAC
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -3445,14 +3463,12 @@
             document.body.style.minHeight = (maxBottom + 80) + 'px';
         }
 
-        /* 配布開始まではDownloadを無効化 */
-        var downloadBtn = document.getElementById('download-vst3');
-        if (downloadBtn) {
-            downloadBtn.addEventListener('click', function(e) {
-                if (downloadBtn.classList.contains('is-disabled')) {
-                    e.preventDefault();
-                    alert('SNAP VST3 は現在配布準備中です。');
-                }
+        /* Mac版は公開ファイルが用意できるまで無効化 */
+        var macDownloadBtn = document.getElementById('download-vst3-mac');
+        if (macDownloadBtn) {
+            macDownloadBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('SNAP VST3 Mac版は現在準備中です。');
             });
         }
 
