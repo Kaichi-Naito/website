@@ -92,6 +92,13 @@
 #snap-vst-ui .snap-settings-row button:focus-visible,.snap134-save:focus-visible,.snap134-gear:focus-visible { outline:2px solid currentColor; outline-offset:3px; }
 @media (prefers-reduced-motion:reduce) { #snap-settings-open .snap-gear-svg { animation:none !important; } }
 @media (max-width:800px) {
+    /* Keep a generous hit area, but scale the visible TRIM thumb to the panel. */
+    #snap134-trim { --trim-thumb:clamp(6px,1.5cqw,10px); appearance:none; -webkit-appearance:none; background:transparent; border:0; padding:0; top:13.417725% !important; height:28px !important; transform:translateY(-50%); touch-action:pan-y; }
+    #snap134-trim::-webkit-slider-runnable-track { height:3px; border:0; border-radius:99px; background:#c3b4d0; }
+    #snap134-trim::-webkit-slider-thumb { appearance:none; -webkit-appearance:none; width:var(--trim-thumb); height:var(--trim-thumb); margin-top:calc((3px - var(--trim-thumb)) / 2); border:0; border-radius:50%; background:#94809e; box-shadow:none; }
+    #snap134-trim::-moz-range-track { height:3px; border:0; border-radius:99px; background:#c3b4d0; }
+    #snap134-trim::-moz-range-progress { height:3px; background:#c3b4d0; }
+    #snap134-trim::-moz-range-thumb { width:var(--trim-thumb); height:var(--trim-thumb); border:0; border-radius:50%; background:#94809e; box-shadow:none; }
     .snap134-target,.snap134-tick,.snap134-trim-label,.snap134-utility-label,.snap134-flow,.snap134-preset-label { --label-height:5px; }
     #snap-vst-ui .snap134-preset select { font-size:7px; }
     .snap134-meter-value,.snap134-trim-value,.snap134-version { font-size:6px; }
