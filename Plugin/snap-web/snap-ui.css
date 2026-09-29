@@ -1,0 +1,101 @@
+/* SNAP UI 0.4.134. Coordinates follow the 1240 x 790 JUCE editor.
+   The plate is rendered by SceneRenderer.cpp with the original FluidArt assets.
+   Text uses the supplied alpha masks; currentColor gives exact theme colours. */
+#snap-vst-ui {
+    --scene-ink: #d01645;
+    --target-ink: #d01645;
+    --target-fill: rgba(221,243,239,.90);
+    min-height: 0 !important;
+    height: auto !important;
+    aspect-ratio: 1240 / 790;
+    container-type: inline-size;
+    background: url('ui/v134/scene-water.png') center / 100% 100% no-repeat !important;
+    color: var(--scene-ink);
+}
+#snap-vst-ui[data-background="wood"] {
+    --scene-ink: #55585c;
+    --target-ink: #fff;
+    --target-fill: rgba(49,142,139,.43);
+    background-image: url('ui/v134/scene-wood.png') !important;
+}
+.snap-art {
+    display: inline-block;
+    width: calc(var(--label-height, 1em) * var(--art-ratio));
+    height: var(--label-height, 1em);
+    max-width: 100%;
+    flex-shrink: 0;
+    background-color: currentColor;
+    -webkit-mask: var(--art) center / contain no-repeat;
+    mask: var(--art) center / contain no-repeat;
+    vertical-align: middle;
+    pointer-events: none;
+}
+.snap134-main { position:absolute; inset:0; font: 400 .85cqw Arial,sans-serif; }
+.snap134-main > * { position:absolute; box-sizing:border-box; }
+.snap134-brand,.snap134-credit,.snap134-preset-label,.snap134-print,.snap134-utility-label,
+.snap134-trim-label,.snap134-trim-value,.snap134-meter-value,.snap134-version { display:flex; align-items:center; }
+.snap134-brand { --label-height:3.272cqw; }
+.snap134-credit { --label-height:1.091cqw; }
+.snap134-preset-label { justify-content:flex-end; --label-height:.694cqw; }
+.snap134-preset { display:flex; align-items:center; }
+#snap-vst-ui .snap134-preset select { width:100%; height:100%; min-height:0; border:1px solid #c3c5c6; border-radius:.9cqw; background:#faf8f5; color:var(--scene-ink); font:400 1.05cqw Arial,sans-serif; text-align:center; padding:0 1.8cqw 0 .5cqw; }
+#snap-vst-ui #web-preset-dirty { position:absolute; right:2.0cqw; color:var(--scene-ink); pointer-events:none; }
+.snap134-save,.snap134-gear { border:0; background:transparent; color:var(--scene-ink); padding:.25cqw; cursor:pointer; }
+.snap134-save svg { width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linejoin:round; }
+#snap-vst-ui .snap134-gear .snap-gear-svg { width:100%; height:100%; color:inherit; }
+#snap-vst-ui .snap134-gear .snap-gear-ring { fill:none; stroke:currentColor; stroke-width:13; }
+#snap-vst-ui .snap134-gear .snap-gear-tooth { fill:currentColor; }
+.snap134-meter { background:rgba(65,67,70,.17); border-radius:.5cqw; overflow:hidden; }
+#snap-vst-ui #web-input-meter-fill { background:linear-gradient(90deg,#95d8cf,#aba6d6); border-radius:.5cqw; }
+.snap134-target { position:absolute; left:60%; width:30%; inset-block:0; z-index:2; display:flex; justify-content:center; align-items:center; background:var(--target-fill); color:var(--target-ink); border-radius:.4cqw; --label-height:.694cqw; }
+.snap134-tick { position:absolute; top:0; transform:translateX(-50%); --label-height:.694cqw; }
+.snap134-meter-value { font-size:1cqw; }
+.snap134-trim-label,.snap134-utility-label { --label-height:.694cqw; }
+.snap134-trim { margin:0; accent-color:#94809e; cursor:ew-resize; }
+.snap134-trim-value { font-size:.75cqw; white-space:nowrap; gap:.15em; }
+.snap134-utility-label { justify-content:center; }
+.snap134-knob { cursor:ns-resize; touch-action:none; }
+.snap134-knob input,.snap134-switch input,.snap134-boost input { position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:inherit; touch-action:none; }
+.snap134-knob:focus-within,.snap134-switch:focus-within,.snap134-boost:focus-within { outline:2px solid var(--scene-ink); outline-offset:3px; border-radius:50%; }
+.snap134-utility-face { position:absolute; left:15%; top:12%; width:70%; height:61%; border-radius:50%; background:linear-gradient(135deg,#eee5f3,#ded3e8); border:1px solid rgba(255,255,255,.6); box-shadow:0 .4cqw 0 #bbaacb,0 .7cqw .6cqw #0002; }
+.snap134-gate::after { content:''; position:absolute; left:47%; bottom:2%; width:8%; aspect-ratio:1; border-radius:50%; background:#7bafb5; }
+.snap134-gate.gate-closed::after { background:#c8a9c5; }
+.snap134-pointer { position:absolute; inset:0; transform:rotate(var(--knob-angle,0deg)); pointer-events:none; }
+.snap134-pointer span { position:absolute; width:5.4%; height:22%; left:47.3%; top:13%; border-radius:99px; background:#88787c; }
+.snap134-utility .snap134-pointer { left:15%; top:12%; width:70%; height:61%; }
+.snap134-utility .snap134-pointer span { width:4%; height:24%; left:48%; background:#61556c; }
+.snap134-value { position:absolute; top:-30%; left:50%; transform:translateX(-50%); background:#302e35e8; color:#fff; padding:.2cqw .5cqw; border-radius:.3cqw; opacity:0; pointer-events:none; }
+.snap134-knob:hover .snap134-value,.snap134-knob:focus-within .snap134-value { opacity:1; }
+.snap134-print { color:#fcf9f3; justify-content:center; pointer-events:none; }
+.snap134-switch { background:transparent; cursor:pointer; border-radius:40%; }
+.snap134-led { pointer-events:none; border-radius:50%; background:radial-gradient(circle,#64818c,#39596e 30%,transparent 65%); }
+.snap134-led.is-on { background:radial-gradient(circle,#fff 0%,#e3fcff 18%,#90e5ff 37%,#7ce5ff50 60%,transparent 72%); box-shadow:0 0 1.3cqw #a2efff70; }
+.snap134-boost { cursor:pointer; }
+.snap134-boost > span { position:absolute; left:42%; top:47%; width:23%; height:44%; background:linear-gradient(90deg,#eeece4,#77787b); border-radius:30%; transform:rotate(-4deg); }
+.snap134-boost.is-on > span { top:8%; transform:rotate(4deg); }
+.snap134-flow { display:flex; align-items:center; gap:.3cqw; --label-height:.694cqw; }
+.snap134-version { justify-content:flex-end; font-size:.7cqw; white-space:nowrap; }
+#snap-vst-ui .snap-vst-settings { color:#fcf9f3; }
+#snap-vst-ui .snap-settings-row { min-height:4.05cqw !important; }
+#snap-vst-ui .snap134-background { display:flex; gap:.75cqw; }
+#snap-vst-ui .snap134-background button { height:2.45cqw; min-height:24px; border:1px solid #c4d0dab8; border-radius:.65cqw; background:#323a43; color:white; display:flex; align-items:center; justify-content:center; padding:0 1.15cqw; font-size:.96cqw; cursor:pointer; }
+#snap-vst-ui .snap134-background button[aria-pressed="true"] { background:#56bfd0; }
+#snap-vst-ui .eq-value { display:none !important; }
+#snap-vst-ui .snap-eq-off-label { --label-height:3cqw; }
+#snap-vst-ui .snap-settings-row > label { --label-height:.8cqw; }
+#snap-vst-ui .snap-settings-profile-caption { --label-height:1.05cqw; }
+#snap-vst-ui .snap-settings-close { --label-height:.9cqw; }
+#snap-vst-ui .snap-settings-row button:focus-visible,.snap134-save:focus-visible,.snap134-gear:focus-visible { outline:2px solid currentColor; outline-offset:3px; }
+@media (prefers-reduced-motion:reduce) { #snap-settings-open .snap-gear-svg { animation:none !important; } }
+@media (max-width:800px) {
+    .snap134-target,.snap134-tick,.snap134-trim-label,.snap134-utility-label,.snap134-flow,.snap134-preset-label { --label-height:5px; }
+    #snap-vst-ui .snap134-preset select { font-size:7px; }
+    .snap134-meter-value,.snap134-trim-value,.snap134-version { font-size:6px; }
+    .snap134-print .snap-art { height:max(5px,var(--label-height)); width:calc(max(5px,var(--label-height)) * var(--art-ratio)); }
+    .snap134-knob input,.snap134-switch input { inset:auto; left:50%; top:50%; transform:translate(-50%,-50%); width:max(100%,32px); height:max(100%,32px); }
+    #snap-vst-ui .snap-settings-row { min-height:7.5cqw !important; grid-template-columns:19cqw minmax(0,1fr) !important; }
+    #snap-vst-ui .snap-settings-row > label { --label-height:1.3cqw; }
+    #snap-vst-ui .snap134-background button { font-size:1.4cqw; }
+    #snap-vst-ui .snap-display-size-row { gap:.45cqw; }
+    #snap-vst-ui .snap-display-size-row button { padding:0 .75cqw !important; }
+}
