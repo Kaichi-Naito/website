@@ -127,7 +127,7 @@
 
         .sample-player-row {
             display: grid;
-            grid-template-columns: auto 1fr auto;
+            grid-template-columns: auto minmax(0, 1fr);
             gap: 12px;
             align-items: center;
         }
@@ -155,30 +155,6 @@
             color: #a8a8a8;
             font-size: 10px;
             margin-top: 2px;
-        }
-
-        .sample-loop-indicator {
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            background: #c0c0c0;
-            width: 48px;
-            height: 38px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: default;
-        }
-
-        .sample-loop-indicator svg {
-            width: 27px;
-            height: 27px;
-            display: block;
-            fill: none;
-            stroke: #111111;
-            stroke-width: 2.2;
-            stroke-linecap: square;
-            stroke-linejoin: miter;
         }
 
         .sample-help {
@@ -2720,14 +2696,6 @@
                         </div>
                     </div>
 
-                    <div class="sample-loop-indicator" title="Loop playback" aria-label="Loop playback">
-                        <svg viewBox="0 0 32 32" aria-hidden="true">
-                            <path d="M7 11 H22 C25 11 27 13 27 16" />
-                            <path d="M23 7 L27 11 L23 15" />
-                            <path d="M25 21 H10 C7 21 5 19 5 16" />
-                            <path d="M9 25 L5 21 L9 17" />
-                        </svg>
-                    </div>
                 </div>
 
                 <audio id="snap-sample-audio"
@@ -2999,7 +2967,7 @@
 </div>
 <div class="snap134-flow" id="snap134-flow" style="left:2.74194%;top:95.18987%;width:42.74194%;height:2.91139%">
 </div>
-<span class="snap134-version" style="left:85.48387%;top:95.18987%;width:12.09677%;height:2.91139%" title="UI matches VST 0.4.134; Web DSP remains 0.4.109">UI 0.4.134 · WEB</span>
+<span class="snap134-version" style="left:85.48387%;top:95.18987%;width:12.09677%;height:2.91139%" title="SNAP v1.0 web trial">SNAP v1.0 · WEB</span>
 </div>
                     <!-- SETTINGS -->
                     <div class="snap-vst-settings" id="snap-vst-settings" role="dialog" aria-label="SNAP settings">
@@ -3351,9 +3319,23 @@
                 windows[w].style.transform = '';
             }
 
+            function getHeaderBottom() {
+                var headerTitle = document.querySelector('.header-title');
+                var commonNav = document.getElementById('common-nav');
+                var bottom = 0;
+
+                [headerTitle, commonNav].forEach(function(el) {
+                    if (!el) return;
+                    var rect = el.getBoundingClientRect();
+                    bottom = Math.max(bottom, rect.bottom + (window.scrollY || window.pageYOffset || 0));
+                });
+
+                return Math.round(bottom);
+            }
+
             if (isMobile) {
                 var mobileLeft = '6px';
-                var mobileTop = 190;
+                var mobileTop = Math.max(190, getHeaderBottom() + 18);
                 var mobileGap = 24;
 
                 [sample, snap, install, download, changelog].forEach(function(win) {
@@ -3418,7 +3400,7 @@
                README begins about 55 px before SNAP ends.
             */
             var desktopGroupYOffset = 120;
-            var sampleTop = 55 + desktopGroupYOffset;
+            var sampleTop = Math.max(55 + desktopGroupYOffset, getHeaderBottom() + 18);
             var snapTop = sampleTop + sampleHeight - 25;
             var installTop = snapTop + snapHeight - 55;
 
