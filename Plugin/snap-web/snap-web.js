@@ -160,7 +160,9 @@
 
         setParam(name, value) {
             if (name === 'signalMode' || name === 'driveCpuHigh') value = 0;
+            if (name === 'cabMode') value = Math.max(0, Math.min(4, Math.round(Number(value) || 0)));
             this.params[name] = Number(value);
+            if (window.SnapWebUi) window.SnapWebUi.sync(this.params);
             if (name === 'compOn' || name === 'driveOn') this.updateWebOutputGain(false);
             const map = {
                 inputTrim:P.INPUT_TRIM, gate:P.GATE, comp:P.COMP, compVol:P.COMP_VOL,
@@ -246,7 +248,7 @@
         }
 
         updateGateVisual(closed) {
-            const gate = document.querySelector('.snap-gate-knob');
+            const gate = document.querySelector('.snap134-gate');
             if (gate) gate.classList.toggle('gate-closed', Boolean(closed));
         }
     }
@@ -260,7 +262,7 @@
         const t = max > min ? Math.max(0, Math.min(1, (value - min) / (max - min))) : 0;
         const angle = -135 + t * 270;
 
-        const knob = el.closest('.snap-knob, .snap-gate-knob');
+        const knob = el.closest('.snap134-knob');
         if (knob) knob.style.setProperty('--knob-angle', angle + 'deg');
 
         const eqFader = el.closest('.snap-eq-fader');
@@ -312,14 +314,21 @@
     }
 
     function setupKnobDragging() {
-        document.querySelectorAll('.snap-knob input[type="range"], .snap-gate-knob input[type="range"]').forEach(el => {
+        const main = document.querySelector('.snap134-main');
+        if (main) {
+            main.addEventListener('pointerdown', () => { main.dataset.inputMethod = 'pointer'; }, true);
+            document.addEventListener('keydown', () => { main.dataset.inputMethod = 'keyboard'; }, true);
+        }
+        document.querySelectorAll('.snap134-knob input[type="range"]').forEach(el => {
             updateRangeVisual(el);
             let startY = 0;
             let startValue = 0;
             let dragging = false;
 
             el.addEventListener('pointerdown', e => {
+                if (e.button !== 0) return;
                 dragging = true;
+                el.focus({ preventScroll:true });
                 startY = e.clientY;
                 startValue = Number(el.value);
                 el.setPointerCapture(e.pointerId);
@@ -346,6 +355,11 @@
             };
             el.addEventListener('pointerup', stop);
             el.addEventListener('pointercancel', stop);
+            el.addEventListener('lostpointercapture', () => { dragging = false; });
+            el.addEventListener('dblclick', () => {
+                el.value = String(DEFAULTS[el.dataset.snapParam]);
+                el.dispatchEvent(new Event('input', { bubbles:true }));
+            });
             el.addEventListener('wheel', e => {
                 e.preventDefault();
                 const step = Number(el.step || 0.1);
@@ -420,8 +434,19 @@
         const open = document.getElementById('snap-settings-open');
         const close = document.getElementById('snap-settings-close');
 
-        if (open && panel) open.addEventListener('click', () => panel.classList.add('is-open'));
-        if (close && panel) close.addEventListener('click', () => panel.classList.remove('is-open'));
+        const main = document.querySelector('.snap134-main');
+        const setOpen = visible => {
+            if (!panel) return;
+            panel.classList.toggle('is-open', visible);
+            if (main) main.inert = visible;
+            if (visible) close.focus({ preventScroll:true });
+            else open.focus({ preventScroll:true });
+        };
+        if (open && panel) open.addEventListener('click', () => setOpen(true));
+        if (close && panel) close.addEventListener('click', () => setOpen(false));
+        if (panel) panel.addEventListener('keydown', event => {
+            if (event.key === 'Escape') { event.preventDefault(); setOpen(false); }
+        });
 
         const eqArea = document.querySelector('.snap-eq-area');
         if (eqArea) {
@@ -557,8 +582,28 @@
         setupSegmentControls(engine);
         setupKnobDragging();
         setupSettingsUi(engine);
+        if (window.SnapWebUi) window.SnapWebUi.setup(engine, saved => {
+            // Validate saved browser values against actual controls. Never forward
+            // arbitrary stored keys to the DSP or change Web-only restrictions.
+            document.querySelectorAll('[data-snap-param]').forEach(el => {
+                const name = el.dataset.snapParam;
+                if (!Object.prototype.hasOwnProperty.call(saved, name) || !Number.isFinite(saved[name])) return;
+                let value = saved[name];
+                if (el.type === 'checkbox') value = value >= .5 ? 1 : 0;
+                else if (el.type === 'range') {
+                    value = Math.max(Number(el.min), Math.min(Number(el.max), value));
+                    value = Math.round(value / Number(el.step)) * Number(el.step);
+                }
+                engine.setParam(name, value);
+                updateControlUi(name, engine.params[name]);
+            });
+            updateEqResponseCurve(engine);
+            document.getElementById('web-preset-dirty').textContent = '';
+        });
 
-        Object.entries(DEFAULTS).forEach(([name,value]) => updateControlUi(name,value));
+        const initialPreset = 'Snap + CAB';
+        document.getElementById('web-preset-select').value = initialPreset;
+        applyPreset(engine, initialPreset);
 
         // Construct the graph immediately so the media element never bypasses SNAP.
         engine.init().catch(() => {});

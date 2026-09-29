@@ -1,0 +1,226 @@
+{
+  "BACKGROUND": {
+    "file": "label_00_white.png",
+    "ratio": 7.729166666666667
+  },
+  "BOOST": {
+    "file": "label_01_white.png",
+    "ratio": 3.609375
+  },
+  "COMP": {
+    "file": "label_02_white.png",
+    "ratio": 2.996875
+  },
+  "DISPLAY SIZE": {
+    "file": "label_03_white.png",
+    "ratio": 8.145833333333334
+  },
+  "DRIVE CPU": {
+    "file": "label_04_white.png",
+    "ratio": 6.145833333333333
+  },
+  "DRIVE": {
+    "file": "label_05_white.png",
+    "ratio": 3.51875
+  },
+  "EQ": {
+    "file": "label_06_white.png",
+    "ratio": 1.328125
+  },
+  "GATE": {
+    "file": "label_07_white.png",
+    "ratio": 2.921875
+  },
+  "HIGH": {
+    "file": "label_08_white.png",
+    "ratio": 2.8385416666666665
+  },
+  "LOW": {
+    "file": "label_09_white.png",
+    "ratio": 2.1145833333333335
+  },
+  "MONO": {
+    "file": "label_10_white.png",
+    "ratio": 3.09375
+  },
+  "ON / OFF": {
+    "file": "label_11_white.png",
+    "ratio": 4.5625
+  },
+  "PRESET FOLDER": {
+    "file": "label_12_white.png",
+    "ratio": 9.5
+  },
+  "RESET": {
+    "file": "label_13_white.png",
+    "ratio": 3.6822916666666665
+  },
+  "SETTINGS": {
+    "file": "label_14_white.png",
+    "ratio": 5.729166666666667
+  },
+  "SIGNAL": {
+    "file": "label_15_white.png",
+    "ratio": 4.348958333333333
+  },
+  "SNAP": {
+    "file": "label_16_white.png",
+    "ratio": 3.075
+  },
+  "STEREO": {
+    "file": "label_17_white.png",
+    "ratio": 4.411458333333333
+  },
+  "TONE": {
+    "file": "label_18_white.png",
+    "ratio": 3.034375
+  },
+  "VOL": {
+    "file": "label_19_white.png",
+    "ratio": 2.140625
+  },
+  "-12": {
+    "file": "label_20_gray.png",
+    "ratio": 1.6363636363636365
+  },
+  "-18": {
+    "file": "label_21_gray.png",
+    "ratio": 1.6391304347826088
+  },
+  "-24": {
+    "file": "label_22_gray.png",
+    "ratio": 1.6406926406926408
+  },
+  "-48": {
+    "file": "label_23_gray.png",
+    "ratio": 1.6391304347826088
+  },
+  "-6": {
+    "file": "label_24_gray.png",
+    "ratio": 0.9826086956521739
+  },
+  "-inf": {
+    "file": "label_25_gray.png",
+    "ratio": 2.051948051948052
+  },
+  "0": {
+    "file": "label_26_gray.png",
+    "ratio": 0.49130434782608695
+  },
+  "Good target": {
+    "file": "label_30_white.png",
+    "ratio": 5.820276497695852
+  },
+  "Kaichi": {
+    "file": "label_31_gray.png",
+    "ratio": 3.4875
+  },
+  "PRESET": {
+    "file": "label_32_gray.png",
+    "ratio": 4.459375
+  },
+  "TRIM": {
+    "file": "label_33_gray.png",
+    "ratio": 2.8217391304347825
+  },
+  " -> ": {
+    "file": "label_34_gray.png",
+    "ratio": 2.121019108280255
+  },
+  "CLOSE": {
+    "file": "label_35_gray.png",
+    "ratio": 3.56875
+  },
+  "31": {
+    "file": "label_36_gray.png",
+    "ratio": 1.0913043478260869
+  },
+  "62": {
+    "file": "label_37_gray.png",
+    "ratio": 1.1385281385281385
+  },
+  "125": {
+    "file": "label_38_gray.png",
+    "ratio": 1.7186147186147187
+  },
+  "250": {
+    "file": "label_39_gray.png",
+    "ratio": 1.8225108225108224
+  },
+  "500": {
+    "file": "label_40_gray.png",
+    "ratio": 1.826086956521739
+  },
+  "1k": {
+    "file": "label_41_gray.png",
+    "ratio": 1.0649350649350648
+  },
+  "2k": {
+    "file": "label_42_gray.png",
+    "ratio": 1.173160173160173
+  },
+  "4k": {
+    "file": "label_43_gray.png",
+    "ratio": 1.1608695652173913
+  },
+  "8k": {
+    "file": "label_44_gray.png",
+    "ratio": 1.173160173160173
+  },
+  "16k": {
+    "file": "label_45_gray.png",
+    "ratio": 1.7359307359307359
+  },
+  "CAB": {
+    "file": "label_46_gray.png",
+    "ratio": 2.1774891774891776
+  },
+  "+12": {
+    "file": "label_47_gray.png",
+    "ratio": 1.8225108225108224
+  },
+  "WATER": {
+    "file": "label_48_white.png",
+    "ratio": 3.8697916666666665
+  },
+  "WOOD FLOOR": {
+    "file": "label_49_white.png",
+    "ratio": 7.067708333333333
+  },
+  "OFF": {
+    "file": "label_50_white.png",
+    "ratio": 2.0989583333333335
+  },
+  "Guitar Effect Plugin by Kaichi": {
+    "file": "label_51_white.png",
+    "ratio": 15.36697247706422
+  },
+  "CAB off": {
+    "file": "label_52_white.png",
+    "ratio": 4.401041666666667
+  },
+  "CAB A": {
+    "file": "label_53_white.png",
+    "ratio": 3.375
+  },
+  "CAB B": {
+    "file": "label_54_white.png",
+    "ratio": 3.3125
+  },
+  "CAB C": {
+    "file": "label_55_white.png",
+    "ratio": 3.2864583333333335
+  },
+  "CAB D": {
+    "file": "label_56_white.png",
+    "ratio": 3.4166666666666665
+  },
+  "GoodTarget": {
+    "file": "label_30_white.png",
+    "ratio": 5.820276497695852
+  },
+  "→": {
+    "file": "label_34_gray.png",
+    "ratio": 2.121019108280255
+  }
+}
