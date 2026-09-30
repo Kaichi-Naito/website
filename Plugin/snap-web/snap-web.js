@@ -480,17 +480,20 @@
         const panel = document.getElementById('snap-vst-settings');
         const open = document.getElementById('snap-settings-open');
         const close = document.getElementById('snap-settings-close');
+        const backdrop = document.getElementById('snap-settings-backdrop');
 
         const main = document.querySelector('.snap134-main');
         const setOpen = visible => {
             if (!panel) return;
             panel.classList.toggle('is-open', visible);
+            if (backdrop) backdrop.classList.toggle('is-open', visible);
             if (main) main.inert = visible;
             if (visible) close.focus({ preventScroll:true });
             else open.focus({ preventScroll:true });
         };
         if (open && panel) open.addEventListener('click', () => setOpen(true));
         if (close && panel) close.addEventListener('click', () => setOpen(false));
+        if (backdrop && panel) backdrop.addEventListener('click', () => setOpen(false));
         if (panel) panel.addEventListener('keydown', event => {
             if (event.key === 'Escape') { event.preventDefault(); setOpen(false); }
         });
