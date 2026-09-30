@@ -2204,20 +2204,17 @@
             padding-top: 10px;
             border-top: 1px solid #9a9a9a;
             box-shadow: inset 0 1px 0 #ffffff;
+            min-height: 34px;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: visible;
         }
 
-        .download-support-btn {
-            display: inline-flex;
-            min-width: 220px;
-            height: 30px;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            font-size: 11px;
-            letter-spacing: .2px;
+        .download-support .bmc-btn-container {
+            transform: scale(.62);
+            transform-origin: center center;
+            margin: -10px -38px;
         }
 
         @media (max-width: 800px) {
@@ -3313,12 +3310,17 @@
                 </div>
 
                 <div class="download-support">
-                    <a href="https://buymeacoffee.com/kaichi_zz"
-                       class="win95-btn primary download-support-btn"
-                       target="_blank"
-                       rel="noopener noreferrer">
-                        ☕BUY ME A COFFEE☕
-                    </a>
+                    <script type="text/javascript"
+                            src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+                            data-name="bmc-button"
+                            data-slug="kaichi_zz"
+                            data-color="#FFDD00"
+                            data-emoji="☕"
+                            data-font="Bree"
+                            data-text="Buy me a coffee"
+                            data-outline-color="#000000"
+                            data-font-color="#000000"
+                            data-coffee-color="#ffffff"></script>
                 </div>
             </div>
         </div>
