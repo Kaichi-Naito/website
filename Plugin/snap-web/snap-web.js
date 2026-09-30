@@ -482,24 +482,6 @@
         const close = document.getElementById('snap-settings-close');
         const backdrop = document.getElementById('snap-settings-backdrop');
 
-        // Rotate the main gear explicitly in JS instead of relying only on SVG CSS
-        // animation. This avoids browser-specific SVG animation/transform issues.
-        const gearSvg = open ? open.querySelector('.snap-gear-svg') : null;
-        if (gearSvg && !gearSvg.dataset.webSpinStarted) {
-            gearSvg.dataset.webSpinStarted = '1';
-            gearSvg.style.animation = 'none';
-            gearSvg.style.transformBox = 'fill-box';
-            gearSvg.style.transformOrigin = 'center center';
-
-            const spinStartedAt = performance.now();
-            const spinGear = now => {
-                const degrees = ((now - spinStartedAt) / 3000 * 360) % 360;
-                gearSvg.style.transform = 'rotate(' + degrees.toFixed(2) + 'deg)';
-                requestAnimationFrame(spinGear);
-            };
-            requestAnimationFrame(spinGear);
-        }
-
         const main = document.querySelector('.snap134-main');
         const setOpen = visible => {
             if (!panel) return;
