@@ -95,7 +95,7 @@
 #snap-vst-ui .snap-settings-profile-caption { --label-height:1.05cqw; }
 #snap-vst-ui .snap-settings-close { --label-height:.9cqw; }
 #snap-vst-ui .snap-settings-row button:focus-visible,.snap134-save:focus-visible,.snap134-gear:focus-visible { outline:2px solid currentColor; outline-offset:3px; }
-@media (prefers-reduced-motion:reduce) { #snap-settings-open .snap-gear-svg { animation:none !important; } }
+
 @media (max-width:800px) {
     /* Keep a generous hit area, but scale the visible TRIM thumb to the panel. */
     #snap134-trim { --trim-thumb:clamp(6px,1.5cqw,10px); appearance:none; -webkit-appearance:none; background:transparent; border:0; padding:0; top:13.417725% !important; height:28px !important; transform:translateY(-50%); touch-action:pan-y; }
@@ -114,4 +114,17 @@
     #snap-vst-ui .snap134-background button { font-size:1.4cqw; }
     #snap-vst-ui .snap-display-size-row { gap:.45cqw; }
     #snap-vst-ui .snap-display-size-row button { padding:0 .75cqw !important; }
+}
+
+
+/* SNAP main gear — preserve the pre-v134 Web behavior. */
+#snap-settings-open .snap-gear-svg {
+    animation: snap-web-gear-idle-spin 3s linear infinite !important;
+    transform-origin: 50% 50%;
+}
+#snap-settings-open:hover .snap-gear-svg {
+    animation-play-state: paused !important;
+}
+@keyframes snap-web-gear-idle-spin {
+    to { transform: rotate(360deg); }
 }
