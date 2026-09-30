@@ -2312,17 +2312,12 @@
         }
         #snap-settings-open .snap-gear-svg {
             animation: snap-web-gear-idle-spin 3.0s linear infinite !important;
-            transform-box: fill-box;
-            transform-origin: center center;
-            will-change: transform;
+            transform-origin: 50% 50%;
         }
         #snap-settings-open:hover .snap-gear-svg {
-            animation-play-state: running !important;
+            animation-play-state: paused !important;
         }
-        @keyframes snap-web-gear-idle-spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        @keyframes snap-web-gear-idle-spin { to { transform: rotate(360deg); } }
 
         /* v0.4.106-109: GATE and CAB share the lower utility-control line. */
         .snap-vst-gate {
@@ -2640,7 +2635,7 @@
             display: flex !important;
         }
 </style>
-<link rel="stylesheet" href="Plugin/snap-web/snap-ui.css?v=134.4">
+<link rel="stylesheet" href="Plugin/snap-web/snap-ui.css?v=134.5">
 
 
     <script>
@@ -3316,7 +3311,7 @@
 
 
     <script src="Plugin/snap-web/snap-ui.js?v=134"></script>
-    <script src="Plugin/snap-web/snap-web.js?v=134.7"></script>
+    <script src="Plugin/snap-web/snap-web.js?v=134.8"></script>
 
     <script>
         function setInitialPositions() {
