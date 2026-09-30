@@ -802,6 +802,18 @@
 
         .snap-vst-settings.is-open { display: block; }
 
+        .snap-settings-backdrop {
+            position: absolute;
+            inset: 0;
+            z-index: 99;
+            display: none;
+            background: transparent;
+        }
+
+        .snap-settings-backdrop.is-open {
+            display: block;
+        }
+
         .snap-settings-header {
             display: flex;
             justify-content: center;
@@ -2300,12 +2312,17 @@
         }
         #snap-settings-open .snap-gear-svg {
             animation: snap-web-gear-idle-spin 3.0s linear infinite !important;
-            transform-origin: 50% 50%;
+            transform-box: fill-box;
+            transform-origin: center center;
+            will-change: transform;
         }
         #snap-settings-open:hover .snap-gear-svg {
-            animation-play-state: paused !important;
+            animation-play-state: running !important;
         }
-        @keyframes snap-web-gear-idle-spin { to { transform: rotate(360deg); } }
+        @keyframes snap-web-gear-idle-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
         /* v0.4.106-109: GATE and CAB share the lower utility-control line. */
         .snap-vst-gate {
@@ -2984,6 +3001,7 @@
 <span class="snap134-version" style="left:85.48387%;top:95.18987%;width:12.09677%;height:2.91139%" title="SNAP v1.0 web trial">SNAP v1.0 · WEB</span>
 </div>
                     <!-- SETTINGS -->
+                    <div class="snap-settings-backdrop" id="snap-settings-backdrop" aria-hidden="true"></div>
                     <div class="snap-vst-settings" id="snap-vst-settings" role="dialog" aria-label="SNAP settings">
     <div class="snap-settings-header">
         <span class="gear-mini"><svg class="snap-gear-svg" viewBox="0 0 100 100" aria-hidden="true">
@@ -3298,7 +3316,7 @@
 
 
     <script src="Plugin/snap-web/snap-ui.js?v=134"></script>
-    <script src="Plugin/snap-web/snap-web.js?v=134.5"></script>
+    <script src="Plugin/snap-web/snap-web.js?v=134.6"></script>
 
     <script>
         function setInitialPositions() {
