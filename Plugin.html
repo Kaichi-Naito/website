@@ -3326,35 +3326,6 @@
         </div>
     </div>
 
-    <!-- Changelog -->
-    <div class="window" id="win-changelog" style="width: 430px; z-index: 102;">
-        <div class="title-bar draggable-cursor" id="handle-changelog">
-            <span>CHANGELOG.log</span>
-            <div class="title-bar-controls">
-                <button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button>
-                <button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button>
-                <button type="button" class="close-button" aria-label="Close">×</button>
-            </div>
-        </div>
-        <div class="window-contents">
-            <div class="changelog">
-                SNAP v0.4.109<br>
-                ------------------------------<br>
-                ・COMP RMS + Peak detector / NaturalComp<br>
-                ・Updated COMP TONE voicing<br>
-                ・Updated DRIVE / SNAP / TONE / VOL voicing<br>
-                ・DRIVE body contour + developer voicing defaults<br>
-                ・Updated factory presets<br>
-                ・EQ response curve<br>
-                ・Browser DSP synced to v0.4.109<br>
-                <br>
-                この欄は今後、公開版の更新履歴に使用します。
-            </div>
-        </div>
-    </div>
-
-
-
     <script src="Plugin/snap-web/snap-ui.js?v=134"></script>
     <script src="Plugin/snap-web/snap-web.js?v=134.8"></script>
 
@@ -3366,8 +3337,7 @@
             var snap = document.getElementById('win-snap');
             var install = document.getElementById('win-install');
             var download = document.getElementById('win-download');
-            var changelog = document.getElementById('win-changelog');
-            var windows = [sample, snap, install, download, changelog];
+            var windows = [sample, snap, install, download];
 
             for (var w = 0; w < windows.length; w++) {
                 if (!windows[w]) continue;
@@ -3393,7 +3363,7 @@
                 var mobileTop = Math.max(190, getHeaderBottom() + 18);
                 var mobileGap = 24;
 
-                [sample, snap, install, download, changelog].forEach(function(win) {
+                [sample, snap, install, download].forEach(function(win) {
                     if (!win) return;
                     win.style.left = mobileLeft;
                     win.style.top = mobileTop + 'px';
@@ -3403,7 +3373,6 @@
                 if (sample) sample.style.zIndex = '118';
                 if (install) install.style.zIndex = '116';
                 if (download) download.style.zIndex = '114';
-                if (changelog) changelog.style.zIndex = '110';
                 if (snap) snap.style.zIndex = '120';
                 document.body.style.minHeight = (mobileTop + 100) + 'px';
                 return;
@@ -3462,12 +3431,6 @@
             var downloadLeft = snapLeft + snapWidth - downloadWidth - 18;
             var downloadTop = installTop + 82;
 
-            var changelogLeft = installLeft + 28;
-            var changelogTop = Math.max(
-                installTop + installHeight + 24,
-                downloadTop + downloadHeight + 24
-            );
-
             if (sample) {
                 sample.style.left = sampleLeft + 'px';
                 sample.style.top = sampleTop + 'px';
@@ -3490,12 +3453,6 @@
                 download.style.left = downloadLeft + 'px';
                 download.style.top = downloadTop + 'px';
                 download.style.zIndex = '114';
-            }
-
-            if (changelog) {
-                changelog.style.left = changelogLeft + 'px';
-                changelog.style.top = changelogTop + 'px';
-                changelog.style.zIndex = '110';
             }
 
             var bottoms = windows.filter(Boolean).map(function(win) {
