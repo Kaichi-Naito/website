@@ -606,6 +606,8 @@
 
             /* スマホ用タスクバー */
             #win95-taskbar { height: calc(28px + env(safe-area-inset-bottom)); }
+            /* Production keeps browser-control insets outside the painted taskbar. */
+            body:not(.xp-desktop) #win95-taskbar { bottom: env(safe-area-inset-bottom); height: 28px; padding-bottom: 0; }
 
             /* Keep the taskbar inside the page viewport; browser controls own the area below. */
             #start-menu { bottom: calc(29px + env(safe-area-inset-bottom)); }
