@@ -66,7 +66,7 @@
             var shutdown = document.getElementById('shutdown-menu-item');
             menu.replaceChildren();
             var user = document.createElement('div'); user.className = 'xp-menu-user';
-            var avatar = document.createElement('img'); avatar.src = window.KaichiUI.asset('images/card-image.jpg'); avatar.alt = '';
+            var avatar = document.createElement('img'); avatar.src = window.KaichiUI.asset('test/assets/kaichi-avatar.jpg'); avatar.alt = '';
             var name = document.createElement('span'); name.textContent = 'Kaichi'; user.append(avatar, name);
             var programs = document.createElement('div'); programs.className = 'xp-menu-programs';
             programs.append(menuItem('プロフィール', 'computer', 'win-profile', 'Kaichi Naito'),
@@ -84,7 +84,7 @@
             var footer = document.createElement('div'); footer.className = 'xp-menu-footer';
             var os = document.createElement('span'); os.textContent = 'Kaichi XP';
             shutdown.querySelector('img').src = icon('power');
-            shutdown.querySelector('span').textContent = '終了オプション';
+            shutdown.querySelector('span').textContent = 'シャットダウン';
             footer.append(os, shutdown);
             menu.append(user, programs, links, footer);
             new MutationObserver(function () {
