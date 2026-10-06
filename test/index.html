@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <base href="../">
+    <link rel="stylesheet" href="test/mobile-desktop.css?v=20261006-rotate1">
+    <script src="test/mobile-desktop.js?v=20261006-rotate1"></script>
     <meta name="keywords" content="ギター, 作曲, 内藤海地, Kaichi, Kaichi Naito, PHALUX, WindowsXP">
     <meta name="description" content="PHALUXのKaichiの各SNSやプロフィールまとめ。ギター演奏・オリジナル楽曲を紹介する。最新楽曲の視聴も可能です。">  
     <meta property="og:title" content="Kaichi Guitar Music">
@@ -188,7 +190,17 @@
 
         document.addEventListener('kaichi-ui-ready', updateVisitorCounter);
     </script>
-    <script src="js/xp-theme.js?v=20261006-xp-production2"></script>
-    <script src="js/common-ui.js?v=20261006-xp-production3"></script>
+    <script>
+        if (!window.KaichiTestRotation.isHost()) {
+            var xpThemeScript = document.createElement('script');
+            xpThemeScript.src = 'js/xp-theme.js?v=20261006-xp-production2';
+            xpThemeScript.onload = function () {
+                var commonUiScript = document.createElement('script');
+                commonUiScript.src = 'js/common-ui.js?v=20261006-xp-production3';
+                document.body.appendChild(commonUiScript);
+            };
+            document.body.appendChild(xpThemeScript);
+        }
+    </script>
 </body>
 </html>
