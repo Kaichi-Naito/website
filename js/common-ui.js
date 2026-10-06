@@ -362,7 +362,7 @@
             history.replaceState(
                 { kaichiSoftReboot: true },
                 '',
-                new URL('index.html', window.location.href).pathname
+                new URL(asset('index.html')).pathname
             );
         } catch (e) {}
 
@@ -436,7 +436,7 @@
                 try {
                     sessionStorage.setItem('kaichi-play-startup-sound', '1');
                 } catch (e) {}
-                window.location.href = 'index.html';
+                window.location.href = asset('index.html');
             });
     }
 
@@ -1045,6 +1045,7 @@
     function triggerCatCrashShutdown() {
         if (catCrashTriggered) return;
         catCrashTriggered = true;
+        if (window.KaichiDesktopTheme) window.KaichiDesktopTheme.rememberWindows95();
 
         /*
            triggerCatCrashShutdown() is reached synchronously from the
