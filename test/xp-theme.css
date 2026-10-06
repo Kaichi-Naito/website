@@ -59,15 +59,15 @@ iframe { box-sizing: border-box; border: 1px solid #7f9db9; }
 #taskbar-tray { height: 36px; border: 0; border-left: 1px solid #104ca9; padding: 0 12px; color: white; background: linear-gradient(#19bded, #0e97eb 15%, #0b9de8 85%, #0888d5); box-shadow: inset 1px 0 #44d1ff; flex-shrink: 0; gap: 10px; }
 #taskbar-tray img { width: 18px; height: 18px; image-rendering: auto; }
 #tray-clock { color: white; width: 40px; }
-#start-menu { left: 0; bottom: calc(36px + env(safe-area-inset-bottom)); width: 390px; max-width: 100vw; padding: 0; border: 2px solid #175acd; border-radius: 7px 7px 0 0; background: white; box-shadow: 3px 3px 7px #0006; font-family: var(--xp-font); overflow: hidden; }
-#start-menu.open { display: grid; grid-template-columns: 1fr 1fr; }
+#start-menu { left: 0; bottom: calc(36px + env(safe-area-inset-bottom)); width: 250px; max-width: 100vw; padding: 0; border: 2px solid #175acd; border-radius: 7px 7px 0 0; background: white; box-shadow: 3px 3px 7px #0006; font-family: var(--xp-font); overflow: hidden; }
+#start-menu.open { display: grid; grid-template-columns: 1fr; }
 .start-menu-rail { display: none; }
 .xp-menu-user { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; height: 66px; padding: 0 10px; border-bottom: 2px solid #e5a342; background: linear-gradient(#1c64cf, #2781e8); color: white; font-size: 18px; font-weight: bold; text-shadow: 1px 1px #164491; }
 .xp-menu-user img { width: 46px; height: 46px; border: 2px solid white; border-radius: 4px; object-fit: cover; background: white; box-shadow: 1px 2px 3px #06469d; }
 .xp-menu-programs { padding: 8px 5px; background: white; }
-.xp-menu-links { padding: 8px 5px; background: #d3e5fa; border-left: 1px solid #9bbce4; }
+.xp-menu-links { padding: 8px 5px; background: #d3e5fa; border-left: 0; }
 .start-menu-item { min-height: 49px; text-decoration: none; box-sizing: border-box; padding: 6px; gap: 8px; border-radius: 0; }
-.start-menu-item img { width: 30px; height: 30px; image-rendering: auto; flex-shrink: 0; }
+.start-menu-item img { width: 30px; height: 30px; image-rendering: pixelated; flex-shrink: 0; }
 .start-menu-item span { display: block; }
 .start-menu-item strong { display: block; margin-bottom: 3px; }
 .start-menu-item small { display: block; color: #777; font-size: 12px; }
@@ -106,7 +106,7 @@ iframe { box-sizing: border-box; border: 1px solid #7f9db9; }
  #taskbar-tray img { width: 15px; height: 15px; }
  #tray-clock { width: 36px; }
  .xp-menu-user { height: 60px; }
- #start-menu { width: 370px; }
+ #start-menu { width: 250px; }
  .start-menu-item { min-height: 46px; }
  #room-view-toggle { bottom: calc(45px + env(safe-area-inset-bottom)); }
 }

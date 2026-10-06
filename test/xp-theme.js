@@ -68,25 +68,20 @@
             var user = document.createElement('div'); user.className = 'xp-menu-user';
             var avatar = document.createElement('img'); avatar.src = window.KaichiUI.asset('test/assets/kaichi-avatar.jpg'); avatar.alt = '';
             var name = document.createElement('span'); name.textContent = 'Kaichi'; user.append(avatar, name);
-            var programs = document.createElement('div'); programs.className = 'xp-menu-programs';
-            programs.append(menuItem('プロフィール', 'computer', 'win-profile', 'Kaichi Naito'),
-                menuItem('音楽', 'music', 'win-spotify', 'Spotify Player'),
-                menuItem('動画', 'video', 'win-youtube', 'Original songs'),
-                menuItem('SNS', 'network', 'win-social', 'Social Media'));
-            var divider = document.createElement('div'); divider.className = 'xp-menu-divider'; programs.appendChild(divider);
-            programs.appendChild(menuItem('PHALUX', 'disc', 'win-phalux', 'Band website'));
             var links = document.createElement('div'); links.className = 'xp-menu-links';
-            links.append(menuItem('Discography', 'disc', 'Discography.html'),
-                menuItem('Plugin', 'folder', 'Plugin.html'),
-                menuItem('Works', 'folder', nav.querySelectorAll('.desktop-icon')[4].href),
-                menuItem('Contact', 'mail', 'Contact.html'),
-                menuItem('FREEBGM', 'music', 'freebgm.html'));
+            nav.querySelectorAll('.desktop-icon').forEach(function (navItem) {
+                if (navItem.querySelector('span').textContent === 'Home') return;
+                var item = navItem.cloneNode(true);
+                item.className = 'start-menu-item';
+                item.querySelector('img').alt = '';
+                links.appendChild(item);
+            });
             var footer = document.createElement('div'); footer.className = 'xp-menu-footer';
             var os = document.createElement('span'); os.textContent = 'Kaichi XP';
             shutdown.querySelector('img').src = icon('power');
             shutdown.querySelector('span').textContent = 'シャットダウン';
             footer.append(os, shutdown);
-            menu.append(user, programs, links, footer);
+            menu.append(user, links, footer);
             new MutationObserver(function () {
                 start.setAttribute('aria-expanded', menu.classList.contains('open') ? 'true' : 'false');
             }).observe(menu, { attributes: true, attributeFilter: ['class'] });
