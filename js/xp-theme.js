@@ -38,6 +38,7 @@
     }
     var originalMenu, originalStart, originalShutdownImage;
     var menuObserver, taskObserver;
+    var menuBindingsReady = false;
     function resetToWindows95() {
         document.body.classList.remove('xp-desktop');
         var menu = document.getElementById('start-menu');
@@ -111,10 +112,13 @@
             menuObserver.observe(menu, { attributes: true, attributeFilter: ['class'] });
             taskObserver = new MutationObserver(updateIcons);
             taskObserver.observe(document.getElementById('taskbar-tasks'), { childList: true });
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && menu.classList.contains('open')) { closeMenu(); start.focus(); }
-            });
-            menu.addEventListener('click', function (e) { if (e.target.closest('a')) closeMenu(); });
+            if (!menuBindingsReady) {
+                menuBindingsReady = true;
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && menu.classList.contains('open')) { closeMenu(); start.focus(); }
+                });
+                menu.addEventListener('click', function (e) { if (e.target.closest('a')) closeMenu(); });
+            }
         }
         var profile = document.getElementById('win-profile');
         if (profile) window.KaichiUI.focusWindow(profile);
@@ -122,6 +126,7 @@
     document.addEventListener('kaichi-ui-ready', ready);
     document.addEventListener('kaichi-desktop-theme-change', function () {
         if (!window.KaichiDesktopTheme.isXP()) resetToWindows95();
+        else if (window.KaichiUI && document.querySelector('#common-nav .desktop-icon')) ready();
     });
     if (window.KaichiUI) ready();
 })();

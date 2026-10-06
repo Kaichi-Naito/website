@@ -1,18 +1,22 @@
 (function () {
     'use strict';
     var key = 'kaichi-desktop-theme';
-    var pending95 = false;
+    var pendingMode = null;
     var mode = 'xp';
 
     function savedMode() {
+        if (pendingMode !== null) return pendingMode;
         var value;
         try { value = localStorage.getItem(key); } catch (e) {}
-        try { if (sessionStorage.getItem(key) === '95') value = '95'; } catch (e) {}
-        return pending95 || value === '95' ? '95' : 'xp';
+        if (value !== 'xp' && value !== '95') {
+            try { value = sessionStorage.getItem(key); } catch (e) {}
+        }
+        return value === '95' ? '95' : value === 'xp' ? 'xp' : mode;
     }
 
     function applySavedTheme() {
         mode = savedMode();
+        pendingMode = null;
         var stylesheet = document.getElementById('desktop-xp-styles');
         if (stylesheet) stylesheet.disabled = mode !== 'xp';
         document.documentElement.dataset.desktopTheme = mode;
@@ -22,10 +26,12 @@
 
     window.KaichiDesktopTheme = {
         isXP: function () { return mode === 'xp'; },
-        rememberWindows95: function () {
-            pending95 = true;
-            try { localStorage.setItem(key, '95'); } catch (e) {}
-            try { sessionStorage.setItem(key, '95'); } catch (e) {}
+        prepareNextTheme: function () {
+            // Repeated clicks during one shutdown must schedule only one switch.
+            if (pendingMode !== null) return;
+            pendingMode = mode === 'xp' ? '95' : 'xp';
+            try { localStorage.setItem(key, pendingMode); } catch (e) {}
+            try { sessionStorage.setItem(key, pendingMode); } catch (e) {}
         },
         applySavedTheme: applySavedTheme
     };

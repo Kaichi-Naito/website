@@ -878,9 +878,9 @@
     function beginFakeShutdown() {
         var screen = document.getElementById('shutdown-screen');
         var output = document.getElementById('shutdown-output');
-        if (!screen || !output) return;
+        if (!screen || !output || screen.classList.contains('active')) return;
 
-        if (window.KaichiDesktopTheme) window.KaichiDesktopTheme.rememberWindows95();
+        if (window.KaichiDesktopTheme) window.KaichiDesktopTheme.prepareNextTheme();
         play(shutdownSound);
         setStartMenuOpen(false);
 
@@ -1045,7 +1045,7 @@
     function triggerCatCrashShutdown() {
         if (catCrashTriggered) return;
         catCrashTriggered = true;
-        if (window.KaichiDesktopTheme) window.KaichiDesktopTheme.rememberWindows95();
+        if (window.KaichiDesktopTheme) window.KaichiDesktopTheme.prepareNextTheme();
 
         /*
            triggerCatCrashShutdown() is reached synchronously from the
@@ -1331,4 +1331,3 @@
         init();
     }
 })();
-
