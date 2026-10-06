@@ -70,7 +70,7 @@
             var name = document.createElement('span'); name.textContent = 'Kaichi'; user.append(avatar, name);
             var links = document.createElement('div'); links.className = 'xp-menu-links';
             nav.querySelectorAll('.desktop-icon').forEach(function (navItem) {
-                if (navItem.querySelector('span').textContent === 'Home') return;
+                if (['Discography', 'Plugin', 'Works', 'Contact', 'FREEBGM'].indexOf(navItem.querySelector('span').textContent) === -1) return;
                 var item = navItem.cloneNode(true);
                 item.className = 'start-menu-item';
                 item.querySelector('img').alt = '';
