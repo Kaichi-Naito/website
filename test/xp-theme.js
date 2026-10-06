@@ -77,7 +77,7 @@
                 links.appendChild(item);
             });
             var footer = document.createElement('div'); footer.className = 'xp-menu-footer';
-            var os = document.createElement('span'); os.textContent = 'Kaichi XP';
+            var os = document.createElement('span'); os.textContent = '@Kaichi_zZ';
             shutdown.querySelector('img').src = icon('power');
             shutdown.querySelector('span').textContent = 'シャットダウン';
             footer.append(os, shutdown);
