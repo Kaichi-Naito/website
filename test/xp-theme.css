@@ -1,17 +1,17 @@
 /* Luna theme: loaded only by test/index.html. Shared production styles stay untouched. */
-:root { --xp-blue: #0058e6; --xp-face: #ece9d8; --xp-font: Tahoma, 'MS UI Gothic', 'Yu Gothic', Arial, sans-serif; }
+:root { --xp-blue: #0058e6; --xp-face: #ece9d8; --xp-font: 'PixelMplus', sans-serif; }
 html { background: #347ce7; }
-body { font-family: var(--xp-font); font-size: 13px; padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
 body::before { background: url('../images/windows-95-background.jpg') center / cover no-repeat; }
-/* Match production title typography; keep XP controls and body text readable. */
+/* Typography follows production; XP overrides below control the visual chrome. */
 .header-title { font-family: 'PixelMplus', sans-serif; font-size: 40px; line-height: normal; font-weight: bold; letter-spacing: normal; color: #fff; text-shadow: 2px 2px #000; margin: 12px 0 22px; }
 .nav { gap: 24px; }
 .desktop-icon { border-radius: 3px; }
 .desktop-icon img { image-rendering: pixelated; }
-.desktop-icon span { font-family: var(--xp-font); font-size: 12px; text-shadow: 1px 1px 2px #000; }
+.desktop-icon span { }
 .desktop-icon:hover span, .desktop-icon:focus-visible span { background: #316ac5; }
 .window { background: var(--xp-blue); border: 1px solid #003eaa; border-radius: 8px 8px 0 0; padding: 2px; box-shadow: inset 1px 0 #78a5ff, inset -1px 0 #0039a0, 2px 3px 7px #0004; box-sizing: border-box; }
-.title-bar { background: linear-gradient(#398cfa 0%, #0866ee 10%, #0059e3 50%, #0056dc 88%, #003daf 100%); height: 29px; box-sizing: border-box; border-radius: 6px 6px 0 0; padding: 2px 2px 3px 5px; margin: 0; font-family: 'Trebuchet MS', var(--xp-font); font-weight: bold; font-size: 13px; text-shadow: 1px 1px #164298; user-select: none; }
+.title-bar { background: linear-gradient(#398cfa 0%, #0866ee 10%, #0059e3 50%, #0056dc 88%, #003daf 100%); height: 29px; box-sizing: border-box; border-radius: 6px 6px 0 0; padding: 2px 2px 3px 5px; margin: 0; user-select: none; }
 .title-bar > span { display: flex; align-items: center; gap: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .title-bar > span::before { content: ''; flex: 0 0 16px; width: 16px; height: 16px; background: var(--xp-icon) center / contain no-repeat; }
 .title-bar-controls { gap: 2px; margin-left: 6px; }
@@ -26,39 +26,37 @@ body::before { background: url('../images/windows-95-background.jpg') center / c
 .minimize-button::after { content: ''; position: absolute; left: 5px; bottom: 5px; width: 9px; height: 3px; background: #fff; }
 .maximize-button { position: relative; font-size: 0; }
 .maximize-button::after { content: ''; position: absolute; left: 5px; top: 5px; width: 9px; height: 8px; border: 1px solid white; border-top-width: 3px; }
-.window-contents { border: 0; background: var(--xp-face); padding: 16px; font-family: var(--xp-font); }
-.win95-btn, .warning-ok-button { font-family: var(--xp-font); font-size: 13px; border: 1px solid #003c74; border-radius: 3px; background: linear-gradient(#fff, #f4f3eb 48%, #e9e5d2); box-shadow: inset 1px 1px #fff, inset -1px -1px #d6d0b5; padding: 6px 12px; }
+.window-contents { border: 0; background: var(--xp-face); padding: 16px; }
+.win95-btn, .warning-ok-button { border: 1px solid #003c74; border-radius: 3px; background: linear-gradient(#fff, #f4f3eb 48%, #e9e5d2); box-shadow: inset 1px 1px #fff, inset -1px -1px #d6d0b5; padding: 6px 12px; }
 .win95-btn:hover, .warning-ok-button:hover { box-shadow: inset 0 0 0 2px #f5c65b; }
 .win95-btn:active, .warning-ok-button:active { background: #e3dfcf; padding: 6px 12px; }
 button:focus-visible, a:focus-visible { outline: 1px dotted #111; outline-offset: -4px; }
 .desktop-icon:focus-visible { outline-color: white; }
 .profile-section { gap: 22px; }
-.profile-text h2 { font-family: 'Trebuchet MS', var(--xp-font); color: #003e91; font-size: 24px; }
+.profile-text h2 { color: #003e91; }
 .profile-img { image-rendering: pixelated; }
 .social-icons-grid { gap: 8px; }
-.social-item { font-size: 12px; margin: 0; padding: 9px 6px; }
+.social-item { margin: 0; padding: 9px 6px; }
 .social-item:active { padding: 9px 6px; }
 .social-item img { image-rendering: pixelated; width: 36px; height: 36px; }
 #win-phalux { width: 225px !important; }
 #win-phalux .window-contents { padding: 16px !important; }
 #win-phalux .window-contents img { border: 1px solid #aca899 !important; }
-.visitor-counter-display { background: #14261e; color: #87fda9; border: 1px solid #7f9db9; box-shadow: inset 1px 1px 3px #000; font-family: 'Lucida Console', monospace; font-size: 25px; padding: 8px 12px; }
-.visitor-counter-line, .visitor-counter-suffix { font-size: 13px; }
+.visitor-counter-display { background: #14261e; color: #87fda9; border: 1px solid #7f9db9; box-shadow: inset 1px 1px 3px #000; padding: 8px 12px; }
 iframe { box-sizing: border-box; border: 1px solid #7f9db9; }
-#win-youtube h3 { font-size: 14px; font-weight: normal; }
 #win95-taskbar { height: calc(36px + env(safe-area-inset-bottom)); padding: 0 0 env(safe-area-inset-bottom); border: 0; box-shadow: none; background: linear-gradient(#4999ff, #1f69ec 12%, #245edb 48%, #245edb 85%, #1748ba); }
-#taskbar-start-btn { border: 0; border-radius: 0 14px 14px 0; height: 36px; min-width: 110px; padding: 0 17px 2px 10px; gap: 6px; background: linear-gradient(#8abf81, #399c3a 13%, #329631 45%, #287d22 88%, #1d641a); box-shadow: inset 0 2px 3px #dcffd277, inset -3px 0 4px #184b36; color: white; font-family: 'Trebuchet MS', var(--xp-font); font-size: 20px; font-style: italic; font-weight: bold; text-shadow: 1px 2px 2px #19441b; flex-shrink: 0; }
+#taskbar-start-btn { border: 0; border-radius: 0 14px 14px 0; height: 36px; min-width: 110px; padding: 0 17px 2px 10px; gap: 6px; background: linear-gradient(#8abf81, #399c3a 13%, #329631 45%, #287d22 88%, #1d641a); box-shadow: inset 0 2px 3px #dcffd277, inset -3px 0 4px #184b36; color: white; font-family: var(--xp-font); font-size: 20px; font-weight: bold; text-shadow: 1px 2px 2px #19441b; flex-shrink: 0; }
 #taskbar-start-btn:hover { filter: brightness(1.1); }
 #taskbar-start-btn:active, #taskbar-start-btn.start-open { padding: 0 17px 2px 10px; border: 0; background: linear-gradient(#287322, #1b6d1d 40%, #338b2e); }
 #taskbar-start-btn img { width: 25px; height: 25px; image-rendering: auto; }
 #taskbar-tasks { gap: 3px; margin: 0 9px; height: 28px; overflow-x: auto; scrollbar-width: none; }
-.win95-taskbar-tab { border: 1px solid #1643b0; border-radius: 3px; box-shadow: inset 1px 1px #73adff, inset -1px -1px #2360d0; background: linear-gradient(#4191fa, #397df1); color: white; font-family: var(--xp-font); font-size: 11px; font-weight: normal; height: 28px; width: min(160px, 13vw); min-width: 75px; padding: 0 8px; flex-shrink: 0; }
+.win95-taskbar-tab { border: 1px solid #1643b0; border-radius: 3px; box-shadow: inset 1px 1px #73adff, inset -1px -1px #2360d0; background: linear-gradient(#4191fa, #397df1); color: white; height: 28px; width: min(160px, 13vw); min-width: 75px; padding: 0 8px; flex-shrink: 0; }
 .win95-taskbar-tab::before { content: ''; width: 16px; height: 16px; flex: 0 0 16px; margin-right: 5px; background: var(--xp-icon) center / contain no-repeat; }
 .win95-taskbar-tab:hover { background: #559afa; }
-.win95-taskbar-tab.active { background: #1c50b9; border-color: #123b94; color: white; font-weight: normal; box-shadow: inset 1px 1px 3px #083986; }
+.win95-taskbar-tab.active { background: #1c50b9; border-color: #123b94; color: white; box-shadow: inset 1px 1px 3px #083986; }
 #taskbar-tray { height: 36px; border: 0; border-left: 1px solid #104ca9; padding: 0 12px; color: white; background: linear-gradient(#19bded, #0e97eb 15%, #0b9de8 85%, #0888d5); box-shadow: inset 1px 0 #44d1ff; flex-shrink: 0; gap: 10px; }
 #taskbar-tray img { width: 18px; height: 18px; image-rendering: auto; }
-#tray-clock { color: white; font-family: var(--xp-font); font-size: 12px; width: 40px; }
+#tray-clock { color: white; width: 40px; }
 #start-menu { left: 0; bottom: calc(36px + env(safe-area-inset-bottom)); width: 390px; max-width: 100vw; padding: 0; border: 2px solid #175acd; border-radius: 7px 7px 0 0; background: white; box-shadow: 3px 3px 7px #0006; font-family: var(--xp-font); overflow: hidden; }
 #start-menu.open { display: grid; grid-template-columns: 1fr 1fr; }
 .start-menu-rail { display: none; }
@@ -66,11 +64,11 @@ iframe { box-sizing: border-box; border: 1px solid #7f9db9; }
 .xp-menu-user img { width: 46px; height: 46px; border: 2px solid white; border-radius: 4px; object-fit: cover; background: white; box-shadow: 1px 2px 3px #06469d; }
 .xp-menu-programs { padding: 8px 5px; background: white; }
 .xp-menu-links { padding: 8px 5px; background: #d3e5fa; border-left: 1px solid #9bbce4; }
-.start-menu-item { min-height: 49px; text-decoration: none; box-sizing: border-box; font-family: var(--xp-font); font-size: 12px; padding: 6px; gap: 8px; border-radius: 0; }
+.start-menu-item { min-height: 49px; text-decoration: none; box-sizing: border-box; padding: 6px; gap: 8px; border-radius: 0; }
 .start-menu-item img { width: 30px; height: 30px; image-rendering: auto; flex-shrink: 0; }
 .start-menu-item span { display: block; }
-.start-menu-item strong { display: block; font-size: 12px; margin-bottom: 3px; }
-.start-menu-item small { display: block; color: #777; font-size: 11px; }
+.start-menu-item strong { display: block; margin-bottom: 3px; }
+.start-menu-item small { display: block; color: #777; font-size: 12px; }
 .start-menu-item:hover, .start-menu-item:focus-visible { background: #316ac5; color: white; }
 .start-menu-item:hover small, .start-menu-item:focus-visible small { color: white; }
 .xp-menu-links .start-menu-item { min-height: 49px; color: #003a85; font-weight: bold; }
@@ -83,14 +81,13 @@ iframe { box-sizing: border-box; border: 1px solid #7f9db9; }
 .warning-error-icon { border: 0; box-shadow: inset 1px 2px 4px #ffb4a4, 1px 1px 2px #999; background: linear-gradient(#f46e54, #c51804); }
 .window.maximized-window { left: 0 !important; top: 0 !important; width: 100vw !important; height: calc(100dvh - 36px - env(safe-area-inset-bottom)) !important; }
 .window.maximized-window .window-contents { height: calc(100% - 29px); }
-.footer { font-family: var(--xp-font); font-size: 11px; bottom: 56px; }
+.footer { bottom: 56px; }
 .room-view-open #desktop-surface { background-image: url('../images/windows-95-background.jpg'); }
 @media (max-width: 800px) {
  .header-title { font-size: 22.4px; margin: 8px 0 20px; }
  .nav { gap: 10px; }
  .desktop-icon img { width: 34px !important; height: 34px !important; }
- .desktop-icon span { font-size: 11px; }
- .title-bar { height: 29px; font-size: 12px; padding-left: 4px; }
+ .title-bar { height: 29px; padding-left: 4px; }
  .title-bar > span::before { flex-basis: 14px; width: 14px; height: 14px; }
  .window-control-button, .close-button { width: 21px; height: 21px; }
  #win-phalux { width: 180px !important; max-width: 46vw !important; }
@@ -102,10 +99,10 @@ iframe { box-sizing: border-box; border: 1px solid #7f9db9; }
  #taskbar-start-btn { min-width: 91px; font-size: 18px; padding-right: 12px; }
  #taskbar-start-btn img { height: 22px !important; width: 22px; }
  #taskbar-tasks { margin: 0 5px; }
- .win95-taskbar-tab { min-width: 88px; font-size: 10px; }
+ .win95-taskbar-tab { min-width: 88px; }
  #taskbar-tray { padding: 0 7px; gap: 5px; }
  #taskbar-tray img { width: 15px; height: 15px; }
- #tray-clock { font-size: 11px; width: 34px; }
+ #tray-clock { width: 36px; }
  .xp-menu-user { height: 60px; }
  #start-menu { width: 370px; }
  .start-menu-item { min-height: 46px; }
