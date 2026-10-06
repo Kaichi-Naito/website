@@ -42,7 +42,7 @@ button:focus-visible, a:focus-visible { outline: 1px dotted #111; outline-offset
 #win-phalux { width: 225px !important; }
 #win-phalux .window-contents { padding: 16px !important; }
 #win-phalux .window-contents img { border: 1px solid #a6a6a6 !important; }
-.visitor-counter-display { background: #14261e; color: #87fda9; border: 1px solid #7f9db9; box-shadow: inset 1px 1px 3px #000; padding: 8px 12px; }
+.visitor-counter-display { background: #000; color: #00ff00; border: 1px solid #7f9db9; box-shadow: inset 1px 1px 3px #000; padding: 8px 12px; }
 iframe { box-sizing: border-box; border: 1px solid #7f9db9; }
 /* Spotify's compact player needs a full 152px viewport, excluding borders. */
 #win-spotify iframe { height: 152px; border: 0; background: transparent; }

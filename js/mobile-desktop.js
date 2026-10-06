@@ -79,6 +79,70 @@
         frame.title = 'Kaichi Guitar Music — PC desktop';
         frame.setAttribute('allow', 'autoplay; fullscreen');
         frame.setAttribute('allowfullscreen', '');
+        var desktopHeight = 1024;
+        var contentObserver;
+        var contentResizeObserver;
+        var fitTimer;
+
+        function contentHeight() {
+            var doc = frame.contentDocument;
+            if (!doc || !doc.body) return desktopHeight;
+            var windows = doc.querySelectorAll('.window, .coming-soon-window');
+            var elements = windows.length ? windows : doc.body.children;
+            var bottom = 0;
+            Array.prototype.forEach.call(elements, function (element) {
+                if (/^(SCRIPT|STYLE|LINK)$/.test(element.tagName) || element.classList.contains('maximized-window')) return;
+                var rect = element.getBoundingClientRect();
+                if (!rect.width || !rect.height) return;
+                // Fixed overlays and viewport-sized maximized windows must not
+                // enlarge their own viewport on every measurement.
+                for (var node = element; node && node !== doc.body; node = node.parentElement) {
+                    if (frame.contentWindow.getComputedStyle(node).position === 'fixed') return;
+                }
+                bottom = Math.max(bottom, rect.bottom + frame.contentWindow.scrollY);
+            });
+            var taskbar = doc.getElementById('win95-taskbar');
+            var footerSpace = taskbar ? taskbar.getBoundingClientRect().height + 16 : 16;
+            return Math.max(1024, Math.ceil(bottom + footerSpace));
+        }
+
+        function scheduleFit() {
+            clearTimeout(fitTimer);
+            // Page layouts also run shortly after kaichi-ui-ready / resize.
+            fitTimer = setTimeout(fitDesktop, 180);
+        }
+
+        function watchContent() {
+            var doc = frame.contentDocument;
+            if (!doc || !doc.body) return;
+            if (contentObserver) contentObserver.disconnect();
+            if (contentResizeObserver) contentResizeObserver.disconnect();
+            if (typeof ResizeObserver !== 'undefined') {
+                contentResizeObserver = new ResizeObserver(scheduleFit);
+                contentResizeObserver.observe(doc.body);
+                doc.querySelectorAll('.window, .coming-soon-window').forEach(function (element) {
+                    contentResizeObserver.observe(element);
+                });
+            }
+            if (typeof MutationObserver !== 'undefined') {
+                contentObserver = new MutationObserver(function (mutations) {
+                    if (contentResizeObserver) {
+                        mutations.forEach(function (mutation) {
+                            mutation.addedNodes.forEach(function (node) {
+                                if (node.nodeType !== 1) return;
+                                if (node.matches('.window, .coming-soon-window')) contentResizeObserver.observe(node);
+                                node.querySelectorAll('.window, .coming-soon-window').forEach(function (element) {
+                                    contentResizeObserver.observe(element);
+                                });
+                            });
+                        });
+                    }
+                    scheduleFit();
+                });
+                contentObserver.observe(doc.documentElement, {childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'hidden']});
+            }
+            scheduleFit();
+        }
 
         function fitDesktop() {
             var bounds = viewport.getBoundingClientRect();
@@ -86,11 +150,15 @@
             var rotate = forced || bounds.height > bounds.width;
             var availableWidth = rotate ? bounds.height : bounds.width;
             var availableHeight = rotate ? bounds.width : bounds.height;
-            var scale = availableWidth / 1366;
+            desktopHeight = contentHeight();
+            var scale = Math.min(availableWidth / 1366, availableHeight / desktopHeight);
             frame.style.width = '1366px';
-            frame.style.height = (availableHeight / scale) + 'px';
+            frame.style.height = desktopHeight + 'px';
+            // Centre any unused space instead of clipping one edge.
+            frame.style.left = ((bounds.width - (rotate ? desktopHeight : 1366) * scale) / 2) + 'px';
+            frame.style.top = ((bounds.height - (rotate ? 1366 : desktopHeight) * scale) / 2) + 'px';
             frame.style.transform = rotate
-                ? 'translateX(' + bounds.width + 'px) rotate(90deg) scale(' + scale + ')'
+                ? 'translateX(' + (desktopHeight * scale) + 'px) rotate(90deg) scale(' + scale + ')'
                 : 'scale(' + scale + ')';
             viewport.dataset.rotation = rotate ? '90' : '0';
         }
@@ -108,10 +176,16 @@
             } catch (e) {}
         }
 
-        frame.addEventListener('load', syncPage);
+        frame.addEventListener('load', function () {
+            syncPage();
+            watchContent();
+        });
         // Soft reboots change the inner DOM/URL without reloading its document.
         window.addEventListener('message', function (event) {
-            if (event.origin === root.origin && event.source === frame.contentWindow && event.data === 'kaichi-desktop-page-ready') syncPage();
+            if (event.origin === root.origin && event.source === frame.contentWindow && event.data === 'kaichi-desktop-page-ready') {
+                syncPage();
+                watchContent();
+            }
         });
         frame.src = source.href;
         viewport.appendChild(frame);
