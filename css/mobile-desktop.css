@@ -1,0 +1,36 @@
+/* The host displays the original page at a real PC viewport width. */
+html.mobile-rotated-host,
+html.mobile-rotated-host body {
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #245edb;
+}
+#rotated-desktop-viewport {
+    position: fixed;
+    top: env(safe-area-inset-top, 0px);
+    right: env(safe-area-inset-right, 0px);
+    bottom: env(safe-area-inset-bottom, 0px);
+    left: env(safe-area-inset-left, 0px);
+    overflow: hidden;
+}
+#rotated-desktop-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    border: 0;
+    max-width: none;
+    transform-origin: 0 0;
+    background: #245edb;
+}
+/* The parent already excludes device insets from the PC viewport. */
+html.mobile-pc-frame #win95-taskbar { bottom: 0; height: 32px; padding-bottom: 0; }
+html.mobile-pc-frame body.xp-desktop #win95-taskbar { height: 36px; }
+html.mobile-pc-frame #start-menu { bottom: 33px; }
+html.mobile-pc-frame body.xp-desktop #start-menu { bottom: 36px; }
+html.mobile-pc-frame #room-view-toggle { bottom: 43px; }
+html.mobile-pc-frame body.xp-desktop #room-view-toggle { bottom: 47px; }

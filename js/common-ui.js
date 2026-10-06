@@ -1,6 +1,8 @@
 (function () {
     'use strict';
 
+    if (window.KaichiMobileDesktop && window.KaichiMobileDesktop.isHost()) return;
+
     var ASSET_BASE = 'https://kaichi-naito.github.io/website/';
     var highestZIndex = 30000;
     var taskbarTasks = null;
