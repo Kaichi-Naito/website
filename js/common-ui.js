@@ -344,6 +344,7 @@
         });
 
         document.body.id = parsedBody.id || 'win95-desktop';
+        if (window.KaichiDesktopTheme) window.KaichiDesktopTheme.applySavedTheme();
         document.body.removeAttribute('style');
         document.body.style.overflow = '';
 
@@ -527,7 +528,7 @@
                 '<div class="start-menu-items">' +
                     '<button type="button" id="shutdown-menu-item" class="start-menu-item">' +
                         '<img src="' + asset('images/gif/Computer.gif') + '" alt="">' +
-                        '<span>Shut Down...</span>' +
+                        '<span>シャットダウン</span>' +
                     '</button>' +
                 '</div>' +
             '</div>' +
@@ -879,6 +880,7 @@
         var output = document.getElementById('shutdown-output');
         if (!screen || !output) return;
 
+        if (window.KaichiDesktopTheme) window.KaichiDesktopTheme.rememberWindows95();
         play(shutdownSound);
         setStartMenuOpen(false);
 

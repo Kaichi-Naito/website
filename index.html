@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="keywords" content="ギター, 作曲, 内藤海地, Kaichi, Kaichi Naito, PHALUX, Windows95">
+    <meta name="keywords" content="ギター, 作曲, 内藤海地, Kaichi, Kaichi Naito, PHALUX, WindowsXP, Windows95">
     <meta name="description" content="PHALUXのKaichiの各SNSやプロフィールまとめ。ギター演奏・オリジナル楽曲を紹介する。最新楽曲の視聴も可能です。">  
     <meta property="og:title" content="Kaichi Guitar Music">
     <meta property="og:description" content="Kaichiのオリジナル楽曲・ギター演奏動画を公開中。">
@@ -20,11 +20,12 @@
     <meta property="og:url" content="https://kaichi-naito.github.io/website/">
     <link rel="canonical" href="https://kaichi-naito.github.io/website/">
     <meta property="og:type" content="website">
-    <meta http-equiv="Cache-Control" content="max-age=31536000">
     <title>Kaichi Guitar Music</title>
     <link rel="icon" href="images/card-image.jpg" type="image/jpg">
-        <link rel="stylesheet" href="css/common-ui.css?v=20261006-footer2">
+        <link rel="stylesheet" href="css/common-ui.css?v=20261006-xp-production1">
     <link rel="stylesheet" href="css/room-view.css?v=20260906-0803" id="room-view-styles">
+    <link rel="stylesheet" href="css/xp-theme.css?v=20261006-xp-production1" id="desktop-xp-styles">
+    <script src="js/desktop-theme.js?v=20261006-xp-production1"></script>
 </head>
 <body id="win95-desktop">
     <div id="desktop-surface">
@@ -133,6 +134,35 @@
         });
 
         function setInitialPositions() {
+            if (window.KaichiDesktopTheme && !window.KaichiDesktopTheme.isXP()) { setWindows95Positions(); return; }
+            var mobile = window.matchMedia('(max-width: 800px)').matches;
+            var compact = window.innerWidth < 1200;
+            var positions = mobile ? {
+                'win-counter': ['4%', 165], 'win-profile': ['4%', 350],
+                'win-phalux': ['53%', 365], 'win-social': ['5%', 610],
+                'win-spotify': ['4%', 840], 'win-youtube': ['2%', 1070]
+            } : {
+                'win-counter': ['3%', 195], 'win-profile': [compact ? '38%' : '28%', 205],
+                'win-phalux': [compact ? '76%' : '77%', compact ? 390 : 185],
+                'win-social': [compact ? '52%' : '58%', compact ? 555 : 385],
+                'win-spotify': [compact ? '3%' : '12%', compact ? 555 : 480],
+                'win-youtube': [compact ? '17%' : '38%', compact ? 800 : 690]
+            };
+            var maxBottom = window.innerHeight;
+            Object.keys(positions).forEach(function (id) {
+                var win = document.getElementById(id);
+                if (!win || win.style.display === 'none') return;
+                if (!win.classList.contains('maximized-window')) {
+                    var proposedLeft = window.innerWidth * parseFloat(positions[id][0]) / 100;
+                    win.style.left = Math.max(8, Math.min(proposedLeft, window.innerWidth - win.offsetWidth - 8)) + 'px';
+                    win.style.top = positions[id][1] + 'px';
+                }
+                maxBottom = Math.max(maxBottom, positions[id][1] + win.offsetHeight + 105);
+            });
+            document.body.style.minHeight = maxBottom + 'px';
+        }
+
+        function setWindows95Positions() {
             var isMobile = window.matchMedia("(max-width: 800px)").matches;
             var profile = document.getElementById('win-profile');
             var counter = document.getElementById('win-counter');
@@ -197,6 +227,7 @@
 
         document.addEventListener('kaichi-ui-ready', updateVisitorCounter);
     </script>
-    <script src="js/common-ui.js?v=t4p-share-v3"></script>
+    <script src="js/xp-theme.js?v=20261006-xp-production1"></script>
+    <script src="js/common-ui.js?v=20261006-xp-production1"></script>
 </body>
 </html>
