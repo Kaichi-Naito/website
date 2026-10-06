@@ -50,9 +50,7 @@
     function ready() {
         document.body.classList.add('xp-desktop');
         var nav = document.getElementById('common-nav');
-        var navIcons = ['computer', 'disc', 'folder', 'video', 'folder', 'mail', 'music'];
-        nav.querySelectorAll('.desktop-icon').forEach(function (a, i) {
-            a.querySelector('img').src = icon(navIcons[i]);
+        nav.querySelectorAll('.desktop-icon').forEach(function (a) {
             if (a.getAttribute('href') === 'index.html') a.href = 'test/';
         });
         updateIcons();

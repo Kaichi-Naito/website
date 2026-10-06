@@ -6,18 +6,17 @@ body::before { background: url('../images/windows-95-background.jpg') center / c
 .header-title { font-family: 'Trebuchet MS', var(--xp-font); font-size: 34px; font-weight: bold; letter-spacing: -.8px; text-shadow: 1px 2px 3px #1e4480; margin: 12px 0 22px; }
 .nav { gap: 24px; }
 .desktop-icon { border-radius: 3px; }
-.desktop-icon img { image-rendering: auto; }
+.desktop-icon img { image-rendering: pixelated; }
 .desktop-icon span { font-family: var(--xp-font); font-size: 12px; text-shadow: 1px 1px 2px #000; }
 .desktop-icon:hover span, .desktop-icon:focus-visible span { background: #316ac5; }
 .window { background: var(--xp-blue); border: 1px solid #003eaa; border-radius: 8px 8px 0 0; padding: 2px; box-shadow: inset 1px 0 #78a5ff, inset -1px 0 #0039a0, 2px 3px 7px #0004; box-sizing: border-box; }
 .title-bar { background: linear-gradient(#398cfa 0%, #0866ee 10%, #0059e3 50%, #0056dc 88%, #003daf 100%); height: 29px; box-sizing: border-box; border-radius: 6px 6px 0 0; padding: 2px 2px 3px 5px; margin: 0; font-family: 'Trebuchet MS', var(--xp-font); font-weight: bold; font-size: 13px; text-shadow: 1px 1px #164298; user-select: none; }
 .title-bar > span { display: flex; align-items: center; gap: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .title-bar > span::before { content: ''; flex: 0 0 16px; width: 16px; height: 16px; background: var(--xp-icon) center / contain no-repeat; }
-.xp-inactive .title-bar { background: linear-gradient(#a9c7f6, #7c9fde 14%, #789ce0 90%, #6589d1); text-shadow: none; color: #f0f5ff; }
-.xp-inactive.window { background: #7a9de1; border-color: #5b7cbd; box-shadow: inset 1px 0 #bed4fa, 2px 3px 6px #0003; }
 .title-bar-controls { gap: 2px; margin-left: 6px; }
 .window-control-button, .close-button { width: 22px; height: 22px; border: 1px solid white; border-radius: 3px; background: linear-gradient(135deg, #91b6ff, #3d80ee 45%, #0751d8); box-shadow: inset 1px 1px #c3d6ff, inset -1px -1px #164ab4, 0 0 1px #003a9d; color: #fff; font-family: Arial, sans-serif; font-size: 16px; line-height: 18px; padding: 0; }
-.close-button { background: linear-gradient(135deg, #f4b49b, #e86d4e 45%, #c92c0c); box-shadow: inset 1px 1px #ffd7c6, inset -1px -1px #aa260a, 0 0 1px #003a9d; }
+/* Override the shared close button's background-image: none !important. */
+.close-button { background-color: #d9401d; background-image: linear-gradient(135deg, #f4b49b, #e86d4e 45%, #c92c0c) !important; box-shadow: inset 1px 1px #ffd7c6, inset -1px -1px #aa260a, 0 0 1px #003a9d; }
 .close-button::before { color: white; font-size: 22px; text-shadow: 1px 1px #9b210c; transform: translateY(-1px); }
 .window-control-button:hover { filter: brightness(1.15); }
 .close-button:hover { filter: brightness(1.15); }
@@ -26,7 +25,6 @@ body::before { background: url('../images/windows-95-background.jpg') center / c
 .minimize-button::after { content: ''; position: absolute; left: 5px; bottom: 5px; width: 9px; height: 3px; background: #fff; }
 .maximize-button { position: relative; font-size: 0; }
 .maximize-button::after { content: ''; position: absolute; left: 5px; top: 5px; width: 9px; height: 8px; border: 1px solid white; border-top-width: 3px; }
-.xp-inactive .title-bar-controls { opacity: .72; }
 .window-contents { border: 0; background: var(--xp-face); padding: 16px; font-family: var(--xp-font); }
 .win95-btn, .warning-ok-button { font-family: var(--xp-font); font-size: 13px; border: 1px solid #003c74; border-radius: 3px; background: linear-gradient(#fff, #f4f3eb 48%, #e9e5d2); box-shadow: inset 1px 1px #fff, inset -1px -1px #d6d0b5; padding: 6px 12px; }
 .win95-btn:hover, .warning-ok-button:hover { box-shadow: inset 0 0 0 2px #f5c65b; }
