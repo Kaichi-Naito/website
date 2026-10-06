@@ -10,7 +10,7 @@ body::before { background: url('../images/windows-95-background.jpg') center / c
 .desktop-icon img { image-rendering: pixelated; }
 .desktop-icon span { }
 .desktop-icon:hover span, .desktop-icon:focus-visible span { background: #316ac5; }
-.window { background: var(--xp-blue); border: 1px solid #003eaa; border-radius: 8px 8px 0 0; padding: 2px; box-shadow: inset 1px 0 #78a5ff, inset -1px 0 #0039a0, 2px 3px 7px #0004; box-sizing: border-box; }
+.window, .xp-desktop .coming-soon-window { background: var(--xp-blue); border: 1px solid #003eaa; border-radius: 8px 8px 0 0; padding: 2px; box-shadow: inset 1px 0 #78a5ff, inset -1px 0 #0039a0, 2px 3px 7px #0004; box-sizing: border-box; }
 .title-bar { background: linear-gradient(#398cfa 0%, #0866ee 10%, #0059e3 50%, #0056dc 88%, #003daf 100%); height: 29px; box-sizing: border-box; border-radius: 6px 6px 0 0; padding: 2px 2px 3px 5px; margin: 0; user-select: none; }
 .title-bar > span { display: flex; align-items: center; gap: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .title-bar > span::before { content: ''; flex: 0 0 16px; width: 16px; height: 16px; background: var(--xp-icon) center / contain no-repeat; }
