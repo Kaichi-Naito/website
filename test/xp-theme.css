@@ -3,8 +3,8 @@
 html { background: #347ce7; }
 body { font-family: var(--xp-font); font-size: 13px; padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
 body::before { background: url('../images/windows-95-background.jpg') center / cover no-repeat; }
-/* Keep the site title pixel-styled while XP controls and body text stay readable. */
-.header-title { font-family: 'PixelMplus', var(--xp-font); font-size: 40px; line-height: 1.25; font-weight: normal; letter-spacing: 0; color: #fff; text-shadow: 2px 2px 0 #1e4480; margin: 12px 0 22px; }
+/* Match production title typography; keep XP controls and body text readable. */
+.header-title { font-family: 'PixelMplus', sans-serif; font-size: 40px; line-height: normal; font-weight: bold; letter-spacing: normal; color: #fff; text-shadow: 2px 2px #000; margin: 12px 0 22px; }
 .nav { gap: 24px; }
 .desktop-icon { border-radius: 3px; }
 .desktop-icon img { image-rendering: pixelated; }
@@ -86,7 +86,7 @@ iframe { box-sizing: border-box; border: 1px solid #7f9db9; }
 .footer { font-family: var(--xp-font); font-size: 11px; bottom: 56px; }
 .room-view-open #desktop-surface { background-image: url('../images/windows-95-background.jpg'); }
 @media (max-width: 800px) {
- .header-title { font-size: 30px; margin: 8px 0 20px; }
+ .header-title { font-size: 22.4px; margin: 8px 0 20px; }
  .nav { gap: 10px; }
  .desktop-icon img { width: 34px !important; height: 34px !important; }
  .desktop-icon span { font-size: 11px; }
