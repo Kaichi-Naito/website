@@ -219,7 +219,7 @@
 
         /* --- タスクバーデザイン --- */
         #win95-taskbar {
-            position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: 32px;
+            position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: calc(32px + env(safe-area-inset-bottom));
             padding: 0 4px env(safe-area-inset-bottom) 4px;
             box-sizing: border-box;
             background-color: #c0c0c0; border-top: 2px solid #ffffff;
@@ -278,7 +278,7 @@
         #start-menu {
             position: fixed;
             left: 4px;
-            bottom: 33px;
+            bottom: calc(33px + env(safe-area-inset-bottom));
             width: 220px;
             display: none;
             z-index: 60000;
@@ -605,25 +605,15 @@
             .desktop-icon span { font-size: 11px; padding: 1px 2px; }
 
             /* スマホ用タスクバー */
-            #win95-taskbar { height: 28px; }
-    
-        /* Bottom overscan is handled separately:
-           extend taskbar-colored pixels below and sideways beyond the visible screen. */
-        #win95-taskbar::after {
-            content: "";
-            position: absolute;
-            left: -20vw;
-            right: -20vw;
-            top: 100%;
-            height: 120px;
-            background: #c0c0c0;
-            pointer-events: none;
-        }
+            #win95-taskbar { height: calc(28px + env(safe-area-inset-bottom)); }
 
-        #taskbar-start-btn { height: 22px; }
+            /* Keep the taskbar inside the page viewport; browser controls own the area below. */
+            #start-menu { bottom: calc(29px + env(safe-area-inset-bottom)); }
+            #taskbar-tasks, #taskbar-tray { height: 22px; }
+            #taskbar-start-btn { height: 22px; }
             #taskbar-start-btn img { height: 16px !important; }
             .win95-taskbar-tab { width: 90px; font-size: 10px; height: 22px; }
-            #taskbar-tray img { width: 28px; height: 28px; }
+            #taskbar-tray img { width: 16px; height: 16px; }
             #tray-clock { font-size: 12px; width: 36px; }
         }
 
