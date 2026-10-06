@@ -107,9 +107,14 @@
         }
 
         function scheduleFit() {
-            clearTimeout(fitTimer);
+            if (fitTimer) return;
             // Page layouts also run shortly after kaichi-ui-ready / resize.
-            fitTimer = setTimeout(fitDesktop, 180);
+            // Continuous updates (for example audio meters) must not postpone
+            // the measurement indefinitely.
+            fitTimer = setTimeout(function () {
+                fitTimer = null;
+                fitDesktop();
+            }, 180);
         }
 
         function watchContent() {
@@ -137,7 +142,13 @@
                             });
                         });
                     }
-                    scheduleFit();
+                    // Text-only meter/clock updates do not change the layout.
+                    var layoutChanged = mutations.some(function (mutation) {
+                        if (mutation.type === 'attributes') return true;
+                        return Array.prototype.some.call(mutation.addedNodes, function (node) { return node.nodeType === 1; }) ||
+                            Array.prototype.some.call(mutation.removedNodes, function (node) { return node.nodeType === 1; });
+                    });
+                    if (layoutChanged) scheduleFit();
                 });
                 contentObserver.observe(doc.documentElement, {childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'hidden']});
             }
