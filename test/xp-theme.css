@@ -1,5 +1,5 @@
 /* Shared Luna theme; desktop-theme.js disables this stylesheet after shutdown. */
-:root { --xp-blue: #0058e6; --xp-face: #ece9d8; --xp-font: 'PixelMplus', sans-serif; }
+:root { --xp-blue: #0058e6; --xp-face: #f4f4f4; --xp-font: 'PixelMplus', sans-serif; }
 html { background: #347ce7; }
 body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
 body::before { background: url('../images/windows-95-background.jpg') center / cover no-repeat; }
@@ -27,9 +27,9 @@ body::before { background: url('../images/windows-95-background.jpg') center / c
 .maximize-button { position: relative; font-size: 0; }
 .maximize-button::after { content: ''; position: absolute; left: 5px; top: 5px; width: 9px; height: 8px; border: 1px solid white; border-top-width: 3px; }
 .window-contents { border: 0; background: var(--xp-face); padding: 16px; }
-.win95-btn, .warning-ok-button { border: 1px solid #003c74; border-radius: 3px; background: linear-gradient(#fff, #f4f3eb 48%, #e9e5d2); box-shadow: inset 1px 1px #fff, inset -1px -1px #d6d0b5; padding: 6px 12px; }
+.win95-btn, .warning-ok-button { border: 1px solid #003c74; border-radius: 3px; background: linear-gradient(#fff, #f5f5f5 48%, #e6e6e6); box-shadow: inset 1px 1px #fff, inset -1px -1px #cfcfcf; padding: 6px 12px; }
 .win95-btn:hover, .warning-ok-button:hover { box-shadow: inset 0 0 0 2px #f5c65b; }
-.win95-btn:active, .warning-ok-button:active { background: #e3dfcf; padding: 6px 12px; }
+.win95-btn:active, .warning-ok-button:active { background: #dedede; padding: 6px 12px; }
 button:focus-visible, a:focus-visible { outline: 1px dotted #111; outline-offset: -4px; }
 .desktop-icon:focus-visible { outline-color: white; }
 .profile-section { gap: 22px; }
@@ -41,7 +41,7 @@ button:focus-visible, a:focus-visible { outline: 1px dotted #111; outline-offset
 .social-item img { image-rendering: pixelated; width: 36px; height: 36px; }
 #win-phalux { width: 225px !important; }
 #win-phalux .window-contents { padding: 16px !important; }
-#win-phalux .window-contents img { border: 1px solid #aca899 !important; }
+#win-phalux .window-contents img { border: 1px solid #a6a6a6 !important; }
 .visitor-counter-display { background: #14261e; color: #87fda9; border: 1px solid #7f9db9; box-shadow: inset 1px 1px 3px #000; padding: 8px 12px; }
 iframe { box-sizing: border-box; border: 1px solid #7f9db9; }
 /* Spotify's compact player needs a full 152px viewport, excluding borders. */
