@@ -15,6 +15,15 @@ html.mobile-rotated-host body {
     right: env(safe-area-inset-right, 0px);
     bottom: env(safe-area-inset-bottom, 0px);
     left: env(safe-area-inset-left, 0px);
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+}
+#rotated-desktop-viewport::-webkit-scrollbar { display: none; }
+#rotated-desktop-viewport[data-rotation="90"] { overflow-y: hidden; }
+#rotated-desktop-viewport[data-rotation="0"] { overflow-x: hidden; }
+#rotated-desktop-content {
+    position: relative;
     overflow: hidden;
 }
 #rotated-desktop-frame {

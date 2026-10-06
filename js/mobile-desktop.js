@@ -74,6 +74,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         var viewport = document.createElement('div');
         viewport.id = 'rotated-desktop-viewport';
+        var content = document.createElement('div');
+        content.id = 'rotated-desktop-content';
         var frame = document.createElement('iframe');
         frame.id = 'rotated-desktop-frame';
         frame.title = 'Kaichi Guitar Music — PC desktop';
@@ -159,19 +161,34 @@
             var bounds = viewport.getBoundingClientRect();
             if (!bounds.width || !bounds.height) return;
             var rotate = forced || bounds.height > bounds.width;
+            var previousRotation = viewport.dataset.rotation;
+            var previousEnd = viewport.scrollWidth - viewport.clientWidth;
+            // Clockwise rotation puts the top of the page at the right edge.
+            var distanceFromTop = previousRotation === '90'
+                ? previousEnd - viewport.scrollLeft : viewport.scrollTop;
             var availableWidth = rotate ? bounds.height : bounds.width;
             var availableHeight = rotate ? bounds.width : bounds.height;
-            desktopHeight = contentHeight();
-            var scale = Math.min(availableWidth / 1366, availableHeight / desktopHeight);
+            // Fit the PC page's width only. Its height remains scrollable.
+            var scale = availableWidth / 1366;
+            desktopHeight = Math.max(contentHeight(), Math.ceil(availableHeight / scale));
             frame.style.width = '1366px';
             frame.style.height = desktopHeight + 'px';
-            // Centre any unused space instead of clipping one edge.
-            frame.style.left = ((bounds.width - (rotate ? desktopHeight : 1366) * scale) / 2) + 'px';
-            frame.style.top = ((bounds.height - (rotate ? 1366 : desktopHeight) * scale) / 2) + 'px';
+            frame.style.left = '0px';
+            frame.style.top = '0px';
+            content.style.width = (rotate ? desktopHeight : 1366) * scale + 'px';
+            content.style.height = (rotate ? 1366 : desktopHeight) * scale + 'px';
             frame.style.transform = rotate
                 ? 'translateX(' + (desktopHeight * scale) + 'px) rotate(90deg) scale(' + scale + ')'
                 : 'scale(' + scale + ')';
             viewport.dataset.rotation = rotate ? '90' : '0';
+            if (previousRotation !== viewport.dataset.rotation) distanceFromTop = 0;
+            if (rotate) {
+                viewport.scrollTop = 0;
+                viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth - distanceFromTop;
+            } else {
+                viewport.scrollLeft = 0;
+                viewport.scrollTop = distanceFromTop;
+            }
         }
 
         function syncPage() {
@@ -199,7 +216,8 @@
             }
         });
         frame.src = source.href;
-        viewport.appendChild(frame);
+        content.appendChild(frame);
+        viewport.appendChild(content);
         document.body.replaceChildren(viewport);
         fitDesktop();
         try { history.replaceState(null, '', visibleUrl); } catch (e) {}
