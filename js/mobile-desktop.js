@@ -51,7 +51,7 @@
         document.addEventListener('touchstart', function (event) {
             stopMomentum();
             gesture = null;
-            if (event.touches.length !== 1 || event.target.closest('input, textarea, select, [contenteditable], #room-view-dialog')) return;
+            if (event.defaultPrevented || event.touches.length !== 1 || event.target.closest('input, textarea, select, [contenteditable], #room-view-dialog')) return;
             var touch = event.touches[0];
             gesture = {id: touch.identifier, startX: touch.clientX, startY: touch.clientY,
                 lastX: touch.clientX, lastY: touch.clientY, lastTime: performance.now(), target: event.target, velocity: 0, moved: false};

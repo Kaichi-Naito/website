@@ -731,8 +731,7 @@
         handle.addEventListener('touchstart', startDragging, { passive: false });
 
         function startDragging(e) {
-            // Finger swipes on the rotated phone page scroll, including title bars.
-            if (e.type === 'touchstart' && document.documentElement.classList.contains('mobile-pc-frame')) return;
+            if (e.type === 'touchstart' && e.touches.length !== 1) { endDrag(); return; }
             if (e.target.closest('.title-bar-controls')) return;
             if (target.classList.contains('maximized-window')) return;
 
@@ -751,10 +750,12 @@
             document.addEventListener('touchmove', dragging, { passive: false });
             document.addEventListener('mouseup', endDrag);
             document.addEventListener('touchend', endDrag);
+            document.addEventListener('touchcancel', endDrag);
         }
 
         function dragging(e) {
             if (!isDragging) return;
+            if (e.type === 'touchmove' && e.touches.length !== 1) { endDrag(); return; }
             var cx = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
             var cy = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
 
@@ -770,6 +771,7 @@
             document.removeEventListener('touchmove', dragging);
             document.removeEventListener('mouseup', endDrag);
             document.removeEventListener('touchend', endDrag);
+            document.removeEventListener('touchcancel', endDrag);
         }
     }
 
