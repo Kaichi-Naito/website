@@ -15,15 +15,6 @@ html.mobile-rotated-host body {
     right: env(safe-area-inset-right, 0px);
     bottom: env(safe-area-inset-bottom, 0px);
     left: env(safe-area-inset-left, 0px);
-    overflow: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: none;
-}
-#rotated-desktop-viewport::-webkit-scrollbar { display: none; }
-#rotated-desktop-viewport[data-rotation="90"] { overflow-y: hidden; }
-#rotated-desktop-viewport[data-rotation="0"] { overflow-x: hidden; }
-#rotated-desktop-content {
-    position: relative;
     overflow: hidden;
 }
 #rotated-desktop-frame {
@@ -43,3 +34,17 @@ html.mobile-pc-frame #start-menu { bottom: 33px; }
 html.mobile-pc-frame body.xp-desktop #start-menu { bottom: 36px; }
 html.mobile-pc-frame #room-view-toggle { bottom: 43px; }
 html.mobile-pc-frame body.xp-desktop #room-view-toggle { bottom: 47px; }
+
+/* Scroll the document within a fixed viewport, rather than a rotated host. */
+html.mobile-pc-frame {
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: none;
+    touch-action: pinch-zoom;
+}
+html.mobile-pc-frame .footer {
+    position: fixed;
+    margin-top: 0;
+    pointer-events: none;
+}

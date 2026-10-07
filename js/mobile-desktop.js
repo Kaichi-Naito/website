@@ -28,7 +28,79 @@
         var managed = window.frameElement && window.frameElement.id === 'rotated-desktop-frame';
         if (!managed) return;
         document.documentElement.classList.add('mobile-pc-frame');
+        // Chromium can deliver transformed touch coordinates without scrolling
+        // the rotated frame. Scroll in the inner document's coordinate system.
+        var gesture = null;
+        var momentum = 0;
+        function stopMomentum() {
+            if (momentum) cancelAnimationFrame(momentum);
+            momentum = 0;
+        }
+        function scrollTarget(target, delta, axis) {
+            var rootScroll = document.scrollingElement;
+            var position = axis === 'x' ? 'scrollLeft' : 'scrollTop';
+            var size = axis === 'x' ? 'scrollWidth' : 'scrollHeight';
+            var visible = axis === 'x' ? 'clientWidth' : 'clientHeight';
+            for (var node = target; node && node !== rootScroll; node = node.parentElement) {
+                var overflow = getComputedStyle(node)[axis === 'x' ? 'overflowX' : 'overflowY'];
+                if (!/auto|scroll/.test(overflow) || node[size] <= node[visible] + 1) continue;
+                if (delta > 0 ? node[position] < node[size] - node[visible] - 1 : node[position] > 0) return node;
+            }
+            return rootScroll;
+        }
+        document.addEventListener('touchstart', function (event) {
+            stopMomentum();
+            gesture = null;
+            if (event.touches.length !== 1 || event.target.closest('input, textarea, select, [contenteditable], #room-view-dialog')) return;
+            var touch = event.touches[0];
+            gesture = {id: touch.identifier, startX: touch.clientX, startY: touch.clientY,
+                lastX: touch.clientX, lastY: touch.clientY, lastTime: performance.now(), target: event.target, velocity: 0, moved: false};
+        }, {passive: true});
+        document.addEventListener('touchmove', function (event) {
+            if (!gesture || event.touches.length !== 1) { gesture = null; return; }
+            var touch = event.touches[0];
+            if (touch.identifier !== gesture.id) return;
+            var dy = gesture.startY - touch.clientY;
+            var dx = gesture.startX - touch.clientX;
+            if (!gesture.moved) {
+                if (Math.max(Math.abs(dx), Math.abs(dy)) < 8) return;
+                gesture.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+            }
+            var delta = gesture.axis === 'x' ? gesture.lastX - touch.clientX : gesture.lastY - touch.clientY;
+            gesture.scroller = scrollTarget(gesture.target, delta, gesture.axis);
+            if (gesture.axis === 'x' && gesture.scroller === document.scrollingElement) return;
+            gesture.position = gesture.axis === 'x' ? 'scrollLeft' : 'scrollTop';
+            gesture.moved = true;
+            if (event.cancelable) event.preventDefault();
+            var now = performance.now();
+            gesture.scroller[gesture.position] += delta;
+            gesture.velocity = delta / Math.max(8, now - gesture.lastTime);
+            gesture.lastX = touch.clientX;
+            gesture.lastY = touch.clientY;
+            gesture.lastTime = now;
+        }, {passive: false});
+        document.addEventListener('touchend', function (event) {
+            if (!gesture || event.touches.length) return;
+            var current = gesture;
+            gesture = null;
+            if (!current.moved || performance.now() - current.lastTime > 100) return;
+            var velocity = Math.max(-3, Math.min(3, current.velocity));
+            var last = performance.now();
+            function coast(now) {
+                var dt = Math.min(32, now - last);
+                last = now;
+                var before = current.scroller[current.position];
+                current.scroller[current.position] += velocity * dt;
+                velocity *= Math.pow(0.94, dt / 16);
+                if (Math.abs(velocity) < 0.03 || current.scroller[current.position] === before) { momentum = 0; return; }
+                momentum = requestAnimationFrame(coast);
+            }
+            momentum = requestAnimationFrame(coast);
+        }, {passive: true});
+        document.addEventListener('touchcancel', function () { gesture = null; stopMomentum(); }, {passive: true});
         document.addEventListener('kaichi-ui-ready', function () {
+            gesture = null;
+            stopMomentum();
             window.parent.postMessage('kaichi-desktop-page-ready', root.origin);
         });
         // Internal navigation opens a fresh page, so games leave the rotated frame.
@@ -74,121 +146,26 @@
     document.addEventListener('DOMContentLoaded', function () {
         var viewport = document.createElement('div');
         viewport.id = 'rotated-desktop-viewport';
-        var content = document.createElement('div');
-        content.id = 'rotated-desktop-content';
         var frame = document.createElement('iframe');
         frame.id = 'rotated-desktop-frame';
         frame.title = 'Kaichi Guitar Music — PC desktop';
         frame.setAttribute('allow', 'autoplay; fullscreen');
         frame.setAttribute('allowfullscreen', '');
-        var desktopHeight = 1024;
-        var contentObserver;
-        var contentResizeObserver;
-        var fitTimer;
-
-        function contentHeight() {
-            var doc = frame.contentDocument;
-            if (!doc || !doc.body) return desktopHeight;
-            var windows = doc.querySelectorAll('.window, .coming-soon-window');
-            var elements = windows.length ? windows : doc.body.children;
-            var bottom = 0;
-            Array.prototype.forEach.call(elements, function (element) {
-                if (/^(SCRIPT|STYLE|LINK)$/.test(element.tagName) || element.classList.contains('maximized-window')) return;
-                var rect = element.getBoundingClientRect();
-                if (!rect.width || !rect.height) return;
-                // Fixed overlays and viewport-sized maximized windows must not
-                // enlarge their own viewport on every measurement.
-                for (var node = element; node && node !== doc.body; node = node.parentElement) {
-                    if (frame.contentWindow.getComputedStyle(node).position === 'fixed') return;
-                }
-                bottom = Math.max(bottom, rect.bottom + frame.contentWindow.scrollY);
-            });
-            var taskbar = doc.getElementById('win95-taskbar');
-            var footerSpace = taskbar ? taskbar.getBoundingClientRect().height + 16 : 16;
-            return Math.max(1024, Math.ceil(bottom + footerSpace));
-        }
-
-        function scheduleFit() {
-            if (fitTimer) return;
-            // Page layouts also run shortly after kaichi-ui-ready / resize.
-            // Continuous updates (for example audio meters) must not postpone
-            // the measurement indefinitely.
-            fitTimer = setTimeout(function () {
-                fitTimer = null;
-                fitDesktop();
-            }, 180);
-        }
-
-        function watchContent() {
-            var doc = frame.contentDocument;
-            if (!doc || !doc.body) return;
-            if (contentObserver) contentObserver.disconnect();
-            if (contentResizeObserver) contentResizeObserver.disconnect();
-            if (typeof ResizeObserver !== 'undefined') {
-                contentResizeObserver = new ResizeObserver(scheduleFit);
-                contentResizeObserver.observe(doc.body);
-                doc.querySelectorAll('.window, .coming-soon-window').forEach(function (element) {
-                    contentResizeObserver.observe(element);
-                });
-            }
-            if (typeof MutationObserver !== 'undefined') {
-                contentObserver = new MutationObserver(function (mutations) {
-                    if (contentResizeObserver) {
-                        mutations.forEach(function (mutation) {
-                            mutation.addedNodes.forEach(function (node) {
-                                if (node.nodeType !== 1) return;
-                                if (node.matches('.window, .coming-soon-window')) contentResizeObserver.observe(node);
-                                node.querySelectorAll('.window, .coming-soon-window').forEach(function (element) {
-                                    contentResizeObserver.observe(element);
-                                });
-                            });
-                        });
-                    }
-                    // Text-only meter/clock updates do not change the layout.
-                    var layoutChanged = mutations.some(function (mutation) {
-                        if (mutation.type === 'attributes') return true;
-                        return Array.prototype.some.call(mutation.addedNodes, function (node) { return node.nodeType === 1; }) ||
-                            Array.prototype.some.call(mutation.removedNodes, function (node) { return node.nodeType === 1; });
-                    });
-                    if (layoutChanged) scheduleFit();
-                });
-                contentObserver.observe(doc.documentElement, {childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'hidden']});
-            }
-            scheduleFit();
-        }
-
         function fitDesktop() {
             var bounds = viewport.getBoundingClientRect();
             if (!bounds.width || !bounds.height) return;
             var rotate = forced || bounds.height > bounds.width;
-            var previousRotation = viewport.dataset.rotation;
-            var previousEnd = viewport.scrollWidth - viewport.clientWidth;
-            // Clockwise rotation puts the top of the page at the right edge.
-            var distanceFromTop = previousRotation === '90'
-                ? previousEnd - viewport.scrollLeft : viewport.scrollTop;
             var availableWidth = rotate ? bounds.height : bounds.width;
             var availableHeight = rotate ? bounds.width : bounds.height;
-            // Fit the PC page's width only. Its height remains scrollable.
             var scale = availableWidth / 1366;
-            desktopHeight = Math.max(contentHeight(), Math.ceil(availableHeight / scale));
+            // Keep a screen-sized inner viewport. The original document owns
+            // native scrolling and its fixed taskbar; the host never scrolls.
             frame.style.width = '1366px';
-            frame.style.height = desktopHeight + 'px';
-            frame.style.left = '0px';
-            frame.style.top = '0px';
-            content.style.width = (rotate ? desktopHeight : 1366) * scale + 'px';
-            content.style.height = (rotate ? 1366 : desktopHeight) * scale + 'px';
+            frame.style.height = (availableHeight / scale) + 'px';
             frame.style.transform = rotate
-                ? 'translateX(' + (desktopHeight * scale) + 'px) rotate(90deg) scale(' + scale + ')'
+                ? 'translateX(' + bounds.width + 'px) rotate(90deg) scale(' + scale + ')'
                 : 'scale(' + scale + ')';
             viewport.dataset.rotation = rotate ? '90' : '0';
-            if (previousRotation !== viewport.dataset.rotation) distanceFromTop = 0;
-            if (rotate) {
-                viewport.scrollTop = 0;
-                viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth - distanceFromTop;
-            } else {
-                viewport.scrollLeft = 0;
-                viewport.scrollTop = distanceFromTop;
-            }
         }
 
         function syncPage() {
@@ -206,18 +183,15 @@
 
         frame.addEventListener('load', function () {
             syncPage();
-            watchContent();
         });
         // Soft reboots change the inner DOM/URL without reloading its document.
         window.addEventListener('message', function (event) {
             if (event.origin === root.origin && event.source === frame.contentWindow && event.data === 'kaichi-desktop-page-ready') {
                 syncPage();
-                watchContent();
             }
         });
         frame.src = source.href;
-        content.appendChild(frame);
-        viewport.appendChild(content);
+        viewport.appendChild(frame);
         document.body.replaceChildren(viewport);
         fitDesktop();
         try { history.replaceState(null, '', visibleUrl); } catch (e) {}

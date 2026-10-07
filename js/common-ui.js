@@ -731,6 +731,8 @@
         handle.addEventListener('touchstart', startDragging, { passive: false });
 
         function startDragging(e) {
+            // Finger swipes on the rotated phone page scroll, including title bars.
+            if (e.type === 'touchstart' && document.documentElement.classList.contains('mobile-pc-frame')) return;
             if (e.target.closest('.title-bar-controls')) return;
             if (target.classList.contains('maximized-window')) return;
 
