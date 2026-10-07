@@ -800,26 +800,55 @@
         function setInitialPositions() {
             var isMobile = window.matchMedia("(max-width: 800px)").matches;
             var songWindows = Array.prototype.slice.call(document.querySelectorAll('.song-window'));
-            var currentTop = isMobile ? 175 : 225;
+            var viewportWidth = document.documentElement.clientWidth;
+            var gutter = isMobile ? 10 : Math.max(24, Math.min(48, viewportWidth * 0.025));
+            var startTop = isMobile ? 175 : 225;
+            var placed = [];
+            var lowestBottom = startTop;
             var visibleIndex = 0;
+
+            // Stable offsets give the desktop a scattered look without moving
+            // windows to new random positions whenever the layout refreshes.
+            function scatter(index, salt) {
+                var value = Math.sin((index + 1) * 12.9898 + salt * 78.233) * 43758.5453;
+                return value - Math.floor(value);
+            }
 
             for (var i = 0; i < songWindows.length; i++) {
                 var el = songWindows[i];
                 if (!el || el.style.display === 'none' || el.dataset.closed === 'true') continue;
+                if (el.classList.contains('maximized-window')) continue;
 
-                if (isMobile) {
-                    el.style.left = ((visibleIndex % 2 === 0) ? 2 : 8) + '%';
-                } else {
-                    var offset = (visibleIndex % 2 === 0) ? -24 : 24;
-                    el.style.left = 'calc(50% - 275px + ' + offset + 'px)';
+                var width = el.offsetWidth;
+                var height = el.offsetHeight || (isMobile ? 180 : 250);
+                var edge = Math.min(gutter, Math.max(0, (viewportWidth - width) / 2));
+                var travel = Math.max(0, viewportWidth - width - edge * 2);
+                var fraction = scatter(visibleIndex, 1);
+                // The newest two releases establish the full desktop width.
+                if (visibleIndex === 0) fraction = 0.04;
+                if (visibleIndex === 1) fraction = 0.94;
+                var left = Math.round(edge + travel * fraction);
+                var top = startTop + Math.round(scatter(visibleIndex, 2) * 76);
+                var overlap = (travel < width * 0.45 ? 14 : 34) + Math.round(scatter(visibleIndex, 3) * 34);
+
+                // Overlap only the bottom of earlier windows, so every title
+                // and its controls remain accessible while scrolling.
+                for (var j = 0; j < placed.length; j++) {
+                    var previous = placed[j];
+                    if (left < previous.right + 16 && left + width > previous.left - 16) {
+                        top = Math.max(top, previous.bottom - Math.min(overlap, previous.height * 0.22));
+                    }
                 }
 
-                el.style.top = currentTop + 'px';
-                currentTop += (el.offsetHeight || (isMobile ? 180 : 250)) + (isMobile ? 20 : 30);
+                top = Math.round(top);
+                el.style.left = left + 'px';
+                el.style.top = top + 'px';
+                placed.push({ left: left, right: left + width, bottom: top + height, height: height });
+                lowestBottom = Math.max(lowestBottom, top + height);
                 visibleIndex++;
             }
 
-            document.body.style.minHeight = (currentTop + 120) + 'px';
+            document.body.style.minHeight = (lowestBottom + 120) + 'px';
         }
 
         window.onKaichiWindowClosed = function (win) {
