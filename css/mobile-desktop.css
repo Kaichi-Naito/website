@@ -48,3 +48,10 @@ html.mobile-pc-frame .footer {
     margin-top: 0;
     pointer-events: none;
 }
+
+/* Keep CRT scanlines/vignette without filtering the entire moving desktop. */
+html.mobile-pc-frame #crt-overlay,
+html.mobile-pc-frame .crt-glitch-strip {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}

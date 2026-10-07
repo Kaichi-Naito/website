@@ -1130,8 +1130,13 @@
     }
 
     function setupCat(catElement, startX, startY, startVx, startVy) {
-        var catObj = { element: catElement, x: startX, y: startY, vx: startVx, vy: startVy };
+        var catObj = { element: catElement, x: startX, y: startY, vx: startVx, vy: startVy, facing: 1 };
         cats.push(catObj);
+        if (document.documentElement.classList.contains('mobile-pc-frame')) {
+            catElement.style.left = '0px';
+            catElement.style.top = '0px';
+            catElement.style.willChange = 'transform';
+        }
 
         if (cats.length === 10) {
             var special = document.getElementById('win-nyan-special');
@@ -1203,6 +1208,7 @@
     function animateCats() {
         var w = window.innerWidth;
         var h = window.innerHeight;
+        var mobileFrame = document.documentElement.classList.contains('mobile-pc-frame');
 
         for (var i = 0; i < cats.length; i++) {
             var cat = cats[i];
@@ -1212,11 +1218,13 @@
             if (cat.x + 80 > w) {
                 cat.x = w - 80;
                 cat.vx *= -1;
-                cat.element.style.transform = 'scaleX(-1)';
+                cat.facing = -1;
+                if (!mobileFrame) cat.element.style.transform = 'scaleX(-1)';
             } else if (cat.x < 0) {
                 cat.x = 0;
                 cat.vx *= -1;
-                cat.element.style.transform = 'scaleX(1)';
+                cat.facing = 1;
+                if (!mobileFrame) cat.element.style.transform = 'scaleX(1)';
             }
 
             if (cat.y + 50 > h) {
@@ -1227,8 +1235,12 @@
                 cat.vy *= -1;
             }
 
-            cat.element.style.left = cat.x + 'px';
-            cat.element.style.top = cat.y + 'px';
+            if (mobileFrame) {
+                cat.element.style.transform = 'translate3d(' + cat.x + 'px,' + cat.y + 'px,0) scaleX(' + cat.facing + ')';
+            } else {
+                cat.element.style.left = cat.x + 'px';
+                cat.element.style.top = cat.y + 'px';
+            }
         }
 
         requestAnimationFrame(animateCats);
