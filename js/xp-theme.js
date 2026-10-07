@@ -120,8 +120,8 @@
                 menu.addEventListener('click', function (e) { if (e.target.closest('a')) closeMenu(); });
             }
         }
-        var profile = document.getElementById('win-profile');
-        if (profile) window.KaichiUI.focusWindow(profile);
+        var initialWindow = document.getElementById('win-youtube') || document.getElementById('win-profile');
+        if (initialWindow) window.KaichiUI.focusWindow(initialWindow);
     }
     document.addEventListener('kaichi-ui-ready', ready);
     document.addEventListener('kaichi-desktop-theme-change', function () {
