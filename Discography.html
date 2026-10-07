@@ -851,12 +851,6 @@
             document.body.style.minHeight = (lowestBottom + 120) + 'px';
         }
 
-        window.onKaichiWindowClosed = function (win) {
-            if (win && win.classList.contains('song-window')) {
-                setTimeout(setInitialPositions, 0);
-            }
-        };
-
         /*
          * Start fetching the spreadsheet IMMEDIATELY.
          *
