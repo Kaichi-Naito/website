@@ -52,6 +52,7 @@
     var softRebootHomePromise = null;
     var startupAudioContext = null;
     var startupAudioBufferPromise = null;
+    var shutdownAudioBufferPromise = null;
     var startupHtmlAudioArmed = false;
 
     function preloadSoftRebootHome() {
@@ -121,6 +122,16 @@
                             return null;
                         });
                 }
+                if (document.documentElement.classList.contains('mobile-pc-frame') && !shutdownAudioBufferPromise) {
+                    shutdownAudioBufferPromise = fetch(asset('Sound/shutdown2.mp3'))
+                        .then(function (response) { if (!response.ok) throw new Error('Could not load shutdown sound'); return response.arrayBuffer(); })
+                        .then(function (buffer) {
+                            return new Promise(function (resolve, reject) {
+                                startupAudioContext.decodeAudioData(buffer, resolve, reject);
+                            });
+                        })
+                        .catch(function () { return null; });
+                }
             }
         } catch (e) {}
 
@@ -128,7 +139,7 @@
            Also arm the exact <audio> element as a fallback.
            It is muted while being started, so nothing is heard.
         */
-        if (startupSound && !startupHtmlAudioArmed) {
+        if (startupSound && !startupHtmlAudioArmed && !document.documentElement.classList.contains('mobile-pc-frame')) {
             startupHtmlAudioArmed = true;
 
             try {
@@ -208,6 +219,8 @@
     }
 
     function playStartupAudioSoftRebootFallback() {
+        // Avoid claiming the phone's media session for a decorative sound.
+        if (document.documentElement.classList.contains('mobile-pc-frame')) return Promise.resolve(false);
         return new Promise(function (resolve) {
             if (!startupSound) {
                 resolve(false);
@@ -443,15 +456,32 @@
     }
 
     function play(audio) {
-        if (!audio) return;
+        if (!audio) return Promise.resolve(false);
         try {
             audio.currentTime = 0;
-            audio.play().catch(function(){});
-        } catch (e) {}
+            return audio.play().then(function () { return true; }).catch(function () { return false; });
+        } catch (e) { return Promise.resolve(false); }
     }
 
     function playClickSound() {
-        play(mouseClickSound);
+        return play(mouseClickSound);
+    }
+
+    function playShutdownSound() {
+        if (!document.documentElement.classList.contains('mobile-pc-frame')) return play(shutdownSound);
+        // Buffer playback keeps this effect out of HTML media playback controls.
+        if (!startupAudioContext || !shutdownAudioBufferPromise) return Promise.resolve(false);
+        return startupAudioContext.resume()
+            .then(function () { return shutdownAudioBufferPromise; })
+            .then(function (buffer) {
+                if (!buffer) return false;
+                var source = startupAudioContext.createBufferSource();
+                source.buffer = buffer;
+                source.connect(startupAudioContext.destination);
+                source.start(0);
+                return true;
+            })
+            .catch(function () { return false; });
     }
 
     function injectNavigation() {
@@ -726,6 +756,8 @@
         target.dataset.dragReady = 'true';
         var isDragging = false;
         var initialX, initialY;
+        var retryGrabSound = false;
+        var grabSoundGeneration = 0;
 
         handle.addEventListener('mousedown', startDragging);
         handle.addEventListener('touchstart', startDragging, { passive: false });
@@ -736,6 +768,13 @@
             if (target.classList.contains('maximized-window')) return;
 
             isDragging = true;
+            retryGrabSound = false;
+            if (e.type === 'touchstart') {
+                var generation = ++grabSoundGeneration;
+                playClickSound().then(function (played) {
+                    if (generation === grabSoundGeneration) retryGrabSound = isDragging && !played;
+                });
+            }
             focusWindow(target);
 
             var clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
@@ -765,7 +804,11 @@
             if (e.type === 'touchmove') e.preventDefault();
         }
 
-        function endDrag() {
+        function endDrag(e) {
+            // First-touch autoplay may unlock only at touchend.
+            if (e && e.type === 'touchend' && !e.touches.length && retryGrabSound) playClickSound();
+            retryGrabSound = false;
+            grabSoundGeneration++;
             isDragging = false;
             document.removeEventListener('mousemove', dragging);
             document.removeEventListener('touchmove', dragging);
@@ -887,7 +930,7 @@
         if (!screen || !output || screen.classList.contains('active')) return;
 
         if (window.KaichiDesktopTheme) window.KaichiDesktopTheme.prepareNextTheme();
-        play(shutdownSound);
+        playShutdownSound();
         setStartMenuOpen(false);
 
         screen.classList.add('active');
