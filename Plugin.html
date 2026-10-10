@@ -3577,6 +3577,7 @@
                            file.type === 'file' &&
                            typeof file.name === 'string' &&
                            file.name.indexOf(SAMPLE_PREFIX) === 0 &&
+                           file.name !== 'SNAP_sample_arpeggio.wav' &&
                            /\.wav$/i.test(file.name);
                 })
                 .sort(function(a, b) {
