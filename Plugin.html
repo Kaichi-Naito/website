@@ -2668,7 +2668,7 @@
             display: flex !important;
         }
 </style>
-<link rel="stylesheet" href="Plugin/snap-web/snap-ui.css?v=134.5">
+<link rel="stylesheet" href="Plugin/snap-web/snap-ui.css?v=1.2.4">
 
 
     <script>
@@ -2840,6 +2840,7 @@
     <div class="snap134-meter" style="left:14.91935%;top:11.89873%;width:45.56452%;height:2.02532%">
 <div id="web-input-meter-fill">
 </div>
+<span id="web-input-peak-hold" class="snap134-peak-hold" aria-hidden="true"></span>
 <div class="snap134-target">
 <span class="snap-art " role="img" aria-label="GoodTarget" style="--art:url('ui/v134/labels/label_30_white.png');--art-ratio:5.82028">
 </span>
@@ -3028,7 +3029,7 @@
 </div>
 <div class="snap134-flow" id="snap134-flow" style="left:2.74194%;top:95.18987%;width:42.74194%;height:2.91139%">
 </div>
-<span class="snap134-version" style="left:85.48387%;top:95.18987%;width:12.09677%;height:2.91139%" title="SNAP v1.0 web trial">SNAP v1.0 · WEB</span>
+<span class="snap134-version" style="left:85.48387%;top:95.18987%;width:12.09677%;height:2.91139%" title="SNAP v1.2.4 web trial">SNAP v1.2.4 · WEB</span>
 </div>
                     <!-- SETTINGS -->
                     <div class="snap-settings-backdrop" id="snap-settings-backdrop" aria-hidden="true"></div>
@@ -3079,6 +3080,19 @@
                     <span class="snap-web-only-note">Web version: MONO only</span>
                 </div>
             </div>
+
+<div class="snap-settings-row snap-low-cut-row">
+    <label><span class="snap-art" role="img" aria-label="LOW CUT" style="--art:url('ui/v134/labels/label_65_white.png');--art-ratio:4.178010471204188"></span></label>
+    <div class="snap-segment" data-segment-param="inputLowCut">
+        <label><input type="radio" name="inputLowCutUi" value="0"><span>OFF</span></label>
+        <label><input type="radio" name="inputLowCutUi" value="1"><span class="snap-art" role="img" aria-label="60 Hz" style="--art:url('ui/v134/labels/label_57_white.png');--art-ratio:2.8020833333333335"></span></label>
+        <label><input type="radio" name="inputLowCutUi" value="2"><span class="snap-art" role="img" aria-label="100 Hz" style="--art:url('ui/v134/labels/label_58_white.png');--art-ratio:3.3802083333333335"></span></label>
+        <label><input type="radio" name="inputLowCutUi" value="3"><span class="snap-art" role="img" aria-label="150 Hz" style="--art:url('ui/v134/labels/label_59_white.png');--art-ratio:3.3802083333333335"></span></label>
+        <select data-snap-param="inputLowCut" aria-label="Input Low Cut" style="display:none">
+            <option value="0">OFF</option><option value="1">60 Hz</option><option value="2">100 Hz</option><option value="3">150 Hz</option>
+        </select>
+    </div>
+</div>
 
             <div class="snap-settings-row">
                 <label><span class="snap-art " role="img" aria-label="DRIVE CPU" style="--art:url('ui/v134/labels/label_04_white.png');--art-ratio:6.14583"></span></label>
@@ -3332,8 +3346,8 @@
         </div>
     </div>
 
-    <script src="Plugin/snap-web/snap-ui.js?v=134"></script>
-    <script src="Plugin/snap-web/snap-web.js?v=134.8"></script>
+    <script src="Plugin/snap-web/snap-ui.js?v=1.2.4"></script>
+    <script src="Plugin/snap-web/snap-web.js?v=1.2.4"></script>
 
     <script>
         function setInitialPositions() {

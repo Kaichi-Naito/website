@@ -1,3 +1,5 @@
+Historical UI update. The current v1.2.4 DSP/UI is documented in `BUILD_NOTES.txt`.
+
 # SNAP Web UI 0.4.134
 
 The browser demo now uses the VST 0.4.134 WATER and WOOD FLOOR scenes, supplied

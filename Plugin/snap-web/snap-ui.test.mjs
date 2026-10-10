@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFileSync } from 'node:fs';
+import createSnapDsp from './snap-runtime.mjs';
 
 const file = name => readFileSync(new URL(name, import.meta.url));
 function engineHarness() {
@@ -12,7 +13,7 @@ function engineHarness() {
     });
     // Expose the unmodified engine implementation only inside the test sandbox.
     vm.runInContext(file('snap-web.js').toString().replace('window.SnapWebParams = P;',
-        'window.SnapWebParams = P; window.TestEngine = SnapWebEngine;'), context);
+        'window.SnapWebParams = P; window.TestEngine = SnapWebEngine; window.TestPresets = PRESETS;'), context);
     const engine = new context.window.TestEngine(null);
     engine.context = { currentTime: 0 };
     function gain() {
@@ -88,14 +89,16 @@ test('startup selects and applies Snap + CAB before audio initialization', () =>
         }, console
     });
     vm.runInContext(file('snap-web.js').toString().replace('window.SnapWebParams = P;',
-        'window.SnapWebParams = P; window.TestEngine = SnapWebEngine;'), context);
+        'window.SnapWebParams = P; window.TestEngine = SnapWebEngine; window.TestPresets = PRESETS;'), context);
     context.window.TestEngine.prototype.init = function () { initialized = { ...this.params }; return Promise.resolve(); };
     start();
     assert.equal(presetSelect.value, 'Snap + CAB');
     assert.equal(initialized.cabMode, 3);
     assert.equal(initialized.eqOn, 1);
-    assert.equal(initialized.gate, 3);
-    assert.ok(Math.abs(initialized.drive - 5.77) < .001);
+    assert.ok(Math.abs(initialized.gate - 1.05) < .001);
+    assert.equal(initialized.inputLowCut, 2);
+    assert.ok(Math.abs(initialized.comp - 7.03) < .001);
+    assert.ok(Math.abs(initialized.drive - 6.12) < .001);
     assert.ok(Math.abs(initialized.eq31 + 2.83) < .001);
     assert.equal(initialized.signalMode, 0);
     assert.equal(initialized.driveCpuHigh, 0);
@@ -107,10 +110,10 @@ test('real AudioWorklet and WASM produce finite non-silent audio with control ch
     const messages=[];
     const context=vm.createContext({
         AudioWorkletProcessor: class { constructor(){ this.port={ postMessage:data=>messages.push(data) }; } },
-        sampleRate:48000, WebAssembly, Float32Array, Math, console,
+        sampleRate:48000, WebAssembly, Float32Array, Math, console, createSnapDsp,
         registerProcessor(name, type) { assert.equal(name,'snap-web-processor'); Processor=type; }
     });
-    vm.runInContext(file('snap-worklet.js').toString(),context);
+    vm.runInContext(file('snap-worklet.js').toString().replace(/^import.*\n/, ''),context);
     const processor=new Processor();
     await processor.port.onmessage({data:{type:'init',wasmBytes:file('snap_dsp.wasm')}});
     assert.equal(processor.ready,true);
@@ -126,4 +129,70 @@ test('real AudioWorklet and WASM produce finite non-silent audio with control ch
     }
     assert.ok(energy>.01);
     assert.ok(messages.some(message=>message.type==='meter' && Number.isFinite(message.db)));
+});
+
+
+test('all seven v1.2.4 presets retain native values and separate DRIVE CPU preference', () => {
+    const context=vm.createContext({window:{addEventListener(){}},document:{getElementById(){return null;}},console});
+    vm.runInContext(file('snap-web.js').toString().replace('window.SnapWebParams = P;',
+        'window.SnapWebParams = P; window.TestPresets = PRESETS;'),context);
+    const names=['01_Snap','02_Snap + CAB','03_Clean','04_Clean + CAB','05_CleanShred','06_Dist','07_Dist + CAB'];
+    const map={attack:'snap',boostEnabled:'boost',compressorAmount:'comp',compressorEnabled:'compOn',
+        compressorTone:'compTone',compressorVolume:'compVol',enabled:'driveOn',eqEnabled:'eqOn',eqOutputGain:'eqOut'};
+    for(const name of names){
+        const preset=context.window.TestPresets[name.slice(3)];
+        const xml=file('native/presets/'+name+'.snappreset').toString();
+        for(const match of xml.matchAll(/<PARAM id="([^"]+)" value="([^"]+)"/g)){
+            const key=map[match[1]]||match[1];
+            if(key==='cabEnabled'||key.startsWith('dev'))continue;
+            assert.equal(preset[key],Number(match[2]),name+': '+key);
+        }
+        assert.equal(preset.inputLowCut,2);
+        assert.equal(preset.driveCpuHigh,0);
+    }
+});
+
+test('real WASM LOW CUT provides the native 12 dB/oct filter and true OFF response', async () => {
+    const rate=48000, frequencies=[60,100,150,1000], cutoffs=[0,60,100,150];
+    for(let choice=0;choice<4;choice++){
+        for(const frequency of frequencies){
+            const m=await createSnapDsp({wasmBinary:file('snap_dsp.wasm')});m._snap_init(rate);
+            m._snap_set_param(1,0);m._snap_set_param(5,0);m._snap_set_param(10,0);m._snap_set_param(34,choice);
+            const input=new Float32Array(m.HEAPF32.buffer,m._snap_get_input_l(),128);
+            const right=new Float32Array(m.HEAPF32.buffer,m._snap_get_input_r(),128);
+            const output=new Float32Array(m.HEAPF32.buffer,m._snap_get_output_l(),128);
+            let dry=0,wet=0;
+            for(let block=0;block<750;block++){
+                for(let i=0;i<128;i++)input[i]=right[i]=.1*Math.sin((block*128+i)*2*Math.PI*frequency/rate);
+                m._snap_process(128);
+                if(block>=375)for(let i=0;i<128;i++){dry+=input[i]**2;wet+=output[i]**2;}
+            }
+            const db=10*Math.log10(wet/dry);
+            const ratio=choice ? Math.tan(Math.PI*cutoffs[choice]/rate)/Math.tan(Math.PI*frequency/rate) : 0;
+            const expected=-10*Math.log10(1+ratio**4);
+            assert.ok(Math.abs(db-expected)<.01,`${choice}/${frequency} Hz: ${db} vs ${expected}`);
+        }
+    }
+});
+
+test('AudioWorklet reports initialization errors and preserves queued controls', async () => {
+    let Processor;
+    const messages=[];
+    const context=vm.createContext({
+        AudioWorkletProcessor:class {constructor(){this.port={postMessage:x=>messages.push(x)};}},
+        sampleRate:48000,Float32Array,Math,console,createSnapDsp,
+        registerProcessor(name,type){Processor=type;}
+    });
+    vm.runInContext(file('snap-worklet.js').toString().replace(/^import.*\n/,''),context);
+    const processor=new Processor();
+    await processor.port.onmessage({data:{type:'param',id:34,value:3}});
+    await processor.port.onmessage({data:{type:'param',id:10,value:0}});
+    await processor.port.onmessage({data:{type:'init',wasmBytes:file('snap_dsp.wasm')}});
+    assert.equal(processor.ready,true);assert.equal(processor.pendingParams.length,0);
+    // An unavailable runtime must report an error instead of falsely enabling Play.
+    context.createSnapDsp=async()=>{throw new Error('runtime unavailable');};
+    const failed=new Processor();
+    await failed.port.onmessage({data:{type:'init',wasmBytes:file('snap_dsp.wasm')}});
+    assert.equal(failed.ready,false);
+    assert.ok(messages.some(x=>x.type==='error'&&x.message==='runtime unavailable'));
 });

@@ -1,12 +1,47 @@
-SNAP Web DSP build notes
+SNAP Web DSP v1.2.4
 
-This module is deliberately freestanding (no Emscripten runtime required).
-Example build with LLVM/clang 17+ and wasm-ld:
+Build from SNAP_v1.2.4_Source.zip with Emscripten (tested: 3.1.6 / LLVM 15 / Binaryen 108):
+  python Plugin/snap-web/native/build-web.py /path/to/SNAP_v1.2.4_Source.zip
+  node --test Plugin/snap-web/snap-ui.test.mjs
 
-clang --target=wasm32 -O3 -ffreestanding -fno-stack-protector -nostdlib \
-  snap_dsp.c \
-  -Wl,--no-entry -Wl,--export-memory -Wl,--allow-undefined \
-  -Wl,--initial-memory=1048576 -Wl,--max-memory=16777216 \
-  -o snap_dsp.wasm
+The original NamCompressor.cpp/.h, CompNamCalibration.h and InputLowCut.h are
+compiled unchanged. The bridge uses one Full (8-channel) NAM stream in MONO,
+including native calibration, 20 ms control smoothing, warmup, and the original
+Lanczos conversion at host rates other than the model's 48 kHz. No Lite model
+or old two-stage compressor is substituted. AudioContext requests 48 kHz.
 
-Math functions are WebAssembly imports supplied by snap-worklet.js.
+Processing: internal +5 dB / TRIM -> meter -> GATE -> INPUT LOW CUT -> NAM COMP
+-> DRIVE / BOOST -> graphic EQ -> CAB -> internal -5 dB.
+INPUT LOW CUT has OFF / 60 / 100 / 150 Hz choices. All seven native presets use
+100 Hz; Clean / Clean + CAB / CleanShred volume is 5.44 / 5.48 / 6.10.
+The unchanged native presets are included under native/presets for verification.
+
+Browser adaptations preserved:
+- MONO only; DRIVE LOW (4x). DRIVE retains the existing browser interpolation /
+  downsampling implementation, not JUCE's polyphase oversampler. Gate / DRIVE
+  control ramps and EQ coefficient updates also retain their browser adaptation.
+- CAB uses unchanged A/B WAVs in non-normalizing Web Audio ConvolverNodes.
+- The existing browser sample output lift, display meter offset (+6 dB), and
+  final browser limiter remain. These are separate from native COMP calibration.
+- snap_reset clears the input filter/GATE/DRIVE/EQ; NAM history stays running,
+  like the native live processor, without allocation/prewarming during playback.
+- Browser saved presets use a v1.2.4 storage key so an old compressor setting
+  is not silently reinterpreted as a new NAM preset. Old saved data is preserved.
+- Coming Soon gate, downloads and page window/scroll/drag handling are unchanged.
+
+UI: native dot artwork; LOW CUT settings and signal flow; GoodTarget -30..-6 dB;
+400 ms peak hold uses WATER #D01645 / WOOD white. Existing scene plates and CAB
+assets match the native version. UI/DSP cache keys are bumped together.
+
+Validation performed:
+- Original native NAM infrastructure, model and mono/stereo checks passed.
+- C++ vs WASM comparison: 44.1 / 48 / 96 kHz x all four LOW CUT positions,
+  including COMP/TONE/VOL changes and bypass; maximum absolute sample error
+  1.35e-7, relative error below -135 dB. This compares LOW CUT + COMP, not the
+  browser-specific DRIVE oversampling or final browser limiter.
+- Node tests cover actual AudioWorklet/WASM processing, preset values, LOW CUT,
+  CAB routing, EQ pointer behavior, init failures and mono/LOW restrictions.
+
+Source/model hashes are in native/source-v124.json. Third-party notices and
+unmodified resampler sources are in native/third-party-notices.tar.gz; original
+NAM, AudioDSPTools and Eigen source locations are in its Licenses/SOURCE.txt.

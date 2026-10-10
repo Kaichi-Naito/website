@@ -1,0 +1,17 @@
+{
+  "version": "1.2.4",
+  "model_sha256": "44544af3fed46085db3f76e2f52a75c49ec92b8152ba955b7ad6cc5b957c3f2f",
+  "source_files_sha256": {
+    "Source/CompNamCalibration.h": "7a08c8307564883e722a29497a9988814bc26d72294b23db01d66dc052493567",
+    "Source/FactoryPresets.h": "e5f111bd7fd2b0f4ea948bd4224be1519ee5deee87b2c40a331e838a006ee50e",
+    "Source/InputLowCut.h": "2bf7440bcf84bfc627606a56e043b57ecf7da9863fb842c50e03dec2e1b0dd2a",
+    "Source/NamCompressor.cpp": "64d604a1f9bb415eec98375fd2a5e4b9cb8d015c0965577d91a2cc0f7d13ec17",
+    "Source/NamCompressor.h": "93fbb98c9eb9122d4d8705f19e544bf5bf7121b4bce24bb0cc42a137c89bad41",
+    "Source/PluginEditor.cpp": "b5c7694c75506ea4bebe51c8ca95bded46d614fdf5bcfe296fffde6d13613257",
+    "Source/PluginProcessor.cpp": "9309f7e5b77ccdbbc78e10b36e3476e5119a361a4a925d1fe0a828195782ba2a"
+  },
+  "toolchain": "Emscripten 3.1.6 / LLVM 15 / Binaryen 108",
+  "web_signal": "MONO",
+  "drive_oversampling": 4,
+  "nam_submodel": "Full (8 channels), same as native; no Lite substitution"
+}

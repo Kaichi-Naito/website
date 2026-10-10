@@ -6,13 +6,318 @@
         EQ1K:18, EQ2K:19, EQ4K:20, EQ8K:21, EQ16K:22, EQ_OUT:23,
         SIGNAL_MODE:24, DRIVE_CPU_HIGH:25,
         DEV_DIRECT_OFF:26, DEV_TRANSIENT_OFF:27, DEV_DIRECT_ON:28, DEV_TRANSIENT_ON:29,
-        DEV_NATURAL_COMP:30, DEV_DRIVE_CLIP_DB:31, DEV_DRIVE_LOW_CUT_HZ:32, DEV_DRIVE_HIGH_CUT_HZ:33
+        DEV_NATURAL_COMP:30, DEV_DRIVE_CLIP_DB:31, DEV_DRIVE_LOW_CUT_HZ:32, DEV_DRIVE_HIGH_CUT_HZ:33, INPUT_LOW_CUT:34
     });
 
-    const DEFAULTS = {"inputTrim":0,"gate":1,"comp":5,"compVol":5,"compTone":5,"compOn":1,"drive":5,"snap":5,"tone":5,"level":5,"driveOn":1,"boost":0,"eqOn":0,"eq31":0,"eq62":0,"eq125":0,"eq250":0,"eq500":0,"eq1k":0,"eq2k":0,"eq4k":0,"eq8k":0,"eq16k":0,"eqOut":0,"signalMode":0,"driveCpuHigh":0,"cabMode":0,"devDirectOff":100,"devTransientOff":100,"devDirectOn":0,"devTransientOn":50,"devNaturalComp":1.0,"devDriveClipDb":-9.2,"devDriveLowCutHz":99.5,"devDriveHighCutHz":5150.0};
+    const DEFAULTS = {"inputTrim":0,"gate":1,"comp":5,"compVol":5,"compTone":5,"compOn":1,"drive":5,"snap":5,"tone":5,"level":5,"driveOn":1,"boost":0,"eqOn":0,"eq31":0,"eq62":0,"eq125":0,"eq250":0,"eq500":0,"eq1k":0,"eq2k":0,"eq4k":0,"eq8k":0,"eq16k":0,"eqOut":0,"signalMode":0,"driveCpuHigh":0,"cabMode":0,"devDirectOff":100,"devTransientOff":100,"devDirectOn":0,"devTransientOn":50,"devNaturalComp":1.0,"devDriveClipDb":-9.2,"devDriveLowCutHz":99.5,"devDriveHighCutHz":5150.0,"inputLowCut":0};
 
 
-    const PRESETS = Object.freeze({"default":{"inputTrim":0,"gate":1,"comp":5,"compVol":5,"compTone":5,"compOn":1,"drive":5,"snap":5,"tone":5,"level":5,"driveOn":1,"boost":0,"eqOn":0,"eq31":0,"eq62":0,"eq125":0,"eq250":0,"eq500":0,"eq1k":0,"eq2k":0,"eq4k":0,"eq8k":0,"eq16k":0,"eqOut":0,"signalMode":0,"driveCpuHigh":0,"cabMode":0,"devDirectOff":100,"devTransientOff":100,"devDirectOn":0,"devTransientOn":50,"devNaturalComp":1,"devDriveClipDb":-9.2,"devDriveLowCutHz":99.5,"devDriveHighCutHz":5150},"Snap":{"snap":7.599999904632568,"boost":0,"cabMode":0,"comp":7.809999942779541,"compOn":1,"compTone":4.269999980926514,"compVol":5,"drive":5.769999980926514,"driveOn":1,"eq125":0,"eq16k":7.600000381469727,"eq1k":0,"eq250":0,"eq2k":-3.060000419616699,"eq31":-2.829999923706055,"eq4k":4.090000152587891,"eq500":-3.65000057220459,"eq62":0,"eq8k":7.719999313354492,"eqOn":0,"eqOut":0,"gate":3,"inputTrim":0,"level":4.289999961853027,"signalMode":0,"tone":3.470000028610229,"devDirectOff":100,"devDirectOn":0,"devTransientOff":100,"devTransientOn":50,"devNaturalComp":1,"devDriveClipDb":-9.2,"devDriveHighCutHz":5150,"devDriveLowCutHz":99.5,"driveCpuHigh":0},"Snap + CAB":{"snap":7.599999904632568,"boost":0,"cabMode":3,"comp":7.529999732971191,"compOn":1,"compTone":5,"compVol":5,"drive":5.769999980926514,"driveOn":1,"eq125":0,"eq16k":7.600000381469727,"eq1k":0,"eq250":0,"eq2k":-3.060000419616699,"eq31":-2.829999923706055,"eq4k":4.090000152587891,"eq500":-3.65000057220459,"eq62":0,"eq8k":7.719999313354492,"eqOn":1,"eqOut":0,"gate":3,"inputTrim":0,"level":4.289999961853027,"signalMode":0,"tone":3.470000028610229,"devDirectOff":100,"devDirectOn":0,"devTransientOff":100,"devTransientOn":50,"devNaturalComp":1,"devDriveClipDb":-9.2,"devDriveHighCutHz":5150,"devDriveLowCutHz":99.5,"driveCpuHigh":0},"Clean":{"snap":4.029999732971191,"boost":0,"cabMode":0,"comp":5,"compOn":1,"compTone":5,"compVol":7.359999656677246,"drive":7.789999961853027,"driveOn":0,"eq125":4.090000152587891,"eq16k":7.600000381469727,"eq1k":0,"eq250":3.739999771118164,"eq2k":-3.060000419616699,"eq31":-2.829999923706055,"eq4k":4.090000152587891,"eq500":-3.65000057220459,"eq62":1.159999847412109,"eq8k":7.719999313354492,"eqOn":0,"eqOut":0,"gate":0.199999988079071,"inputTrim":0,"level":5,"signalMode":0,"tone":3.799999952316284,"devDirectOff":100,"devDirectOn":0,"devDriveClipDb":-9.2,"devDriveHighCutHz":5150,"devDriveLowCutHz":99.5,"devNaturalComp":1,"devTransientOff":100,"devTransientOn":50,"driveCpuHigh":0},"Clean + CAB":{"snap":4.029999732971191,"boost":0,"cabMode":4,"comp":5,"compOn":1,"compTone":6.609999656677246,"compVol":7.329999923706055,"drive":7.789999961853027,"driveOn":0,"eq125":1.960000038146973,"eq16k":7.600000381469727,"eq1k":0,"eq250":1.130000114440918,"eq2k":0.5699996948242188,"eq31":-2.829999923706055,"eq4k":4.090000152587891,"eq500":-2.060000419616699,"eq62":0.1599998474121094,"eq8k":7.719999313354492,"eqOn":1,"eqOut":0,"gate":3,"inputTrim":0,"level":5,"signalMode":0,"tone":3.799999952316284,"devDirectOff":100,"devDirectOn":0,"devTransientOff":100,"devTransientOn":50,"devDriveClipDb":-9.2,"devDriveHighCutHz":5150,"devDriveLowCutHz":99.5,"devNaturalComp":1,"driveCpuHigh":0},"CleanShred":{"snap":4.029999732971191,"boost":0,"cabMode":0,"comp":10,"compOn":1,"compTone":4.339999675750732,"compVol":7.460000038146973,"drive":7.789999961853027,"driveOn":0,"eq125":0,"eq16k":9.809999465942383,"eq1k":0,"eq250":0,"eq2k":-3.010000228881836,"eq31":-7.480000019073486,"eq4k":-6.289999961853027,"eq500":2.559999465942383,"eq62":-2.210000038146973,"eq8k":5.139999389648438,"eqOn":1,"eqOut":0,"gate":3,"inputTrim":0,"level":5,"signalMode":0,"tone":3.799999952316284,"devDirectOff":100,"devDirectOn":0,"devTransientOff":100,"devTransientOn":50,"devDriveClipDb":-9.2,"devDriveHighCutHz":5150,"devDriveLowCutHz":99.5,"devNaturalComp":1,"driveCpuHigh":0},"Dist":{"snap":7.809999942779541,"boost":1,"cabMode":0,"comp":4.069999694824219,"compOn":0,"compTone":5,"compVol":5,"drive":8.75,"driveOn":1,"eq125":1.769999504089355,"eq16k":8.399999618530273,"eq1k":-0.1999998092651367,"eq250":2.239999771118164,"eq2k":3.049999237060547,"eq31":-2.829999923706055,"eq4k":4.680000305175781,"eq500":1.309999465942383,"eq62":0,"eq8k":12,"eqOn":0,"eqOut":0,"gate":3,"inputTrim":0,"level":3.809999942779541,"signalMode":0,"tone":4.199999809265137,"devDirectOff":100,"devDirectOn":0,"devTransientOff":100,"devTransientOn":50,"devDriveClipDb":-9.2,"devDriveHighCutHz":5150,"devDriveLowCutHz":99.5,"devNaturalComp":1,"driveCpuHigh":0},"Dist + CAB":{"snap":7.559999942779541,"boost":1,"cabMode":1,"comp":4.069999694824219,"compOn":0,"compTone":5,"compVol":5,"drive":8.75,"driveOn":1,"eq125":1.769999504089355,"eq16k":8.399999618530273,"eq1k":-0.1999998092651367,"eq250":2.239999771118164,"eq2k":2.479999542236328,"eq31":-2.829999923706055,"eq4k":4.680000305175781,"eq500":1.309999465942383,"eq62":0,"eq8k":6.840000152587891,"eqOn":1,"eqOut":0,"gate":3,"inputTrim":0,"level":3.349999904632568,"signalMode":0,"tone":4.159999847412109,"devDirectOff":100,"devDirectOn":0,"devTransientOff":100,"devTransientOn":50,"devDriveClipDb":-9.2,"devDriveHighCutHz":5150,"devDriveLowCutHz":99.5,"devNaturalComp":1,"driveCpuHigh":0}});
+    const PRESETS = Object.freeze({
+    "default": {
+        "inputTrim": 0,
+        "gate": 1,
+        "comp": 5,
+        "compVol": 5,
+        "compTone": 5,
+        "compOn": 1,
+        "drive": 5,
+        "snap": 5,
+        "tone": 5,
+        "level": 5,
+        "driveOn": 1,
+        "boost": 0,
+        "eqOn": 0,
+        "eq31": 0,
+        "eq62": 0,
+        "eq125": 0,
+        "eq250": 0,
+        "eq500": 0,
+        "eq1k": 0,
+        "eq2k": 0,
+        "eq4k": 0,
+        "eq8k": 0,
+        "eq16k": 0,
+        "eqOut": 0,
+        "signalMode": 0,
+        "driveCpuHigh": 0,
+        "cabMode": 0,
+        "devDirectOff": 100,
+        "devTransientOff": 100,
+        "devDirectOn": 0,
+        "devTransientOn": 50,
+        "devNaturalComp": 1.0,
+        "devDriveClipDb": -9.2,
+        "devDriveLowCutHz": 99.5,
+        "devDriveHighCutHz": 5150.0,
+        "inputLowCut": 0
+    },
+    "Snap": {
+        "inputTrim": 0.0,
+        "gate": 0.9899999499320984,
+        "comp": 7.0,
+        "compVol": 5.0,
+        "compTone": 5.0,
+        "compOn": 1.0,
+        "drive": 6.049999713897705,
+        "snap": 7.599999904632568,
+        "tone": 3.470000028610229,
+        "level": 4.289999961853027,
+        "driveOn": 1.0,
+        "boost": 0.0,
+        "eqOn": 0.0,
+        "eq31": -2.829999923706055,
+        "eq62": 0.0,
+        "eq125": 0.0,
+        "eq250": 0.0,
+        "eq500": -3.65000057220459,
+        "eq1k": 0.0,
+        "eq2k": -3.060000419616699,
+        "eq4k": 4.090000152587891,
+        "eq8k": 7.719999313354492,
+        "eq16k": 7.600000381469727,
+        "eqOut": 0.0,
+        "signalMode": 0.0,
+        "driveCpuHigh": 0,
+        "cabMode": 0.0,
+        "devDirectOff": 100,
+        "devTransientOff": 100,
+        "devDirectOn": 0,
+        "devTransientOn": 50.0,
+        "devNaturalComp": 1.0,
+        "devDriveClipDb": -9.2,
+        "devDriveLowCutHz": 99.5,
+        "devDriveHighCutHz": 5150.0,
+        "inputLowCut": 2.0
+    },
+    "Snap + CAB": {
+        "inputTrim": 0.0,
+        "gate": 1.049999952316284,
+        "comp": 7.029999732971191,
+        "compVol": 5.0,
+        "compTone": 5.0,
+        "compOn": 1.0,
+        "drive": 6.119999885559082,
+        "snap": 7.599999904632568,
+        "tone": 3.470000028610229,
+        "level": 4.289999961853027,
+        "driveOn": 1.0,
+        "boost": 0.0,
+        "eqOn": 1.0,
+        "eq31": -2.829999923706055,
+        "eq62": 0.0,
+        "eq125": 0.0,
+        "eq250": 0.0,
+        "eq500": -3.65000057220459,
+        "eq1k": 0.0,
+        "eq2k": -3.060000419616699,
+        "eq4k": 4.090000152587891,
+        "eq8k": 7.719999313354492,
+        "eq16k": 7.600000381469727,
+        "eqOut": 0.0,
+        "signalMode": 0.0,
+        "driveCpuHigh": 0,
+        "cabMode": 3.0,
+        "devDirectOff": 100,
+        "devTransientOff": 100,
+        "devDirectOn": 0,
+        "devTransientOn": 50.0,
+        "devNaturalComp": 1.0,
+        "devDriveClipDb": -9.2,
+        "devDriveLowCutHz": 99.5,
+        "devDriveHighCutHz": 5150.0,
+        "inputLowCut": 2.0
+    },
+    "Clean": {
+        "inputTrim": 0.0,
+        "gate": 0.199999988079071,
+        "comp": 5.0,
+        "compVol": 5.440000057220459,
+        "compTone": 5.0,
+        "compOn": 1.0,
+        "drive": 7.789999961853027,
+        "snap": 4.029999732971191,
+        "tone": 3.799999952316284,
+        "level": 5.0,
+        "driveOn": 0.0,
+        "boost": 0.0,
+        "eqOn": 1.0,
+        "eq31": -2.829999923706055,
+        "eq62": 1.159999847412109,
+        "eq125": 4.090000152587891,
+        "eq250": 0.0,
+        "eq500": 0.0,
+        "eq1k": 0.0,
+        "eq2k": -3.060000419616699,
+        "eq4k": 4.090000152587891,
+        "eq8k": 7.719999313354492,
+        "eq16k": 7.600000381469727,
+        "eqOut": 0.0,
+        "signalMode": 0.0,
+        "driveCpuHigh": 0,
+        "cabMode": 0.0,
+        "devDirectOff": 100,
+        "devTransientOff": 100,
+        "devDirectOn": 0,
+        "devTransientOn": 50,
+        "devNaturalComp": 1.0,
+        "devDriveClipDb": -9.2,
+        "devDriveLowCutHz": 99.5,
+        "devDriveHighCutHz": 5150.0,
+        "inputLowCut": 2.0
+    },
+    "Clean + CAB": {
+        "inputTrim": 0.0,
+        "gate": 3.0,
+        "comp": 5.0,
+        "compVol": 5.480000019073486,
+        "compTone": 6.609999656677246,
+        "compOn": 1.0,
+        "drive": 7.089999675750732,
+        "snap": 4.029999732971191,
+        "tone": 3.799999952316284,
+        "level": 5.0,
+        "driveOn": 0.0,
+        "boost": 0.0,
+        "eqOn": 1.0,
+        "eq31": -2.829999923706055,
+        "eq62": 0.1599998474121094,
+        "eq125": 1.960000038146973,
+        "eq250": 1.130000114440918,
+        "eq500": -2.060000419616699,
+        "eq1k": 0.0,
+        "eq2k": 0.5699996948242188,
+        "eq4k": 4.090000152587891,
+        "eq8k": 7.719999313354492,
+        "eq16k": 7.600000381469727,
+        "eqOut": 0.0,
+        "signalMode": 0.0,
+        "driveCpuHigh": 0,
+        "cabMode": 4.0,
+        "devDirectOff": 100,
+        "devTransientOff": 100,
+        "devDirectOn": 0,
+        "devTransientOn": 50.0,
+        "devNaturalComp": 1.0,
+        "devDriveClipDb": -9.2,
+        "devDriveLowCutHz": 99.5,
+        "devDriveHighCutHz": 5150.0,
+        "inputLowCut": 2.0
+    },
+    "CleanShred": {
+        "inputTrim": 0.0,
+        "gate": 1.419999957084656,
+        "comp": 9.25,
+        "compVol": 6.099999904632568,
+        "compTone": 5.0,
+        "compOn": 1.0,
+        "drive": 5.0,
+        "snap": 5.0,
+        "tone": 5.0,
+        "level": 5.0,
+        "driveOn": 0.0,
+        "boost": 0.0,
+        "eqOn": 0.0,
+        "eq31": 0.0,
+        "eq62": 0.0,
+        "eq125": 0.0,
+        "eq250": 0.0,
+        "eq500": 0.0,
+        "eq1k": 0.0,
+        "eq2k": 0.0,
+        "eq4k": 0.0,
+        "eq8k": 0.0,
+        "eq16k": 0.0,
+        "eqOut": 0.0,
+        "signalMode": 0.0,
+        "driveCpuHigh": 0,
+        "cabMode": 0.0,
+        "devDirectOff": 100,
+        "devTransientOff": 100,
+        "devDirectOn": 0,
+        "devTransientOn": 50,
+        "devNaturalComp": 1.0,
+        "devDriveClipDb": -9.2,
+        "devDriveLowCutHz": 99.5,
+        "devDriveHighCutHz": 5150.0,
+        "inputLowCut": 2.0
+    },
+    "Dist": {
+        "inputTrim": 0.0,
+        "gate": 3.0,
+        "comp": 4.069999694824219,
+        "compVol": 5.0,
+        "compTone": 5.0,
+        "compOn": 0.0,
+        "drive": 9.59999942779541,
+        "snap": 7.809999942779541,
+        "tone": 4.199999809265137,
+        "level": 5.0,
+        "driveOn": 1.0,
+        "boost": 1.0,
+        "eqOn": 0.0,
+        "eq31": -2.829999923706055,
+        "eq62": 0.0,
+        "eq125": 1.769999504089355,
+        "eq250": 2.239999771118164,
+        "eq500": 1.309999465942383,
+        "eq1k": -0.1999998092651367,
+        "eq2k": 3.049999237060547,
+        "eq4k": 4.680000305175781,
+        "eq8k": 12.0,
+        "eq16k": 8.399999618530273,
+        "eqOut": 0.0,
+        "signalMode": 0.0,
+        "driveCpuHigh": 0,
+        "cabMode": 0.0,
+        "devDirectOff": 100,
+        "devTransientOff": 100,
+        "devDirectOn": 0,
+        "devTransientOn": 50.0,
+        "devNaturalComp": 1.0,
+        "devDriveClipDb": -9.2,
+        "devDriveLowCutHz": 99.5,
+        "devDriveHighCutHz": 5150.0,
+        "inputLowCut": 2.0
+    },
+    "Dist + CAB": {
+        "inputTrim": 0.0,
+        "gate": 3.0,
+        "comp": 4.069999694824219,
+        "compVol": 5.0,
+        "compTone": 5.0,
+        "compOn": 0.0,
+        "drive": 9.630000114440918,
+        "snap": 7.329999923706055,
+        "tone": 5.0,
+        "level": 4.5,
+        "driveOn": 1.0,
+        "boost": 1.0,
+        "eqOn": 1.0,
+        "eq31": -2.829999923706055,
+        "eq62": 0.0,
+        "eq125": 1.769999504089355,
+        "eq250": 2.239999771118164,
+        "eq500": 1.309999465942383,
+        "eq1k": -0.1999998092651367,
+        "eq2k": 2.479999542236328,
+        "eq4k": 4.680000305175781,
+        "eq8k": 6.840000152587891,
+        "eq16k": 8.399999618530273,
+        "eqOut": 0.0,
+        "signalMode": 0.0,
+        "driveCpuHigh": 0,
+        "cabMode": 3.0,
+        "devDirectOff": 100,
+        "devTransientOff": 100,
+        "devDirectOn": 0,
+        "devTransientOn": 50.0,
+        "devNaturalComp": 1.0,
+        "devDriveClipDb": -9.2,
+        "devDriveLowCutHz": 99.5,
+        "devDriveHighCutHz": 5150.0,
+        "inputLowCut": 2.0
+    }
+});
 
     class SnapWebEngine {
         constructor(audioElement) {
@@ -34,6 +339,9 @@
             this.browserStatus = document.getElementById('browser-demo-status');
             this.meterFill = document.getElementById('web-input-meter-fill');
             this.meterValue = document.getElementById('web-meter-value');
+            this.peakHold = document.getElementById('web-input-peak-hold');
+            this.displayedPeak = this.heldPeak = -60;
+            this.holdUntil = this.meterTime = 0;
         }
 
         setStatus(text) {
@@ -50,10 +358,10 @@
             this.setStatus('LOADING SNAP WEB DSP...');
             try {
                 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                this.context = new AudioContextClass({ latencyHint: 'interactive' });
-                await this.context.audioWorklet.addModule('Plugin/snap-web/snap-worklet.js');
+                this.context = new AudioContextClass({ latencyHint: 'interactive', sampleRate:48000 });
+                await this.context.audioWorklet.addModule('Plugin/snap-web/snap-worklet.js?v=1.2.4');
 
-                const wasmResponse = await fetch('Plugin/snap-web/snap_dsp.wasm', { cache: 'no-cache' });
+                const wasmResponse = await fetch('Plugin/snap-web/snap_dsp.wasm?v=1.2.4', { cache: 'no-cache' });
                 if (!wasmResponse.ok) throw new Error('WASM HTTP ' + wasmResponse.status);
                 const wasmBytes = await wasmResponse.arrayBuffer();
 
@@ -160,6 +468,7 @@
 
         setParam(name, value) {
             if (name === 'signalMode' || name === 'driveCpuHigh') value = 0;
+            if (name === 'inputLowCut') value = Math.max(0, Math.min(3, Math.round(Number(value) || 0)));
             if (name === 'cabMode') value = Math.max(0, Math.min(4, Math.round(Number(value) || 0)));
             this.params[name] = Number(value);
             if (window.SnapWebUi) window.SnapWebUi.sync(this.params);
@@ -177,7 +486,8 @@
                 devNaturalComp:P.DEV_NATURAL_COMP,
                 devDriveClipDb:P.DEV_DRIVE_CLIP_DB,
                 devDriveLowCutHz:P.DEV_DRIVE_LOW_CUT_HZ,
-                devDriveHighCutHz:P.DEV_DRIVE_HIGH_CUT_HZ
+                devDriveHighCutHz:P.DEV_DRIVE_HIGH_CUT_HZ,
+                inputLowCut:P.INPUT_LOW_CUT
             };
             if (name === 'cabMode') return this.applyCabMode(Number(value));
             if (map[name] !== undefined) this.send(map[name], value);
@@ -237,7 +547,19 @@
             const DISPLAY_METER_OFFSET_DB = 6.0;
             const raw = Number(db);
             const displayDb = Number.isFinite(raw) ? raw + DISPLAY_METER_OFFSET_DB : -60;
-            const v = Math.max(-60, Math.min(0, displayDb));
+            const now = performance.now();
+            const delta = this.meterTime ? Math.min(.1, (now-this.meterTime)/1000) : 1/60;
+            this.meterTime = now;
+            const input = Math.max(-60, Math.min(0, displayDb));
+            this.displayedPeak = Math.max(input, this.displayedPeak-54*delta);
+            if (input >= this.heldPeak) { this.heldPeak=input; this.holdUntil=now+400; }
+            else if (now >= this.holdUntil) this.heldPeak=Math.max(this.displayedPeak, this.heldPeak-33*delta);
+            const v = this.displayedPeak;
+            if (this.peakHold) {
+                this.peakHold.style.left = ((this.heldPeak+60)/60*100).toFixed(2)+'%';
+                this.peakHold.style.display = this.heldPeak > -60 ? 'block' : 'none';
+                this.peakHold.closest('.snap134-meter').classList.toggle('is-clipping', displayDb >= -.1);
+            }
 
             if (this.meterFill) {
                 this.meterFill.style.width = (((v + 60) / 60) * 100).toFixed(1) + '%';

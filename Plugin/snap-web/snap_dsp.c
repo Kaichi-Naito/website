@@ -1,9 +1,10 @@
-// SNAP Web DSP core — updated from SNAP v0.4.109 PluginProcessor DSP.
-// Browser-oriented standalone core: Gate -> Compressor -> Drive/SNAP -> 10-band EQ.
-// CAB convolution is performed by Web Audio ConvolverNodes using the same IR WAVs.
-// Browser-only constraints remain MONO + DRIVE CPU LOW (4x); DSP voicing follows v0.4.109.
-
-// Freestanding WebAssembly build: math functions are imported from JavaScript.
+// SNAP Web DSP v1.2.4. Gate -> native LOW CUT -> native Full NAM COMP -> Drive -> EQ.
+// Native compressor, calibration and sample-rate conversion are compiled unchanged.
+// Browser-only MONO / DRIVE LOW (4x) constraints and CAB Web Audio routing remain.
+extern int snap_native_init(float);
+extern void snap_native_low_cut(float*, int, int);
+extern void snap_native_comp(float*, int, float, float, float, int);
+extern void snap_native_reset_filter(void);
 extern double exp(double);
 extern double pow(double, double);
 extern double tanh(double);
@@ -13,8 +14,7 @@ extern double asinh(double);
 extern double log(double);
 
 #define MAX_FRAMES 128
-#define MAX_COMP_DELAY 1024
-#define NUM_CH 2
+#define NUM_CH 1
 #define NUM_EQ 10
 #define PI 3.1415926535897932384626433832795
 #define LN10 2.3025850929940456840179914546844
@@ -53,14 +53,14 @@ enum {
     P_EQ1K = 18, P_EQ2K = 19, P_EQ4K = 20, P_EQ8K = 21, P_EQ16K = 22, P_EQ_OUT = 23,
     P_SIGNAL_MODE = 24, P_DRIVE_CPU_HIGH = 25,
     P_DEV_DIRECT_OFF = 26, P_DEV_TRANSIENT_OFF = 27, P_DEV_DIRECT_ON = 28, P_DEV_TRANSIENT_ON = 29,
-    P_DEV_NATURAL_COMP = 30, P_DEV_DRIVE_CLIP_DB = 31, P_DEV_DRIVE_LOW_CUT_HZ = 32, P_DEV_DRIVE_HIGH_CUT_HZ = 33
+    P_DEV_NATURAL_COMP = 30, P_DEV_DRIVE_CLIP_DB = 31, P_DEV_DRIVE_LOW_CUT_HZ = 32, P_DEV_DRIVE_HIGH_CUT_HZ = 33, P_INPUT_LOW_CUT = 34
 };
 
 typedef struct {
     float inputTrim, gate, comp, compVol, compTone;
     float compOn, drive, snap, tone, level, driveOn, boost;
     float eqOn, eq[NUM_EQ], eqOut;
-    float signalMode, driveCpuHigh;
+    float signalMode, driveCpuHigh, inputLowCut;
     float devDirectOff, devTransientOff, devDirectOn, devTransientOn;
     float devNaturalComp, devDriveClipDb, devDriveLowCutHz, devDriveHighCutHz;
 } Params;
@@ -79,20 +79,6 @@ static float baseSmoothCoeff = 0.001f;
 static float gateDetectorEnvelope, gateGain;
 static float gateDetectorAttackCoeff, gateDetectorReleaseCoeff, gateOpenCoeff, gateCloseCoeff;
 static int gateHoldSamples, gateHoldRemaining, gateIsOpen;
-
-// Compressor. v0.4.109: one visible COMP control drives two hidden serial stages.
-typedef struct {
-    float detectorHpIn, detectorHpOut;
-    float detectorRmsSquared;
-    float toneLp;
-} CompState;
-static CompState compStage1State[NUM_CH], compStage2State[NUM_CH];
-static float compStage1Delay[NUM_CH][MAX_COMP_DELAY];
-static float compStage2Delay[NUM_CH][MAX_COMP_DELAY];
-static int compDelaySize, compStage1Lookahead, compStage2Lookahead, compWrite;
-static float compStage1GainReductionDb, compStage2GainReductionDb;
-static float compUpwardGainDb;
-static float compUpwardRiseCoeff, compUpwardFallCoeff;
 
 // Drive.
 typedef struct {
@@ -119,13 +105,8 @@ static float inputPeakDb = -60.0f;
 static void clear_states(void) {
     int ch, i, b;
     gateDetectorEnvelope = 0.0f; gateGain = 1.0f; gateHoldRemaining = 0; gateIsOpen = 1;
-    compWrite = 0; compStage1GainReductionDb = 0.0f; compStage2GainReductionDb = 0.0f; compUpwardGainDb = 0.0f;
+    snap_native_reset_filter();
     for (ch=0; ch<NUM_CH; ++ch) {
-        CompState* s1=&compStage1State[ch];
-        CompState* s2=&compStage2State[ch];
-        s1->detectorHpIn=s1->detectorHpOut=s1->detectorRmsSquared=s1->toneLp=0.0f;
-        s2->detectorHpIn=s2->detectorHpOut=s2->detectorRmsSquared=s2->toneLp=0.0f;
-        for (i=0;i<MAX_COMP_DELAY;++i) { compStage1Delay[ch][i]=0.0f; compStage2Delay[ch][i]=0.0f; }
         DriveState* ds=&driveState[ch];
         ds->inputHp1In=ds->inputHp1Out=ds->inputHp2In=ds->inputHp2Out=0.0f;
         ds->inputHp3In=ds->inputHp3Out=ds->inputHp4In=ds->inputHp4Out=0.0f;
@@ -144,28 +125,6 @@ static float gate_threshold_db(float amount) {
     float n = remapped / 10.0f;
     if (n <= 0.0001f) return -1000.0f;
     return -78.0f + 50.0f * (float)pow((double)n, 0.72);
-}
-
-static float comp_gr_db(float detectorDb, float thresholdDb, float ratio) {
-    const float kneeWidthDb=12.0f, halfKnee=6.0f;
-    float diff=detectorDb-thresholdDb, slope=1.0f-(1.0f/ratio);
-    if (diff <= -halfKnee) return 0.0f;
-    if (diff >= halfKnee) return -diff*slope;
-    float kp=diff+halfKnee;
-    return -slope*kp*kp/(2.0f*kneeWidthDb);
-}
-
-static float lookup_comp_curve(float n, const float* values) {
-    float scaled=clampf(n,0,1)*10.0f;
-    int lo=(int)scaled; if(lo<0)lo=0; if(lo>9)lo=9;
-    int hi=lo+1; if(hi>10)hi=10;
-    float t=clampf(scaled-(float)lo,0,1); float st=t*t*(3-2*t);
-    return values[lo]+(values[hi]-values[lo])*st;
-}
-
-static float fixed_makeup_db(float n) {
-    static const float values[11]={0.0f,0.2f,0.7f,1.5f,2.8f,4.5f,5.3f,6.1f,6.9f,7.7f,8.5f};
-    return lookup_comp_curve(n, values);
 }
 
 // 1N4148-inspired feedback solver copied from v0.4.80 equations.
@@ -241,7 +200,7 @@ static void init_params(void){
     p.inputTrim=0; p.gate=1; p.comp=5; p.compVol=5; p.compTone=5; p.compOn=1;
     p.drive=5; p.snap=5; p.tone=5; p.level=5; p.driveOn=1; p.boost=0;
     p.eqOn=0; int i; for(i=0;i<NUM_EQ;++i)p.eq[i]=0; p.eqOut=0;
-    p.signalMode=0; p.driveCpuHigh=0;
+    p.signalMode=0; p.driveCpuHigh=0; p.inputLowCut=0;
     p.devDirectOff=100; p.devTransientOff=100; p.devDirectOn=0; p.devTransientOn=50;
     p.devNaturalComp=1.0f; p.devDriveClipDb=-9.2f; p.devDriveLowCutHz=99.5f; p.devDriveHighCutHz=5150.0f;
     sInputTrim=p.inputTrim; sGate=p.gate; sComp=p.comp; sCompVol=p.compVol; sCompTone=p.compTone;
@@ -254,15 +213,7 @@ __attribute__((export_name("snap_init"))) void snap_init(float sampleRate){
     sr=sampleRate>8000?sampleRate:48000;
     init_params(); clear_states();
     baseSmoothCoeff=1.0f-(float)exp(-1.0/(0.025*(double)sr));
-    compStage1Lookahead=(int)(sr*0.0010f+0.5f); if(compStage1Lookahead<1)compStage1Lookahead=1;
-    compStage2Lookahead=(int)(sr*0.0005f+0.5f); if(compStage2Lookahead<1)compStage2Lookahead=1;
-    int compMaxLookahead=compStage1Lookahead>compStage2Lookahead?compStage1Lookahead:compStage2Lookahead;
-    if(compMaxLookahead>MAX_COMP_DELAY-MAX_FRAMES-2)compMaxLookahead=MAX_COMP_DELAY-MAX_FRAMES-2;
-    if(compStage1Lookahead>compMaxLookahead)compStage1Lookahead=compMaxLookahead;
-    if(compStage2Lookahead>compMaxLookahead)compStage2Lookahead=compMaxLookahead;
-    compDelaySize=compMaxLookahead+MAX_FRAMES+2; if(compDelaySize>MAX_COMP_DELAY)compDelaySize=MAX_COMP_DELAY;
-    compUpwardRiseCoeff=(float)exp(-1.0/(0.010*(double)sr));
-    compUpwardFallCoeff=(float)exp(-1.0/(0.005*(double)sr));
+    snap_native_init(sr);
     gateHoldSamples=(int)(sr*0.006f+0.5f); if(gateHoldSamples<1)gateHoldSamples=1; gateHoldRemaining=gateHoldSamples;
     gateDetectorAttackCoeff=(float)exp(-1.0/(0.00004*(double)sr));
     gateDetectorReleaseCoeff=(float)exp(-1.0/(0.008*(double)sr));
@@ -290,8 +241,9 @@ __attribute__((export_name("snap_set_param"))) void snap_set_param(int id,float 
         case P_EQ_ON:p.eqOn=v>0.5f;break;
         case P_EQ31:case P_EQ62:case P_EQ125:case P_EQ250:case P_EQ500:case P_EQ1K:case P_EQ2K:case P_EQ4K:case P_EQ8K:case P_EQ16K:{ int b=id-P_EQ31; p.eq[b]=clampf(v,-12,12); update_eq_coeff(b,p.eq[b]); break; }
         case P_EQ_OUT:p.eqOut=clampf(v,-18,18);break;
-        case P_SIGNAL_MODE:p.signalMode=v>=0.5f?1.0f:0.0f;break;
-        case P_DRIVE_CPU_HIGH:p.driveCpuHigh=v>0.5f;break;
+        case P_SIGNAL_MODE:p.signalMode=0;break;
+        case P_DRIVE_CPU_HIGH:p.driveCpuHigh=0;break;
+        case P_INPUT_LOW_CUT:p.inputLowCut=clampf((float)(int)(v+0.5f),0,3);break;
         case P_DEV_DIRECT_OFF:p.devDirectOff=clampf(v,0,100);break;
         case P_DEV_TRANSIENT_OFF:p.devTransientOff=clampf(v,0,100);break;
         case P_DEV_DIRECT_ON:p.devDirectOn=clampf(v,0,100);break;
@@ -329,122 +281,9 @@ static void process_gate(float* L,float* R,int n){
 }
 
 static void process_comp(float* L,float* R,int n){
-    extern double sqrt(double);
-    static const float preGainDb[11]={0.0f,1.0f,2.0f,3.0f,4.5f,6.5f,8.0f,9.5f,10.5f,11.5f,12.5f};
-    static const float th1[11]={0.0f,-5.0f,-7.0f,-9.0f,-10.0f,-12.0f,-13.0f,-14.0f,-15.0f,-16.0f,-18.0f};
-    static const float ra1[11]={1.0f,1.2f,1.4f,1.6f,1.9f,2.2f,2.5f,2.8f,3.1f,3.4f,3.8f};
-    static const float th2[11]={0.0f,-10.0f,-13.0f,-16.0f,-19.0f,-22.0f,-24.0f,-26.0f,-28.0f,-30.0f,-32.0f};
-    static const float ra2[11]={1.0f,1.3f,1.6f,1.9f,2.2f,2.8f,3.2f,3.6f,4.0f,4.5f,5.0f};
-    static const float upTh[11]={-120.0f,-50.0f,-44.0f,-39.0f,-35.0f,-32.0f,-31.0f,-30.0f,-29.0f,-28.0f,-27.0f};
-    static const float upRa[11]={1.0f,1.15f,1.30f,1.50f,1.70f,2.0f,2.2f,2.4f,2.6f,2.8f,3.0f};
-    static const float upMax[11]={0.0f,0.6f,1.5f,2.5f,4.0f,6.0f,7.0f,8.0f,9.0f,10.0f,11.0f};
-
-    const float detectorHpCoeff=(float)exp(-2.0*PI*95.0/(double)sr);
-    const float stage1Attack=(float)exp(-1.0/(0.00015*(double)sr));
-    const float stage1Release=(float)exp(-1.0/(0.020*(double)sr));
-    const float stage1Rms=(float)exp(-1.0/(0.004*(double)sr));
-    const float stage2Attack=(float)exp(-1.0/(0.00050*(double)sr));
-    const float stage2Release=(float)exp(-1.0/(0.055*(double)sr));
-    const float stage2Rms=(float)exp(-1.0/(0.012*(double)sr));
-    const float splitC=1.0f-(float)exp(-2.0*PI*2400.0/(double)sr);
-    const int enabled=p.compOn>0.5f;
-    int i,ch;
-    float* arr[2]={L,R};
-
-    for(i=0;i<n;++i){
-        sComp=smooth_to(sComp,p.comp,baseSmoothCoeff);
-        sCompTone=smooth_to(sCompTone,p.compTone,baseSmoothCoeff);
-        sCompVol=smooth_to(sCompVol,p.compVol,baseSmoothCoeff);
-
-        float an=clampf(sComp/10.0f,0.0f,1.0f);
-        float pgDb=enabled?lookup_comp_curve(an,preGainDb):0.0f;
-        float pg=db_to_gain(pgDb);
-        float threshold1=lookup_comp_curve(an,th1), ratio1=lookup_comp_curve(an,ra1);
-        float threshold2=lookup_comp_curve(an,th2), ratio2=lookup_comp_curve(an,ra2);
-
-        int read1=compWrite-compStage1Lookahead; while(read1<0)read1+=compDelaySize;
-        int read2=compWrite-compStage2Lookahead; while(read2<0)read2+=compDelaySize;
-
-        // Stage 1 input is full-range programme audio with compensated pre-gain.
-        for(ch=0;ch<2;++ch) compStage1Delay[ch][compWrite]=arr[ch][i]*pg;
-
-        // Stage 1 detector: 95 Hz HPF, 45/55 peak/RMS energy blend.
-        float hybrid1=0.0f;
-        for(ch=0;ch<2;++ch){
-            CompState* s=&compStage1State[ch];
-            float ds=one_hp(compStage1Delay[ch][compWrite],&s->detectorHpIn,&s->detectorHpOut,detectorHpCoeff);
-            float pk=absf(ds), sq=ds*ds;
-            s->detectorRmsSquared=stage1Rms*s->detectorRmsSquared+(1.0f-stage1Rms)*sq;
-            float rms=(float)sqrt(s->detectorRmsSquared>0.0f?s->detectorRmsSquared:0.0f);
-            float h=(float)sqrt(0.45f*pk*pk+0.55f*rms*rms);
-            if(h>hybrid1)hybrid1=h;
-        }
-        float d1=gain_to_db(hybrid1,-120.0f);
-        float target1=comp_gr_db(d1,threshold1,ratio1);
-        float coef1=target1<compStage1GainReductionDb?stage1Attack:stage1Release;
-        compStage1GainReductionDb=coef1*compStage1GainReductionDb+(1.0f-coef1)*target1;
-        float gain1=enabled?db_to_gain(compStage1GainReductionDb):1.0f;
-
-        // Feed Stage 1 delayed output directly into hidden Stage 2.
-        for(ch=0;ch<2;++ch)
-            compStage2Delay[ch][compWrite]=compStage1Delay[ch][read1]*gain1;
-
-        // Stage 2 detector: slower, RMS-dominant 10/90 energy blend.
-        float hybrid2=0.0f;
-        for(ch=0;ch<2;++ch){
-            CompState* s=&compStage2State[ch];
-            float ds=one_hp(compStage2Delay[ch][compWrite],&s->detectorHpIn,&s->detectorHpOut,detectorHpCoeff);
-            float pk=absf(ds), sq=ds*ds;
-            s->detectorRmsSquared=stage2Rms*s->detectorRmsSquared+(1.0f-stage2Rms)*sq;
-            float rms=(float)sqrt(s->detectorRmsSquared>0.0f?s->detectorRmsSquared:0.0f);
-            float h=(float)sqrt(0.10f*pk*pk+0.90f*rms*rms);
-            if(h>hybrid2)hybrid2=h;
-        }
-        float d2=gain_to_db(hybrid2,-120.0f);
-        float target2=comp_gr_db(d2,threshold2,ratio2);
-        float coef2=target2<compStage2GainReductionDb?stage2Attack:stage2Release;
-        compStage2GainReductionDb=coef2*compStage2GainReductionDb+(1.0f-coef2)*target2;
-
-        // Deterministic fixed makeup plus bounded upward leveller.
-        float makeupDb=enabled?fixed_makeup_db(an):0.0f;
-        float upwardThreshold=lookup_comp_curve(an,upTh);
-        float upwardRatio=lookup_comp_curve(an,upRa);
-        float upwardMaximum=lookup_comp_curve(an,upMax);
-        float upwardDetectorDb=gain_to_db(hybrid1,-120.0f)-pgDb;
-        float desiredUp=0.0f;
-        if(enabled && upwardRatio>1.0001f && upwardDetectorDb<upwardThreshold && upwardDetectorDb>-78.0f){
-            float raw=(upwardThreshold-upwardDetectorDb)*(1.0f-1.0f/upwardRatio);
-            float activity=clampf((upwardDetectorDb+78.0f)/14.0f,0.0f,1.0f);
-            desiredUp=(raw<upwardMaximum?raw:upwardMaximum)*activity;
-        }
-        if(!enabled) compUpwardGainDb=0.0f;
-        else {
-            float uc=desiredUp>compUpwardGainDb?compUpwardRiseCoeff:compUpwardFallCoeff;
-            compUpwardGainDb=uc*compUpwardGainDb+(1.0f-uc)*desiredUp;
-        }
-        float postBoost=enabled?clampf(makeupDb+compUpwardGainDb,0.0f,24.0f):0.0f;
-        float finalStageDb=enabled?compStage2GainReductionDb+postBoost-pgDb:0.0f;
-
-        // v0.4.94 COMP TONE: exact neutral at 5, post-compression only.
-        float tn=clampf(sCompTone/10.0f,0.0f,1.0f);
-        float centered=(tn-0.5f)*2.0f;
-        float shaped=0.0f;
-        if(absf(centered)>1.0e-9f) shaped=(centered<0.0f?-1.0f:1.0f)*(float)pow(absf(centered),0.85);
-        float lowDb=shaped<=0.0f ? (-2.5f*shaped) : (-1.5f*shaped);
-        float highDb=shaped<=0.0f ? (9.0f*shaped) : (7.0f*shaped);
-        float lowG=db_to_gain(lowDb), highG=db_to_gain(highDb);
-        float volDb=-18.0f+36.0f*(sCompVol/10.0f);
-        float stage2FinalGain=db_to_gain(finalStageDb+volDb);
-
-        for(ch=0;ch<2;++ch){
-            CompState* s=&compStage2State[ch];
-            float delayed=compStage2Delay[ch][read2];
-            float wet=enabled?delayed*stage2FinalGain:delayed;
-            float lo=one_lp(wet,&s->toneLp,splitC), hi=wet-lo;
-            arr[ch][i]=lo*lowG+hi*highG;
-        }
-        compWrite=(compWrite+1)%compDelaySize;
-    }
+    snap_native_low_cut(L,n,(int)p.inputLowCut);
+    snap_native_comp(L,n,p.comp,p.compTone,p.compVol,p.compOn>0.5f);
+    for(int i=0;i<n;++i)R[i]=L[i];
 }
 
 static float drive_one_os(float x,DriveState* s,float osRate,float drive,float snap,float tone,float level,float boost,float ddOff,float dtOff,float ddOn,float dtOn,float clipDb,float highCutHz,PeakCoeff5 snapBell,PeakCoeff5 body125,PeakCoeff5 body250){
@@ -480,18 +319,18 @@ static void process_drive(float* L,float* R,int n){
     for(i=0;i<n;++i){
         sDevDriveLowCutHz=smooth_to(sDevDriveLowCutHz,p.devDriveLowCutHz,baseSmoothCoeff); float hpC=(float)exp(-2.0*PI*clampf(sDevDriveLowCutHz,10,300)/(double)sr);
         float filtered[2], previous[2], sum[2]={0,0};
-        for(ch=0;ch<2;++ch){ DriveState* st=&driveState[ch]; float x=arr[ch][i]; float h1=one_hp(x,&st->inputHp1In,&st->inputHp1Out,hpC); filtered[ch]=one_hp(h1,&st->inputHp2In,&st->inputHp2Out,hpC); previous[ch]=st->interpPrev; }
+        for(ch=0;ch<NUM_CH;++ch){ DriveState* st=&driveState[ch]; float x=arr[ch][i]; float h1=one_hp(x,&st->inputHp1In,&st->inputHp1Out,hpC); filtered[ch]=one_hp(h1,&st->inputHp2In,&st->inputHp2Out,hpC); previous[ch]=st->interpPrev; }
         for(k=0;k<F;++k){
             float t=(float)(k+1)/(float)F;
             sDrive=smooth_to(sDrive,p.drive,osSmooth); sSnap=smooth_to(sSnap,p.snap,osSmooth); sTone=smooth_to(sTone,p.tone,osSmooth); sLevel=smooth_to(sLevel,p.level,osSmooth); sBoost=smooth_to(sBoost,p.boost,boostSmooth);
             sDevDirectOff=smooth_to(sDevDirectOff,p.devDirectOff,osSmooth); sDevTransientOff=smooth_to(sDevTransientOff,p.devTransientOff,osSmooth); sDevDirectOn=smooth_to(sDevDirectOn,p.devDirectOn,osSmooth); sDevTransientOn=smooth_to(sDevTransientOn,p.devTransientOn,osSmooth); sDevDriveClipDb=smooth_to(sDevDriveClipDb,p.devDriveClipDb,osSmooth); sDevDriveHighCutHz=smooth_to(sDevDriveHighCutHz,p.devDriveHighCutHz,osSmooth);
-            for(ch=0;ch<2;++ch){ float xi=previous[ch]+(filtered[ch]-previous[ch])*t; sum[ch]+=drive_one_os(xi,&driveState[ch],osRate,sDrive,sSnap,sTone,sLevel,sBoost,sDevDirectOff,sDevTransientOff,sDevDirectOn,sDevTransientOn,sDevDriveClipDb,sDevDriveHighCutHz,snapBell,body125,body250); }
+            for(ch=0;ch<NUM_CH;++ch){ float xi=previous[ch]+(filtered[ch]-previous[ch])*t; sum[ch]+=drive_one_os(xi,&driveState[ch],osRate,sDrive,sSnap,sTone,sLevel,sBoost,sDevDirectOff,sDevTransientOff,sDevDirectOn,sDevTransientOn,sDevDriveClipDb,sDevDriveHighCutHz,snapBell,body125,body250); }
         }
-        for(ch=0;ch<2;++ch){ driveState[ch].interpPrev=filtered[ch]; arr[ch][i]=sum[ch]/(float)F; }
+        for(ch=0;ch<NUM_CH;++ch){ driveState[ch].interpPrev=filtered[ch]; arr[ch][i]=sum[ch]/(float)F; }
     }
 }
 
-static void process_eq(float* L,float* R,int n){ if(p.eqOn<=0.5f)return; int i,b,ch; float* arr[2]={L,R}; for(ch=0;ch<2;++ch)for(i=0;i<n;++i){float x=arr[ch][i];for(b=0;b<NUM_EQ;++b)x=biquad_process(&eqState[ch][b],x);arr[ch][i]=x*db_to_gain(p.eqOut);} }
+static void process_eq(float* L,float* R,int n){ if(p.eqOn<=0.5f)return; int i,b,ch; float* arr[2]={L,R}; for(ch=0;ch<NUM_CH;++ch)for(i=0;i<n;++i){float x=arr[ch][i];for(b=0;b<NUM_EQ;++b)x=biquad_process(&eqState[ch][b],x);arr[ch][i]=x*db_to_gain(p.eqOut);} }
 
 __attribute__((export_name("snap_process"))) void snap_process(int frames){
     if(frames<0)frames=0;if(frames>MAX_FRAMES)frames=MAX_FRAMES; int i;

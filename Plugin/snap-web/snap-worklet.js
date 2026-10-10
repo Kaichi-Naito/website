@@ -1,3 +1,5 @@
+import createSnapDsp from './snap-runtime.mjs?v=1.2.4';
+
 class SnapWebProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
@@ -5,27 +7,25 @@ class SnapWebProcessor extends AudioWorkletProcessor {
         this.exports = null;
         this.inL = this.inR = this.outL = this.outR = null;
         this.meterCounter = 0;
+        this.meterPeakDb = -60;
         this.pendingParams = [];
 
         this.port.onmessage = async (event) => {
             const data = event.data || {};
             if (data.type === 'init' && data.wasmBytes) {
                 try {
-                    const env = {
-                        exp: Math.exp,
-                        pow: Math.pow,
-                        sin: Math.sin,
-                        cos: Math.cos,
-                        log: Math.log,
-                        tanh: Math.tanh,
-                        asinh: Math.asinh,
-                        sinh: Math.sinh,
-                        cosh: Math.cosh,
-                        sqrt: Math.sqrt
-                    };
-                    const result = await WebAssembly.instantiate(data.wasmBytes, { env });
-                    this.exports = result.instance.exports;
+                    const module = await createSnapDsp({ wasmBinary:data.wasmBytes });
+                    // Keep the small existing processing interface; the generated runtime
+                    // handles native C++ startup, SIMD, exceptions and resampling memory.
+                    this.exports = { memory:{ get buffer() { return module.HEAPF32.buffer; } } };
+                    for (const name of ['snap_init','snap_reset','snap_set_param',
+                        'snap_get_input_l','snap_get_input_r','snap_get_output_l','snap_get_output_r',
+                        'snap_get_input_peak_db','snap_get_gate_closed','snap_process']) {
+                        this.exports[name] = module['_' + name];
+                    }
                     this.exports.snap_init(sampleRate);
+                    const error = module.UTF8ToString(module._snap_native_error());
+                    if (error) throw new Error(error);
                     this.refreshViews();
                     for (const [id, value] of this.pendingParams) {
                         this.exports.snap_set_param(id, value);
@@ -85,12 +85,14 @@ class SnapWebProcessor extends AudioWorkletProcessor {
             out1[i] = this.outR[i];
         }
 
+        this.meterPeakDb = Math.max(this.meterPeakDb, this.exports.snap_get_input_peak_db());
         if ((++this.meterCounter & 7) === 0) {
             this.port.postMessage({
                 type: 'meter',
-                db: this.exports.snap_get_input_peak_db(),
+                db: this.meterPeakDb,
                 gateClosed: Boolean(this.exports.snap_get_gate_closed())
             });
+            this.meterPeakDb = -60;
         }
         return true;
     }

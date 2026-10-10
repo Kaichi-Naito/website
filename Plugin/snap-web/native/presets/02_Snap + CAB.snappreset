@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PARAMETERS backgroundStyle="0">
+  <PARAM id="inputLowCut" value="2.0"/>
+  <PARAM id="attack" value="7.599999904632568"/>
+  <PARAM id="boostEnabled" value="0.0"/>
+  <PARAM id="cabEnabled" value="0.0"/>
+  <PARAM id="cabMode" value="3.0"/>
+  <PARAM id="compressorAmount" value="7.029999732971191"/>
+  <PARAM id="compressorEnabled" value="1.0"/>
+  <PARAM id="compressorTone" value="5.0"/>
+  <PARAM id="compressorVolume" value="5.0"/>
+  <PARAM id="drive" value="6.119999885559082"/>
+  <PARAM id="enabled" value="1.0"/>
+  <PARAM id="eq125" value="0.0"/>
+  <PARAM id="eq16k" value="7.600000381469727"/>
+  <PARAM id="eq1k" value="0.0"/>
+  <PARAM id="eq250" value="0.0"/>
+  <PARAM id="eq2k" value="-3.060000419616699"/>
+  <PARAM id="eq31" value="-2.829999923706055"/>
+  <PARAM id="eq4k" value="4.090000152587891"/>
+  <PARAM id="eq500" value="-3.65000057220459"/>
+  <PARAM id="eq62" value="0.0"/>
+  <PARAM id="eq8k" value="7.719999313354492"/>
+  <PARAM id="eqEnabled" value="1.0"/>
+  <PARAM id="eqOutputGain" value="0.0"/>
+  <PARAM id="gate" value="1.049999952316284"/>
+  <PARAM id="inputTrim" value="0.0"/>
+  <PARAM id="level" value="4.289999961853027"/>
+  <PARAM id="signalMode" value="0.0"/>
+  <PARAM id="tone" value="3.470000028610229"/>
+  <PARAM id="devDirectMixBoostOff"/>
+  <PARAM id="devDirectMixBoostOn"/>
+  <PARAM id="devTransientMixBoostOff"/>
+  <PARAM id="devTransientMixBoostOn" value="50.0"/>
+  <PARAM id="devNaturalComp"/>
+  <PARAM id="devDriveClipDb"/>
+  <PARAM id="devDriveHighCutHz"/>
+  <PARAM id="devDriveLowCutHz"/>
+</PARAMETERS>

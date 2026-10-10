@@ -1,4 +1,4 @@
-/* SNAP UI 0.4.134. Coordinates follow the 1240 x 790 JUCE editor.
+/* SNAP UI v1.2.4. Coordinates follow the 1240 x 790 JUCE editor.
    The plate is rendered by SceneRenderer.cpp with the original FluidArt assets.
    Text uses the supplied alpha masks; currentColor gives exact theme colours. */
 #snap-vst-ui {
@@ -47,7 +47,7 @@
 #snap-vst-ui .snap134-gear .snap-gear-tooth { fill:currentColor; }
 .snap134-meter { background:rgba(65,67,70,.17); border-radius:.5cqw; overflow:hidden; }
 #snap-vst-ui #web-input-meter-fill { background:linear-gradient(90deg,#95d8cf,#aba6d6); border-radius:.5cqw; }
-.snap134-target { position:absolute; left:60%; width:30%; inset-block:0; z-index:2; display:flex; justify-content:center; align-items:center; background:var(--target-fill); color:var(--target-ink); border-radius:.4cqw; --label-height:.694cqw; }
+.snap134-target { position:absolute; left:50%; width:40%; inset-block:0; z-index:2; display:flex; justify-content:center; align-items:center; background:var(--target-fill); color:var(--target-ink); border-radius:.4cqw; --label-height:.694cqw; }
 .snap134-tick { position:absolute; top:0; transform:translateX(-50%); --label-height:.694cqw; }
 .snap134-meter-value { font-size:1cqw; }
 .snap134-trim-label,.snap134-utility-label { --label-height:.694cqw; }
@@ -128,3 +128,10 @@
 @keyframes snap-web-gear-idle-spin {
     to { transform: rotate(360deg); }
 }
+
+/* v1.2.4: target -30..-6 dB, WATER hold uses the exact scene ink. */
+.snap134-peak-hold { position:absolute; top:1px; bottom:1px; width:2px; transform:translateX(-1px); background:var(--scene-ink); z-index:3; pointer-events:none; display:none; }
+#snap-vst-ui[data-background="wood"] .snap134-peak-hold { background:rgba(255,255,255,.9); }
+#snap-vst-ui .snap134-meter.is-clipping .snap134-peak-hold { background:#ed535c; }
+#snap-vst-ui .snap-low-cut-row .snap-segment { gap:.5cqw; flex-wrap:wrap; }
+#snap-vst-ui .snap-low-cut-row .snap-segment label { min-height:26px; padding:.35cqw .7cqw; font-size:1cqw; }
