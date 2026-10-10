@@ -196,3 +196,23 @@ test('AudioWorklet reports initialization errors and preserves queued controls',
     assert.equal(failed.ready,false);
     assert.ok(messages.some(x=>x.type==='error'&&x.message==='runtime unavailable'));
 });
+
+
+test('native runtime initializes in AudioWorklet scope without URL, fetch or document', async () => {
+    let Processor;
+    const messages=[];
+    const context=vm.createContext({console,WebAssembly,
+        AudioWorkletProcessor:class {constructor(){this.port={postMessage:x=>messages.push(x)};}},
+        sampleRate:48000,registerProcessor(name,type){Processor=type;}});
+    assert.equal(vm.runInContext('typeof URL',context),'undefined');
+    const runtime=file('snap-runtime.mjs').toString().replaceAll('import.meta.url',
+        JSON.stringify('https://example.test/snap-runtime.mjs')).replace('export default createSnapDsp;','');
+    vm.runInContext(runtime,context);
+    vm.runInContext(file('snap-worklet.js').toString().replace(/^import.*\n/,''),context);
+    const processor=new Processor();
+    await processor.port.onmessage({data:{type:'init',wasmBytes:file('snap_dsp.wasm')}});
+    assert.equal(processor.ready,true,JSON.stringify(messages));
+    const output=[new Float32Array(128),new Float32Array(128)];
+    processor.process([[new Float32Array(128).fill(.1)]],[output]);
+    assert.ok(output[0].every(Number.isFinite));
+});

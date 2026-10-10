@@ -8,7 +8,8 @@ The original NamCompressor.cpp/.h, CompNamCalibration.h and InputLowCut.h are
 compiled unchanged. The bridge uses one Full (8-channel) NAM stream in MONO,
 including native calibration, 20 ms control smoothing, warmup, and the original
 Lanczos conversion at host rates other than the model's 48 kHz. No Lite model
-or old two-stage compressor is substituted. AudioContext requests 48 kHz.
+or old two-stage compressor is substituted. AudioContext requests 48 kHz. The AudioWorklet supplies locateFile alongside
+preloaded WASM bytes: its global scope has no URL constructor.
 
 Processing: internal +5 dB / TRIM -> meter -> GATE -> INPUT LOW CUT -> NAM COMP
 -> DRIVE / BOOST -> graphic EQ -> CAB -> internal -5 dB.

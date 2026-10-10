@@ -359,7 +359,7 @@
             try {
                 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
                 this.context = new AudioContextClass({ latencyHint: 'interactive', sampleRate:48000 });
-                await this.context.audioWorklet.addModule('Plugin/snap-web/snap-worklet.js?v=1.2.4');
+                await this.context.audioWorklet.addModule('Plugin/snap-web/snap-worklet.js?v=1.2.4.1');
 
                 const wasmResponse = await fetch('Plugin/snap-web/snap_dsp.wasm?v=1.2.4', { cache: 'no-cache' });
                 if (!wasmResponse.ok) throw new Error('WASM HTTP ' + wasmResponse.status);

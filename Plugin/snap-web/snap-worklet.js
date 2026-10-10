@@ -14,7 +14,7 @@ class SnapWebProcessor extends AudioWorkletProcessor {
             const data = event.data || {};
             if (data.type === 'init' && data.wasmBytes) {
                 try {
-                    const module = await createSnapDsp({ wasmBinary:data.wasmBytes });
+                    const module = await createSnapDsp({ wasmBinary:data.wasmBytes, locateFile:name=>name });
                     // Keep the small existing processing interface; the generated runtime
                     // handles native C++ startup, SIMD, exceptions and resampling memory.
                     this.exports = { memory:{ get buffer() { return module.HEAPF32.buffer; } } };
