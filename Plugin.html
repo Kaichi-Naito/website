@@ -3060,11 +3060,11 @@
             <div class="snap-settings-row">
                 <label><span class="snap-art " role="img" aria-label="DISPLAY SIZE" style="--art:url('ui/v134/labels/label_03_white.png');--art-ratio:8.14583"></span></label>
                 <div class="snap-display-size-row">
-                    <button type="button" data-web-display-size="50">50%</button>
-                    <button type="button" data-web-display-size="75">75%</button>
-                    <button type="button" data-web-display-size="100">100%</button>
-                    <button type="button" data-web-display-size="125" class="is-selected">125%</button>
-                    <button type="button" data-web-display-size="150">150%</button>
+                    <button type="button" data-web-display-size="50" aria-label="50%"><span class="snap-art" role="img" aria-label="50%" style="--art:url('ui/v134/labels/label_60_white.png');--art-ratio:2.115183246073298"></span></button>
+                    <button type="button" data-web-display-size="75" aria-label="75%"><span class="snap-art" role="img" aria-label="75%" style="--art:url('ui/v134/labels/label_61_white.png');--art-ratio:2.1256544502617802"></span></button>
+                    <button type="button" data-web-display-size="100" aria-label="100%"><span class="snap-art" role="img" aria-label="100%" style="--art:url('ui/v134/labels/label_62_white.png');--art-ratio:2.6858638743455496"></span></button>
+                    <button type="button" data-web-display-size="125" class="is-selected" aria-label="125%"><span class="snap-art" role="img" aria-label="125%" style="--art:url('ui/v134/labels/label_63_white.png');--art-ratio:2.671875"></span></button>
+                    <button type="button" data-web-display-size="150" aria-label="150%"><span class="snap-art" role="img" aria-label="150%" style="--art:url('ui/v134/labels/label_64_white.png');--art-ratio:2.6858638743455496"></span></button>
                 </div>
             </div>
 
@@ -3084,7 +3084,7 @@
 <div class="snap-settings-row snap-low-cut-row">
     <label><span class="snap-art" role="img" aria-label="LOW CUT" style="--art:url('ui/v134/labels/label_65_white.png');--art-ratio:4.178010471204188"></span></label>
     <div class="snap-segment" data-segment-param="inputLowCut">
-        <label><input type="radio" name="inputLowCutUi" value="0"><span>OFF</span></label>
+        <label><input type="radio" name="inputLowCutUi" value="0"><span class="snap-art" role="img" aria-label="OFF" style="--art:url('ui/v134/labels/label_50_white.png');--art-ratio:2.0989583333333335"></span></label>
         <label><input type="radio" name="inputLowCutUi" value="1"><span class="snap-art" role="img" aria-label="60 Hz" style="--art:url('ui/v134/labels/label_57_white.png');--art-ratio:2.8020833333333335"></span></label>
         <label><input type="radio" name="inputLowCutUi" value="2"><span class="snap-art" role="img" aria-label="100 Hz" style="--art:url('ui/v134/labels/label_58_white.png');--art-ratio:3.3802083333333335"></span></label>
         <label><input type="radio" name="inputLowCutUi" value="3"><span class="snap-art" role="img" aria-label="150 Hz" style="--art:url('ui/v134/labels/label_59_white.png');--art-ratio:3.3802083333333335"></span></label>
@@ -3347,7 +3347,7 @@
     </div>
 
     <script src="Plugin/snap-web/snap-ui.js?v=1.2.4"></script>
-    <script src="Plugin/snap-web/snap-web.js?v=1.2.4.1"></script>
+    <script src="Plugin/snap-web/snap-web.js?v=1.2.4.2"></script>
 
     <script>
         function setInitialPositions() {
@@ -3519,7 +3519,8 @@
 
         function setSampleUi(isPlaying) {
             if (!samplePlayBtn || !sampleSelect) return;
-            var dspState = (window.snapWebEngine && window.snapWebEngine.ready) ? 'READY' : 'LOADING';
+            var dspState = (window.snapWebEngine && window.snapWebEngine.ready) ? 'READY' :
+                (window.snapWebEngine && window.snapWebEngine.initPromise ? 'LOADING' : 'STANDBY');
 
             if (isPlaying) {
                 samplePlayBtn.textContent = '■ STOP SAMPLE';
@@ -3636,6 +3637,15 @@
                 }
                 populateSampleSelect(files);
             })
+            .catch(function(apiError) {
+                // These entries come from this repository's actual sample files.
+                // A GitHub API rate limit must not disable the public sample player.
+                return fetch(SAMPLE_FOLDER + 'manifest.json?v=1.2.4.2')
+                    .then(function(response) {
+                        if (!response.ok) throw apiError;
+                        return response.json();
+                    }).then(populateSampleSelect);
+            })
             .catch(function(error) {
                 console.error('Could not load sample list:', error);
 
@@ -3694,17 +3704,28 @@
 
                 if (sampleAudio.paused) {
                     try {
-                        if (window.snapWebEngine) {
-                            sampleEngineStatus.textContent = 'STARTING SNAP WEB DSP...';
-                            await window.snapWebEngine.resume();
-                        }
-                        await sampleAudio.play();
+                        samplePlayBtn.disabled = true;
+                        sampleSelect.disabled = true;
+                        if (!window.snapWebEngine) throw new Error('SNAP engine unavailable');
+                        sampleEngineStatus.textContent = 'STARTING SNAP WEB DSP...';
+                        // Both permission requests must run inside this click, before
+                        // awaiting downloads or WASM initialization. The engine captures
+                        // the media element synchronously, so no dry audio can escape.
+                        var dspStart = window.snapWebEngine.resume();
+                        var mediaStart = sampleAudio.play();
+                        await Promise.all([dspStart, mediaStart]);
+                        sampleAudio.currentTime = 0;
+                        setSampleUi(true);
                     } catch (error) {
+                        sampleAudio.pause();
                         console.error(error);
                         if (sampleEngineStatus) {
-                            sampleEngineStatus.textContent =
-                                'PLAYBACK ERROR — ' + getSelectedSampleName();
+                            sampleEngineStatus.textContent = 'PLAYBACK ERROR — ' +
+                                (error.message || getSelectedSampleName());
                         }
+                    } finally {
+                        samplePlayBtn.disabled = false;
+                        sampleSelect.disabled = false;
                     }
                 } else {
                     sampleAudio.pause();

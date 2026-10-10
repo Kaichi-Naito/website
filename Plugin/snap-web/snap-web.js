@@ -350,7 +350,18 @@
 
         async init() {
             if (this.initPromise) return this.initPromise;
-            this.initPromise = this._init();
+            this.initPromise = this._init().catch(error => {
+                this.ready = false;
+                for (const node of [this.mediaSource, this.worklet, this.dryGain,
+                    this.cabAGain, this.cabBGain, this.convolverA, this.convolverB,
+                    this.master, this.limiter]) {
+                    if (node) node.disconnect();
+                }
+                if (this.worklet) this.worklet.port.close();
+                this.worklet = null;
+                this.initPromise = null;
+                throw error;
+            });
             return this.initPromise;
         }
 
@@ -358,14 +369,16 @@
             this.setStatus('LOADING SNAP WEB DSP...');
             try {
                 const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                this.context = new AudioContextClass({ latencyHint: 'interactive', sampleRate:48000 });
+                if (!this.context) this.context = new AudioContextClass({ latencyHint: 'interactive', sampleRate:48000 });
+                // Capture immediately, before any await. Playback can then be unlocked
+                // by the same user gesture without bypassing the pending DSP graph.
+                if (!this.mediaSource) this.mediaSource = this.context.createMediaElementSource(this.audioElement);
                 await this.context.audioWorklet.addModule('Plugin/snap-web/snap-worklet.js?v=1.2.4.1');
 
                 const wasmResponse = await fetch('Plugin/snap-web/snap_dsp.wasm?v=1.2.4', { cache: 'no-cache' });
                 if (!wasmResponse.ok) throw new Error('WASM HTTP ' + wasmResponse.status);
                 const wasmBytes = await wasmResponse.arrayBuffer();
 
-                this.mediaSource = this.context.createMediaElementSource(this.audioElement);
                 this.worklet = new AudioWorkletNode(this.context, 'snap-web-processor', {
                     numberOfInputs: 1,
                     numberOfOutputs: 1,
@@ -411,7 +424,7 @@
                         this.applyAllParams();
                         this.updateWebOutputGain(true);
                         this.applyCabMode(this.params.cabMode, true);
-                        this.setStatus('LOOP ON / SNAP WEB DSP: READY');
+                        this.setStatus((this.audioElement.paused ? '' : 'PLAYING / ') + 'LOOP ON / SNAP WEB DSP: READY');
                         if (this.browserStatus) {
                             this.browserStatus.textContent = 'Web DSP Ready';
                             this.browserStatus.className = 'status-ready';
@@ -458,8 +471,12 @@
         }
 
         async resume() {
-            await this.init();
-            if (this.context.state !== 'running') await this.context.resume();
+            const initialization = this.init();
+            // Do not await initialization before resume: suspended contexts may not
+            // deliver worklet messages, and browser gesture activation may expire.
+            const activation = this.context && this.context.state !== 'running'
+                ? this.context.resume() : Promise.resolve();
+            await Promise.all([initialization, activation]);
         }
 
         send(id, value) {
@@ -978,8 +995,9 @@
         document.getElementById('web-preset-select').value = initialPreset;
         applyPreset(engine, initialPreset);
 
-        // Construct the graph immediately so the media element never bypasses SNAP.
-        engine.init().catch(() => {});
+        // Start audio from PLAY SAMPLE rather than the page load. The audio context
+        // and media element must be unlocked by that same user gesture.
+        engine.setStatus('LOOP ON / SNAP WEB DSP: STANDBY');
     });
 
     window.SnapWebParams = P;

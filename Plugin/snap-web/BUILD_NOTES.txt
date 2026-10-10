@@ -34,6 +34,15 @@ UI: native dot artwork; LOW CUT settings and signal flow; GoodTarget -30..-6 dB;
 400 ms peak hold uses WATER #D01645 / WOOD white. Existing scene plates and CAB
 assets match the native version. UI/DSP cache keys are bumped together.
 
+v1.2.4.2 browser startup correction:
+- OFF and all five display-size buttons use the original native label PNGs.
+- AudioContext.resume and media.play are requested inside the PLAY SAMPLE
+  gesture, before awaiting WASM/IR downloads. The media source is captured
+  synchronously, preventing unprocessed playback during startup.
+- Failed initialization disconnects its graph and permits a new attempt.
+- GitHub sample-list API failures fall back to the local verified manifest.
+- Playback errors retain the actual error message for diagnosis.
+
 Validation performed:
 - Original native NAM infrastructure, model and mono/stereo checks passed.
 - C++ vs WASM comparison: 44.1 / 48 / 96 kHz x all four LOW CUT positions,

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "SNAP_sample_01_Strum.wav",
+    "type": "file"
+  },
+  {
+    "name": "SNAP_sample_02_arpeggio.wav",
+    "type": "file"
+  },
+  {
+    "name": "SNAP_sample_03_BridgeMute.wav",
+    "type": "file"
+  },
+  {
+    "name": "SNAP_sample_04_Lead.wav",
+    "type": "file"
+  },
+  {
+    "name": "SNAP_sample_arpeggio.wav",
+    "type": "file"
+  }
+]

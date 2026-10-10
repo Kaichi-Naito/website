@@ -5,6 +5,69 @@ import { readFileSync } from 'node:fs';
 import createSnapDsp from './snap-runtime.mjs';
 
 const file = name => readFileSync(new URL(name, import.meta.url));
+
+test('resume unlocks a suspended context before waiting for worklet readiness', async () => {
+    const e = engineHarness();
+    let completeInit, activated = false;
+    e._init = () => {
+        e.context = { state:'suspended', resume() { activated = true; this.state = 'running'; return Promise.resolve(); } };
+        return new Promise(resolve => { completeInit = resolve; });
+    };
+    const start = e.resume();
+    assert.equal(activated, true); // Still in the synchronous user gesture.
+    completeInit();
+    await start;
+});
+
+test('failed initialization disconnects its graph and permits another attempt', async () => {
+    const e = engineHarness();
+    let attempts = 0, disconnected = 0, closed = 0;
+    e._init = async () => {
+        attempts++;
+        if (attempts === 1) {
+            e.ready = true;
+            e.dryGain = e.cabAGain = e.cabBGain = null;
+            e.mediaSource = { disconnect() { disconnected++; } };
+            e.worklet = { disconnect() { disconnected++; }, port:{ close() { closed++; } } };
+            throw new Error('IR HTTP 503');
+        }
+        e.ready = true;
+        return true;
+    };
+    await assert.rejects(e.init(), /IR HTTP 503/);
+    assert.equal(e.initPromise, null);
+    assert.equal(e.ready, false);
+    assert.equal(disconnected, 2);
+    assert.equal(closed, 1);
+    await e.init();
+    assert.equal(attempts, 2);
+    assert.equal(e.ready, true);
+});
+
+test('sample click requests both audio permissions before asynchronous initialization', async () => {
+    const html = file('../../Plugin.html').toString();
+    const code = html.slice(html.indexOf('        if (samplePlayBtn && sampleAudio) {'), html.indexOf('        loadSampleList();'));
+    let click, finishDsp;
+    const requests = [];
+    const button = { disabled:false, addEventListener(name, handler) { click = handler; } };
+    const select = { value:'SNAP_sample_01_Strum.wav', disabled:false };
+    const audio = { paused:true, currentTime:10, play() { requests.push('media'); this.paused = false; return Promise.resolve(); }, pause() { this.paused = true; } };
+    const status = { textContent:'' };
+    const context = vm.createContext({ samplePlayBtn:button, sampleSelect:select, sampleAudio:audio, sampleEngineStatus:status,
+        window:{snapWebEngine:{resume() { requests.push('context'); return new Promise(resolve => { finishDsp = resolve; }); }}},
+        setSampleUi(playing) { status.textContent = playing ? 'PLAYING' : 'STOPPED'; }, getSelectedSampleName() { return '01_Strum.wav'; }, console });
+    vm.runInContext(code, context);
+    const pending = click();
+    assert.deepEqual(requests, ['context', 'media']);
+    assert.equal(button.disabled, true);
+    finishDsp(); await pending;
+    assert.equal(status.textContent, 'PLAYING');
+    assert.equal(audio.currentTime, 0);
+    assert.equal(button.disabled, false);
+    await click();
+    assert.equal(audio.paused, true);
+    assert.equal(audio.currentTime, 0);
+});
 function engineHarness() {
     const context = vm.createContext({
         window: { addEventListener() {} },
@@ -77,8 +140,8 @@ test('EQ drag follows visible track at different sizes and preserves thumb grab 
     }
 });
 
-test('startup selects and applies Snap + CAB before audio initialization', () => {
-    let start, initialized;
+test('startup applies Snap + CAB but waits for user input to initialize audio', () => {
+    let start, initialized, selected;
     const presetSelect = { value:'default', addEventListener() {} };
     const dirty = { textContent:'*' };
     const context = vm.createContext({
@@ -90,18 +153,21 @@ test('startup selects and applies Snap + CAB before audio initialization', () =>
     });
     vm.runInContext(file('snap-web.js').toString().replace('window.SnapWebParams = P;',
         'window.SnapWebParams = P; window.TestEngine = SnapWebEngine; window.TestPresets = PRESETS;'), context);
-    context.window.TestEngine.prototype.init = function () { initialized = { ...this.params }; return Promise.resolve(); };
+    context.window.TestEngine.prototype.init = function () { initialized = true; return Promise.resolve(); };
+    context.window.TestEngine.prototype.setStatus = function () { selected = { ...this.params }; };
     start();
     assert.equal(presetSelect.value, 'Snap + CAB');
-    assert.equal(initialized.cabMode, 3);
-    assert.equal(initialized.eqOn, 1);
-    assert.ok(Math.abs(initialized.gate - 1.05) < .001);
-    assert.equal(initialized.inputLowCut, 2);
-    assert.ok(Math.abs(initialized.comp - 7.03) < .001);
-    assert.ok(Math.abs(initialized.drive - 6.12) < .001);
-    assert.ok(Math.abs(initialized.eq31 + 2.83) < .001);
-    assert.equal(initialized.signalMode, 0);
-    assert.equal(initialized.driveCpuHigh, 0);
+    assert.equal(initialized, undefined);
+    assert.equal(context.window.snapWebEngine.context, null);
+    assert.equal(selected.cabMode, 3);
+    assert.equal(selected.eqOn, 1);
+    assert.ok(Math.abs(selected.gate - 1.05) < .001);
+    assert.equal(selected.inputLowCut, 2);
+    assert.ok(Math.abs(selected.comp - 7.03) < .001);
+    assert.ok(Math.abs(selected.drive - 6.12) < .001);
+    assert.ok(Math.abs(selected.eq31 + 2.83) < .001);
+    assert.equal(selected.signalMode, 0);
+    assert.equal(selected.driveCpuHigh, 0);
     assert.equal(dirty.textContent, '');
 });
 
