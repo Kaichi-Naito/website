@@ -138,6 +138,78 @@
             font-weight: bold;
         }
 
+        /* A pixel guitar beneath PLAY SAMPLE; notes animate only during playback. */
+        .sample-player-controls {
+            width: 160px;
+            margin-inline: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sample-player-controls .sample-play-btn { width: 100%; }
+
+        .sample-guitar-stage {
+            position: relative;
+            width: 160px;
+            height: 104px;
+            margin-top: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: visible;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .sample-guitar-art {
+            display: block;
+            width: 156px;
+            height: auto;
+            image-rendering: pixelated;
+            transform-origin: 43% 65%;
+        }
+
+        .sample-music-note {
+            position: absolute;
+            z-index: 1;
+            opacity: 0;
+            font: bold 20px/1 'PixelMplus', monospace;
+            color: #1959c7;
+            text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #252525;
+            pointer-events: none;
+        }
+
+        .sample-music-note:nth-of-type(1) { left: 113px; top: 17px; --note-travel: 12px; animation-delay: 0s !important; }
+        .sample-music-note:nth-of-type(2) { left: 75px; top: 6px; --note-travel: -9px; color: #e4ac24; font-size: 16px; animation-delay: .53s !important; }
+        .sample-music-note:nth-of-type(3) { left: 136px; top: 47px; --note-travel: 18px; color: #26449e; font-size: 16px; animation-delay: 1.06s !important; }
+
+        .sample-player.is-playing .sample-guitar-art {
+            animation: sample-guitar-strum .6s ease-in-out infinite alternate;
+        }
+
+        .sample-player.is-playing .sample-music-note {
+            animation: sample-note-rise 1.6s ease-out infinite;
+        }
+
+        @keyframes sample-guitar-strum {
+            from { transform: rotate(-1.7deg) translateY(1px); }
+            to { transform: rotate(1.7deg) translateY(-1px); }
+        }
+
+        @keyframes sample-note-rise {
+            0% { opacity: 0; transform: translate(0, 8px) scale(.8); }
+            18% { opacity: 1; }
+            67% { opacity: .95; }
+            100% { opacity: 0; transform: translate(var(--note-travel), -30px) scale(1.08); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .sample-player.is-playing .sample-guitar-art,
+            .sample-player.is-playing .sample-music-note { animation: none; }
+            .sample-player.is-playing .sample-music-note { opacity: .9; }
+        }
+
         .sample-display {
             min-height: 42px;
             background: #000;
@@ -2733,13 +2805,24 @@
 
 
             <!-- Four verified sample WAV files are shown directly; each button plays through SNAP Web DSP. -->
-            <div class="sample-player">
+            <div class="sample-player" id="sample-player-visual">
                 <span class="sample-player-title">SAMPLE PLAYER</span>
 
                 <div class="sample-player-row">
-                    <button type="button" class="win95-btn sample-play-btn" id="sample-play-btn" disabled>
-                        ▶ PLAY SAMPLE
-                    </button>
+                    <div class="sample-player-controls">
+                        <button type="button" class="win95-btn sample-play-btn" id="sample-play-btn" disabled>
+                            ▶ PLAY SAMPLE
+                        </button>
+                        <div class="sample-guitar-stage" aria-hidden="true">
+                            <img class="sample-guitar-art"
+                                 src="Plugin/snap-web/sample-guitar.png"
+                                 width="160" height="107"
+                                 alt="" draggable="false">
+                            <span class="sample-music-note">♪</span>
+                            <span class="sample-music-note">♫</span>
+                            <span class="sample-music-note">♪</span>
+                        </div>
+                    </div>
 
                     <div class="sample-display">
                         <div class="sample-choice-grid" role="group" aria-label="Sample sounds">
@@ -3496,6 +3579,7 @@
         --------------------------------------------------------- */
         var sampleAudio = document.getElementById('snap-sample-audio');
         var samplePlayBtn = document.getElementById('sample-play-btn');
+        var samplePlayerVisual = document.getElementById('sample-player-visual');
         var sampleButtons = Array.from(document.querySelectorAll('[data-sample-file]'));
         var sampleEngineStatus = document.getElementById('sample-engine-status');
         var SAMPLE_PREFIX = 'SNAP_sample_';
@@ -3510,6 +3594,9 @@
 
         function setSampleUi(isPlaying) {
             if (!samplePlayBtn) return;
+            if (samplePlayerVisual) {
+                samplePlayerVisual.classList.toggle('is-playing', !!isPlaying);
+            }
             var dspState = (window.snapWebEngine && window.snapWebEngine.ready) ? 'READY' :
                 (window.snapWebEngine && window.snapWebEngine.initPromise ? 'LOADING' : 'STANDBY');
 
