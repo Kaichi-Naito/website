@@ -152,9 +152,16 @@
         }
 
         .sample-display-sub {
-            color: #a8a8a8;
-            font-size: 10px;
-            margin-top: 2px;
+            /* Keep playback/error status accessible, but hide the debug line visually. */
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
 
         .sample-help {
