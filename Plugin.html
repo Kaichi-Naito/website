@@ -3482,13 +3482,8 @@
 
         /* ---------------------------------------------------------
            SAMPLE PLAYER
-           GitHub APIで Plugin/samplesound/ を取得して、
-           SNAP_sample_*.wav を自動でプルダウンへ追加します。
-
-           例:
-           SNAP_sample_Strum.wav -> Strum.wav
-
-           HTMLAudioElementをWeb Audioへ取り込み、AudioWorklet内の
+           GitHubで確認済みの4つのWAVを常時表示し、1クリックで
+           選択・再生します。HTMLAudioElementからAudioWorkletの
            SNAP WebAssembly DSPを通してループ再生します。
         --------------------------------------------------------- */
         var sampleAudio = document.getElementById('snap-sample-audio');
