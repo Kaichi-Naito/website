@@ -170,8 +170,9 @@
             transform-origin: 43% 65%;
         }
 
-        /* Two alternating note arrangements, like a small two-frame pixel GIF.
-           Each arrangement stays visible for .34 seconds while audio plays. */
+        /* Two alternating note arrangements: JavaScript flips one class
+           every 340ms while audio plays, so system reduced-motion CSS cannot
+           accidentally freeze frame A. Stopped audio hides both sets. */
         .sample-note-set {
             position: absolute;
             inset: 0;
@@ -191,27 +192,23 @@
 
         .sample-music-note.note-sm { font-size: 20px; }
 
-        /* Frame A: notes rise to the right of the headstock. */
-        .sample-note-set-a .sample-music-note:nth-child(1) { left: 109px; top: 7px; }
-        .sample-note-set-a .sample-music-note:nth-child(2) { left: 67px; top: 0; color: #e4ac24; }
-        .sample-note-set-a .sample-music-note:nth-child(3) { left: 134px; top: 40px; color: #26449e; }
+        /* Clearly separated A/B layouts (not just 10px differences). */
+        .sample-note-set-a .sample-music-note:nth-child(1) { left: 112px; top: 2px; }
+        .sample-note-set-a .sample-music-note:nth-child(2) { left: 66px; top: 0; color: #e4ac24; }
+        .sample-note-set-a .sample-music-note:nth-child(3) { left: 131px; top: 43px; color: #26449e; }
 
-        /* Frame B: visibly different positions and note symbols. */
-        .sample-note-set-b .sample-music-note:nth-child(1) { left: 122px; top: 0; }
-        .sample-note-set-b .sample-music-note:nth-child(2) { left: 85px; top: 25px; color: #26449e; }
-        .sample-note-set-b .sample-music-note:nth-child(3) { left: 139px; top: 24px; color: #e4ac24; }
+        .sample-note-set-b .sample-music-note:nth-child(1) { left: 90px; top: -7px; }
+        .sample-note-set-b .sample-music-note:nth-child(2) { left: 24px; top: 17px; color: #26449e; }
+        .sample-note-set-b .sample-music-note:nth-child(3) { left: 109px; top: 49px; color: #e4ac24; }
 
         .sample-player.is-playing .sample-guitar-art {
             animation: sample-guitar-strum .6s ease-in-out infinite alternate;
         }
 
-        .sample-player.is-playing .sample-note-set-a {
-            animation: sample-note-frame-a .68s steps(1, end) infinite;
-        }
-
-        .sample-player.is-playing .sample-note-set-b {
-            animation: sample-note-frame-b .68s steps(1, end) infinite;
-        }
+        .sample-player.is-playing .sample-note-set-a { opacity: 1; }
+        .sample-player.is-playing .sample-note-set-b { opacity: 0; }
+        .sample-player.is-playing.is-note-frame-b .sample-note-set-a { opacity: 0; }
+        .sample-player.is-playing.is-note-frame-b .sample-note-set-b { opacity: 1; }
 
         .sample-player.is-playing .sample-music-note {
             animation: sample-note-float .34s ease-out infinite;
@@ -222,30 +219,15 @@
             to { transform: rotate(1.7deg) translateY(-1px); }
         }
 
-        @keyframes sample-note-frame-a {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        @keyframes sample-note-frame-b {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
-        }
-
         @keyframes sample-note-float {
             from { transform: translateY(5px) scale(.94); }
             to { transform: translateY(-6px) scale(1.04); }
         }
 
         @media (prefers-reduced-motion: reduce) {
+            /* Keep the requested two-frame switch; skip continuous movement. */
             .sample-player.is-playing .sample-guitar-art,
-            .sample-player.is-playing .sample-note-set,
-            .sample-player.is-playing .sample-music-note {
-                animation: none;
-            }
-
-            .sample-player.is-playing .sample-note-set-a { opacity: .95; }
-            .sample-player.is-playing .sample-note-set-b { opacity: 0; }
+            .sample-player.is-playing .sample-music-note { animation: none; }
         }
 
         .sample-display {
@@ -3631,6 +3613,7 @@
         var SAMPLE_FOLDER = 'Plugin/samplesound/';
         var selectedSampleFile = 'SNAP_sample_01_Strum.wav';
         var playRequestId = 0;
+        var sampleNoteFrameTimer = null;
 
         function getSampleDisplayName(fileName) {
             return fileName.indexOf(SAMPLE_PREFIX) === 0
@@ -3641,6 +3624,18 @@
             if (!samplePlayBtn) return;
             if (samplePlayerVisual) {
                 samplePlayerVisual.classList.toggle('is-playing', !!isPlaying);
+                if (isPlaying && sampleNoteFrameTimer === null) {
+                    samplePlayerVisual.classList.remove('is-note-frame-b');
+                    sampleNoteFrameTimer = window.setInterval(function() {
+                        samplePlayerVisual.classList.toggle('is-note-frame-b');
+                    }, 340);
+                } else if (!isPlaying) {
+                    if (sampleNoteFrameTimer !== null) {
+                        window.clearInterval(sampleNoteFrameTimer);
+                        sampleNoteFrameTimer = null;
+                    }
+                    samplePlayerVisual.classList.remove('is-note-frame-b');
+                }
             }
             var dspState = (window.snapWebEngine && window.snapWebEngine.ready) ? 'READY' :
                 (window.snapWebEngine && window.snapWebEngine.initPromise ? 'LOADING' : 'STANDBY');
