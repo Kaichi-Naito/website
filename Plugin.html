@@ -183,14 +183,19 @@
 
         .sample-music-note {
             position: absolute;
-            font: bold 26px/1 'PixelMplus', monospace;
+            width: 32px;
+            height: 32px;
             color: #1959c7;
-            text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #252525;
-            white-space: nowrap;
+            shape-rendering: crispEdges;
+            image-rendering: pixelated;
+            overflow: visible;
             pointer-events: none;
         }
 
-        .sample-music-note.note-sm { font-size: 20px; }
+        .sample-music-note.note-sm {
+            width: 24px;
+            height: 24px;
+        }
 
         /* Clearly separated A/B layouts (not just 10px differences). */
         .sample-note-set-a .sample-music-note:nth-child(1) { left: 112px; top: 2px; }
@@ -211,7 +216,7 @@
         .sample-player.is-playing.is-note-frame-b .sample-note-set-b { opacity: 1; }
 
         .sample-player.is-playing .sample-music-note {
-            animation: sample-note-float .34s ease-out infinite;
+            animation: sample-note-float .7s ease-out infinite;
         }
 
         @keyframes sample-guitar-strum {
@@ -2839,14 +2844,26 @@
                                  width="160" height="107"
                                  alt="" draggable="false">
                             <div class="sample-note-set sample-note-set-a">
-                                <span class="sample-music-note">♪</span>
-                                <span class="sample-music-note note-sm">♫</span>
-                                <span class="sample-music-note note-sm">♪</span>
+                                <svg class="sample-music-note" viewBox="0 0 16 16" shape-rendering="crispEdges" focusable="false" aria-hidden="true">
+                                    <path fill="currentColor" d="M11 2h2v9h-2z M13 2h2v2h-2z M14 4h2v3h-2z M7 10h5v2H7z M4 12h7v2H4z M5 14h4v1H5z"/>
+                                </svg>
+                                <svg class="sample-music-note note-sm" viewBox="0 0 16 16" shape-rendering="crispEdges" focusable="false" aria-hidden="true">
+                                    <path fill="currentColor" d="M4 2h10v3H4z M4 5h2v7H4z M12 5h2v7h-2z M1 11h5v3H1z M9 10h5v3H9z M2 14h3v1H2z M10 13h3v1h-3z"/>
+                                </svg>
+                                <svg class="sample-music-note note-sm" viewBox="0 0 16 16" shape-rendering="crispEdges" focusable="false" aria-hidden="true">
+                                    <path fill="currentColor" d="M11 2h2v9h-2z M13 2h2v2h-2z M14 4h2v3h-2z M7 10h5v2H7z M4 12h7v2H4z M5 14h4v1H5z"/>
+                                </svg>
                             </div>
                             <div class="sample-note-set sample-note-set-b">
-                                <span class="sample-music-note">♫</span>
-                                <span class="sample-music-note note-sm">♪</span>
-                                <span class="sample-music-note note-sm">♫</span>
+                                <svg class="sample-music-note" viewBox="0 0 16 16" shape-rendering="crispEdges" focusable="false" aria-hidden="true">
+                                    <path fill="currentColor" d="M4 2h10v3H4z M4 5h2v7H4z M12 5h2v7h-2z M1 11h5v3H1z M9 10h5v3H9z M2 14h3v1H2z M10 13h3v1h-3z"/>
+                                </svg>
+                                <svg class="sample-music-note note-sm" viewBox="0 0 16 16" shape-rendering="crispEdges" focusable="false" aria-hidden="true">
+                                    <path fill="currentColor" d="M11 2h2v9h-2z M13 2h2v2h-2z M14 4h2v3h-2z M7 10h5v2H7z M4 12h7v2H4z M5 14h4v1H5z"/>
+                                </svg>
+                                <svg class="sample-music-note note-sm" viewBox="0 0 16 16" shape-rendering="crispEdges" focusable="false" aria-hidden="true">
+                                    <path fill="currentColor" d="M4 2h10v3H4z M4 5h2v7H4z M12 5h2v7h-2z M1 11h5v3H1z M9 10h5v3H9z M2 14h3v1H2z M10 13h3v1h-3z"/>
+                                </svg>
                             </div>
                         </div>
                     </div>
@@ -3628,7 +3645,7 @@
                     samplePlayerVisual.classList.remove('is-note-frame-b');
                     sampleNoteFrameTimer = window.setInterval(function() {
                         samplePlayerVisual.classList.toggle('is-note-frame-b');
-                    }, 340);
+                    }, 700);
                 } else if (!isPlaying) {
                     if (sampleNoteFrameTimer !== null) {
                         window.clearInterval(sampleNoteFrameTimer);
