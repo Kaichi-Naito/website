@@ -85,46 +85,44 @@
             font-size: 13px;
         }
 
-        .sample-display-select-wrap {
-            position: relative;
-            width: 100%;
-            min-width: 0;
+        .sample-choice-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 5px;
         }
 
-        .sample-display-select {
-            width: 100%;
+        .sample-choice {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             min-width: 0;
-            height: 24px;
-            margin: 0;
-            padding: 0 34px 0 0;
-            border: 0;
-            outline: 0;
-            background-color: #000;
+            min-height: 29px;
+            padding: 5px 9px;
+            border: 1px solid #505050;
+            background: #111;
             color: #00ff66;
             font-family: 'PixelMplus', monospace;
-            font-size: 14px;
+            font-size: 12px;
+            text-align: left;
             cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
         }
 
-        .sample-display-select-wrap::after {
-            content: "▼";
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-52%);
-            color: #00ff66;
-            font-family: Arial, sans-serif;
-            font-size: 18px;
-            line-height: 1;
-            pointer-events: none;
+        .sample-choice:hover { background: #202b20; border-color: #84bd88; }
+        .sample-choice[aria-pressed="true"] {
+            background: #16311e;
+            border-color: #00ff66;
+            box-shadow: inset 0 0 0 1px #255a30;
         }
-
-        .sample-display-select option {
-            background: #000;
-            color: #00ff66;
+        .sample-choice:focus-visible {
+            outline: 2px solid #d1f5d7;
+            outline-offset: 1px;
+        }
+        .sample-choice-icon { flex: 0 0 14px; text-align: center; }
+        .sample-choice-label {
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .sample-player-row {
@@ -1762,11 +1760,14 @@
                 margin-right: 0 !important;
             }
 
-            .sample-display-select-wrap,
-            .sample-display-select {
-                width: 100% !important;
-                min-width: 0 !important;
-                max-width: 100% !important;
+            .sample-choice-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .sample-choice {
+                font-size: 11px;
+                padding: 7px 5px;
+                gap: 4px;
             }
 
             .sample-help {
@@ -2723,19 +2724,7 @@
         <div class="window-contents">
 
 
-            <!--
-                SAMPLE PLAYER
-                GitHub APIから Plugin/samplesound/ のファイル一覧を取得し、
-                "SNAP_sample_" で始まる .wav を自動でプルダウンへ追加します。
-
-                表示名:
-                SNAP_sample_Strum.wav -> Strum.wav
-
-                現段階では通常のAudio要素でループ再生します。
-                WebAssembly版SNAP完成後は、
-                AudioBufferSource -> AudioWorklet/WASM(SNAP DSP) -> AudioContext.destination
-                へ差し替える想定です。
-            -->
+            <!-- Four verified sample WAV files are shown directly; each button plays through SNAP Web DSP. -->
             <div class="sample-player">
                 <span class="sample-player-title">SAMPLE PLAYER</span>
 
@@ -2745,14 +2734,21 @@
                     </button>
 
                     <div class="sample-display">
-                        <div class="sample-display-select-wrap">
-                            <select id="sample-select"
-                                    class="sample-display-select"
-                                    aria-label="Sample sound">
-                                <option value="">Loading samples...</option>
-                            </select>
+                        <div class="sample-choice-grid" role="group" aria-label="Sample sounds">
+                            <button type="button" class="sample-choice" data-sample-file="SNAP_sample_01_Strum.wav" aria-pressed="true">
+                                <span class="sample-choice-icon" aria-hidden="true">▶</span><span class="sample-choice-label">01 STRUM</span>
+                            </button>
+                            <button type="button" class="sample-choice" data-sample-file="SNAP_sample_02_arpeggio.wav" aria-pressed="false">
+                                <span class="sample-choice-icon" aria-hidden="true">▶</span><span class="sample-choice-label">02 ARPEGGIO</span>
+                            </button>
+                            <button type="button" class="sample-choice" data-sample-file="SNAP_sample_03_BridgeMute.wav" aria-pressed="false">
+                                <span class="sample-choice-icon" aria-hidden="true">▶</span><span class="sample-choice-label">03 BRIDGE MUTE</span>
+                            </button>
+                            <button type="button" class="sample-choice" data-sample-file="SNAP_sample_04_Lead.wav" aria-pressed="false">
+                                <span class="sample-choice-icon" aria-hidden="true">▶</span><span class="sample-choice-label">04 LEAD</span>
+                            </button>
                         </div>
-                        <div class="sample-display-sub" id="sample-engine-status">
+                        <div class="sample-display-sub" id="sample-engine-status" role="status">
                             LOOP ON / SNAP WEB DSP: PREPARING
                         </div>
                     </div>
@@ -3295,7 +3291,7 @@
     </div>
 
 
-    <div class="window download-window" id="win-download" style="width: 360px; z-index: 122;">
+    <div class="window download-window" id="win-download" style="width: 360px; z-index: 114;">
         <div class="title-bar draggable-cursor" id="handle-download">
             <span>SNAP_DOWNLOAD.exe</span>
             <div class="title-bar-controls">
@@ -3383,7 +3379,7 @@
                 var mobileTop = Math.max(190, getHeaderBottom() + 18);
                 var mobileGap = 24;
 
-                [sample, snap, install, download].forEach(function(win) {
+                [sample, download, snap, install].forEach(function(win) {
                     if (!win) return;
                     win.style.left = mobileLeft;
                     win.style.top = mobileTop + 'px';
@@ -3393,7 +3389,7 @@
                 if (sample) sample.style.zIndex = '118';
                 if (install) install.style.zIndex = '116';
                 if (snap) snap.style.zIndex = '120';
-                if (download) download.style.zIndex = '122';
+                if (download) download.style.zIndex = '114';
                 document.body.style.minHeight = (mobileTop + 100) + 'px';
                 return;
             }
@@ -3411,20 +3407,17 @@
             var downloadHeight = download ? (download.offsetHeight || 170) : 170;
 
             /*
-               Reference layout proportions from the supplied screenshot:
-
-               SAMPLE  x = 0
-               SNAP    x = +215 px
-               README  x = +10 px
-
-               This preserves the same overlap relationship, but the complete
-               three-window composition is centred as one group.
+               The top row contains SAMPLE PLAYER on the left and DOWNLOAD on
+               the right. SNAP sits below both, with the README behind it.
+               Keep this coordinate layout independent of z-index stacking.
             */
             var snapOffsetX = 215;
             var readmeOffsetX = 10;
+            var topRowGap = 22;
+            var topRowWidth = sampleWidth + topRowGap + downloadWidth;
 
             var compositionWidth = Math.max(
-                sampleWidth,
+                topRowWidth,
                 snapOffsetX + snapWidth,
                 readmeOffsetX + installWidth
             );
@@ -3438,18 +3431,21 @@
             var snapLeft = stageLeft + snapOffsetX;
             var installLeft = stageLeft + readmeOffsetX;
 
-            /*
-               Same vertical overlap feel as the reference image.
-               SAMPLE overlaps SNAP by about 25 px.
-               README begins about 55 px before SNAP ends.
-            */
             var desktopGroupYOffset = 120;
             var sampleTop = Math.max(55 + desktopGroupYOffset, getHeaderBottom() + 18);
-            var snapTop = sampleTop + sampleHeight - 25;
+            var downloadLeft = sampleLeft + sampleWidth + topRowGap;
+            var downloadTop = sampleTop;
+            var snapTop = sampleTop + Math.max(sampleHeight, downloadHeight) + 18;
             var installTop = snapTop + snapHeight - 55;
 
-            var downloadLeft = snapLeft + snapWidth - downloadWidth - 18;
-            var downloadTop = installTop + 82;
+            // On narrower desktop viewports, stack the top row rather than
+            // letting DOWNLOAD disappear beyond the right edge of the screen.
+            if (viewportW < topRowWidth + 40) {
+                downloadLeft = Math.max(12, Math.min(viewportW - downloadWidth - 12, snapLeft + snapWidth - downloadWidth));
+                downloadTop = sampleTop + sampleHeight + 18;
+                snapTop = downloadTop + downloadHeight + 18;
+                installTop = snapTop + snapHeight - 55;
+            }
 
             if (sample) {
                 sample.style.left = sampleLeft + 'px';
@@ -3472,7 +3468,7 @@
             if (download) {
                 download.style.left = downloadLeft + 'px';
                 download.style.top = downloadTop + 'px';
-                download.style.zIndex = '122';
+                download.style.zIndex = '114';
             }
 
             var bottoms = windows.filter(Boolean).map(function(win) {
@@ -3497,245 +3493,131 @@
         --------------------------------------------------------- */
         var sampleAudio = document.getElementById('snap-sample-audio');
         var samplePlayBtn = document.getElementById('sample-play-btn');
-        var sampleSelect = document.getElementById('sample-select');
+        var sampleButtons = Array.from(document.querySelectorAll('[data-sample-file]'));
         var sampleEngineStatus = document.getElementById('sample-engine-status');
-
         var SAMPLE_PREFIX = 'SNAP_sample_';
         var SAMPLE_FOLDER = 'Plugin/samplesound/';
-        var SAMPLE_API =
-            'https://api.github.com/repos/kaichi-naito/website/contents/Plugin/samplesound';
+        var selectedSampleFile = 'SNAP_sample_01_Strum.wav';
+        var playRequestId = 0;
 
         function getSampleDisplayName(fileName) {
-            if (fileName.indexOf(SAMPLE_PREFIX) === 0) {
-                return fileName.substring(SAMPLE_PREFIX.length);
-            }
-            return fileName;
-        }
-
-        function getSelectedSampleName() {
-            if (!sampleSelect || !sampleSelect.value) return '';
-            return getSampleDisplayName(sampleSelect.value);
+            return fileName.indexOf(SAMPLE_PREFIX) === 0
+                ? fileName.substring(SAMPLE_PREFIX.length) : fileName;
         }
 
         function setSampleUi(isPlaying) {
-            if (!samplePlayBtn || !sampleSelect) return;
+            if (!samplePlayBtn) return;
             var dspState = (window.snapWebEngine && window.snapWebEngine.ready) ? 'READY' :
                 (window.snapWebEngine && window.snapWebEngine.initPromise ? 'LOADING' : 'STANDBY');
 
-            if (isPlaying) {
-                samplePlayBtn.textContent = '■ STOP SAMPLE';
-                if (sampleEngineStatus) {
-                    sampleEngineStatus.textContent =
-                        'PLAYING / LOOP ON / SNAP WEB DSP: ' + dspState;
-                }
-            } else {
-                samplePlayBtn.textContent = '▶ PLAY SAMPLE';
-                if (sampleEngineStatus) {
-                    sampleEngineStatus.textContent =
-                        'LOOP ON / SNAP WEB DSP: ' + dspState;
-                }
+            samplePlayBtn.textContent = isPlaying ? '■ STOP SAMPLE' : '▶ PLAY SAMPLE';
+            sampleButtons.forEach(function(button) {
+                var active = button.dataset.sampleFile === selectedSampleFile;
+                button.setAttribute('aria-pressed', active ? 'true' : 'false');
+                var icon = button.querySelector('.sample-choice-icon');
+                if (icon) icon.textContent = active && isPlaying ? '■' : '▶';
+            });
+
+            if (sampleEngineStatus) {
+                sampleEngineStatus.textContent = (isPlaying ? 'PLAYING / ' : '') +
+                    'LOOP ON / SNAP WEB DSP: ' + dspState;
             }
         }
 
-        function setAudioSourceFromFileName(fileName, resumePlayback) {
+        function setAudioSourceFromFileName(fileName) {
             if (!sampleAudio || !fileName) return;
-
             sampleAudio.pause();
             sampleAudio.currentTime = 0;
-
-            /*
-                Plugin.html は /website/Plugin.html にあるので、
-                この相対パスは
-                /website/Plugin/samplesound/<filename>
-                を指します。
-            */
+            selectedSampleFile = fileName;
             sampleAudio.src = new URL(
                 SAMPLE_FOLDER + encodeURIComponent(fileName),
                 window.location.href
             ).href;
-
             sampleAudio.load();
-
-            if (resumePlayback) {
-                sampleAudio.play().catch(function() {
-                    if (sampleEngineStatus) {
-                        sampleEngineStatus.textContent =
-                            'PLAYBACK ERROR — ' + getSampleDisplayName(fileName);
-                    }
-                });
-            } else {
-                setSampleUi(false);
-            }
+            setSampleUi(false);
         }
 
-        function populateSampleSelect(files) {
-            if (!sampleSelect) return;
+        async function startSamplePlayback() {
+            if (!sampleAudio || !selectedSampleFile) return;
+            var request = ++playRequestId;
+            try {
+                samplePlayBtn.disabled = true;
+                if (!window.snapWebEngine) throw new Error('SNAP engine unavailable');
+                if (sampleEngineStatus) sampleEngineStatus.textContent = 'STARTING SNAP WEB DSP...';
 
-            var sampleFiles = files
-                .filter(function(file) {
-                    return file &&
-                           file.type === 'file' &&
-                           typeof file.name === 'string' &&
-                           file.name.indexOf(SAMPLE_PREFIX) === 0 &&
-                           file.name !== 'SNAP_sample_arpeggio.wav' &&
-                           /\.wav$/i.test(file.name);
-                })
-                .sort(function(a, b) {
-                    return getSampleDisplayName(a.name).localeCompare(
-                        getSampleDisplayName(b.name),
-                        'ja',
-                        { numeric: true, sensitivity: 'base' }
-                    );
-                });
+                // Request audio playback immediately in the button click gesture
+                // alongside AudioContext.resume(), before awaiting either promise.
+                var dspStart = window.snapWebEngine.resume();
+                var mediaStart = sampleAudio.play();
+                await Promise.all([dspStart, mediaStart]);
 
-            sampleSelect.innerHTML = '';
-
-            if (sampleFiles.length === 0) {
-                var noneOption = document.createElement('option');
-                noneOption.value = '';
-                noneOption.textContent = 'No SNAP samples found';
-                sampleSelect.appendChild(noneOption);
-
-                if (samplePlayBtn) samplePlayBtn.disabled = true;
-                if (sampleEngineStatus) sampleEngineStatus.textContent = 'NO SAMPLE FILES FOUND';
-                return;
-            }
-
-            sampleFiles.forEach(function(file) {
-                var option = document.createElement('option');
-                option.value = file.name;
-                option.textContent = getSampleDisplayName(file.name);
-                sampleSelect.appendChild(option);
-            });
-
-            // Always select the first file that actually exists in the folder
-            // after sorting by the displayed file name.
-            sampleSelect.value = sampleFiles[0].name;
-
-            if (samplePlayBtn) samplePlayBtn.disabled = false;
-            setAudioSourceFromFileName(sampleSelect.value, false);
-        }
-
-        function loadSampleList() {
-            if (sampleEngineStatus) {
-                sampleEngineStatus.textContent = 'LOADING SAMPLE LIST...';
-            }
-
-            fetch(SAMPLE_API, {
-                headers: {
-                    'Accept': 'application/vnd.github+json'
-                }
-            })
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error('GitHub API HTTP ' + response.status);
-                }
-                return response.json();
-            })
-            .then(function(files) {
-                if (!Array.isArray(files)) {
-                    throw new Error('Unexpected GitHub API response');
-                }
-                populateSampleSelect(files);
-            })
-            .catch(function(apiError) {
-                // These entries come from this repository's actual sample files.
-                // A GitHub API rate limit must not disable the public sample player.
-                return fetch(SAMPLE_FOLDER + 'manifest.json?v=1.2.4.2')
-                    .then(function(response) {
-                        if (!response.ok) throw apiError;
-                        return response.json();
-                    }).then(populateSampleSelect);
-            })
-            .catch(function(error) {
-                console.error('Could not load sample list:', error);
-
-                // Do not guess a filename. If the folder listing cannot be read,
-                // keep playback disabled rather than selecting a nonexistent sample.
-                if (sampleSelect) {
-                    sampleSelect.innerHTML = '';
-                    var errorOption = document.createElement('option');
-                    errorOption.value = '';
-                    errorOption.textContent = 'Sample list unavailable';
-                    sampleSelect.appendChild(errorOption);
-                }
-
-                if (samplePlayBtn) samplePlayBtn.disabled = true;
-
+                if (request !== playRequestId) return;
+                sampleAudio.currentTime = 0;
+                setSampleUi(true);
+            } catch (error) {
+                if (request !== playRequestId) return;
+                sampleAudio.pause();
+                console.error(error);
                 if (sampleEngineStatus) {
-                    sampleEngineStatus.textContent = 'SAMPLE LIST LOAD FAILED';
+                    sampleEngineStatus.textContent = 'PLAYBACK ERROR — ' +
+                        (error.message || getSampleDisplayName(selectedSampleFile));
                 }
-            });
+            } finally {
+                if (request === playRequestId) samplePlayBtn.disabled = false;
+            }
+        }
+
+        function stopSamplePlayback() {
+            ++playRequestId;
+            sampleAudio.pause();
+            sampleAudio.currentTime = 0;
+            samplePlayBtn.disabled = false;
+            setSampleUi(false);
         }
 
         if (sampleAudio) {
             sampleAudio.loop = true;
-
-            sampleAudio.addEventListener('play', function() {
-                setSampleUi(true);
-            });
-
-            sampleAudio.addEventListener('pause', function() {
-                setSampleUi(false);
-            });
-
+            sampleAudio.addEventListener('play', function() { setSampleUi(true); });
+            sampleAudio.addEventListener('pause', function() { setSampleUi(false); });
             sampleAudio.addEventListener('error', function() {
+                setSampleUi(false);
                 if (sampleEngineStatus) {
                     sampleEngineStatus.textContent =
-                        'SAMPLE FILE NOT FOUND — ' + (getSelectedSampleName() || '');
-                }
-                if (samplePlayBtn) {
-                    samplePlayBtn.textContent = '▶ PLAY SAMPLE';
+                        'SAMPLE FILE NOT FOUND — ' + getSampleDisplayName(selectedSampleFile);
                 }
             });
         }
 
-        if (sampleSelect) {
-            sampleSelect.addEventListener('change', function() {
-                if (!sampleSelect.value) return;
-
-                var wasPlaying = sampleAudio && !sampleAudio.paused;
-                setAudioSourceFromFileName(sampleSelect.value, wasPlaying);
+        sampleButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                if (!sampleAudio) return;
+                var fileName = button.dataset.sampleFile;
+                if (!fileName) return;
+                if (fileName === selectedSampleFile && !sampleAudio.paused) {
+                    stopSamplePlayback();
+                    return;
+                }
+                // The four buttons are always visible and each starts its sample
+                // immediately, including when playback is already active.
+                ++playRequestId;
+                if (fileName !== selectedSampleFile) setAudioSourceFromFileName(fileName);
+                else sampleAudio.currentTime = 0;
+                startSamplePlayback();
             });
-        }
+        });
 
         if (samplePlayBtn && sampleAudio) {
-            samplePlayBtn.addEventListener('click', async function() {
-                if (!sampleSelect || !sampleSelect.value) return;
-
-                if (sampleAudio.paused) {
-                    try {
-                        samplePlayBtn.disabled = true;
-                        sampleSelect.disabled = true;
-                        if (!window.snapWebEngine) throw new Error('SNAP engine unavailable');
-                        sampleEngineStatus.textContent = 'STARTING SNAP WEB DSP...';
-                        // Both permission requests must run inside this click, before
-                        // awaiting downloads or WASM initialization. The engine captures
-                        // the media element synchronously, so no dry audio can escape.
-                        var dspStart = window.snapWebEngine.resume();
-                        var mediaStart = sampleAudio.play();
-                        await Promise.all([dspStart, mediaStart]);
-                        sampleAudio.currentTime = 0;
-                        setSampleUi(true);
-                    } catch (error) {
-                        sampleAudio.pause();
-                        console.error(error);
-                        if (sampleEngineStatus) {
-                            sampleEngineStatus.textContent = 'PLAYBACK ERROR — ' +
-                                (error.message || getSelectedSampleName());
-                        }
-                    } finally {
-                        samplePlayBtn.disabled = false;
-                        sampleSelect.disabled = false;
-                    }
-                } else {
-                    sampleAudio.pause();
-                    sampleAudio.currentTime = 0;
-                }
+            samplePlayBtn.addEventListener('click', function() {
+                if (sampleAudio.paused) startSamplePlayback();
+                else stopSamplePlayback();
             });
         }
 
-        loadSampleList();
+        if (sampleAudio && sampleButtons.length) {
+            selectedSampleFile = sampleButtons[0].dataset.sampleFile;
+            samplePlayBtn.disabled = false;
+            setAudioSourceFromFileName(selectedSampleFile);
+        }
 
 
 
