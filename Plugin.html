@@ -170,26 +170,51 @@
             transform-origin: 43% 65%;
         }
 
-        .sample-music-note {
+        /* Two alternating note arrangements, like a small two-frame pixel GIF.
+           Each arrangement stays visible for .34 seconds while audio plays. */
+        .sample-note-set {
             position: absolute;
+            inset: 0;
             z-index: 1;
             opacity: 0;
-            font: bold 20px/1 'PixelMplus', monospace;
-            color: #1959c7;
-            text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #252525;
             pointer-events: none;
         }
 
-        .sample-music-note:nth-of-type(1) { left: 113px; top: 17px; --note-travel: 12px; animation-delay: 0s !important; }
-        .sample-music-note:nth-of-type(2) { left: 75px; top: 6px; --note-travel: -9px; color: #e4ac24; font-size: 16px; animation-delay: .53s !important; }
-        .sample-music-note:nth-of-type(3) { left: 136px; top: 47px; --note-travel: 18px; color: #26449e; font-size: 16px; animation-delay: 1.06s !important; }
+        .sample-music-note {
+            position: absolute;
+            font: bold 26px/1 'PixelMplus', monospace;
+            color: #1959c7;
+            text-shadow: 1px 1px 0 #ffffff, -1px -1px 0 #252525;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .sample-music-note.note-sm { font-size: 20px; }
+
+        /* Frame A: notes rise to the right of the headstock. */
+        .sample-note-set-a .sample-music-note:nth-child(1) { left: 109px; top: 7px; }
+        .sample-note-set-a .sample-music-note:nth-child(2) { left: 67px; top: 0; color: #e4ac24; }
+        .sample-note-set-a .sample-music-note:nth-child(3) { left: 134px; top: 40px; color: #26449e; }
+
+        /* Frame B: visibly different positions and note symbols. */
+        .sample-note-set-b .sample-music-note:nth-child(1) { left: 122px; top: 0; }
+        .sample-note-set-b .sample-music-note:nth-child(2) { left: 85px; top: 25px; color: #26449e; }
+        .sample-note-set-b .sample-music-note:nth-child(3) { left: 139px; top: 24px; color: #e4ac24; }
 
         .sample-player.is-playing .sample-guitar-art {
             animation: sample-guitar-strum .6s ease-in-out infinite alternate;
         }
 
+        .sample-player.is-playing .sample-note-set-a {
+            animation: sample-note-frame-a .68s steps(1, end) infinite;
+        }
+
+        .sample-player.is-playing .sample-note-set-b {
+            animation: sample-note-frame-b .68s steps(1, end) infinite;
+        }
+
         .sample-player.is-playing .sample-music-note {
-            animation: sample-note-rise 1.6s ease-out infinite;
+            animation: sample-note-float .34s ease-out infinite;
         }
 
         @keyframes sample-guitar-strum {
@@ -197,17 +222,30 @@
             to { transform: rotate(1.7deg) translateY(-1px); }
         }
 
-        @keyframes sample-note-rise {
-            0% { opacity: 0; transform: translate(0, 8px) scale(.8); }
-            18% { opacity: 1; }
-            67% { opacity: .95; }
-            100% { opacity: 0; transform: translate(var(--note-travel), -30px) scale(1.08); }
+        @keyframes sample-note-frame-a {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        @keyframes sample-note-frame-b {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes sample-note-float {
+            from { transform: translateY(5px) scale(.94); }
+            to { transform: translateY(-6px) scale(1.04); }
         }
 
         @media (prefers-reduced-motion: reduce) {
             .sample-player.is-playing .sample-guitar-art,
-            .sample-player.is-playing .sample-music-note { animation: none; }
-            .sample-player.is-playing .sample-music-note { opacity: .9; }
+            .sample-player.is-playing .sample-note-set,
+            .sample-player.is-playing .sample-music-note {
+                animation: none;
+            }
+
+            .sample-player.is-playing .sample-note-set-a { opacity: .95; }
+            .sample-player.is-playing .sample-note-set-b { opacity: 0; }
         }
 
         .sample-display {
@@ -2818,9 +2856,16 @@
                                  src="Plugin/snap-web/sample-guitar.png"
                                  width="160" height="107"
                                  alt="" draggable="false">
-                            <span class="sample-music-note">♪</span>
-                            <span class="sample-music-note">♫</span>
-                            <span class="sample-music-note">♪</span>
+                            <div class="sample-note-set sample-note-set-a">
+                                <span class="sample-music-note">♪</span>
+                                <span class="sample-music-note note-sm">♫</span>
+                                <span class="sample-music-note note-sm">♪</span>
+                            </div>
+                            <div class="sample-note-set sample-note-set-b">
+                                <span class="sample-music-note">♫</span>
+                                <span class="sample-music-note note-sm">♪</span>
+                                <span class="sample-music-note note-sm">♫</span>
+                            </div>
                         </div>
                     </div>
 
