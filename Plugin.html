@@ -3295,7 +3295,7 @@
     </div>
 
 
-    <div class="window download-window" id="win-download" style="width: 360px; z-index: 114;">
+    <div class="window download-window" id="win-download" style="width: 360px; z-index: 122;">
         <div class="title-bar draggable-cursor" id="handle-download">
             <span>SNAP_DOWNLOAD.exe</span>
             <div class="title-bar-controls">
@@ -3392,8 +3392,8 @@
 
                 if (sample) sample.style.zIndex = '118';
                 if (install) install.style.zIndex = '116';
-                if (download) download.style.zIndex = '114';
                 if (snap) snap.style.zIndex = '120';
+                if (download) download.style.zIndex = '122';
                 document.body.style.minHeight = (mobileTop + 100) + 'px';
                 return;
             }
@@ -3472,7 +3472,7 @@
             if (download) {
                 download.style.left = downloadLeft + 'px';
                 download.style.top = downloadTop + 'px';
-                download.style.zIndex = '114';
+                download.style.zIndex = '122';
             }
 
             var bottoms = windows.filter(Boolean).map(function(win) {
