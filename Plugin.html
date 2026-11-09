@@ -85,6 +85,63 @@
             font-size: 13px;
         }
 
+        /* Make clear that the lower plugin window is an interactive audio demo. */
+        .sample-live-hint {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 11px;
+            padding: 10px 14px;
+            border: 2px inset #ffffff;
+            background: #101715;
+            color: #d8ffe1;
+            box-sizing: border-box;
+            font-family: 'PixelMplus', monospace;
+        }
+
+        .sample-live-message {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .sample-live-title {
+            color: #00ff66;
+            font-size: 15px;
+            line-height: 1.25;
+            font-weight: 700;
+            letter-spacing: .35px;
+        }
+
+        .sample-live-instruction {
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .sample-live-arrow {
+            flex: none;
+            color: #00ff66;
+            font-family: monospace;
+            font-size: 30px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .sample-player.is-playing .sample-live-arrow {
+            animation: sample-live-nudge 1.1s ease-in-out infinite alternate;
+        }
+
+        @keyframes sample-live-nudge {
+            from { transform: translateY(-2px); }
+            to { transform: translateY(4px); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .sample-player.is-playing .sample-live-arrow { animation: none; }
+        }
+
         .sample-choice-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2890,6 +2947,16 @@
 
                 </div>
 
+                <div class="sample-live-hint">
+                    <div class="sample-live-message">
+                        <strong class="sample-live-title">INTERACTIVE LIVE DEMO</strong>
+                        <span class="sample-live-instruction" id="sample-live-instruction">
+                            Play a sample, then tweak the plugin below. Hear the sound change in real time!
+                        </span>
+                    </div>
+                    <span class="sample-live-arrow" aria-hidden="true">↓</span>
+                </div>
+
                 <audio id="snap-sample-audio"
                        preload="auto"
                        loop></audio>
@@ -3624,6 +3691,7 @@
         var sampleAudio = document.getElementById('snap-sample-audio');
         var samplePlayBtn = document.getElementById('sample-play-btn');
         var samplePlayerVisual = document.getElementById('sample-player-visual');
+        var sampleLiveInstruction = document.getElementById('sample-live-instruction');
         var sampleButtons = Array.from(document.querySelectorAll('[data-sample-file]'));
         var sampleEngineStatus = document.getElementById('sample-engine-status');
         var SAMPLE_PREFIX = 'SNAP_sample_';
@@ -3658,6 +3726,11 @@
                 (window.snapWebEngine && window.snapWebEngine.initPromise ? 'LOADING' : 'STANDBY');
 
             samplePlayBtn.textContent = isPlaying ? '■ STOP SAMPLE' : '▶ PLAY SAMPLE';
+            if (sampleLiveInstruction) {
+                sampleLiveInstruction.textContent = isPlaying
+                    ? 'Now tweak the plugin below — hear your changes instantly!'
+                    : 'Play a sample, then tweak the plugin below. Hear the sound change in real time!';
+            }
             sampleButtons.forEach(function(button) {
                 var active = button.dataset.sampleFile === selectedSampleFile;
                 button.setAttribute('aria-pressed', active ? 'true' : 'false');
