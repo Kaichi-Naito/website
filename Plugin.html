@@ -2444,6 +2444,32 @@
             box-sizing: border-box;
         }
 
+        .download-btn-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .download-btn-apple {
+            display: block;
+            width: 16px;
+            height: 20px;
+            flex: 0 0 auto;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+
+        .download-btn-windows {
+            display: block;
+            width: 19px;
+            height: 20px;
+            flex: 0 0 auto;
+            background: url('images/start.png') -3px center / auto 20px no-repeat;
+            image-rendering: pixelated;
+        }
+
         .download-support {
             margin-top: 12px;
             padding-top: 10px;
@@ -3634,14 +3660,21 @@
                        download="SNAP_v1.2.4_Windows.vst3"
                        id="download-vst3-windows"
                        class="win95-btn primary download-main-btn">
-                        WINDOWS
+                        <span class="download-btn-label">
+                            <span class="download-btn-windows" aria-hidden="true"></span>
+                            <span>WINDOWS</span>
+                        </span>
                     </a>
 
                     <a href="https://github.com/Kaichi-Naito/website/releases/download/SNAP_v1.2.4/SNAP_v1.2.4_Mac.pkg"
                        download="SNAP_v1.2.4_Mac.pkg"
                        id="download-vst3-mac"
                        class="win95-btn primary download-main-btn">
-                        MAC (VST3)
+                        <span class="download-btn-label">
+                            <img class="download-btn-apple" width="16" height="20" alt="" aria-hidden="true"
+                                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAVCAYAAACg/AXsAAAAXElEQVR42t1SQQrAMAyKpf//sr2MsR4SmulhTOgpjRE1ogdeb8NsLKcY0QccJK/BjjQWc2b7OL1WCRkiwW2sQgA1HVgj/gcJXUr4dJif8QRKX+zpwFV7JB9R1X4BuB4MKISOMqUAAAAASUVORK5CYII=">
+                            <span>MAC (VST3)</span>
+                        </span>
                     </a>
 
                     <a href="https://github.com/Kaichi-Naito/website/releases/download/SNAP_v1.2.4/SNAP_v1.2.4_Mac_AU.pkg"
