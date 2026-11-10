@@ -2316,6 +2316,70 @@
 
     
         /* =========================================================
+           SNAP video: portrait YouTube Short in a Windows-style window.
+        ========================================================= */
+        .snap-video-window .window-contents {
+            padding: 10px;
+        }
+
+        .snap-video-frame {
+            width: 100%;
+            aspect-ratio: 9 / 16;
+            position: relative;
+            background: #080a0c;
+            border: 2px inset #ffffff;
+            overflow: hidden;
+        }
+
+        .snap-video-frame iframe {
+            position: absolute;
+            inset: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .snap-video-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            color: #00ff66;
+            font-family: 'PixelMplus', monospace;
+            font-size: 15px;
+            line-height: 1.7;
+            text-align: center;
+        }
+
+        .snap-video-placeholder strong {
+            font-size: 20px;
+        }
+
+        .snap-video-footer {
+            margin-top: 8px;
+            text-align: center;
+            font-size: 12px;
+            line-height: 1.5;
+            font-family: 'PixelMplus', sans-serif;
+        }
+
+        .snap-video-footer a,
+        .snap-video-footer a:visited {
+            color: #111;
+        }
+
+        @media (max-width: 800px) {
+            #win-video {
+                width: min(calc(100vw - 12px), 390px) !important;
+                box-sizing: border-box !important;
+            }
+        }
+
+        /* =========================================================
            v0.91 separate DOWNLOAD window
         ========================================================= */
         .download-window .window-contents {
@@ -2730,6 +2794,7 @@
         html.coming-soon-locked #win-snap,
         html.coming-soon-locked #win-install,
         html.coming-soon-locked #win-download,
+        html.coming-soon-locked #win-video,
         html.coming-soon-locked #win-changelog {
             display: none !important;
         }
@@ -2824,6 +2889,7 @@
         html:not(.coming-soon-unlocked) #win-snap,
         html:not(.coming-soon-unlocked) #win-install,
         html:not(.coming-soon-unlocked) #win-download,
+        html:not(.coming-soon-unlocked) #win-video,
         html:not(.coming-soon-unlocked) #win-changelog {
             display: none !important;
         }
@@ -3500,6 +3566,30 @@
     </div>
 
 
+    <!-- Portrait launch video, styled as a separate draggable window. -->
+    <div class="window snap-video-window" id="win-video" style="width: 342px; z-index: 115;">
+        <div class="title-bar draggable-cursor" id="handle-video">
+            <span>SNAP_VIDEO.mp4 - Media Player</span>
+            <div class="title-bar-controls">
+                <button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button>
+                <button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button>
+                <button type="button" class="close-button" aria-label="Close">×</button>
+            </div>
+        </div>
+        <div class="window-contents">
+            <div class="snap-video-frame" id="snap-video-frame">
+                <div class="snap-video-placeholder">
+                    <strong>SNAP / VIDEO</strong>
+                    <span>AVAILABLE FROM<br> NOV 10 · 21:00 JST</span>
+                </div>
+            </div>
+            <div class="snap-video-footer">
+                <a href="https://youtube.com/shorts/09BktqF5zdA"
+                   target="_blank" rel="noopener noreferrer">WATCH ON YOUTUBE</a>
+            </div>
+        </div>
+    </div>
+
     <div class="window download-window" id="win-download" style="width: 360px; z-index: 114;">
         <div class="title-bar draggable-cursor" id="handle-download">
             <span>SNAP_DOWNLOAD.exe</span>
@@ -3562,7 +3652,8 @@
             var snap = document.getElementById('win-snap');
             var install = document.getElementById('win-install');
             var download = document.getElementById('win-download');
-            var windows = [sample, snap, install, download];
+            var video = document.getElementById('win-video');
+            var windows = [sample, snap, install, download, video];
 
             for (var w = 0; w < windows.length; w++) {
                 if (!windows[w]) continue;
@@ -3588,7 +3679,7 @@
                 var mobileTop = Math.max(190, getHeaderBottom() + 18);
                 var mobileGap = 24;
 
-                [sample, download, snap, install].forEach(function(win) {
+                [sample, download, snap, install, video].forEach(function(win) {
                     if (!win) return;
                     win.style.left = mobileLeft;
                     win.style.top = mobileTop + 'px';
@@ -3599,6 +3690,7 @@
                 if (install) install.style.zIndex = '116';
                 if (snap) snap.style.zIndex = '120';
                 if (download) download.style.zIndex = '114';
+                if (video) video.style.zIndex = '115';
                 document.body.style.minHeight = (mobileTop + 100) + 'px';
                 return;
             }
@@ -3609,11 +3701,13 @@
             var snapWidth = snap ? (snap.offsetWidth || 860) : 860;
             var installWidth = install ? (install.offsetWidth || 760) : 760;
             var downloadWidth = download ? (download.offsetWidth || 360) : 360;
+            var videoWidth = video ? (video.offsetWidth || 342) : 342;
 
             var sampleHeight = sample ? (sample.offsetHeight || 190) : 190;
             var snapHeight = snap ? (snap.offsetHeight || 620) : 620;
             var installHeight = install ? (install.offsetHeight || 520) : 520;
             var downloadHeight = download ? (download.offsetHeight || 170) : 170;
+            var videoHeight = video ? (video.offsetHeight || 680) : 680;
 
             /*
                The top row contains SAMPLE PLAYER on the left and DOWNLOAD on
@@ -3628,7 +3722,7 @@
             var compositionWidth = Math.max(
                 topRowWidth,
                 snapOffsetX + snapWidth,
-                readmeOffsetX + installWidth
+                readmeOffsetX + installWidth + 22 + videoWidth
             );
 
             var stageLeft = Math.max(
@@ -3656,6 +3750,16 @@
                 installTop = snapTop + snapHeight - 55;
             }
 
+            // Place the portrait video beside README on wide displays.
+            // On narrower desktop screens, place it below README instead.
+            var videoLeft = installLeft + installWidth + 22;
+            var videoTop = installTop;
+            if (videoLeft + videoWidth + 12 > viewportW) {
+                videoLeft = Math.max(12, Math.min(viewportW - videoWidth - 12,
+                    installLeft + Math.round((installWidth - videoWidth) / 2)));
+                videoTop = installTop + installHeight + 22;
+            }
+
             if (sample) {
                 sample.style.left = sampleLeft + 'px';
                 sample.style.top = sampleTop + 'px';
@@ -3678,6 +3782,12 @@
                 download.style.left = downloadLeft + 'px';
                 download.style.top = downloadTop + 'px';
                 download.style.zIndex = '114';
+            }
+
+            if (video) {
+                video.style.left = videoLeft + 'px';
+                video.style.top = videoTop + 'px';
+                video.style.zIndex = '115';
             }
 
             var bottoms = windows.filter(Boolean).map(function(win) {
@@ -3907,6 +4017,45 @@
             });
             window.addEventListener('focus', checkReleaseTime);
             window.addEventListener('pageshow', checkReleaseTime);
+        })();
+    </script>
+
+    <script>
+        (function () {
+            var container = document.getElementById('snap-video-frame');
+            if (!container) return;
+
+            // The landing page opens at 20:50 JST; the Short publishes at 21:00 JST.
+            var videoReleaseAt = Date.parse('2026-11-10T21:00:00+09:00');
+
+            function showLaunchVideo() {
+                if (Date.now() < videoReleaseAt) return false;
+                if (container.querySelector('iframe')) return true;
+
+                var iframe = document.createElement('iframe');
+                iframe.src = 'https://www.youtube-nocookie.com/embed/09BktqF5zdA?rel=0&playsinline=1';
+                iframe.title = 'SNAP guitar plugin demo - YouTube Shorts';
+                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+                iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+                iframe.setAttribute('allowfullscreen', '');
+                iframe.loading = 'lazy';
+
+                container.replaceChildren(iframe);
+                return true;
+            }
+
+            function scheduleVideo() {
+                if (showLaunchVideo()) return;
+                var msRemaining = videoReleaseAt - Date.now();
+                setTimeout(scheduleVideo, Math.min(60000, msRemaining + 100));
+            }
+
+            scheduleVideo();
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) showLaunchVideo();
+            });
+            window.addEventListener('focus', showLaunchVideo);
+            window.addEventListener('pageshow', showLaunchVideo);
         })();
     </script>
 
