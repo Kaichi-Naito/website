@@ -1,0 +1,8 @@
+# Only exclude unused font assets from the published GitHub Pages site.
+# Keep them in the repository for future reuse.
+# These four fonts are not referenced by the site's HTML, CSS or JavaScript.
+exclude:
+  - 'fonts/瀞ノグリッチゴシックH1.ttf'
+  - 'fonts/瀞ノグリッチゴシックH2.ttf'
+  - 'fonts/瀞ノグリッチゴシックH3.ttf'
+  - 'fonts/瀞ノグリッチゴシックH4.ttf'
