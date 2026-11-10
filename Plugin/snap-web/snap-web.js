@@ -332,6 +332,7 @@
             this.convolverB = null;
             this.master = null;
             this.limiter = null;
+            this.outputGate = null;
             this.ready = false;
             this.initPromise = null;
             this.params = { ...DEFAULTS };
@@ -354,7 +355,7 @@
                 this.ready = false;
                 for (const node of [this.mediaSource, this.worklet, this.dryGain,
                     this.cabAGain, this.cabBGain, this.convolverA, this.convolverB,
-                    this.master, this.limiter]) {
+                    this.master, this.limiter, this.outputGate]) {
                     if (node) node.disconnect();
                 }
                 if (this.worklet) this.worklet.port.close();
@@ -415,7 +416,11 @@
                 this.worklet.connect(this.dryGain).connect(this.master);
                 this.worklet.connect(this.convolverA).connect(this.cabAGain).connect(this.master);
                 this.worklet.connect(this.convolverB).connect(this.cabBGain).connect(this.master);
-                this.master.connect(this.limiter).connect(this.context.destination);
+                // Keep the first sample silent while the Worklet compiles WASM.
+                // The previous immediate play() could expose unprocessed audio.
+                this.outputGate = this.context.createGain();
+                this.outputGate.gain.value = 0;
+                this.master.connect(this.limiter).connect(this.outputGate).connect(this.context.destination);
 
                 this.worklet.port.onmessage = (event) => {
                     const data = event.data || {};
@@ -468,6 +473,19 @@
             if (!r.ok) throw new Error('IR HTTP ' + r.status + ': ' + url);
             const a = await r.arrayBuffer();
             return this.context.decodeAudioData(a.slice(0));
+        }
+
+        setPlaybackAudible(audible) {
+            if (!this.outputGate || !this.context) return;
+            const t = this.context.currentTime;
+            const gain = this.outputGate.gain;
+            gain.cancelScheduledValues(t);
+            if (audible) {
+                gain.setValueAtTime(0, t);
+                gain.linearRampToValueAtTime(1, t + 0.025);
+            } else {
+                gain.setValueAtTime(0, t);
+            }
         }
 
         async resume() {
