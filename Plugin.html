@@ -2340,25 +2340,6 @@
             border: 0;
         }
 
-        .snap-video-placeholder {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 18px;
-            color: #00ff66;
-            font-family: 'PixelMplus', monospace;
-            font-size: 15px;
-            line-height: 1.7;
-            text-align: center;
-        }
-
-        .snap-video-placeholder strong {
-            font-size: 20px;
-        }
-
         .snap-video-footer {
             margin-top: 8px;
             text-align: center;
@@ -3578,10 +3559,12 @@
         </div>
         <div class="window-contents">
             <div class="snap-video-frame" id="snap-video-frame">
-                <div class="snap-video-placeholder">
-                    <strong>SNAP / VIDEO</strong>
-                    <span>AVAILABLE FROM<br> NOV 10 · 21:00 JST</span>
-                </div>
+                <iframe src="https://www.youtube-nocookie.com/embed/09BktqF5zdA?rel=0&amp;playsinline=1"
+                        title="SNAP guitar plugin demo - YouTube Shorts"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        loading="lazy"
+                        allowfullscreen></iframe>
             </div>
             <div class="snap-video-footer">
                 <a href="https://youtube.com/shorts/09BktqF5zdA"
@@ -4019,45 +4002,6 @@
             });
             window.addEventListener('focus', checkReleaseTime);
             window.addEventListener('pageshow', checkReleaseTime);
-        })();
-    </script>
-
-    <script>
-        (function () {
-            var container = document.getElementById('snap-video-frame');
-            if (!container) return;
-
-            // The landing page opens at 20:50 JST; the Short publishes at 21:00 JST.
-            var videoReleaseAt = Date.parse('2026-11-10T21:00:00+09:00');
-
-            function showLaunchVideo() {
-                if (Date.now() < videoReleaseAt) return false;
-                if (container.querySelector('iframe')) return true;
-
-                var iframe = document.createElement('iframe');
-                iframe.src = 'https://www.youtube-nocookie.com/embed/09BktqF5zdA?rel=0&playsinline=1';
-                iframe.title = 'SNAP guitar plugin demo - YouTube Shorts';
-                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
-                iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-                iframe.setAttribute('allowfullscreen', '');
-                iframe.loading = 'lazy';
-
-                container.replaceChildren(iframe);
-                return true;
-            }
-
-            function scheduleVideo() {
-                if (showLaunchVideo()) return;
-                var msRemaining = videoReleaseAt - Date.now();
-                setTimeout(scheduleVideo, Math.min(60000, msRemaining + 100));
-            }
-
-            scheduleVideo();
-            document.addEventListener('visibilitychange', function () {
-                if (!document.hidden) showLaunchVideo();
-            });
-            window.addEventListener('focus', showLaunchVideo);
-            window.addEventListener('pageshow', showLaunchVideo);
         })();
     </script>
 
