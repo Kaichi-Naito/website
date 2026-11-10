@@ -2322,6 +2322,12 @@
             padding: 10px;
         }
 
+        /* 342px -> 513px (1.5x), even if the window's inline width is
+           overwritten; preserve regular maximize behavior. */
+        #win-video:not(.maximized-window) {
+            width: min(513px, calc(100vw - 24px)) !important;
+        }
+
         .snap-video-frame {
             width: 100%;
             aspect-ratio: 9 / 16;
@@ -2354,7 +2360,7 @@
         }
 
         @media (max-width: 800px) {
-            #win-video {
+            #win-video:not(.maximized-window) {
                 width: min(calc(100vw - 12px), 390px) !important;
                 box-sizing: border-box !important;
             }
