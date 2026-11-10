@@ -3753,7 +3753,9 @@
             // Place the portrait video beside README on wide displays.
             // On narrower desktop screens, place it below README instead.
             var videoLeft = installLeft + installWidth + 22;
-            var videoTop = installTop;
+            // SNAP overlaps the top of README, so lower the video title bar
+            // enough to keep it fully visible behind the higher-z-index SNAP.
+            var videoTop = installTop + 72;
             if (videoLeft + videoWidth + 12 > viewportW) {
                 videoLeft = Math.max(12, Math.min(viewportW - videoWidth - 12,
                     installLeft + Math.round((installWidth - videoWidth) / 2)));
