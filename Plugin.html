@@ -3875,6 +3875,10 @@
         var sampleNoteFrameTimer = null;
         var sampleStarting = false;
         var sampleIsAudible = false;
+        // First-play crackle can occur after the DSP reports ready.
+        // Keep the first few seconds of actual processing inaudible once per page load.
+        var sampleWarmupComplete = false;
+        var FIRST_PLAY_WARMUP_MS = 3600;
 
         function getSampleDisplayName(fileName) {
             return fileName.indexOf(SAMPLE_PREFIX) === 0
@@ -3951,6 +3955,39 @@
             updateSampleAvailability();
         }
 
+        function rewindSampleAfterWarmup() {
+            // Seeking a playing media element can be asynchronous. Wait for
+            // completion before opening the output gate to avoid a seek glitch.
+            return new Promise(function(resolve, reject) {
+                var finished = false;
+                var timeoutId = null;
+
+                function finish(error) {
+                    if (finished) return;
+                    finished = true;
+                    sampleAudio.removeEventListener('seeked', onSeeked);
+                    window.clearTimeout(timeoutId);
+                    if (error) reject(error);
+                    else resolve();
+                }
+
+                function onSeeked() { finish(); }
+
+                sampleAudio.addEventListener('seeked', onSeeked);
+                timeoutId = window.setTimeout(function() {
+                    if (sampleAudio.seeking) finish(new Error('Sample seek timed out'));
+                    else finish();
+                }, 1200);
+                try {
+                    sampleAudio.currentTime = 0;
+                    // If already at zero, browsers may not fire 'seeked'.
+                    if (!sampleAudio.seeking) window.setTimeout(function() { finish(); }, 0);
+                } catch (error) {
+                    finish(error);
+                }
+            });
+        }
+
         async function startSamplePlayback() {
             if (!sampleAudio || !selectedSampleFile || sampleStarting) return;
             var request = ++playRequestId;
@@ -3974,9 +4011,33 @@
 
                 if (request !== playRequestId) return;
                 if (!engine.ready) throw new Error('SNAP DSP not ready');
-                sampleAudio.currentTime = 0;
+
+                if (!sampleWarmupComplete) {
+                    // Let the real sample run through WASM and CAB processing
+                    // while the final output stays fully muted. A simple delay
+                    // before play() would not warm up the audio DSP.
+                    samplePlayBtn.textContent = 'LOADING AUDIO...';
+                    samplePlayBtn.setAttribute('aria-busy', 'true');
+                    if (sampleEngineStatus) {
+                        sampleEngineStatus.textContent = 'FIRST PLAY / WARMING UP SNAP AUDIO...';
+                    }
+                    await new Promise(function(resolve) {
+                        window.setTimeout(resolve, FIRST_PLAY_WARMUP_MS);
+                    });
+                    if (request !== playRequestId) return;
+                    if (sampleAudio.paused || !engine.context || engine.context.state !== 'running') {
+                        throw new Error('Audio engine stopped during warmup');
+                    }
+                    await rewindSampleAfterWarmup();
+                    if (request !== playRequestId) return;
+                } else {
+                    sampleAudio.currentTime = 0;
+                }
+
                 engine.setPlaybackAudible(true);
                 sampleIsAudible = true;
+                sampleWarmupComplete = true;
+                samplePlayBtn.removeAttribute('aria-busy');
                 setSampleUi(true);
             } catch (error) {
                 if (request !== playRequestId) return;
@@ -3992,6 +4053,7 @@
             } finally {
                 if (request === playRequestId) {
                     sampleStarting = false;
+                    samplePlayBtn.removeAttribute('aria-busy');
                     updateSampleAvailability();
                 }
             }
