@@ -3803,21 +3803,43 @@
             var sampleLeft, snapLeft, installLeft, downloadLeft, videoLeft;
             var snapTop, installTop, downloadTop, videoTop;
 
-            // Match the supplied 2048px-wide reference:
-            // VIDEO (far left, behind SAMPLE), SAMPLE (upper centre),
-            // DOWNLOAD (upper right, over SNAP), SNAP (centre),
-            // README (to the right, behind SNAP).
-            var snapOffset = 193;
-            var videoOffset = 415;
-            var fullReferenceWidth = videoOffset + snapOffset + snapWidth + installWidth - 3;
+            // Match the user's preferred composition:
+            // VIDEO (left/behind SAMPLE), SAMPLE (upper middle),
+            // DOWNLOAD (upper right/above SAMPLE and SNAP),
+            // SNAP (middle/below SAMPLE), README (right/behind SNAP).
+            //
+            // The old wide-only threshold pushed VIDEO and README below the
+            // fold at common browser zoom levels. Keep this composition on
+            // desktop and compress horizontal gaps/overlaps only as needed.
+            var referenceVideoOffset = 415;
+            var referenceSnapOffset = 193;
+            var referenceReadmeOverlap = 3;
+            var fullReferenceWidth = referenceVideoOffset + referenceSnapOffset +
+                snapWidth + installWidth - referenceReadmeOverlap;
 
-            if (viewportW >= fullReferenceWidth + 40) {
-                var leftEdge = Math.max(12, Math.round((viewportW - fullReferenceWidth) / 2) + 45);
-                sampleLeft = leftEdge + videoOffset;
+            if (viewportW >= 1900) {
+                // Reserve space for the right edge, while keeping the supplied
+                // arrangement identical on sufficiently wide viewports.
+                var compression = Math.max(0, fullReferenceWidth - (viewportW - 80));
+                var videoReduction = Math.min(45, compression * 0.22);
+                var snapReduction = Math.min(43, (compression - videoReduction) * 0.27);
+                var videoOffset = referenceVideoOffset - videoReduction;
+                var snapOffset = referenceSnapOffset - snapReduction;
+                var readmeOverlap = referenceReadmeOverlap +
+                    compression - videoReduction - snapReduction;
+                var compositionWidth = videoOffset + snapOffset +
+                    snapWidth + installWidth - readmeOverlap;
+
+                var freeSpace = viewportW - compositionWidth;
+                var leftEdge = Math.max(12, Math.min(
+                    freeSpace - 12, Math.round(freeSpace / 2) + 40));
+
                 videoLeft = leftEdge;
+                sampleLeft = videoLeft + videoOffset;
                 snapLeft = sampleLeft + snapOffset;
-                downloadLeft = sampleLeft + sampleWidth - 45;
-                installLeft = snapLeft + snapWidth - 3;
+                downloadLeft = Math.max(12, Math.min(viewportW - downloadWidth - 12,
+                    sampleLeft + sampleWidth - 45));
+                installLeft = snapLeft + snapWidth - readmeOverlap;
 
                 snapTop = sampleTop + sampleHeight + 40;
                 downloadTop = sampleTop + 140;
