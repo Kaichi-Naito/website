@@ -2448,25 +2448,26 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 3px;
             white-space: nowrap;
+            vertical-align: middle;
         }
 
-        .download-btn-apple {
-            display: block;
-            width: 16px;
+        .download-btn-icon-wrap {
+            display: inline-flex;
+            width: 17px;
             height: 20px;
-            flex: 0 0 auto;
-            object-fit: contain;
-            image-rendering: pixelated;
+            flex: 0 0 17px;
+            align-items: center;
+            justify-content: center;
         }
 
+        .download-btn-apple,
         .download-btn-windows {
             display: block;
-            width: 19px;
-            height: 20px;
-            flex: 0 0 auto;
-            background: url('images/start.png') -3px center / auto 20px no-repeat;
+            width: 17px;
+            height: 19px;
+            object-fit: contain;
             image-rendering: pixelated;
         }
 
@@ -3661,7 +3662,8 @@
                        id="download-vst3-windows"
                        class="win95-btn primary download-main-btn">
                         <span class="download-btn-label">
-                            <span class="download-btn-windows" aria-hidden="true"></span>
+                            <span class="download-btn-icon-wrap"><img class="download-btn-windows" width="17" height="19" alt="" aria-hidden="true"
+                                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAWCAYAAADafVyIAAADXUlEQVR42qWVzW9UZRTGf8+503EhhaCUjSaKBmFR+TBFjNJ0h98riDEaxZi4M/4F/gWu5B9Q2WiIsEPQhJ2iFJIGFIm2sJCkIaYlCm1jYOa+j4tzZ/pFCdE7M7mTe9/7Puf5OOeKuxw3tdnt53YhwED37IXmnzFivWfEfR6x8sK8NlkyFHBdQ6nBBUsUAMGchvyfAWpgYGQnuIao6I5fxIqsXQLnQ28dwW9+rnsCvXEEx2rERhhVzQUh3FMIAQ96RpDftTcP+25L5mKzW3t2IEPn/EVEIw1GCNl88MUNpPSjFKNI7Ypg44H9/HXsW6SA4uUS3dKQqz1PgwIiwCsUEKwjq+/fiqyx3Wrx0MEXiRggqiz96HtWa/nz+QG4fXaCKktL0ZTVA0g1SOmLhQQ8vJ6uC/PHT2BD4NUmVyM7khoQUYHA6kkD6zyjtz8LW1UyUCNyKN1TlcCCr961APoM5rTJEXB7fIINntXi9SGn/lmRW0ApCe7sjFLD4Ohubn59KkH7HbQEYNCzYvw0AE8c77pn6uCBlrI/NrunV4QpDgJTeiwQroQKVEvS2wcYGL3kbR9v5595g40LdGUGXvjFYbHux+FkVYybTQ24mA0H98PCPCoGidJZZND3QBILc9A1FIQCbhy7jggsaD//swG+PJSNHsWosSFUcfO7MyBx9J2io+8XLQketPdd8tCH23igtVhVSFz7dBKVAojOT8OaOimD2PpKWbPFJk+Ei83211eY3K7SOwBbXDv8OzJgo7rbRD4NvHIyXBBRCg7x+NizTJ0+R7ud/aHCCpMjMxKC2nlWPybmzvndutJUD6AIKhtawWP7RpAq2m018WYZwwB45KOnKAW6JZtYYaA0w6e3tsLF2PkrNsXi7+nZHCPNsidfqrVqmtYFQiZkZFBVNTQzNVl1guVEVX/DjY8O8cf355KsVs1OWu3RXx2YUDMOJK59chk7+6BzbqeaWUc/3WFcxJaxZwBT6gxCnlcA2Gb68CSdM8PLqA3sveDeLLx6KpMhwCUjnWOi4s/frjYxh22v1avSFZ0fhrVyc4DO+C61Ki8bg3a+dOyUFcPC9dn0ZY3Y3ve7depE2BJRZYy3jO1leuIyd+ZuQYGtr9b6XwD9Rvqmcm2oItlsfbm+5x7/AqVjlMs4ss7KAAAAAElFTkSuQmCC"></span>
                             <span>WINDOWS</span>
                         </span>
                     </a>
@@ -3671,8 +3673,8 @@
                        id="download-vst3-mac"
                        class="win95-btn primary download-main-btn">
                         <span class="download-btn-label">
-                            <img class="download-btn-apple" width="16" height="20" alt="" aria-hidden="true"
-                                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAVCAYAAACg/AXsAAAAXElEQVR42t1SQQrAMAyKpf//sr2MsR4SmulhTOgpjRE1ogdeb8NsLKcY0QccJK/BjjQWc2b7OL1WCRkiwW2sQgA1HVgj/gcJXUr4dJif8QRKX+zpwFV7JB9R1X4BuB4MKISOMqUAAAAASUVORK5CYII=">
+                            <span class="download-btn-icon-wrap"><img class="download-btn-apple" width="17" height="19" alt="" aria-hidden="true"
+                                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAVCAYAAACg/AXsAAAAXElEQVR42t1SQQrAMAyKpf//sr2MsR4SmulhTOgpjRE1ogdeb8NsLKcY0QccJK/BjjQWc2b7OL1WCRkiwW2sQgA1HVgj/gcJXUr4dJif8QRKX+zpwFV7JB9R1X4BuB4MKISOMqUAAAAASUVORK5CYII="></span>
                             <span>MAC (VST3)</span>
                         </span>
                     </a>
@@ -3681,7 +3683,11 @@
                        download="SNAP_v1.2.4_Mac_AU.pkg"
                        id="download-au-mac"
                        class="win95-btn primary download-main-btn">
-                        MAC (AU)
+                        <span class="download-btn-label">
+                            <span class="download-btn-icon-wrap"><img class="download-btn-apple" width="17" height="19" alt="" aria-hidden="true"
+                                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAVCAYAAACg/AXsAAAAXElEQVR42t1SQQrAMAyKpf//sr2MsR4SmulhTOgpjRE1ogdeb8NsLKcY0QccJK/BjjQWc2b7OL1WCRkiwW2sQgA1HVgj/gcJXUr4dJif8QRKX+zpwFV7JB9R1X4BuB4MKISOMqUAAAAASUVORK5CYII="></span>
+                            <span>MAC (AU)</span>
+                        </span>
                     </a>
                 </div>
 
