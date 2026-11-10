@@ -2108,7 +2108,14 @@
         }
 
         @media (max-width: 800px) {
-            #win-sample,
+            /* The sample window should retain its reduced, compact proportion
+               rather than inherit the full-viewport width of the other windows. */
+            #win-sample {
+                width: min(720px, 84vw) !important;
+                max-width: calc(100vw - 12px) !important;
+                box-sizing: border-box !important;
+            }
+
             #win-snap,
             #win-install,
             #win-changelog {
@@ -3761,7 +3768,11 @@
 
                 [sample, download, snap, install, video].forEach(function(win) {
                     if (!win) return;
-                    win.style.left = mobileLeft;
+                    // Centre only the compact sample window on narrow phones.
+                    // All other window placements remain unchanged.
+                    win.style.left = win === sample
+                        ? Math.max(6, Math.round((window.innerWidth - win.offsetWidth) / 2)) + 'px'
+                        : mobileLeft;
                     win.style.top = mobileTop + 'px';
                     mobileTop += (win.offsetHeight || 300) + mobileGap;
                 });
