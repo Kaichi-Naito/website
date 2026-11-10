@@ -2478,6 +2478,15 @@
             transform: translateY(-1px);
         }
 
+        /* Optical alignment only: keep button text and layout unchanged. */
+        #download-vst3-mac .download-btn-apple {
+            transform: translate(2px, -1px);
+        }
+
+        #download-au-mac .download-btn-apple {
+            transform: translate(-2px, -1px);
+        }
+
         .download-btn-windows {
             display: block;
             width: 18px;
@@ -2485,6 +2494,7 @@
             flex: 0 0 18px;
             background: url('images/start.png') -3px center / auto 20px no-repeat;
             image-rendering: pixelated;
+            transform: translate(-2px, -2px);
         }
 
         .download-support {
