@@ -164,7 +164,8 @@
             cursor: pointer;
         }
 
-        .sample-choice:hover { background: #202b20; border-color: #84bd88; }
+        .sample-choice:hover:not(:disabled) { background: #202b20; border-color: #84bd88; }
+        .sample-choice:disabled { opacity: .62; cursor: wait; }
         .sample-choice[aria-pressed="true"] {
             background: #16311e;
             border-color: #00ff66;
@@ -3804,9 +3805,11 @@
         function updateSampleAvailability() {
             if (!samplePlayBtn || !sampleAudio) return;
             var buffered = hasSampleData();
-            samplePlayBtn.disabled = !buffered || sampleStarting;
+            // STOP must remain clickable even if buffering drops mid-playback.
+            var blocked = sampleStarting || (!sampleIsAudible && !buffered);
+            samplePlayBtn.disabled = blocked;
             sampleButtons.forEach(function(button) {
-                button.disabled = !buffered || sampleStarting;
+                button.disabled = blocked;
             });
             if (!sampleStarting && !sampleIsAudible) {
                 samplePlayBtn.textContent = sampleAudio.error
@@ -3930,6 +3933,7 @@
             });
             sampleAudio.addEventListener('pause', function() {
                 sampleIsAudible = false;
+                if (window.snapWebEngine) window.snapWebEngine.setPlaybackAudible(false);
                 setSampleUi(false);
                 updateSampleAvailability();
             });
