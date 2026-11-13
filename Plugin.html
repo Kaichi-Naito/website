@@ -2395,6 +2395,45 @@
         }
 
         /* =========================================================
+           Download counter – matching the Visitor_Counter.exe style.
+        ========================================================= */
+        #win-download-counter:not(.maximized-window) {
+            width: min(340px, calc(100vw - 24px)) !important;
+        }
+
+        #win-download-counter .window-contents {
+            padding: 17px 18px 20px;
+            text-align: center;
+            background: #f3f3f3;
+        }
+
+        .snap-download-counter-copy {
+            margin: 0;
+            font-family: 'PixelMplus', monospace;
+            font-size: 20px;
+            line-height: 1.3;
+            color: #171717;
+        }
+
+        .snap-download-counter-number {
+            width: 238px;
+            max-width: 100%;
+            margin: 13px auto 9px;
+            padding: 11px 8px;
+            box-sizing: border-box;
+            background: #0b0d0b;
+            border: 2px inset #777;
+            color: #00ff00;
+            font-family: 'PixelMplus', monospace;
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            line-height: 1.15;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        /* =========================================================
            v0.91 separate DOWNLOAD window
         ========================================================= */
         .download-window .window-contents {
@@ -3733,10 +3772,74 @@
         </div>
     </div>
 
+    <!-- Live GitHub Releases download counter, styled like Visitor_Counter.exe. -->
+    <div class="window snap-download-counter-window" id="win-download-counter" style="width: 340px; z-index: 124;">
+        <div class="title-bar draggable-cursor" id="handle-download-counter">
+            <span>Download_Counter.exe</span>
+            <div class="title-bar-controls">
+                <button type="button" class="window-control-button minimize-button" aria-label="Minimize">_</button>
+                <button type="button" class="window-control-button maximize-button" aria-label="Maximize">□</button>
+                <button type="button" class="close-button" aria-label="Close">×</button>
+            </div>
+        </div>
+        <div class="window-contents">
+            <p class="snap-download-counter-copy">Thank you for</p>
+            <div class="snap-download-counter-number" id="snap-download-counter-value"
+                 role="status" aria-live="polite" aria-label="Loading SNAP download count">------</div>
+            <p class="snap-download-counter-copy">downloads!</p>
+        </div>
+    </div>
+
     <script src="Plugin/snap-web/snap-ui.js?v=1.2.4"></script>
     <script src="Plugin/snap-web/snap-web.js?v=1.2.4.3"></script>
 
     <script>
+        // Refresh once whenever the page is opened. No credentials are
+        // embedded in the client; the release and its download counts are public.
+        async function updateSnapDownloadCounter() {
+            var display = document.getElementById('snap-download-counter-value');
+            if (!display) return;
+
+            var names = [
+                'SNAP_v1.2.4_Windows.vst3',
+                'SNAP_v1.2.4_Mac.pkg',
+                'SNAP_v1.2.4_Mac_AU.pkg'
+            ];
+
+            try {
+                var response = await fetch(
+                    'https://api.github.com/repos/Kaichi-Naito/website/releases/tags/SNAP_v1.2.4',
+                    { cache: 'no-store' }
+                );
+                if (!response.ok) throw new Error('GitHub API: HTTP ' + response.status);
+                var release = await response.json();
+                if (!release || !Array.isArray(release.assets)) {
+                    throw new Error('GitHub release assets unavailable');
+                }
+
+                var total = 0;
+                names.forEach(function(name) {
+                    var asset = release.assets.find(function(item) { return item.name === name; });
+                    if (!asset || !Number.isSafeInteger(asset.download_count) || asset.download_count < 0) {
+                        throw new Error('Missing download count for ' + name);
+                    }
+                    total += asset.download_count;
+                });
+
+                display.textContent = String(total).padStart(6, '0');
+                display.setAttribute('aria-label', total + ' SNAP downloads');
+                display.title = 'SNAP v1.2.4 downloads across Windows VST3, Mac VST3 and Mac AU';
+            } catch (error) {
+                // Never display an invented zero if GitHub is rate-limiting
+                // requests or the visitor is temporarily offline.
+                display.textContent = '------';
+                display.setAttribute('aria-label', 'Download count unavailable');
+                display.title = 'Download count temporarily unavailable';
+                console.warn('SNAP download count unavailable:', error);
+            }
+        }
+        updateSnapDownloadCounter();
+
         function setInitialPositions() {
             var isMobile = window.matchMedia("(max-width: 800px)").matches;
             var sample = document.getElementById('win-sample');
@@ -3744,7 +3847,8 @@
             var install = document.getElementById('win-install');
             var download = document.getElementById('win-download');
             var video = document.getElementById('win-video');
-            var windows = [sample, snap, install, download, video];
+            var counter = document.getElementById('win-download-counter');
+            var windows = [sample, snap, install, download, video, counter];
 
             for (var w = 0; w < windows.length; w++) {
                 if (windows[w]) windows[w].style.transform = '';
@@ -3768,7 +3872,8 @@
                 download: 125,
                 snap: 121,
                 readme: 117,
-                video: 119
+                video: 119,
+                counter: 124
             };
 
             if (isMobile) {
@@ -3776,7 +3881,7 @@
                 var mobileTop = Math.max(190, getHeaderBottom() + 18);
                 var mobileGap = 24;
 
-                [sample, download, snap, install, video].forEach(function(win) {
+                [sample, download, counter, snap, install, video].forEach(function(win) {
                     if (!win) return;
                     // Centre only the compact sample window on narrow phones.
                     // All other window placements remain unchanged.
@@ -3789,6 +3894,7 @@
 
                 if (sample) sample.style.zIndex = String(layers.sample);
                 if (download) download.style.zIndex = String(layers.download);
+                if (counter) counter.style.zIndex = String(layers.counter);
                 if (snap) snap.style.zIndex = String(layers.snap);
                 if (install) install.style.zIndex = String(layers.readme);
                 if (video) video.style.zIndex = String(layers.video);
@@ -3802,6 +3908,7 @@
             var installWidth = install ? (install.offsetWidth || 760) : 760;
             var downloadWidth = download ? (download.offsetWidth || 360) : 360;
             var videoWidth = video ? (video.offsetWidth || 513) : 513;
+            var counterWidth = counter ? (counter.offsetWidth || 340) : 340;
 
             var sampleHeight = sample ? (sample.offsetHeight || 340) : 340;
             var snapHeight = snap ? (snap.offsetHeight || 650) : 650;
@@ -3812,6 +3919,7 @@
             var sampleTop = Math.max(175, getHeaderBottom() + 18);
             var sampleLeft, snapLeft, installLeft, downloadLeft, videoLeft;
             var snapTop, installTop, downloadTop, videoTop;
+            var counterLeft, counterTop;
 
             // Match the user's preferred composition:
             // VIDEO (left/behind SAMPLE), SAMPLE (upper middle),
@@ -3877,12 +3985,30 @@
                 }
             }
 
+            // Keep the counter alongside DOWNLOAD on wide screens and
+            // beneath it when horizontal space is tight. On compact desktop
+            // widths, place it after the existing windows rather than covering
+            // the interactive SNAP UI.
+            counterLeft = Math.max(12, Math.min(viewportW - counterWidth - 12,
+                downloadLeft + downloadWidth + 20));
+            if (counterLeft >= downloadLeft + downloadWidth + 12) {
+                counterTop = sampleTop + 48;
+            } else {
+                counterTop = downloadTop + downloadHeight + 22;
+            }
+            if (viewportW < 1350) {
+                counterLeft = Math.max(12, Math.round((viewportW - counterWidth) / 2));
+                counterTop = Math.max(installTop + installHeight,
+                    videoTop + videoHeight) + 24;
+            }
+
             [
                 [sample, sampleLeft, sampleTop, layers.sample],
                 [install, installLeft, installTop, layers.readme],
                 [snap, snapLeft, snapTop, layers.snap],
                 [download, downloadLeft, downloadTop, layers.download],
-                [video, videoLeft, videoTop, layers.video]
+                [video, videoLeft, videoTop, layers.video],
+                [counter, counterLeft, counterTop, layers.counter]
             ].forEach(function(entry) {
                 var win = entry[0];
                 if (!win) return;
